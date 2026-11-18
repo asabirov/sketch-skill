@@ -1,0 +1,22 @@
+<!-- Best for: A short form that people complete once, such as a new project or a contact request. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Form: Single column</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-narrow" style="max-width:560px">
+  <a href="#">Back to projects</a><form class="sketch-stack" action="#">
+  <h1>Create a project</h1>
+  <label class="sketch-field">Name<input class="sketch-input" name="name" required></label>
+  <label class="sketch-field">Owner<input class="sketch-input" name="owner"></label>
+  <label class="sketch-field">Due date<input class="sketch-input" name="due" type="date"></label>
+  <fieldset class="sketch-stack" style="gap:0"><legend class="sketch-muted">Visibility</legend>
+    <label class="sketch-choice"><input type="radio" name="visibility" checked>Team</label>
+    <label class="sketch-choice"><input type="radio" name="visibility">Only me</label>
+  </fieldset>
+  <button class="sketch-button">Create</button>
+</form></main>
+<script src="../../assets/sketch.js"></script>

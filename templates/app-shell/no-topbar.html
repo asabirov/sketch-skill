@@ -1,0 +1,21 @@
+<!-- Best for: A focused tool where the page needs all the height, such as an issue tracker or a mail client. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App shell: No top bar</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<!-- No header, so one row holds the nav and the page, and a phone adds a row for the tab bar. -->
+<div class="sketch-shell sketch-rail" style="grid-template-rows:1fr auto">
+  <nav class="sketch-nav" aria-label="Main">
+    <strong class="sketch-from-desktop" style="padding:10px 12px">[Product]</strong>
+    <input class="sketch-input sketch-from-desktop" type="search" aria-label="Search" placeholder="Search" style="margin-bottom:8px">
+    <a href="#" aria-current="page"><i data-icon="bell"></i>Inbox</a><a href="#"><i data-icon="check"></i>Issues</a><a href="#"><i data-icon="link"></i>Projects</a><a href="#"><i data-icon="settings"></i>Settings</a>
+  </nav>
+  <main class="sketch-main">
+    <div class="sketch-row"><h1>Inbox</h1></div>
+    <section class="sketch-panel sketch-frame sketch-stack"><h2>Page content</h2><p>Put the page here.</p></section>
+  </main>
+</div>
+<script src="../../assets/sketch.js"></script>

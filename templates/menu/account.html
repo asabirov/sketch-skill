@@ -1,0 +1,26 @@
+<!-- Best for: The account, plan and sign-out actions that open from the user's name. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu: Account</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<!-- The menu open above the name at the foot of the side list. Escape or a click outside closes it. -->
+<section data-state="account" class="sketch-shell">
+  <header class="sketch-bar"><strong>[Product]</strong></header>
+  <nav class="sketch-nav" aria-label="Main">
+    <a href="#" aria-current="page"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="calendar"></i>Projects</a>
+    <span class="sketch-spacer sketch-from-desktop"></span>
+    <button class="sketch-menu-item" data-sketch-popover="account-menu"><i data-icon="user"></i>Ana</button>
+  </nav>
+  <div class="sketch-menu" id="account-menu" aria-label="Account" data-open>
+    <p class="sketch-muted" style="margin:4px 12px">Ana Reyes account</p>
+    <button class="sketch-menu-item"><i data-icon="settings"></i>Settings</button>
+    <button class="sketch-menu-item"><i data-icon="external"></i>Upgrade</button>
+    <button class="sketch-menu-item"><i data-icon="info"></i>Help</button>
+    <a class="sketch-menu-item" href="#"><i data-icon="arrow-right"></i>Sign out</a>
+  </div>
+  <main class="sketch-main"><h1>Home</h1><p>Put the page here.</p></main>
+</section>
+<script src="../../assets/sketch.js"></script>

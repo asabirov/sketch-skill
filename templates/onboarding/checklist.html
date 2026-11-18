@@ -1,0 +1,28 @@
+<!-- Best for: A product that people set up over time, with a list of tasks and the tasks that are done. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onboarding: Checklist</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main" style="max-width:720px">
+  <!-- An in-app checklist: the progress, the steps with their state in words, and the next step open. -->
+  <section class="sketch-panel sketch-frame sketch-stack" aria-labelledby="start">
+    <div class="sketch-row"><h1 id="start">Get started</h1><span class="sketch-spacer"></span><span>2 of 5 done</span></div>
+    <progress value="2" max="5" aria-label="2 of 5 steps done" style="width:100%"></progress>
+    <ol class="sketch-list">
+      <li><span>Create your account</span><span class="sketch-spacer"></span><span class="sketch-muted">Done</span></li>
+      <li><span>Name your team</span><span class="sketch-spacer"></span><span class="sketch-muted">Done</span></li>
+      <li style="display:grid;gap:8px;padding:12px 8px;background:var(--sketch-wash)">
+        <div class="sketch-row"><b>Invite your team</b><span class="sketch-spacer"></span><span>To do</span></div>
+        <p style="margin:0">People you invite can see and edit your projects.</p>
+        <div class="sketch-row"><button class="sketch-button">Invite</button><button class="sketch-button secondary">Skip</button></div>
+      </li>
+      <li><span>Create a project</span><span class="sketch-spacer"></span><span>To do</span></li>
+      <li><span>Connect your calendar</span><span class="sketch-spacer"></span><span>To do</span></li>
+    </ol>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>

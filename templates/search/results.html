@@ -1,0 +1,32 @@
+<!-- Best for: A search over many items, with filters at the left and a list of results. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search: Results</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <form class="sketch-row" role="search" action="#">
+    <input class="sketch-input" type="search" aria-label="Search" value="lamp" style="flex:1 1 220px"><button class="sketch-button">Search</button>
+  </form>
+  <div class="sketch-cols" style="--cols:220px minmax(0,1fr)">
+    <div class="sketch-stack">
+      <button class="sketch-button secondary sketch-menu-button" aria-expanded="false" aria-controls="filters" style="justify-self:start">Filters</button>
+      <fieldset class="sketch-collapse sketch-stack" id="filters" style="gap:0"><legend class="sketch-muted">Category</legend>
+        <label class="sketch-choice"><input type="checkbox" checked>Lighting</label>
+        <label class="sketch-choice"><input type="checkbox">Desks</label>
+        <label class="sketch-choice"><input type="checkbox">Storage</label>
+      </fieldset>
+    </div>
+    <section class="sketch-stack" aria-label="Results"><h1 style="font-size:18px">24 results for lamp</h1>
+      <ul class="sketch-list">
+        <li style="display:grid"><a href="#" style="justify-self:start">Desk lamp</a><span>Warm light with two brightness levels.</span></li>
+        <li style="display:grid"><a href="#" style="justify-self:start">Floor lamp</a><span>Tall reading light for a corner.</span></li>
+        <li style="display:grid"><a href="#" style="justify-self:start">Clip lamp</a><span>Clips to a shelf or a bed frame.</span></li>
+      </ul>
+    </section>
+  </div>
+</main>
+<script src="../../assets/sketch.js"></script>

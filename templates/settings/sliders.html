@@ -1,0 +1,21 @@
+<!-- Best for: Values that people set on a scale, such as text size, line height or volume. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings: Sliders</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><span class="sketch-spacer"></span><h1 style="font-size:14px;margin:0">[Product] settings</h1><span class="sketch-spacer"></span></header>
+<main class="sketch-narrow" style="--width:640px;padding-top:24px">
+  <div class="sketch-tabs" aria-label="Settings" style="justify-content:center"><button role="tab">General</button><button role="tab">Sync</button><button role="tab">Icon</button><button role="tab">Themes</button><button role="tab" aria-selected="true">Typography</button></div>
+  <h2>Fonts</h2>
+  <label class="sketch-row" style="justify-content:space-between">Text <select class="sketch-input" style="width:min(240px,100%)"><option>System</option><option>Serif</option></select></label>
+  <label class="sketch-row" style="justify-content:space-between">Code <select class="sketch-input" style="width:min(240px,100%)"><option>Monospace</option></select></label>
+  <h2>Sizes</h2>
+  <label class="sketch-row">Text size <input type="range" min="12" max="24" value="16" style="flex:1;min-width:160px" oninput="this.nextElementSibling.value=this.value"><output>16</output> px</label>
+  <label class="sketch-row">Line height <input type="range" min="100" max="200" value="150" style="flex:1;min-width:160px" oninput="this.nextElementSibling.value=this.value"><output>150</output> %</label>
+  <label class="sketch-row">Line width <input type="range" min="40" max="120" value="72" style="flex:1;min-width:160px" oninput="this.nextElementSibling.value=this.value"><output>72</output> characters</label>
+  <button class="sketch-button secondary" style="justify-self:start">Reset</button>
+</main>
+<script src="../../assets/sketch.js"></script>

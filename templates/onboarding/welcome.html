@@ -1,0 +1,21 @@
+<!-- Best for: The first start of an app, with a short welcome and one picture for each step. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onboarding: Welcome</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<!-- Full-screen steps: a picture, one idea, the step dots, then Back, Skip and Next. -->
+<header class="sketch-bar" style="position:absolute;inset:0 0 auto;border:0"><strong>[Product]</strong></header>
+<main class="sketch-narrow" style="max-width:520px;min-height:100vh;align-content:center;justify-items:center;text-align:center;padding-top:72px">
+  <svg viewBox="0 0 200 140" width="200" height="140" aria-hidden="true" style="max-width:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+    <rect x="30" y="30" width="90" height="70" rx="12"/><rect x="80" y="50" width="90" height="70" rx="12"/><path d="M20 128 C70 110 130 140 180 120"/>
+  </svg>
+  <h1>Plan work with your team</h1>
+  <p>[One sentence on the first thing people can do.]</p>
+  <p class="sketch-dots" role="img" aria-label="Step 1 of 3"><i class="on"></i><i></i><i></i></p>
+  <div class="sketch-row" style="width:100%"><button class="sketch-button secondary" disabled>Back</button><span class="sketch-spacer"></span>
+    <button class="sketch-button secondary">Skip</button><button class="sketch-button">Next</button></div>
+</main>
+<script src="../../assets/sketch.js"></script>

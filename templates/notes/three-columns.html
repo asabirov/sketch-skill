@@ -1,0 +1,28 @@
+<!-- Best for: A writing or mail tool with folders, a list of items with previews and one open item. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes: Three columns</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<!-- Folders from 1000 px, then the notes, then the open note from 600 px. A phone shows the notes only. -->
+<main class="sketch-split" style="--split:200px 300px minmax(0,1fr)">
+  <nav class="sketch-nav sketch-from-desktop" aria-label="Folders"><a href="#" aria-current="page">All notes</a><a href="#">Work</a><a href="#">Recipes</a><a href="#">Trash</a></nav>
+  <section class="sketch-stack" aria-label="Notes" style="padding:16px">
+    <input class="sketch-input" type="search" aria-label="Search notes" placeholder="Search">
+    <ul class="sketch-list">
+      <li style="display:grid;gap:2px" ><a href="#" aria-current="true" style="justify-content:start"><b>Spring launch plan</b></a><span class="sketch-muted">Dates, owners and the open copy tasks.</span></li>
+      <li style="display:grid;gap:2px"><a href="#" style="justify-content:start"><b>Pasta for four</b></a><span class="sketch-muted">400 g flour, 4 eggs, a pinch of salt.</span></li>
+      <li style="display:grid;gap:2px"><a href="#" style="justify-content:start"><b>Book list</b></a><span class="sketch-muted">Three novels and one history of maps.</span></li>
+    </ul>
+  </section>
+  <article class="sketch-main sketch-from-tablet" aria-label="Open note" style="max-width:760px;margin:0">
+    <div class="sketch-row" role="toolbar" aria-label="Format"><button class="sketch-icon-button" aria-label="Edit"><i data-icon="edit"></i></button><button class="sketch-icon-button" aria-label="Copy link"><i data-icon="link"></i></button><button class="sketch-icon-button" aria-label="Delete"><i data-icon="trash"></i></button></div>
+    <h1>Spring launch plan</h1>
+    <p>Launch on 14 April. Theo owns the page. Mira owns the email.</p>
+    <p>Open: the pricing copy and the press note.</p>
+  </article>
+</main>
+<script src="../../assets/sketch.js"></script>

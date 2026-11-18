@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch page templates</title>
+<link rel="stylesheet" href="sketch.css">
+<style>
+  .frame { --s: .25; width: calc(var(--w) * var(--s) * 1px); height: calc(800px * var(--s)); overflow: hidden; outline: 1px solid var(--sketch-wash); }
+  .frame iframe { width: calc(var(--w) * 1px); height: 800px; border: 0; transform: scale(var(--s)); transform-origin: 0 0; }
+  main h2 { padding-top: 24px; }
+  [data-sketch] main .sketch-stack { gap: 4px; }
+  main h3 .sketch-muted { font-weight: 400; }
+  @media (min-width: 1200px) { .frame { --s: .45; } }
+</style>
+<body data-sketch>
+<header class="sketch-bar"><h1 style="font-size:16px;margin:0">Sketch page templates</h1></header>
+<main class="sketch-main" style="max-width:none">
+  <p>43 templates in 22 categories, each at 390, 820 and 1280 px. Copy one file from its category.</p>
+</main>
+<script src="sketch.js"></script>
+<script>
+  // Each template: its file name, its title "Screen: Variant" and the "Best for" line from the top of the file.
+  const pages = [
+    ['app-shell-no-topbar', 'App shell: No top bar', 'A focused tool where the page needs all the height, such as an issue tracker or a mail client.'],
+    ['app-shell-sidebar', 'App shell: Sidebar', 'A product with 4 to 8 sections that people switch between all day, such as a CRM or a project tool.'],
+    ['app-shell-topbar', 'App shell: Top bar', 'A product with 3 to 5 sections and wide pages, such as a store admin or an analytics tool.'],
+    ['home-composer-centred', 'Home: Composer-centred', 'The first page of an assistant or a search tool, where people start by typing one request.'],
+    ['home-onboarding-hint', 'Home: Onboarding hint', 'A first page that points to one new control with a small hint.'],
+    ['home-session-start', 'Home: Session start', 'A tool where people start a new work session from a list of earlier sessions.'],
+    ['conversation-channels', 'Conversation: Channels', 'A team chat with many workspaces and channels, with a list of channels at the left of the messages.'],
+    ['conversation-split-with-preview', 'Conversation: Split with preview', 'A chat that makes a document, a page or code, and shows it large beside the messages.'],
+    ['conversation-with-side-panel', 'Conversation: With side panel', 'A chat that shows files, steps or details in a narrow panel at the right.'],
+    ['list-card-grid', 'List: Card grid', 'Items that people find by their picture, such as designs, files or templates.'],
+    ['list-empty', 'List: Empty', 'A list that has no items yet and needs no action.'],
+    ['list-empty-with-suggestions', 'List: Empty with suggestions', 'A list that has no items yet, with ideas that help people make the first one.'],
+    ['list-rows-with-tabs', 'List: Rows with tabs', 'A long list of items with a title and a date, such as chats, notes or orders.'],
+    ['list-table', 'List: Table', 'Items with many fields and a status, such as connections, users or invoices.'],
+    ['catalog-discover', 'Catalog: Discover', 'A store of add-ons or templates that people browse by category.'],
+    ['projects-index', 'Projects: Index', 'A small set of workspaces that people open by name.'],
+    ['project-detail', 'Project: Detail', 'One workspace with its own files, instructions and recent work.'],
+    ['search-command-palette', 'Search: Command palette', 'A search over the whole product that opens from a key shortcut.'],
+    ['search-results', 'Search: Results', 'A search over many items, with filters at the left and a list of results.'],
+    ['menu-account', 'Menu: Account', 'The account, plan and sign-out actions that open from the user’s name.'],
+    ['settings-form', 'Settings: Form', 'Settings in groups, with a list of groups at the left.'],
+    ['settings-icon-grid', 'Settings: Icon grid', 'A choice of one app icon or picture from a grid of small tiles.'],
+    ['settings-option-form', 'Settings: Option form', 'Settings in sections with checkboxes, menus and key shortcuts, in a window with tabs.'],
+    ['settings-sliders', 'Settings: Sliders', 'Values that people set on a scale, such as text size, line height or volume.'],
+    ['settings-sync-status', 'Settings: Sync status', 'A service that keeps data the same on all devices, with its state and one switch.'],
+    ['settings-theme-picker', 'Settings: Theme picker', 'A choice of one colour theme from a grid of preview cards.'],
+    ['settings-toggles', 'Settings: Toggles', 'Features that people turn on or off, each with one sentence about it.'],
+    ['settings-usage-meters', 'Settings: Usage meters', 'Limits and current use, such as messages, storage or seats.'],
+    ['landing-product-story', 'Landing: Product story', 'A public page that explains one product, with a hero, feature bands, prices and a footer.'],
+    ['notes-empty-editor', 'Notes: Empty editor', 'A writing tool before people open or make an item, with the list beside an empty editor.'],
+    ['notes-three-columns', 'Notes: Three columns', 'A writing or mail tool with folders, a list of items with previews and one open item.'],
+    ['detail-properties-panel', 'Detail: Properties panel', 'One record with a description, some properties and recent activity, such as a task, a ticket or a deal.'],
+    ['form-single-column', 'Form: Single column', 'A short form that people complete once, such as a new project or a contact request.'],
+    ['dashboard-metrics', 'Dashboard: Metrics', 'A first page that shows a small number of key numbers and one chart, such as sales or sign-ups.'],
+    ['board-kanban', 'Board: Kanban', 'Items that move through a small number of stages, such as tasks, leads or job applicants.'],
+    ['checkout-one-page', 'Checkout: One page', 'A purchase of a small number of items, with the address, the payment and the order summary on one page.'],
+    ['pricing-plans', 'Pricing: Plans', 'A public page that compares two or three plans and their prices.'],
+    ['sign-in-email', 'Sign in: Email', 'A sign-in with an email address and a password.'],
+    ['onboarding-checklist', 'Onboarding: Checklist', 'A product that people set up over time, with a list of tasks and the tasks that are done.'],
+    ['onboarding-steps', 'Onboarding: Steps', 'A setup that needs a small number of steps in a fixed order before people can use the product.'],
+    ['onboarding-welcome', 'Onboarding: Welcome', 'The first start of an app, with a short welcome and one picture for each step.'],
+    ['empty-full-screen', 'Empty: Full screen', 'A product or a section that has no data yet, with one action that starts it.'],
+    ['mobile-tab-bar', 'Mobile: Tab bar', 'A phone app with 3 to 5 main sections that people switch between with one tap.'],
+  ];
+  const main = document.querySelector('main');
+  let group;
+  for (const [name, title, bestFor] of pages) {
+    const [screen, variant] = title.split(': ');
+    if (screen !== group) {
+      group = screen;
+      main.appendChild(document.createElement('h2')).textContent = screen;
+    }
+    const category = screen.toLowerCase().replaceAll(' ', '-');
+    const template = name.slice(category.length + 1);
+    const file = `../templates/${category}/${template}.html`;
+    const section = main.appendChild(document.createElement('section'));
+    section.className = 'sketch-stack';
+    section.innerHTML = `<h3><a href="${file}">${variant}</a> <span class="sketch-muted">${file}</span></h3>`
+      + `<p>Best for: ${bestFor}</p>`
+      + `<div class="sketch-row" style="align-items:start">${[390, 820, 1280].map(w =>
+        `<div class="frame" style="--w:${w}"><iframe data-src="${file}" title="${title} at ${w} px" loading="lazy"></iframe></div>`).join('')}</div>`;
+  }
+  // A file:// frame refuses script access, so each frame reloads with the gallery's theme.
+  const root = document.documentElement, frames = document.querySelectorAll('iframe');
+  const show = () => frames.forEach(frame => { frame.src = `${frame.dataset.src}?theme=${root.dataset.theme}`; });
+  new MutationObserver(show).observe(root, {attributes: true, attributeFilter: ['data-theme']});
+  show();
+</script>

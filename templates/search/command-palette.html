@@ -1,0 +1,23 @@
+<!-- Best for: A search over the whole product that opens from a key shortcut. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search: Command palette</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<!-- The palette open over the page. Escape closes it. -->
+<section data-state="palette">
+  <header class="sketch-bar"><strong>[Product]</strong><span class="sketch-spacer"></span><button class="sketch-button secondary" data-sketch-open="palette"><i data-icon="search"></i>Search<kbd class="sketch-muted">Ctrl K</kbd></button></header>
+  <dialog class="sketch-dialog" id="palette" aria-label="Search" data-open style="width:min(640px,calc(100vw - 32px));align-self:start;margin-top:10vh">
+    <input class="sketch-input" type="search" aria-label="Search" value="launch" autofocus>
+    <div class="sketch-row" aria-label="Filter"><button class="sketch-chip" aria-pressed="true">All</button><button class="sketch-chip" aria-pressed="false">Chats</button><button class="sketch-chip" aria-pressed="false">Files</button></div>
+    <h2 class="sketch-muted" style="margin:0;font-size:14px">Chats</h2>
+    <div class="sketch-stack" style="gap:0"><a class="sketch-menu-item" href="#"><i data-icon="comment"></i>Spring launch plan</a><a class="sketch-menu-item" href="#"><i data-icon="comment"></i>Launch page copy</a></div>
+    <h2 class="sketch-muted" style="margin:0;font-size:14px">Files</h2>
+    <div class="sketch-stack" style="gap:0"><a class="sketch-menu-item" href="#"><i data-icon="image"></i>launch-dates.csv</a></div>
+    <p class="sketch-muted" style="margin:0"><kbd>Enter</kbd> to open, <kbd>Esc</kbd> to close</p>
+  </dialog>
+  <main class="sketch-main"><h1>Overview</h1><p>Put the page here.</p></main>
+</section>
+<script src="../../assets/sketch.js"></script>

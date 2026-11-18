@@ -1,0 +1,24 @@
+<!-- Best for: A long list of items with a title and a date, such as chats, notes or orders. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>List: Rows with tabs</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main" style="max-width:860px">
+  <div class="sketch-row"><h1>Chats</h1><span class="sketch-spacer"></span><button class="sketch-button"><i data-icon="plus"></i>New</button></div>
+  <div class="sketch-row"><div class="sketch-tabs" aria-label="Filter"><button role="tab" aria-controls="tab-all" aria-selected="true">All</button><button role="tab" aria-controls="tab-starred">Starred</button><button role="tab" aria-controls="tab-shared">Shared</button></div><span class="sketch-spacer"></span>
+    <input class="sketch-input" type="search" aria-label="Search chats" placeholder="Search" style="width:min(240px,100%)"><button class="sketch-button secondary">Select</button></div>
+  <ul class="sketch-list" id="tab-all">
+    <li><a href="#">Trip plan for May</a><span class="sketch-spacer"></span><span class="sketch-muted">2 hours ago</span></li>
+    <li><a href="#">Reply to the landlord</a><span class="sketch-spacer"></span><span class="sketch-muted">Yesterday</span></li>
+    <li><a href="#">Q3 sales summary</a><span class="sketch-spacer"></span><span class="sketch-muted">12 Oct</span></li>
+    <li><a href="#">Interview questions for a designer</a><span class="sketch-spacer"></span><span class="sketch-muted">3 Oct</span></li>
+    <li><a href="#">Garden watering plan</a><span class="sketch-spacer"></span><span class="sketch-muted">28 Sep</span></li>
+  </ul>
+  <p id="tab-starred" class="sketch-muted">No starred chats.</p>
+  <p id="tab-shared" class="sketch-muted">No shared chats.</p>
+</main>
+<script src="../../assets/sketch.js"></script>

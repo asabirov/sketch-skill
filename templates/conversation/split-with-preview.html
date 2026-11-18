@@ -1,0 +1,22 @@
+<!-- Best for: A chat that makes a document, a page or code, and shows it large beside the messages. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conversation: Split with preview</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<!-- Messages at the left, the made item large at the right from 1000 px. Below that, the item comes after the messages. -->
+<main class="sketch-main sketch-cols" style="--cols:minmax(0,2fr) minmax(0,3fr);max-width:none">
+  <section class="sketch-stack" aria-label="Chat" style="grid-template-rows:1fr auto;min-height:min(640px,70vh)">
+    <div class="sketch-thread"><p class="own">Make a launch page for the spring sale.</p><p>Done. The page has a hero, three offers and a sign-up form.</p><p class="own">Make the hero shorter.</p></div>
+    <form class="sketch-row" action="#"><input class="sketch-input" aria-label="Message" placeholder="Ask for a change" style="flex:1"><button class="sketch-button">Send</button></form>
+  </section>
+  <section class="sketch-panel sketch-frame sketch-stack" aria-label="Preview" style="padding:16px">
+    <div class="sketch-row"><h2>Spring sale page</h2><span class="sketch-spacer"></span>
+      <div class="sketch-segmented" role="radiogroup" aria-label="View"><label><input type="radio" name="view" checked>Preview</label><label><input type="radio" name="view">Code</label></div></div>
+    <div class="sketch-placeholder" style="min-height:420px">Page preview</div>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>

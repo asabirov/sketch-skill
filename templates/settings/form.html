@@ -1,0 +1,26 @@
+<!-- Best for: Settings in groups, with a list of groups at the left. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings: Form</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<!-- Settings in a dialog over the page: groups at the left, label and control rows at the right. -->
+<section data-state="settings">
+  <header class="sketch-bar"><strong>[Product]</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" aria-label="Settings" data-sketch-open="settings-dialog"><i data-icon="settings"></i></button></header>
+  <dialog class="sketch-dialog" id="settings-dialog" aria-labelledby="settings-title" data-open style="width:min(860px,calc(100vw - 32px))">
+    <div class="sketch-row"><h1 id="settings-title" style="font-size:20px;margin:0">Settings</h1><span class="sketch-spacer"></span><button class="sketch-icon-button" aria-label="Close" data-sketch-close autofocus><i data-icon="close"></i></button></div>
+    <div class="sketch-split" style="--split:180px minmax(0,1fr);min-height:0">
+      <nav class="sketch-nav" aria-label="Groups" style="padding:0 16px 0 0"><a href="#" aria-current="page">General</a><a href="#">Account</a><a href="#">Privacy</a><a href="#">Billing</a></nav>
+      <form class="sketch-stack" action="#" style="padding:8px 0 0 24px">
+        <label class="sketch-row" style="justify-content:space-between">Display name <input class="sketch-input" value="Ana" style="width:min(260px,100%)"></label>
+        <label class="sketch-row" style="justify-content:space-between">Language <select class="sketch-input" style="width:min(260px,100%)"><option>English (UK)</option><option>Spanish</option></select></label>
+        <label class="sketch-row" style="justify-content:space-between">Send with <select class="sketch-input" style="width:min(260px,100%)"><option>Enter</option><option>Ctrl Enter</option></select></label>
+        <div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button">Save</button></div>
+      </form>
+    </div>
+  </dialog>
+  <main class="sketch-main"><h1>Home</h1><p>Put the page here.</p></main>
+</section>
+<script src="../../assets/sketch.js"></script>

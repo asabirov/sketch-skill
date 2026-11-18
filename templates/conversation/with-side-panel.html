@@ -1,0 +1,25 @@
+<!-- Best for: A chat that shows files, steps or details in a narrow panel at the right. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conversation: With side panel</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><a class="sketch-phone-only" href="#">Back</a><strong>[Product]</strong></header>
+<!-- Chats, then the open chat, then its details from 1000 px. A phone shows the open chat only. -->
+<main class="sketch-split" style="--split:220px minmax(0,1fr) 300px">
+  <nav class="sketch-nav sketch-from-tablet" aria-label="Chats"><a href="#" aria-current="page">Quarterly report</a><a href="#">Hiring plan</a><a href="#">Board update</a></nav>
+  <section class="sketch-stack" aria-label="Chat" style="grid-template-rows:auto 1fr auto;min-height:calc(100vh - 62px);padding:16px">
+    <div class="sketch-row"><h1 style="font-size:18px">Quarterly report</h1><span class="sketch-spacer"></span><button class="sketch-icon-button" aria-label="Chat actions"><i data-icon="more"></i></button></div>
+    <div class="sketch-thread"><p class="own">Draft the summary from the sales file.</p><p>Here is a first draft. It uses the figures from q3-sales.csv.</p></div>
+    <form class="sketch-row" action="#"><input class="sketch-input" aria-label="Message" placeholder="Reply" style="flex:1"><button class="sketch-button">Send</button></form>
+  </section>
+  <aside class="sketch-stack sketch-from-desktop" aria-label="Details" style="padding:16px">
+    <h2>Files</h2>
+    <ul class="sketch-list"><li><i data-icon="image"></i>q3-sales.csv</li><li><i data-icon="image"></i>summary-draft.md</li></ul>
+    <h2>Steps</h2>
+    <ol class="sketch-steps"><li>Read the file</li><li aria-current="step">Write the summary</li><li>Check the totals</li></ol>
+  </aside>
+</main>
+<script src="../../assets/sketch.js"></script>

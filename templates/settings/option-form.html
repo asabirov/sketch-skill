@@ -1,0 +1,22 @@
+<!-- Best for: Settings in sections with checkboxes, menus and key shortcuts, in a window with tabs. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings: Option form</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><span class="sketch-spacer"></span><h1 style="font-size:14px;margin:0">[Product] settings</h1><span class="sketch-spacer"></span></header>
+<main class="sketch-narrow" style="--width:640px;padding-top:24px">
+  <div class="sketch-tabs" aria-label="Settings" style="justify-content:center"><button role="tab" aria-selected="true">General</button><button role="tab">Sync</button><button role="tab">Icon</button><button role="tab">Themes</button><button role="tab">Typography</button></div>
+  <fieldset class="sketch-stack" style="gap:0"><legend><h2>Editor</h2></legend>
+    <label class="sketch-choice"><input type="checkbox" checked>Check spelling while typing</label>
+    <label class="sketch-choice"><input type="checkbox">Open the last note on start</label></fieldset>
+  <h2>Notes</h2>
+  <label class="sketch-row" style="justify-content:space-between">Sort by <select class="sketch-input" style="width:min(240px,100%)"><option>Date changed</option><option>Title</option></select></label>
+  <label class="sketch-row" style="justify-content:space-between">New notes in <select class="sketch-input" style="width:min(240px,100%)"><option>All notes</option><option>Work</option></select></label>
+  <h2>Shortcuts</h2>
+  <div class="sketch-row" style="justify-content:space-between"><span>New note</span><button class="sketch-button secondary" aria-label="Change the New note shortcut, now Ctrl N"><kbd>Ctrl N</kbd></button></div>
+  <div class="sketch-row" style="justify-content:space-between"><span>Search</span><button class="sketch-button secondary" aria-label="Change the Search shortcut, now Ctrl K"><kbd>Ctrl K</kbd></button></div>
+</main>
+<script src="../../assets/sketch.js"></script>

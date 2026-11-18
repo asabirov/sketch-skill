@@ -1,0 +1,23 @@
+<!-- Best for: Items that people find by their picture, such as designs, files or templates. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>List: Card grid</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <h1>Designs</h1>
+  <div class="sketch-tabs" aria-label="Filter"><button role="tab" aria-controls="tab-all" aria-selected="true">All</button><button role="tab" aria-controls="tab-starred">Starred</button><button role="tab" aria-controls="tab-shared">Shared</button></div>
+  <section class="sketch-panel sketch-frame sketch-row" aria-label="News" style="padding:16px"><p style="margin:0;flex:1">Templates are new. Start a design from one of 40 layouts.</p><a href="#">Show templates</a></section>
+  <div class="sketch-row"><button class="sketch-button"><i data-icon="plus"></i>New</button><button class="sketch-button secondary"><i data-icon="upload"></i>Import</button></div>
+  <div class="sketch-grid" id="tab-all" style="--wide:3">
+    <article class="sketch-stack" style="gap:8px"><div class="sketch-placeholder" style="min-height:160px">Preview</div><a href="#">Spring sale page</a><span class="sketch-muted">Edited 2 hours ago</span></article>
+    <article class="sketch-stack" style="gap:8px"><div class="sketch-placeholder" style="min-height:160px">Preview</div><a href="#">Pitch deck</a><span class="sketch-muted">Edited yesterday</span></article>
+    <article class="sketch-stack" style="gap:8px"><div class="sketch-placeholder" style="min-height:160px">Preview</div><a href="#">Menu card</a><span class="sketch-muted">Edited 3 Oct</span></article>
+  </div>
+  <p id="tab-starred" class="sketch-muted">No starred designs.</p>
+  <p id="tab-shared" class="sketch-muted">No shared designs.</p>
+</main>
+<script src="../../assets/sketch.js"></script>

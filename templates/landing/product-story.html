@@ -1,0 +1,32 @@
+<!-- Best for: A public page that explains one product, with a hero, feature bands, prices and a footer. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing: Product story</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong><span class="sketch-spacer"></span>
+  <button class="sketch-button secondary sketch-menu-button" aria-expanded="false" aria-controls="menu">Menu</button>
+  <nav class="sketch-collapse" id="menu" aria-label="Main"><a href="#">Features</a><a href="#">Pricing</a><a href="#">Help</a><a class="sketch-button" href="#">Download</a></nav></header>
+<!-- Hero, two feature bands that change sides, a feature grid, two prices, then the footer. -->
+<main class="sketch-main" style="gap:72px">
+  <section class="sketch-stack" style="justify-items:center;text-align:center">
+    <h1 style="font-size:40px">Notes that stay out of your way</h1><p>Write in plain text. Find any note in a second.</p>
+    <a class="sketch-button" href="#">Download</a><div class="sketch-placeholder" style="width:100%;min-height:320px">App on a laptop and a phone</div></section>
+  <section class="sketch-cols" style="--cols:minmax(0,1fr) minmax(0,1fr);align-items:center">
+    <div class="sketch-stack"><h2>Write naturally</h2><p>Headings, lists and links come from what you type.</p></div><div class="sketch-placeholder" style="min-height:240px">Editor with a list</div></section>
+  <section class="sketch-cols flip" style="--cols:minmax(0,1fr) minmax(0,1fr);align-items:center">
+    <div class="sketch-stack"><h2>Find it with tags</h2><p>Add a tag anywhere in a note. The side list groups notes by tag.</p></div><div class="sketch-placeholder" style="min-height:240px">Side list with tags</div></section>
+  <section class="sketch-stack"><h2>And more</h2>
+    <div class="sketch-grid" style="--tablet:3;--wide:3">
+      <div class="sketch-stack" style="gap:8px"><i data-icon="download"></i><h3>Export</h3><p style="margin:0">Save notes as PDF, HTML or Markdown.</p></div>
+      <div class="sketch-stack" style="gap:8px"><i data-icon="link"></i><h3>Links</h3><p style="margin:0">Link one note to another by its title.</p></div>
+      <div class="sketch-stack" style="gap:8px"><i data-icon="eye"></i><h3>Focus</h3><p style="margin:0">Hide everything except the text.</p></div></div></section>
+  <section class="sketch-stack" id="pricing"><h2>Price</h2>
+    <div class="sketch-grid" style="--wide:2">
+      <div class="sketch-panel sketch-frame sketch-stack"><h3>Free</h3><p style="margin:0;font-size:30px">0 a month</p><p style="margin:0">All writing features on one device.</p></div>
+      <div class="sketch-panel sketch-frame sketch-stack"><h3>Pro</h3><p style="margin:0;font-size:30px">[YOUR PRICE] a month</p><p style="margin:0">Sync on all devices, themes and export.</p><a class="sketch-button" href="#" style="justify-self:start">Try Pro</a></div></div></section>
+</main>
+<footer class="sketch-nav" style="flex-wrap:wrap;border-top:var(--sketch-stroke) solid var(--sketch-ink)"><a href="#">Help</a><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Newsletter</a></footer>
+<script src="../../assets/sketch.js"></script>

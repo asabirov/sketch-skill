@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch components</title>
+<link rel="stylesheet" href="sketch.css">
+<style>
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 96px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  h1, h2 { margin: 0; }
+  .token-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .token-row code { flex: 1; overflow-wrap: anywhere; }
+</style>
+</head>
+<body data-sketch>
+<main>
+  <h1>Sketch components</h1>
+
+  <section data-state="components" class="sketch-stack">
+    <p class="sketch-muted">Sample data. Each block below is one class from sketch.css.</p>
+    <div class="grid">
+      <div class="sketch-panel sketch-frame sketch-stack">
+        <h2>Actions</h2>
+        <div class="sketch-row">
+          <button class="sketch-button" type="button">Publish</button>
+          <button class="sketch-button secondary" type="button">Cancel</button>
+        </div>
+        <div class="sketch-row">
+          <button class="sketch-icon-button" type="button" aria-label="Add token"><i data-icon="plus"></i></button>
+          <button class="sketch-icon-button" type="button" aria-label="Search"><i data-icon="search"></i></button>
+          <button class="sketch-icon-button" type="button" aria-label="Edit"><i data-icon="edit"></i></button>
+          <button class="sketch-icon-button" type="button" aria-label="Delete"><i data-icon="trash"></i></button>
+          <button class="sketch-icon-button" type="button" aria-label="More" data-sketch-popover="gallery-menu"><i data-icon="more"></i></button>
+        </div>
+        <div class="sketch-row">
+          <button class="sketch-button secondary" type="button" data-sketch-popover="gallery-popover">Popover</button>
+          <button class="sketch-button secondary" type="button" data-sketch-open="gallery-dialog">Dialog</button>
+          <button class="sketch-button secondary" type="button" data-sketch-toast="Token copied">Toast</button>
+        </div>
+      </div>
+
+      <div class="sketch-panel sketch-frame sketch-stack">
+        <h2>Choices</h2>
+        <div class="sketch-segmented" role="radiogroup" aria-label="Theme preview">
+          <label><input type="radio" name="preview" checked>Light</label>
+          <label><input type="radio" name="preview">Dark</label>
+          <label><input type="radio" name="preview">Both</label>
+        </div>
+        <label class="sketch-switch"><input type="checkbox" role="switch" checked>Snap to grid</label>
+        <div class="sketch-row" aria-label="Filter">
+          <button class="sketch-chip" type="button" aria-pressed="true">Colour</button>
+          <button class="sketch-chip" type="button" aria-pressed="false">Type</button>
+          <button class="sketch-chip" type="button" aria-pressed="false">Spacing</button>
+        </div>
+        <div class="sketch-row">
+          <span class="sketch-badge">Draft</span>
+          <span class="sketch-badge strong">Changed</span>
+        </div>
+      </div>
+
+      <div class="sketch-panel sketch-frame sketch-stack">
+        <h2>Fields</h2>
+        <label class="sketch-field">Name
+          <input class="sketch-input" value="color.ground.light">
+        </label>
+        <label class="sketch-field">Group
+          <select class="sketch-input"><option>Colour</option><option>Type</option><option>Spacing</option></select>
+        </label>
+        <label class="sketch-field">Token
+          <select class="sketch-input">
+            <optgroup label="Ground"><option>ground.light</option><option>ground.dark</option></optgroup>
+            <optgroup label="Archived" disabled><option>ground.old</option></optgroup>
+            <optgroup label="Ink"><option>ink.strong</option><option>ink.soft</option></optgroup>
+          </select>
+        </label>
+        <label class="sketch-field">Value
+          <input class="sketch-input" value="#fbfbf" aria-invalid="true" aria-describedby="value-error">
+          <span class="sketch-error" id="value-error">Error: a hex colour has 6 digits.</span>
+        </label>
+        <label class="sketch-field">Note
+          <textarea class="sketch-input">Page background in the light theme.</textarea>
+        </label>
+      </div>
+
+      <div class="sketch-panel sketch-frame sketch-stack">
+        <h2>Picture not decided</h2>
+        <div class="sketch-placeholder">Brand mark</div>
+      </div>
+
+      <div class="sketch-panel sketch-frame sketch-stack">
+        <h2>Inbox</h2>
+        <ul class="sketch-list">
+          <li class="sketch-conversation"><span aria-hidden="true">TP</span><div><a href="#components" aria-label="Theo Park, 2 unread">Theo Park</a><p>The pricing copy is ready. Can you look at it before lunch? I left two notes in the last section.</p></div><div><span>9:52</span><span class="sketch-badge strong" aria-hidden="true">2</span></div></li>
+          <li class="sketch-conversation"><span aria-hidden="true">ML</span><div><a href="#components" aria-current="page">Mira Lane</a><span><span class="sketch-muted">#1042</span> Export of the March report</span><p>Thanks. I will check the export after lunch.</p></div><div><span>9:41</span></div></li>
+          <li class="sketch-conversation"><span class="square" aria-hidden="true">DR</span><div><a href="#components">Design review for the spring release</a><p>Ana Ruiz: The new rows look good to me.</p></div><div><span>9:30</span></div></li>
+          <li class="sketch-conversation"><span class="square" aria-hidden="true">LZ</span><div><a href="#components">Lea Zhou, Omar Haddad, Priya Nair</a><p>Omar Haddad: The room is booked for Friday.</p></div><div><span>Yesterday</span></div></li>
+        </ul>
+        <div class="sketch-row" style="align-items:start;flex-wrap:nowrap;gap:12px">
+          <span class="sketch-avatar" aria-hidden="true">TP</span>
+          <div class="sketch-stack" style="gap:4px;min-width:0">
+            <p style="margin:0"><b>Theo Park</b> <span class="sketch-muted">9:52</span></p>
+            <p style="margin:0">The pricing copy is ready.</p>
+            <div class="sketch-row"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Smile, 1"><i data-icon="smile"></i>1</button></div>
+          </div>
+        </div>
+        <div class="sketch-thread"><p>Can you look at it before lunch?</p><p class="own">Yes. I will send notes by noon.</p></div>
+        <form class="sketch-row" action="#components" style="flex-wrap:nowrap">
+          <input class="sketch-input" aria-label="Message Theo Park" placeholder="Message Theo Park" style="flex:1;min-width:0">
+          <button class="sketch-icon-button" type="button" aria-label="Send"><i data-icon="send"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="sketch-panel sketch-frame sketch-stack">
+      <div class="sketch-tabs" aria-label="Library">
+        <button type="button" role="tab" aria-controls="tab-tokens" aria-selected="true">Tokens</button>
+        <button type="button" role="tab" aria-controls="tab-components">Components</button>
+        <button type="button" role="tab" aria-controls="tab-history">History</button>
+      </div>
+      <div id="tab-tokens" class="sketch-table-box">
+        <table class="sketch-table">
+          <thead><tr><th>Token</th><th>Light</th><th>Dark</th><th>State</th></tr></thead>
+          <tbody>
+            <tr><td><code>color.ground</code></td><td>#fbfbf8</td><td>#141513</td><td><span class="sketch-badge strong">Changed</span></td></tr>
+            <tr><td><code>color.ink</code></td><td>#1b1b19</td><td>#efeee6</td><td><span class="sketch-badge">Draft</span></td></tr>
+            <tr><td><code>space.4</code></td><td>16px</td><td>16px</td><td><span class="sketch-badge">Draft</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="tab-components" class="sketch-muted">12 components use these tokens.</p>
+      <p id="tab-history" class="sketch-muted">3 changes since the last release.</p>
+    </div>
+  </section>
+
+  <section data-state="popover" class="sketch-stack">
+    <p class="sketch-muted">The popover from the editor: the page fills its drawn outline, nothing past it.</p>
+    <div class="sketch-frame token-row">
+      <code>color.ground.light</code>
+      <button class="sketch-button secondary" type="button" data-sketch-popover="token-popover">Edit</button>
+    </div>
+    <div class="sketch-popover" id="token-popover" role="dialog" aria-label="color.ground.light" data-open>
+      <div class="sketch-row">
+        <code>color.ground.light</code>
+        <span class="sketch-spacer"></span>
+        <button class="sketch-icon-button" type="button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button>
+      </div>
+      <label class="sketch-field">Value <input class="sketch-input" value="#fbfbf8"></label>
+      <label class="sketch-field">Request <textarea class="sketch-input" placeholder="Describe the change"></textarea></label>
+      <div class="sketch-row">
+        <button class="sketch-button" type="button">Save</button>
+        <button class="sketch-button secondary" type="button" data-sketch-close>Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section data-state="menu" class="sketch-stack">
+    <div class="sketch-frame token-row">
+      <code>color.ground.light</code>
+      <button class="sketch-icon-button" type="button" aria-label="Token actions" data-sketch-popover="token-menu"><i data-icon="more"></i></button>
+    </div>
+    <div class="sketch-menu" id="token-menu" aria-label="Token actions" data-open>
+      <button class="sketch-menu-item" type="button"><i data-icon="edit"></i>Rename</button>
+      <button class="sketch-menu-item" type="button" data-sketch-toast="Token copied"><i data-icon="copy"></i>Copy</button>
+      <button class="sketch-menu-item" type="button" disabled><i data-icon="link"></i>Link</button>
+      <button class="sketch-menu-item" type="button" data-sketch-open="gallery-dialog"><i data-icon="trash"></i>Delete</button>
+    </div>
+  </section>
+
+  <section data-state="dialog" class="sketch-stack">
+    <div class="sketch-frame token-row">
+      <code>color.ground.light</code>
+      <button class="sketch-button secondary" type="button" data-sketch-open="state-dialog">Delete</button>
+    </div>
+    <dialog class="sketch-dialog" id="state-dialog" aria-labelledby="state-dialog-title" data-open>
+      <h2 id="state-dialog-title">Delete color.ground.light?</h2>
+      <p>4 components use it. They fall back to color.ground.</p>
+      <div class="sketch-row">
+        <button class="sketch-button" type="button" data-sketch-close>Delete</button>
+        <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Keep</button>
+      </div>
+    </dialog>
+  </section>
+
+  <div class="sketch-popover" id="gallery-popover" role="dialog" aria-label="Spacing">
+    <label class="sketch-field">Spacing step <input class="sketch-input" value="16px"></label>
+    <button class="sketch-button" type="button" data-sketch-close>Apply</button>
+  </div>
+  <div class="sketch-menu" id="gallery-menu" aria-label="More">
+    <button class="sketch-menu-item" type="button"><i data-icon="download"></i>Export</button>
+    <button class="sketch-menu-item" type="button"><i data-icon="upload"></i>Import</button>
+    <button class="sketch-menu-item" type="button"><i data-icon="settings"></i>Settings</button>
+  </div>
+  <dialog class="sketch-dialog" id="gallery-dialog" aria-labelledby="gallery-dialog-title">
+    <h2 id="gallery-dialog-title">Delete color.ground.light?</h2>
+    <p>4 components use it. They fall back to color.ground.</p>
+    <div class="sketch-row">
+      <button class="sketch-button" type="button" data-sketch-close>Delete</button>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Keep</button>
+    </div>
+  </dialog>
+</main>
+<script src="sketch.js"></script>
+</body>
+</html>

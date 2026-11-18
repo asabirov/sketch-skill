@@ -1,0 +1,39 @@
+<!-- Best for: A purchase of a small number of items, with the address, the payment and the order summary on one page. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout: One page</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <a href="#">Back to shop</a> <h1>Checkout</h1>
+  <div class="sketch-cols">
+    <form class="sketch-stack" id="pay" action="#">
+      <h2>Cart</h2>
+      <ul class="sketch-list">
+        <li>Desk lamp<span class="sketch-muted">Qty 1</span><span class="sketch-spacer"></span>$48.00</li>
+        <li>Notebook<span class="sketch-muted">Qty 2</span><span class="sketch-spacer"></span>$24.00</li>
+      </ul>
+      <h2>Billing address</h2>
+      <label class="sketch-field">Address<input class="sketch-input" autocomplete="street-address" required></label>
+      <div class="sketch-row" style="gap:16px">
+        <label class="sketch-field" style="flex:2 1 160px">City<input class="sketch-input" autocomplete="address-level2" required></label>
+        <label class="sketch-field" style="flex:1 1 120px">Postal code<input class="sketch-input" autocomplete="postal-code" required></label>
+      </div>
+      <label class="sketch-field">Country<select class="sketch-input" autocomplete="country" required><option>[Country]</option></select></label>
+      <h2>Payment</h2>
+      <label class="sketch-field">Name on card<input class="sketch-input" autocomplete="cc-name" required></label>
+      <label class="sketch-field">Card number<input class="sketch-input" inputmode="numeric" autocomplete="cc-number" required></label>
+      <div class="sketch-row" style="gap:16px">
+        <label class="sketch-field" style="flex:1 1 120px">Expiry<input class="sketch-input" autocomplete="cc-exp" placeholder="MM/YY" required></label>
+        <label class="sketch-field" style="flex:1 1 120px">CVC<input class="sketch-input" inputmode="numeric" autocomplete="cc-csc" required></label>
+      </div>
+    </form>
+    <aside class="sketch-panel sketch-frame sketch-stack" aria-label="Order summary"><h2>Order summary</h2>
+      <dl class="sketch-facts"><dt>Subtotal</dt><dd>$72.00</dd><dt>Shipping</dt><dd>$6.00</dd><dt>Total</dt><dd><b>$78.00</b></dd></dl>
+      <button class="sketch-button" form="pay">Pay $78.00</button></aside>
+  </div>
+</main>
+<script src="../../assets/sketch.js"></script>

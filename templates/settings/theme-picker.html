@@ -1,0 +1,20 @@
+<!-- Best for: A choice of one colour theme from a grid of preview cards. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings: Theme picker</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><span class="sketch-spacer"></span><h1 style="font-size:14px;margin:0">[Product] settings</h1><span class="sketch-spacer"></span></header>
+<main class="sketch-narrow" style="--width:640px;padding-top:24px">
+  <div class="sketch-tabs" aria-label="Settings" style="justify-content:center"><button role="tab">General</button><button role="tab">Sync</button><button role="tab">Icon</button><button role="tab" aria-selected="true">Themes</button><button role="tab">Typography</button></div>
+  <fieldset class="sketch-stack"><legend><h2>Theme</h2></legend>
+    <div class="sketch-grid" style="--phone:2;--tablet:2;--wide:2">
+      <label class="sketch-stack" style="gap:8px;cursor:pointer"><span class="sketch-placeholder" style="min-height:120px" aria-hidden="true">Daylight preview</span><span><input type="radio" name="theme" checked> Daylight</span></label>
+      <label class="sketch-stack" style="gap:8px;cursor:pointer"><span class="sketch-placeholder" style="min-height:120px" aria-hidden="true">Charcoal preview</span><span><input type="radio" name="theme"> Charcoal</span></label>
+      <label class="sketch-stack" style="gap:8px;cursor:pointer"><span class="sketch-placeholder" style="min-height:120px" aria-hidden="true">Solar preview</span><span><input type="radio" name="theme"> Solar</span></label>
+      <label class="sketch-stack" style="gap:8px;cursor:pointer"><span class="sketch-placeholder" style="min-height:120px" aria-hidden="true">Forest preview</span><span><input type="radio" name="theme"> Forest</span></label>
+    </div></fieldset>
+</main>
+<script src="../../assets/sketch.js"></script>

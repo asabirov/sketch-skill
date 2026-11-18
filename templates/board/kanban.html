@@ -1,0 +1,29 @@
+<!-- Best for: Items that move through a small number of stages, such as tasks, leads or job applicants. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board: Kanban</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main" style="max-width:none">
+  <div class="sketch-row"><h1>Launch board</h1><span class="sketch-spacer"></span><button class="sketch-button">New</button></div>
+  <div class="sketch-row">
+    <nav class="sketch-nav" aria-label="View" style="padding:0"><a href="#" aria-current="page">Board</a><a href="#">List</a></nav>
+    <input class="sketch-input" type="search" aria-label="Search cards" placeholder="Search" style="width:min(100%,240px)">
+    <div class="sketch-row" role="group" aria-label="Filters">
+      <button class="sketch-chip" aria-pressed="true">Mine</button><button class="sketch-chip" aria-pressed="false">Due</button><button class="sketch-chip" aria-pressed="false">Urgent</button></div>
+  </div>
+  <div class="sketch-board" role="region" aria-label="Board" tabindex="0">
+    <section class="sketch-stack" style="gap:8px"><h2>To do <span class="sketch-muted">2</span></h2>
+      <div class="sketch-frame">Write the FAQ</div><div class="sketch-frame">Pick the launch date</div></section>
+    <section class="sketch-stack" style="gap:8px"><h2>In progress <span class="sketch-muted">2</span></h2>
+      <div class="sketch-frame">Pricing copy</div><div class="sketch-frame">Help centre links</div></section>
+    <section class="sketch-stack" style="gap:8px"><h2>Review <span class="sketch-muted">1</span></h2>
+      <div class="sketch-frame">Website refresh</div></section>
+    <section class="sketch-stack" style="gap:8px"><h2>Done <span class="sketch-muted">1</span></h2>
+      <div class="sketch-frame">Billing page</div></section>
+  </div>
+</main>
+<script src="../../assets/sketch.js"></script>

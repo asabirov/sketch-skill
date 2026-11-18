@@ -1,0 +1,28 @@
+<!-- Best for: A setup that needs a small number of steps in a fixed order before people can use the product. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onboarding: Steps</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<!-- One question on each screen, with the progress above it and Skip beside Continue. -->
+<header class="sketch-bar" style="border:0"><strong>[Product]</strong></header>
+<main class="sketch-narrow" style="max-width:560px;min-height:calc(100vh - 62px);align-content:center">
+  <div class="sketch-stack" style="gap:8px">
+    <span class="sketch-muted">Step 2 of 4</span>
+    <progress value="2" max="4" aria-label="Step 2 of 4" style="width:100%"></progress>
+  </div>
+  <form class="sketch-stack" action="#">
+    <h1>What will you use [Product] for?</h1>
+    <p>We use this to set up your first project.</p>
+    <fieldset class="sketch-grid" style="--wide:2" aria-label="Use">
+      <label class="sketch-choice sketch-frame" style="margin:0"><input type="radio" name="use" checked>Plan product work</label>
+      <label class="sketch-choice sketch-frame" style="margin:0"><input type="radio" name="use">Track bugs</label>
+      <label class="sketch-choice sketch-frame" style="margin:0"><input type="radio" name="use">Run a team's tasks</label>
+      <label class="sketch-choice sketch-frame" style="margin:0"><input type="radio" name="use">Something else</label>
+    </fieldset>
+    <div class="sketch-row"><a href="#">Back</a><span class="sketch-spacer"></span><button class="sketch-button secondary" type="button">Skip</button><button class="sketch-button">Continue</button></div>
+  </form>
+</main>
+<script src="../../assets/sketch.js"></script>

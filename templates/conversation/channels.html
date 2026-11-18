@@ -1,0 +1,28 @@
+<!-- Best for: A team chat with many workspaces and channels, with a list of channels at the left of the messages. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conversation: Channels</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><a class="sketch-phone-only" href="#">Back</a><strong>[Workspace]</strong></header>
+<!-- Workspace rail, then channels, then the open channel. A phone shows the open channel only. -->
+<main class="sketch-split" style="--split:76px 240px minmax(0,1fr)">
+  <nav class="sketch-nav sketch-from-desktop" aria-label="Workspaces" style="align-items:center;padding:16px 8px">
+    <a href="#" aria-current="page" aria-label="[Workspace]"><i data-icon="image"></i></a><a href="#" aria-label="[Other workspace]"><i data-icon="image"></i></a></nav>
+  <nav class="sketch-nav sketch-from-tablet" aria-label="Channels">
+    <h2 style="margin:8px 12px 0;font-size:14px" class="sketch-muted">Channels</h2>
+    <a href="#" aria-current="page"># launch</a><a href="#"># design</a><a href="#"># general</a>
+    <h2 style="margin:16px 12px 0;font-size:14px" class="sketch-muted">Direct messages</h2>
+    <a href="#">Theo Park</a><a href="#">Mira Lane</a></nav>
+  <section class="sketch-stack" aria-label="Channel launch" style="grid-template-rows:auto 1fr auto;min-height:calc(100vh - 62px);padding:16px">
+    <div class="sketch-row"><h1 style="font-size:18px"># launch</h1><span class="sketch-muted">Plans for the Friday launch</span></div>
+    <ul class="sketch-list" style="align-content:end">
+      <li style="display:grid;gap:2px"><span><b>Theo Park</b> <span class="sketch-muted">9:40</span></span><span>The pricing copy is ready for review.</span></li>
+      <li style="display:grid;gap:2px"><span><b>Mira Lane</b> <span class="sketch-muted">9:52</span></span><span>Thanks. I will check it after lunch.</span></li>
+    </ul>
+    <form class="sketch-row" action="#"><input class="sketch-input" aria-label="Message # launch" placeholder="Message # launch" style="flex:1"><button class="sketch-button">Send</button></form>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>

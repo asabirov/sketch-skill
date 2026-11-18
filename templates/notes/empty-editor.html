@@ -1,0 +1,23 @@
+<!-- Best for: A writing tool before people open or make an item, with the list beside an empty editor. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes: Empty editor</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<!-- Folders from 1000 px, then the notes, then an empty editor from 600 px. -->
+<main class="sketch-split" style="--split:200px 300px minmax(0,1fr)">
+  <nav class="sketch-nav sketch-from-desktop" aria-label="Folders"><a href="#" aria-current="page">All notes</a><a href="#">Work</a><a href="#">Recipes</a><a href="#">Trash</a></nav>
+  <section class="sketch-stack" aria-label="Notes" style="padding:16px">
+    <div class="sketch-row"><input class="sketch-input" type="search" aria-label="Search notes" placeholder="Search" style="flex:1"><button class="sketch-icon-button" aria-label="New note"><i data-icon="plus"></i></button></div>
+    <ul class="sketch-list"><li><a href="#">Spring launch plan</a></li><li><a href="#">Pasta for four</a></li><li><a href="#">Book list</a></li></ul>
+  </section>
+  <section class="sketch-stack sketch-from-tablet" aria-label="Editor" style="align-content:center;justify-items:center;text-align:center;padding:32px">
+    <div class="sketch-placeholder" style="width:160px;min-height:120px">Empty page</div>
+    <p style="margin:0">128 notes</p>
+    <p class="sketch-muted" style="margin:0">Open a note, or press Ctrl N for a new one.</p>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>

@@ -1,0 +1,25 @@
+<!-- Best for: A first page that points to one new control with a small hint. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home: Onboarding hint</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<!-- The home page with one hint bubble open below the new control. Close it with "Close" or Escape. -->
+<section data-state="hint">
+  <header class="sketch-bar"><strong>[Product]</strong><button class="sketch-button secondary" data-sketch-popover="hint"><i data-icon="calendar"></i>Projects</button></header>
+  <div class="sketch-popover" id="hint" role="dialog" aria-labelledby="hint-title" data-open>
+    <h2 id="hint-title" style="margin:0">New: Projects</h2>
+    <p style="margin:0">Keep chats, files and instructions for one piece of work in one place.</p>
+    <div class="sketch-row"><button class="sketch-button" data-sketch-close>Close</button></div>
+  </div>
+  <main class="sketch-narrow" style="--width:720px;padding-top:12vh">
+    <h1 style="text-align:center">Good morning, Ana</h1>
+    <form class="sketch-panel sketch-frame sketch-stack" action="#" style="padding:16px">
+      <textarea class="sketch-input" aria-label="Request" placeholder="Ask for anything" rows="3"></textarea>
+      <div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button">Send</button></div>
+    </form>
+  </main>
+</section>
+<script src="../../assets/sketch.js"></script>
