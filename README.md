@@ -13,7 +13,7 @@ The agent draws a page with one marker. The page shows layout and behaviour, and
 Install the latest version:
 
 ```sh
-DO_NOT_TRACK=1 npx skills add https://github.com/asabirov/sketch-skill --skill sketch --agent claude-code codex --global
+DO_NOT_TRACK=1 npx skills add https://github.com/asabirov/sketch-skill --skill sketch --agent claude-code codex --global -y
 ```
 
 Update it later:
