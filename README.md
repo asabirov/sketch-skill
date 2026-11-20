@@ -6,7 +6,7 @@
 
 The agent draws a page with one marker. The page shows layout and behaviour, and nobody can mistake it for the finished product.
 
-![The template gallery: page templates drawn in one ink.](assets/preview.png)
+![Four sketches at four widths: a chat, a pricing page, a phone inbox in the dark theme, and a board.](assets/preview.png)
 
 ## Install
 
@@ -79,7 +79,7 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 
 ## Run and verify
 
-Open `assets/sketch-pages.html` in a browser to see the template gallery.
+Open `assets/sketch-pages.html` in a browser to see the template gallery. See a picture of each template in [`docs/templates.md`](docs/templates.md).
 
 ## Licence
 

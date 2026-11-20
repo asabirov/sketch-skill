@@ -1,0 +1,22 @@
+<!-- README example, option B: four screens at four widths. The canvas is 1280 by 800.
+     Each sheet is drawn at scale 0.6 and is 587 px high in its own pixels.
+     The widths are 1260 (desktop), 713 (tablet), 370 (phone) and 1603 (wide). -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>README example: Four screens</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<style>
+  .canvas { display: flex; flex-wrap: wrap; gap: 24px; align-content: center; width: 1280px; height: 800px; padding: 0 24px; box-sizing: border-box; overflow: hidden; }
+  .sheet { height: 364px; padding: 6px; box-sizing: border-box; }
+  .sheet iframe { height: 587px; border: 0; transform: scale(.6); transform-origin: 0 0; }
+</style>
+<body data-sketch>
+<div class="canvas">
+  <div class="sheet sketch-frame" style="width:768px"><iframe src="built/chat-with-files.html?theme=light" title="Chat with files, desktop" style="width:1260px"></iframe></div>
+  <div class="sheet sketch-frame" style="width:440px"><iframe src="built/plans.html?theme=light" title="Plans, tablet" style="width:713px"></iframe></div>
+  <div class="sheet sketch-frame" style="width:234px"><iframe src="built/phone-inbox.html?theme=dark" title="Inbox, phone, dark theme" style="width:370px"></iframe></div>
+  <div class="sheet sketch-frame" style="width:974px"><iframe src="built/launch-board.html?theme=light" title="Launch board, wide" style="width:1603px"></iframe></div>
+</div>
+<script src="../../assets/sketch.js"></script>
