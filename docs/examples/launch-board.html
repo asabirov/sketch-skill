@@ -1,0 +1,33 @@
+<!-- Made from templates/board/kanban.html. Each card holds an owner and a due date. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trackline: Launch board</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>Trackline</strong></header>
+<main class="sketch-main" style="max-width:none">
+  <div class="sketch-row"><h1>Launch board</h1><span class="sketch-spacer"></span><button class="sketch-button">New</button></div>
+  <div class="sketch-row">
+    <nav class="sketch-nav" aria-label="View" style="padding:0"><a href="#" aria-current="page">Board</a><a href="#">List</a></nav>
+    <input class="sketch-input" type="search" aria-label="Search cards" placeholder="Search" style="width:min(100%,240px)">
+    <div class="sketch-row" role="group" aria-label="Filters">
+      <button class="sketch-chip" aria-pressed="true">Mine</button><button class="sketch-chip" aria-pressed="false">Due</button><button class="sketch-chip" aria-pressed="false">Urgent</button></div>
+  </div>
+  <div class="sketch-board" role="region" aria-label="Board" tabindex="0">
+    <section class="sketch-stack" style="gap:8px"><h2>To do <span class="sketch-muted">3</span></h2>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Write the FAQ<div class="sketch-row"><span class="sketch-muted">Due 2 Apr</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">MK</span></div></div>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Pick the launch date<div class="sketch-row"><span class="sketch-badge strong">Urgent</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">TP</span></div></div>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Press note<div class="sketch-row"><span class="sketch-muted">Due 9 Apr</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">IM</span></div></div></section>
+    <section class="sketch-stack" style="gap:8px"><h2>In progress <span class="sketch-muted">2</span></h2>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Pricing copy<div class="sketch-row"><span class="sketch-muted">Due 28 Mar</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">TP</span></div></div>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Help centre links<div class="sketch-row"><span class="sketch-muted">Due 4 Apr</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">MK</span></div></div></section>
+    <section class="sketch-stack" style="gap:8px"><h2>Review <span class="sketch-muted">1</span></h2>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Website refresh<div class="sketch-row"><span class="sketch-muted">Due 27 Mar</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">IM</span></div></div></section>
+    <section class="sketch-stack" style="gap:8px"><h2>Done <span class="sketch-muted">2</span></h2>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Billing page<div class="sketch-row"><span class="sketch-row sketch-muted" style="gap:4px"><i data-icon="check"></i>20 Mar</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">MK</span></div></div>
+      <div class="sketch-frame sketch-stack" style="gap:8px">Launch email<div class="sketch-row"><span class="sketch-row sketch-muted" style="gap:4px"><i data-icon="check"></i>24 Mar</span><span class="sketch-spacer"></span><span class="sketch-avatar" aria-hidden="true">IM</span></div></div></section>
+  </div>
+</main>
+<script src="../../assets/sketch.js"></script>
