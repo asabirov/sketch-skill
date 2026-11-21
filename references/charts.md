@@ -23,7 +23,7 @@ Use this page to choose a chart template and to draw a chart in a sketch. The pr
 - Never use a second value axis. If two series have different units, draw two charts.
 - Never scroll inside a chart. Each rule page says how many periods fit and what to do with more.
 - Name each mark in words in a `sketch-key`. Never use a hue.
-- Give the chart `role="img"` and an `aria-label` with a summary and the values. Put the data in a table with the class `sketch-data` below the chart. The kit shows it to screen readers only, so the page has no visible data control. A sparkline in a table row gives every value in its `aria-label` in place of a table.
+- Give the chart `role="img"` and an `aria-label` with a summary and the values. Put the data in a table with the class `sketch-chart-data` below the chart. The kit shows it to screen readers only, so the page has no visible data control. A sparkline in a table row gives every value in its `aria-label` in place of a table.
 - Put the main numbers above the chart in a `sketch-summary`, such as "November 1 to 21: €39k" and "November, projected: ~€57k". Give each value its change against the same days of the earlier period.
 - Split a bar into at most 2 parts. Draw the lower part solid and the upper part in the thinned ink of `second`. A projected bar is not split, because the split of a projection is not known.
 - Draw a reference level, such as a minimum cash level, as a `sketch-ref` line with its name and value on the line.
@@ -53,4 +53,5 @@ The classes are in `assets/sketch.css`, after the sparkline.
 - `<td class="sketch-trend">` holds the change in a `span` above a `sketch-spark`, in a table row. The sparkline is 120 px wide, and 80 px below 600 px.
 - `<div class="sketch-tabs sketch-tiles">` holds stat tiles as `button role="tab"` with `aria-controls`. Each tile holds a label, a `b` value, a change and a `sketch-spark`. The chosen tile has a drawn frame and shows its `role="tabpanel"`.
 - `<div class="sketch-goal" role="meter">` shows a value against a total: a `span class="mark"` label, a `div class="track"` with an `<i>`, and a row with the two ends. Set `--v` on the mark and the `<i>`. The actual part is solid and the rest is hatched.
-- `sketch-data` on a `sketch-table` keeps its headers and rows below 600 px. Use it for the data table of a chart and for a table with a sparkline in each row.
+- `sketch-data` on a `sketch-table` keeps its headers and rows below 600 px. Use it for a table with a sparkline in each row.
+- `<table class="sketch-chart-data">` is the data table of a chart. It has a `caption`, and only screen readers see it.

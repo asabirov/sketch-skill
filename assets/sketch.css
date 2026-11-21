@@ -404,13 +404,16 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 [data-sketch] .sketch-meter { height: 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 7px 5px 6px 4px; overflow: hidden; }
 [data-sketch] .sketch-meter i { display: block; height: 100%; background: var(--sketch-ink); }
 /* A chart's data table is for screen readers only. The chart's aria-label and key give the values to a sighted reader. */
-[data-sketch] .sketch-data { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+[data-sketch] .sketch-chart-data { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* A menu button shows or hides the element right after it, below 1000 px. */
 [data-sketch] .sketch-collapse { display: grid; flex-basis: 100%; }
 @media (max-width: 599px) {
   [data-sketch] :is(.sketch-from-tablet, .sketch-from-desktop, .sketch-table thead) { display: none !important; }
   [data-sketch] .sketch-table tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; padding: 12px 0; border-bottom: var(--sketch-stroke) solid var(--sketch-wash); }
   [data-sketch] .sketch-table td { padding: 0; border: 0; }
+  [data-sketch] .sketch-data thead { display: table-header-group !important; } /* A data table keeps its headers and rows, so each value keeps its period and its series. */
+  [data-sketch] .sketch-data tr { display: table-row; padding: 0; }
+  [data-sketch] .sketch-data :is(th, td) { padding: 6px 8px; }
   [data-sketch] .sketch-plot:not(.line) > div:last-child > b { position: absolute; top: -20px; right: 0; margin: 0; } /* A narrow last bar puts its value above the plot, clear of a taller bar before it. */
   [data-sketch] :is(.sketch-plot > .minor > b, .sketch-periods > .minor, .sketch-periods small) { visibility: hidden; }
   [data-sketch] .sketch-periods small { display: none; }
