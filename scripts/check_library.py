@@ -14,13 +14,14 @@ import sys
 
 ROOT = pathlib.Path(__file__).parents[1]
 HASH_FILE = ROOT / "scripts" / "library_name_hashes.json"
+# The list excludes common code words that would make ordinary patterns fail.
 URL = re.compile(r"\b(?:https?|ftp)://\S+|\bwww\.\S+", re.IGNORECASE)
 SOURCE = re.compile(r"^\s*source\s*:", re.IGNORECASE | re.MULTILINE)
-WORDS = re.compile(r"[\w]+(?:['’-][\w]+)*", re.UNICODE)
+WORDS = re.compile(r"[^\W_]+", re.UNICODE)
 
 
 def normalize_name(value):
-    return " ".join(value.casefold().split())
+    return " ".join(WORDS.findall(value.casefold()))
 
 
 def hash_name(value):
@@ -53,6 +54,9 @@ def check_tree(root, hashes):
     findings = []
     for path in sorted(root.rglob("*")):
         if path.is_file():
+            relative_parts = path.relative_to(root).parts
+            if any(hash_name(part) in hashes for part in relative_parts):
+                findings.append(f"{path}: blocked path name")
             findings.extend(check_file(path, hashes))
     return findings
 
@@ -67,7 +71,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.hash:
         for line in sys.stdin:
-            print(hash_name(line))
+            if normalize_name(line):
+                print(hash_name(line))
         return 0
     findings = check_tree(ROOT / "library", load_hashes())
     if findings:
