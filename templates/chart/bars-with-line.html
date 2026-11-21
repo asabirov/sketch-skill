@@ -1,0 +1,81 @@
+<!-- Best for: A report that compares each monthly total with a plan or a target in the same unit, such as revenue against budget. -->
+<!-- Many periods: Up to 24 months fit at 390 px. The bars get narrower. Below 600 px, only every third month counted back from the current month, and the last projected month, keep a label. For more than 24 months, group the months into quarters. The line and the bars share one axis, so there is never a second scale. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chart: Bars with a line</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <h1>Revenue against plan</h1>
+  <p>October: <b>€55k</b>, €3k above plan. November so far: <b>€39k</b> of <b>€54k</b> planned.</p>
+  <section class="sketch-panel sketch-frame sketch-stack">
+    <h2>Revenue and plan by month</h2>
+    <div class="sketch-chart" style="--n:14" role="img" aria-label="Revenue by month, in thousand euro: Dec 41k, Jan 38k, Feb 36k, Mar 44k, Apr 47k, May 45k, Jun 50k, Jul 48k, Aug 42k, Sep 52k, Oct 55k. November to date 39k, projected 57k. Projected December 60k, January 54k. Plan, in the same unit: Dec 40k, Jan 40k, Feb 40k, Mar 42k, Apr 44k, May 46k, Jun 48k, Jul 48k, Aug 46k, Sep 50k, Oct 52k, Nov 54k, Dec 58k, Jan 50k.">
+    <div class="sketch-plot">
+      <span class="sketch-tick" style="--v:0%"><span>0</span></span>
+      <span class="sketch-tick" style="--v:50%"><span>30k</span></span>
+      <span class="sketch-tick" style="--v:100%"><span>60k</span></span>
+      <div class="minor"><i style="--v:68.3%"></i></div>
+      <div class="minor"><i style="--v:63.3%"></i></div>
+      <div><i style="--v:60%"></i></div>
+      <div class="minor"><i style="--v:73.3%"></i></div>
+      <div class="minor"><i style="--v:78.3%"></i></div>
+      <div><i style="--v:75%"></i></div>
+      <div class="minor"><i style="--v:83.3%"></i></div>
+      <div class="minor"><i style="--v:80%"></i></div>
+      <div><i style="--v:70%"></i></div>
+      <div class="minor"><i style="--v:86.7%"></i></div>
+      <div class="minor"><i style="--v:91.7%"></i></div>
+      <div class="partial minor"><i class="rest" style="--v:30%"></i><i style="--v:65%"></i></div>
+      <div class="projected minor"><i style="--v:100%"></i></div>
+      <div class="projected"><i style="--v:90%"></i></div>
+      <svg class="sketch-line" viewBox="0 0 140 100" preserveAspectRatio="none" aria-hidden="true"><polyline class="halo" points="5,33.3 15,33.3 25,33.3 35,30 45,26.7 55,23.3 65,20 75,20 85,23.3 95,16.7 105,13.3 115,10 125,3.3 135,16.7"/><polyline points="5,33.3 15,33.3 25,33.3 35,30 45,26.7 55,23.3 65,20 75,20 85,23.3 95,16.7 105,13.3 115,10 125,3.3 135,16.7"/></svg>
+    </div>
+    <ol class="sketch-periods" aria-hidden="true">
+      <li class="minor">Dec</li>
+      <li class="minor">Jan</li>
+      <li>Feb</li>
+      <li class="minor">Mar</li>
+      <li class="minor">Apr</li>
+      <li>May</li>
+      <li class="minor">Jun</li>
+      <li class="minor">Jul</li>
+      <li>Aug</li>
+      <li class="minor">Sep</li>
+      <li class="minor">Oct</li>
+      <li>Nov<small>to date</small></li>
+      <li class="minor">Dec<small>proj.</small></li>
+      <li>Jan<small>proj.</small></li>
+    </ol>
+    </div>
+    <ul class="sketch-key" aria-hidden="true">
+      <li><i></i>Actual revenue</li><li><i class="projected"></i>Projected revenue</li><li><i class="line"></i>Plan</li>
+    </ul>
+    <details>
+    <summary>Data</summary>
+    <div class="sketch-table-box"><table class="sketch-table">
+      <thead><tr><th>Month</th><th>State</th><th>Revenue</th><th>Plan</th></tr></thead>
+      <tbody>
+          <tr><td>Dec 2025</td><td>Actual</td><td>€41k</td><td>€40k</td></tr>
+          <tr><td>Jan 2026</td><td>Actual</td><td>€38k</td><td>€40k</td></tr>
+          <tr><td>Feb 2026</td><td>Actual</td><td>€36k</td><td>€40k</td></tr>
+          <tr><td>Mar 2026</td><td>Actual</td><td>€44k</td><td>€42k</td></tr>
+          <tr><td>Apr 2026</td><td>Actual</td><td>€47k</td><td>€44k</td></tr>
+          <tr><td>May 2026</td><td>Actual</td><td>€45k</td><td>€46k</td></tr>
+          <tr><td>Jun 2026</td><td>Actual</td><td>€50k</td><td>€48k</td></tr>
+          <tr><td>Jul 2026</td><td>Actual</td><td>€48k</td><td>€48k</td></tr>
+          <tr><td>Aug 2026</td><td>Actual</td><td>€42k</td><td>€46k</td></tr>
+          <tr><td>Sep 2026</td><td>Actual</td><td>€52k</td><td>€50k</td></tr>
+          <tr><td>Oct 2026</td><td>Actual</td><td>€55k</td><td>€52k</td></tr>
+          <tr><td>Nov 2026</td><td>Actual to date, projected €57k</td><td>€39k</td><td>€54k</td></tr>
+          <tr><td>Dec 2026</td><td>Projected</td><td>€60k</td><td>€58k</td></tr>
+          <tr><td>Jan 2027</td><td>Projected</td><td>€54k</td><td>€50k</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>

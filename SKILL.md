@@ -1,6 +1,6 @@
 ---
 name: sketch
-description: "Use when drawing a disposable one-ink UI sketch for a layout or interaction review, or when choosing a sketch template category. Covers the sketch kit, the 43 categorized templates, the template gallery and drawing rules. Not for the final look of a product, its UI kit or its design system and not for the tool that shows the sketch to a reviewer."
+description: "Use when drawing a disposable one-ink UI sketch for a layout or interaction review, or when choosing a sketch template category. Covers the sketch kit, the 48 categorized templates, the chart rules, the template gallery and drawing rules. Not for the final look of a product, its UI kit or its design system and not for the tool that shows the sketch to a reviewer."
 metadata:
   version: "0.14.0"
 ---
@@ -12,6 +12,7 @@ A sketch is a disposable page drawn with one marker. It shows layout and behavio
 | Task | Read |
 | --- | --- |
 | Draw a sketch, or start one from a page template | [references/sketch-prototypes.md](references/sketch-prototypes.md) |
+| Draw a chart, or choose a chart template | [references/charts.md](references/charts.md) |
 
 The skill folder holds `assets/`, `templates/` and `references/`. Keep the installed skill unchanged. Copy a template to the project, edit it, then run `python3 "<skill-folder>/assets/sketch_inline.py" page.html > sketch.html` from the project folder.
 

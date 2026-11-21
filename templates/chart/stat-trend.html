@@ -1,0 +1,32 @@
+<!-- Best for: A first row of a report that shows a few key numbers, each with the trend of its last months, such as revenue, costs and margin. -->
+<!-- Many periods: Each small trend holds 6 complete months, the current month and one projected month. It has no labels between its first and last month, so it fits a card of any width. For a longer trend, open the full chart. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chart: Stat with a small trend</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <h1>November to date</h1>
+  <div class="sketch-grid" style="--phone:1;--tablet:2;--wide:4">
+    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Revenue</h2>
+      <div class="sketch-row"><b style="font-size:32px">€39k</b><span>of €57k projected</span></div><span>▲ 6% vs. October at day 21</span>
+      <div class="sketch-chart" style="--n:8" role="img" aria-label="Revenue, May to October: 45k, 50k, 48k, 42k, 52k, 55k. November to date 39k, projected 57k. December projected 60k."><div class="sketch-plot" style="--h:48px"><div><i style="--v:75%"></i></div><div><i style="--v:83.3%"></i></div><div><i style="--v:80%"></i></div><div><i style="--v:70%"></i></div><div><i style="--v:86.7%"></i></div><div><i style="--v:91.7%"></i></div><div class="partial"><i class="rest" style="--v:30%"></i><i style="--v:65%"></i></div><div class="projected"><i style="--v:100%"></i></div></div><div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Dec proj.</span></div></div></section>
+    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Costs</h2>
+      <div class="sketch-row"><b style="font-size:32px">€27k</b><span>of €40k projected</span></div><span>▲ 2% vs. October at day 21</span>
+      <div class="sketch-chart" style="--n:8" role="img" aria-label="Costs, May to October: 36k, 38k, 37k, 36k, 39k, 39k. November to date 27k, projected 40k. December projected 41k."><div class="sketch-plot" style="--h:48px"><div><i style="--v:80%"></i></div><div><i style="--v:84.4%"></i></div><div><i style="--v:82.2%"></i></div><div><i style="--v:80%"></i></div><div><i style="--v:86.7%"></i></div><div><i style="--v:86.7%"></i></div><div class="partial"><i class="rest" style="--v:28.9%"></i><i style="--v:60%"></i></div><div class="projected"><i style="--v:91.1%"></i></div></div><div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Dec proj.</span></div></div></section>
+    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Margin</h2>
+      <div class="sketch-row"><b style="font-size:32px">€12k</b><span>of €17k projected</span></div><span>▲ 15% vs. October at day 21</span>
+      <div class="sketch-chart" style="--n:8" role="img" aria-label="Margin, May to October: 9k, 12k, 11k, 6k, 13k, 16k. November to date 12k, projected 17k. December projected 19k."><div class="sketch-plot" style="--h:48px"><div><i style="--v:45%"></i></div><div><i style="--v:60%"></i></div><div><i style="--v:55%"></i></div><div><i style="--v:30%"></i></div><div><i style="--v:65%"></i></div><div><i style="--v:80%"></i></div><div class="partial"><i class="rest" style="--v:25%"></i><i style="--v:60%"></i></div><div class="projected"><i style="--v:95%"></i></div></div><div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Dec proj.</span></div></div></section>
+    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Cash balance</h2>
+      <div class="sketch-row"><b style="font-size:32px">€131k</b><span>today</span></div><span>▼ 4% vs. October end</span>
+      <svg class="sketch-spark" style="height:48px" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Cash balance, May to October month ends: 121k, 130k, 126k, 119k, 128k, 136k. Today 131k. January projected 150k."><polyline points="0,15 12.5,12 25,13.3 37.5,15.7 50,12.7 62.5,10 71,11.7"/><polyline class="projected" points="71,11.7 87.5,8 100,5.3"/></svg>
+      <div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Jan proj.</span></div></section>
+  </div>
+  <ul class="sketch-key" aria-hidden="true">
+    <li><i></i>Actual</li><li><i class="projected"></i>Projected</li>
+  </ul>
+</main>
+<script src="../../assets/sketch.js"></script>
