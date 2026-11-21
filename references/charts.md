@@ -45,6 +45,9 @@ The classes are in `assets/sketch.css`, after the sparkline.
 - `compare` on a `polyline` in a `sketch-line` draws a thin line for an earlier period, such as October. Name it in the key with `<i class="line compare">`.
 - `<i class="second">` before the other `<i>` of a period is the upper part of a split bar. Name it in the key with `<i class="second">`.
 - `<span class="sketch-ref" style="--v:25%"><span>Minimum €100k</span></span>` in a plot draws a reference level with its label on the right.
+- `<span class="plan" style="--p:90%"></span>` and `<b class="plan-value" style="--t:95%">54k</b>` before the bars of a period draw a dashed plan tick and its value. Set `--t` to the top of the tick or of the bar, whichever is higher. The value hides below 600 px. Name the tick in the key with `<i class="plan">`.
+- `below` on a period draws its bar in the thinned ink, for a month below its plan.
+- `<span class="sketch-today" style="--x:83.6%"><span>Today</span></span>` in a plot draws a dashed vertical line at today. Set `--x` to the place of today across the plot.
 - `ends` on a `sketch-periods` row keeps its first and last label inside the chart. Then give the first and the last label a year, such as "Dec 2025".
 - `<dl class="sketch-summary">` holds the numbers above a chart, one `div` of `dt` and `dd` for each. The first value is the largest. A `span` after the value is its change.
 - `<td class="sketch-trend">` holds the change in a `span` above a `sketch-spark`, in a table row. The sparkline is 120 px wide, and 80 px below 600 px.
