@@ -28,12 +28,12 @@ Related: `account/live-preview-signup`, a sign-up with a live preview of the app
 - `start` to `email` to `check-email`. Trigger: click a continue button. Moves: the card content and the links (opacity and transform 200 ms, ease-out). measured.
 - any link or button, hover. Trigger: pointer. Moves: the background and text colour. 150 ms, ease. measured.
 - `enter-code` to `code-expired`. Trigger: continue with an old code. Moves: a status layer fades (opacity 200 ms, ease-in-out). measured.
-- `create-workspace`, submit. Trigger: click Create workspace. Moves: a loading bar (an animation of 2000 ms, feed). measured.
-- `building`. Trigger: none, it plays once. Moves: the whole mark builds in 3400 ms. Four strokes draw in 800 ms each, with delays 500, 750, 1000 and 1250 ms (a stagger of 250 ms). Four fills follow in 600 ms each, with delays 900, 1150, 1400 and 1650 ms. The mark settles in 500 ms at 2350 ms. The overlay leaves in 550 ms at 3500 ms. All feed. measured.
-- `building` to `profile`. Trigger: the end of `building`. Moves: the step content fades in, block by block (opacity 0 to 1, 750 ms, delays 0, 80, 160 and 240 ms, a feed() spring with a small overshoot: 0.88 at 32 %, 1.014 at 65 %, 1 at 100 %). The dots fade (opacity 500 ms, cubic-bezier(0.16, 1, 0.3, 1)). The side video cross-fades (opacity 350 ms, ease). measured.
+- `create-workspace`, submit. Trigger: click Create workspace. Moves: a loading bar (an animation of 2000 ms, linear). measured.
+- `building`. Trigger: none, it plays once. Moves: the whole mark builds in 3400 ms. Four strokes draw in 800 ms each, with delays 500, 750, 1000 and 1250 ms (a stagger of 250 ms). Four fills follow in 600 ms each, with delays 900, 1150, 1400 and 1650 ms. The mark settles in 500 ms at 2350 ms. The overlay leaves in 550 ms at 3500 ms. All linear. measured.
+- `building` to `profile`. Trigger: the end of `building`. Moves: the step content fades in, block by block (opacity 0 to 1, 750 ms, delays 0, 80, 160 and 240 ms, a linear() spring with a small overshoot: 0.88 at 32 %, 1.014 at 65 %, 1 at 100 %). The dots fade (opacity 500 ms, cubic-bezier(0.16, 1, 0.3, 1)). The side video cross-fades (opacity 350 ms, ease). measured.
 - each onboarding step to the next (`profile` to `invite` to `connect-repo` to `connect-chat` to `newsletter`). Trigger: Continue or Skip. Moves: the old content leaves first (opacity 1 to 0, 200 ms, cubic-bezier(0.4, 0, 1, 1)). Then the new content enters with the same spring and stagger as above. The dots, the side video and a side layer (opacity 200 ms, ease-out) cross-fade. measured.
 - `newsletter`, toggle. Trigger: click a toggle. Moves: the track colour and the knob position (background-color, left and right, 150 ms, ease-out). measured.
-- `newsletter` to `app`. Trigger: click Finish. Moves: the app view fades in (80 ms, feed), and a panel fades (opacity 200 ms, ease-in-out). measured.
+- `newsletter` to `app`. Trigger: click Finish. Moves: the app view fades in (80 ms, linear), and a panel fades (opacity 200 ms, ease-in-out). measured.
 
 ## Hard cases
 

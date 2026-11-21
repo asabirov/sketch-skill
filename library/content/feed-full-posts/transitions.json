@@ -18,7 +18,7 @@
     "animation": null,
     "duration": 50,
     "delay": 0,
-    "easing": "feed",
+    "easing": "linear",
     "measurement": "estimated"
   },
   {
@@ -40,7 +40,7 @@
     "animation": null,
     "duration": 50,
     "delay": 0,
-    "easing": "feed",
+    "easing": "linear",
     "measurement": "estimated"
   },
   {
@@ -62,7 +62,7 @@
     "animation": null,
     "duration": 400,
     "delay": 0,
-    "easing": "feed(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1)",
+    "easing": "linear(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1)",
     "measurement": "measured"
   },
   {
@@ -73,7 +73,7 @@
     "animation": null,
     "duration": 300,
     "delay": 0,
-    "easing": "feed(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1)",
+    "easing": "linear(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1)",
     "measurement": "measured"
   },
   {
@@ -95,7 +95,7 @@
     "animation": null,
     "duration": 280,
     "delay": 0,
-    "easing": "feed(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1)",
+    "easing": "linear(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1)",
     "measurement": "measured"
   },
   {
@@ -106,7 +106,7 @@
     "animation": null,
     "duration": 300,
     "delay": 0,
-    "easing": "feed(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1)",
+    "easing": "linear(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1)",
     "measurement": "measured"
   },
   {
@@ -128,7 +128,7 @@
     "animation": null,
     "duration": 150,
     "delay": 0,
-    "easing": "feed",
+    "easing": "linear",
     "measurement": "estimated"
   }
 ]

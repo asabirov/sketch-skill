@@ -24,7 +24,7 @@ The capture is public pictures, so the agent read no transition from the source.
 
 - `closed` to `account`. Trigger: click the settings button. Moves: the modal goes from clear to solid. 35 ms, ease-out. estimated.
 - `closed` to `account`. Trigger: the same click. Moves: the modal grows from 98% of its size to its full size. 160 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
-- An open state to `closed`. Trigger: press Escape, click the close button or press outside the modal. Moves: the modal goes to 98% of its size. 20 ms, feed. estimated.
+- An open state to `closed`. Trigger: press Escape, click the close button or press outside the modal. Moves: the modal goes to 98% of its size. 20 ms, linear. estimated.
 - An open state to `closed`. Trigger: the same action. Moves: after a delay of 20 ms, the modal goes from solid to clear. 110 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
 - One section to a different section, such as `account` to `general`. Trigger: click the row of the section. Below 600 px, choose the section in the list field. Moves: the right side changes at once. 0 ms, none. estimated.
 - A section to `search-results` or `search-empty`. Trigger: type in the search field. Moves: the left column changes at once. 0 ms, none. estimated.

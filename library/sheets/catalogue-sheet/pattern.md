@@ -15,13 +15,13 @@ Related: `sheets/catalogue-sheet-search-top` puts the search field below the tit
 
 ## Transitions
 
-- `closed` to `catalogue`. Trigger: tap on the button of the screen. Moves: the sheet rises from below the screen, with the animation `directory-enter`. 520 ms, feed(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
+- `closed` to `catalogue`. Trigger: tap on the button of the screen. Moves: the sheet rises from below the screen, with the animation `directory-enter`. 520 ms, linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
 - `closed` to `catalogue`. Trigger: the same tap. Moves: the scrim shows, with the animation `scrim-enter`. 120 ms, cubic-bezier(0.23, 1, 0.32, 1). measured.
 - `catalogue` to `filtered`. Trigger: tap on a chip. Moves: while the finger is down, the chip shrinks to `scale(0.96)` and its `background-color` changes. 120 ms, cubic-bezier(0.23, 1, 0.32, 1). measured. The rows change at once.
 - `catalogue` to `search`, and `search` to `no-match`. Trigger: a key. Moves: the rows change at once. This move has no duration.
 - `no-match` to `catalogue`. Trigger: tap on Clear filters. Moves: the rows show at once. The button has the same 120 ms press as a chip.
 - An open sheet to `closed`. Trigger: tap on Close, a press outside the sheet, Escape, or the action of a row. Moves: the sheet leaves at once, and the scrim fades out with the animation `scrim-exit`. 120 ms, cubic-bezier(0.23, 1, 0.32, 1). measured.
-- An open sheet to `closed`. Trigger: the release of a drag down on the head, after one third of the sheet height. Moves: the `transform` of the sheet, to below the screen. 520 ms, the same `feed()` spring. measured.
+- An open sheet to `closed`. Trigger: the release of a drag down on the head, after one third of the sheet height. Moves: the `transform` of the sheet, to below the screen. 520 ms, the same `linear()` spring. measured.
 
 ## Hard cases
 

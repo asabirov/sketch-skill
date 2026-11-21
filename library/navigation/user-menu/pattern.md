@@ -21,7 +21,7 @@ The source moves the menu with a script that writes the style in each frame, and
 
 - `closed` to `menu-open`. Trigger: click the trigger. Moves: the menu goes from clear to solid. 35 ms, ease-out. measured duration, estimated easing.
 - `closed` to `menu-open`. Trigger: the same click. Moves: the menu grows from 98% of its size to its full size, from the corner next to the trigger. 160 ms, cubic-bezier(0, 0, 0.2, 1). measured duration, estimated easing.
-- `menu-open` or `theme-open` to `closed`. Trigger: press Escape, press outside the menu or click the trigger. Moves: the menu goes to 98% of its size. 20 ms, feed. measured duration, estimated easing.
+- `menu-open` or `theme-open` to `closed`. Trigger: press Escape, press outside the menu or click the trigger. Moves: the menu goes to 98% of its size. 20 ms, linear. measured duration, estimated easing.
 - `menu-open` or `theme-open` to `closed`. Trigger: the same action. Moves: after a delay of 20 ms, the menu goes from solid to clear. 110 ms, cubic-bezier(0, 0, 0.2, 1). measured delay and duration, estimated easing. The source removes the menu about 170 ms after the action.
 - `menu-open` to `theme-open`. Trigger: the pointer goes over the row that has the arrow. Moves: the submenu shows at once beside its row. 0 ms, none. measured.
 - `theme-open` to `menu-open`. Trigger: the pointer goes over a different row. Moves: the submenu goes at once. 0 ms, none. measured.

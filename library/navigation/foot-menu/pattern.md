@@ -19,7 +19,7 @@ The capture is one still picture, so the agent read no transition from the sourc
 
 - `closed` to `menu-open`. Trigger: click the trigger. Moves: the menu goes from clear to solid. 35 ms, ease-out. estimated.
 - `closed` to `menu-open`. Trigger: the same click. Moves: the menu grows from 98% of its size to its full size, from the corner next to the trigger. 160 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
-- `menu-open` or `theme-open` to `closed`. Trigger: press Escape, press outside the menu or click the trigger. Moves: the menu goes to 98% of its size. 20 ms, feed. estimated.
+- `menu-open` or `theme-open` to `closed`. Trigger: press Escape, press outside the menu or click the trigger. Moves: the menu goes to 98% of its size. 20 ms, linear. estimated.
 - `menu-open` or `theme-open` to `closed`. Trigger: the same action. Moves: after a delay of 20 ms, the menu goes from solid to clear. 110 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
 - `menu-open` to `theme-open`. Trigger: the pointer goes over the Theme row. Moves: the submenu shows at once beside its row. 0 ms, none. estimated.
 - `theme-open` to `menu-open`. Trigger: the pointer goes over a different row. Moves: the submenu goes at once. 0 ms, none. estimated.
@@ -45,7 +45,7 @@ The picture of the source is 1280 px wide. So each case below 1000 px is the des
 - The owner's rule for each part: one part has one pattern. So this record draws the menu. `settings/settings-window` draws the settings window, and `navigation/user-menu` draws the signed-out page. The profile and the notification settings are behind the settings row.
 - The menu of the source also has a dashboard row, an invite row and an upgrade row, and its help row opens a submenu. An icon button stands beside its trigger. These parts are the product's own, so the sketch draws none of them.
 - The picture of the source shows no theme row. The owner asked for a theme choice, and then for a submenu as in `navigation/user-menu`. The sketch puts the Theme row before the line.
-- The coordinator of this capture read the entry of the menu in the source with `document.getAnimations()`: 2 animations, 120 ms, feed. The agent of this record did not read this value, so `transitions.json` does not have it.
+- The coordinator of this capture read the entry of the menu in the source with `document.getAnimations()`: 2 animations, 120 ms, linear. The agent of this record did not read this value, so `transitions.json` does not have it.
 - In the sketch, a click on the Theme row and the Right Arrow key also open the submenu.
 - Keep these parts when the look changes: the head of the menu names the member, one press of Escape closes all layers, the focus goes back to the trigger, and the sign-out row stays apart from the other rows.
 - The sketch keeps no brand and no picture of the source. The member and all words are sample content.

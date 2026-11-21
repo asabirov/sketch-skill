@@ -15,7 +15,7 @@ Related: `chat/create-a-chat` has a grid of shapes for the avatar. `chat/create-
 
 ## Transitions
 
-- `closed` to `empty`. Trigger: tap on the New chat button. Moves: the sheet rises from below the screen, with the animation `directory-enter`. 520 ms, feed(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
+- `closed` to `empty`. Trigger: tap on the New chat button. Moves: the sheet rises from below the screen, with the animation `directory-enter`. 520 ms, linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
 - `closed` to `empty`. Trigger: the same tap. Moves: the scrim shows, with the animation `scrim-enter`. 120 ms, cubic-bezier(0.23, 1, 0.32, 1). measured.
 - `empty` to `filled`. Trigger: the first character in the Name field. Moves: the `background-color` and the `color` of the Create button, from quiet to full. 120 ms, cubic-bezier(0.23, 1, 0.32, 1). measured. The preview changes at once on each choice.
 - `filled` to `name-taken`. Trigger: tap on Create. Moves: while the finger is down, the button shrinks to `scale(0.96)` and its `background-color` changes. 120 ms, cubic-bezier(0.23, 1, 0.32, 1). measured. The message shows at once.

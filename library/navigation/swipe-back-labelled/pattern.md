@@ -13,11 +13,11 @@ Related: `navigation/swipe-back` has a Back button with no name. `navigation/swi
 
 ## Transitions
 
-- `list` to `detail`. Trigger: tap on a row. Moves: the list leaves to the left with `push-exit`, and the page comes in from the right with `push-enter`. 520 ms, feed(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
-- `detail` to `list`. Trigger: tap on Back. Moves: the page leaves to the right with `back-exit`, and the list comes in from the left with `back-enter`. 520 ms, the same `feed()` spring. measured.
+- `list` to `detail`. Trigger: tap on a row. Moves: the list leaves to the left with `push-exit`, and the page comes in from the right with `push-enter`. 520 ms, linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
+- `detail` to `list`. Trigger: tap on Back. Moves: the page leaves to the right with `back-exit`, and the list comes in from the left with `back-enter`. 520 ms, the same `linear()` spring. measured.
 - `detail` to `dragging`. Trigger: a drag to the right from the left edge. Moves: the page, by the distance of the finger. The list moves from 48 px left to its position, and its dim goes from full to none, in step with the page. This move has no duration.
-- `dragging` to `list`. Trigger: a release after one third of the screen width. A flick also goes back, if it is longer than 24 px and faster than 0.5 px in a millisecond. Moves: the `transform` of the page to the right edge, the `transform` of the list to its position, and the `opacity` of the dim to 0. 520 ms, the same `feed()` spring. measured.
-- `dragging` to `detail`. Trigger: a release before one third of the screen width. Moves: the same three properties, back to the start. 520 ms, the same `feed()` spring. measured.
+- `dragging` to `list`. Trigger: a release after one third of the screen width. A flick also goes back, if it is longer than 24 px and faster than 0.5 px in a millisecond. Moves: the `transform` of the page to the right edge, the `transform` of the list to its position, and the `opacity` of the dim to 0. 520 ms, the same `linear()` spring. measured.
+- `dragging` to `detail`. Trigger: a release before one third of the screen width. Moves: the same three properties, back to the start. 520 ms, the same `linear()` spring. measured.
 
 ## Hard cases
 

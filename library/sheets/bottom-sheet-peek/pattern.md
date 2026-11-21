@@ -13,11 +13,11 @@ Related: `sheets/bottom-sheet` dims the screen behind it, and its closed sheet d
 
 ## Transitions
 
-- `closed` to `open`. Trigger: tap on the handle and the title of the small sheet. Moves: the sheet rises from below the screen, with the animation `directory-enter`. 520 ms, feed(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
+- `closed` to `open`. Trigger: tap on the handle and the title of the small sheet. Moves: the sheet rises from below the screen, with the animation `directory-enter`. 520 ms, linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
 - `open` to `closed`. Trigger: tap on the button that makes the sheet small, or Escape. Moves: the sheet becomes small at once. This move has no duration.
 - `open` to `dragging`. Trigger: a drag down on the head of the sheet. Moves: the sheet, by the distance of the finger. This move has no duration.
-- `dragging` to `open`. Trigger: a release before one third of the sheet height. Moves: the `transform` of the sheet, back to the open position. 520 ms, the same `feed()` spring. measured.
-- `dragging` to `closed`. Trigger: a release after one third of the sheet height. A flick also closes the sheet, if it is longer than 24 px and faster than 0.5 px in a millisecond. Moves: the `transform` of the sheet, to below the screen. 520 ms, the same `feed()` spring. measured.
+- `dragging` to `open`. Trigger: a release before one third of the sheet height. Moves: the `transform` of the sheet, back to the open position. 520 ms, the same `linear()` spring. measured.
+- `dragging` to `closed`. Trigger: a release after one third of the sheet height. A flick also closes the sheet, if it is longer than 24 px and faster than 0.5 px in a millisecond. Moves: the `transform` of the sheet, to below the screen. 520 ms, the same `linear()` spring. measured.
 
 ## Hard cases
 

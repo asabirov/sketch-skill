@@ -24,7 +24,7 @@ Related: `settings/notification-settings-by-event` has one page for each kind of
 - `channel` to `overview`. Trigger: a click on the back link. Moves: nothing. The list shows at once. measured.
 - `channel` to `event-off`. Trigger: a click on the switch. Moves: the fill of the switch changes (background-color 150 ms, ease-out), and the thumb moves to the other side (left 150 ms, ease-out). measured.
 - `channel` to `channel-off`. Trigger: a click on the switch of the channel. Moves: the same switch values (background-color and left 150 ms, ease-out), and each control of the channel dims (opacity 150 ms, ease-out). measured. The way back to on has the same values.
-- `channel` to `format-menu`. Trigger: a click on the format control. Moves: the menu fades in (opacity 50 ms, feed) and grows from 98% (transform 230 ms, ease-out). The source moves it with a script spring. estimated.
+- `channel` to `format-menu`. Trigger: a click on the format control. Moves: the menu fades in (opacity 50 ms, linear) and grows from 98% (transform 230 ms, ease-out). The source moves it with a script spring. estimated.
 - `channel` to `save-error`. Trigger: a refused change. Moves: nothing. The source shows no error state, so the sketch shows the sentence at once.
 
 ## Hard cases

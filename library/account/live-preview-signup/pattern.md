@@ -26,13 +26,13 @@ Related: `account/email-code-signup`, a sign-up with an emailed code and a paged
 - `your-name` to `invite`. Trigger: click Next. Moves: the preview section heading colour as the highlight moves. 100 ms, ease-out. measured.
 - any field, focus. Trigger: focus. Moves: the field border colour and the focus ring shadow. 80 ms, ease-out. measured.
 - any button, hover and press. Trigger: pointer. Moves: the background, border and text colour. 80 ms, cubic-bezier(0.36, 0.19, 0.29, 1). measured.
-- `welcome-use` to `welcome-familiar` to `welcome-goals`. Trigger: Next, or a click on an answer. Moves: the new question content fades in after the old one leaves. Opacity 500 ms, 150 ms delay, feed. measured.
-- `welcome-goals` to `upsell`. Trigger: click Get started. Moves: the plan page fades in (opacity 500 ms, feed). The header fades in with a spring curve (opacity 700 ms, a feed() spring that reaches 0.95 at about 50 %). The rows fade in one after the other (opacity 160 ms, ease-out, delays 0, 50 and 100 ms). measured.
-- `upsell`, row open. Trigger: click a row. Moves: the row body grows from grid-template-rows 0fr to 1fr. 300 ms, feed. measured.
+- `welcome-use` to `welcome-familiar` to `welcome-goals`. Trigger: Next, or a click on an answer. Moves: the new question content fades in after the old one leaves. Opacity 500 ms, 150 ms delay, linear. measured.
+- `welcome-goals` to `upsell`. Trigger: click Get started. Moves: the plan page fades in (opacity 500 ms, linear). The header fades in with a spring curve (opacity 700 ms, a linear() spring that reaches 0.95 at about 50 %). The rows fade in one after the other (opacity 160 ms, ease-out, delays 0, 50 and 100 ms). measured.
+- `upsell`, row open. Trigger: click a row. Moves: the row body grows from grid-template-rows 0fr to 1fr. 300 ms, linear. measured.
 - `first-channel`, action card hover. Trigger: pointer. Moves: the card transform. 300 ms, ease. measured.
 - `task-dialog` open and close. Trigger: click the task, or Cancel or Confirm. Moves: nothing. The dialog and the overlay show at once (0 ms). measured.
-- `task-dialog` to `task-done`. Trigger: click Confirm. Moves: the checkbox fills (background and border colour 160 ms, cubic-bezier(0.36, 0.19, 0.29, 1)). The tick pops (opacity 0 to 1, scale 0.4 to 1.25 at 70 % to 1, 240 ms, feed). The old plant fades out (opacity 1 to 0, scale 1 to 0.8, 200 ms, feed). The new plant grows (opacity 0 to 1, scale 0.7 to 1.15 at 60 % to 1, 240 ms, 80 ms delay, feed). measured.
-- cookie banner, close. Trigger: click Reject. Moves: opacity to 0 in 400 ms, feed, then visibility hidden after a 400 ms delay. measured. The sketch leaves the banner out by the owner's choice.
+- `task-dialog` to `task-done`. Trigger: click Confirm. Moves: the checkbox fills (background and border colour 160 ms, cubic-bezier(0.36, 0.19, 0.29, 1)). The tick pops (opacity 0 to 1, scale 0.4 to 1.25 at 70 % to 1, 240 ms, linear). The old plant fades out (opacity 1 to 0, scale 1 to 0.8, 200 ms, linear). The new plant grows (opacity 0 to 1, scale 0.7 to 1.15 at 60 % to 1, 240 ms, 80 ms delay, linear). measured.
+- cookie banner, close. Trigger: click Reject. Moves: opacity to 0 in 400 ms, linear, then visibility hidden after a 400 ms delay. measured. The sketch leaves the banner out by the owner's choice.
 
 ## Hard cases
 

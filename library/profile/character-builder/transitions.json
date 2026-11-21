@@ -6,7 +6,7 @@
     "animation": null,
     "duration": 0,
     "delay": 0,
-    "easing": "feed"
+    "easing": "linear"
   },
   {
     "label": "save",
@@ -15,6 +15,6 @@
     "animation": null,
     "duration": 10300,
     "delay": 0,
-    "easing": "feed"
+    "easing": "linear"
   }
 ]

@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).parents[1]
 HASH_FILE = ROOT / "scripts" / "library_name_hashes.json"
 # The list excludes common code words that would make ordinary patterns fail.
 URL = re.compile(r"\b(?:https?|ftp)://\S+|\bwww\.\S+", re.IGNORECASE)
-SOURCE = re.compile(r"^\s*source\s*:", re.IGNORECASE | re.MULTILINE)
+SOURCE = re.compile(r"(?<![a-z])source\s*:", re.IGNORECASE)
 WORDS = re.compile(r"[^\W_]+", re.UNICODE)
 
 
@@ -39,7 +39,7 @@ def check_file(path, hashes):
     try:
         text = path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
-        return []
+        return [f"{path}: invalid encoding"]
     findings = []
     if SOURCE.search(text):
         findings.append(f"{path}: Source line")
@@ -72,13 +72,14 @@ def load_hashes():
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--hash", action="store_true", help="hash names from standard input")
+    parser.add_argument("--root", help="library directory to check instead of the repository one")
     args = parser.parse_args(argv)
     if args.hash:
         for line in sys.stdin:
             if normalize_name(line):
                 print(hash_name(line))
         return 0
-    findings = check_tree(ROOT / "library", load_hashes())
+    findings = check_tree(pathlib.Path(args.root) if args.root else ROOT / "library", load_hashes())
     if findings:
         print("\n".join(findings), file=sys.stderr)
         return 1

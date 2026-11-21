@@ -24,7 +24,7 @@ The capture is still pictures, so the agent read no transition from the source. 
 - `closed` to `general`. Trigger: the same click. Moves: the window grows from 98% of its size to its full size. 160 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
 - `closed` to `account`. Trigger: click the account button. Moves: the window goes from clear to solid. 35 ms, ease-out. estimated.
 - `closed` to `account`. Trigger: the same click. Moves: the window grows from 98% of its size to its full size. 160 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
-- `general`, `themes`, `notifications` or `account` to `closed`. Trigger: press Escape, click the close button or press outside the window. Moves: the window goes to 98% of its size. 20 ms, feed. estimated.
+- `general`, `themes`, `notifications` or `account` to `closed`. Trigger: press Escape, click the close button or press outside the window. Moves: the window goes to 98% of its size. 20 ms, linear. estimated.
 - `general`, `themes`, `notifications` or `account` to `closed`. Trigger: the same action. Moves: after a delay of 20 ms, the window goes from solid to clear. 110 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
 - One tab to a different tab, such as `general` to `themes`. Trigger: click the tab, or press the Left Arrow or the Right Arrow key on the row of tabs. Moves: the part below the tabs changes at once. 0 ms, none. estimated.
 - `account` to `signed-out`. Trigger: click the sign-out button. Moves: the page changes at once. 0 ms, none. estimated.

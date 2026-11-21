@@ -16,9 +16,9 @@ Related: `chat/chat-list-tab-bar` has a tab bar in place of the Menu button. `ch
 ## Transitions
 
 - `list` to `chat`. Trigger: tap on a row. Moves: while the finger is down, the row shrinks to `scale(0.96)` and its `background-color` becomes a soft fill. 120 ms, cubic-bezier(0.23, 1, 0.32, 1). measured.
-- `list` to `chat`. Trigger: the same tap. Moves: the list leaves to the left with `push-exit`, and the chat comes in from the right with `push-enter`. 520 ms, feed(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
-- `chat` or `search` to `list`. Trigger: tap on Back. Moves: the screen leaves to the right with `back-exit`, and the list comes in from the left with `back-enter`. 520 ms, the same `feed()` spring. measured.
-- `list` to `search`. Trigger: tap on the Search field. Moves: the same `push-exit` and `push-enter`. 520 ms, the same `feed()` spring. measured.
+- `list` to `chat`. Trigger: the same tap. Moves: the list leaves to the left with `push-exit`, and the chat comes in from the right with `push-enter`. 520 ms, linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%). measured.
+- `chat` or `search` to `list`. Trigger: tap on Back. Moves: the screen leaves to the right with `back-exit`, and the list comes in from the left with `back-enter`. 520 ms, the same `linear()` spring. measured.
+- `list` to `search`. Trigger: tap on the Search field. Moves: the same `push-exit` and `push-enter`. 520 ms, the same `linear()` spring. measured.
 - `search` to `search-none`. Trigger: a key. Moves: the rows change at once. This move has no duration.
 
 ## Hard cases

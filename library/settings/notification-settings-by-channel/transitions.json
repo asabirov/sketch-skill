@@ -73,7 +73,7 @@
     "animation": null,
     "duration": 50,
     "delay": 0,
-    "easing": "feed",
+    "easing": "linear",
     "measurement": "estimated"
   },
   {

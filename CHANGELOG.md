@@ -6,6 +6,11 @@
 
 - Added the reusable pattern library and its pull request gate.
 
+### Changed
+
+- Each sketch loads the kit from `assets/sketch.css` and `assets/sketch.js` instead of an inline copy.
+- The kit draws the extra pattern icons. A pattern sets `window.sketchGlyphs` with the paths instead of drawing them itself.
+
 ## 0.14.0 — 2026-11-20
 
 ### Changed
