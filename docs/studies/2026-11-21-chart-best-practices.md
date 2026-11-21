@@ -27,7 +27,7 @@ The agent found no source for these points. They are decisions of this kit.
 - A projected part of a line is dashed. A line cannot be hatched, so the dash is the line form of practice 3.
 - The current period that is not complete shows its actual value to date as a solid part, and its projected rest as a hatched part on top. So the bar has the full projected height, and the solid part stays comparable with the earlier months.
 - A change in the current period compares the value to date with the earlier period at the same day. A full earlier month against a part of this month always looks like a fall.
-- To fit many periods, the bars get narrower. Below 600 px, only the first period and the current period keep a label, as status pages label only the ends of a long row of bars. The number of periods that fit is in the rule page of each template.
+- To fit many periods, the bars get narrower. Below 600 px, only the first period and the current period keep a label, as status pages label only the ends of a long row of bars. Each other label has the class `minor`, and `assets/sketch.css:418` hides it below 600 px. See `templates/chart/monthly-bars.html:41`. The number of periods that fit is in the rule page of each template.
 
 ## What the agent could not check
 
