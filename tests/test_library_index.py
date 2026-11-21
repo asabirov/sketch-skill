@@ -25,7 +25,7 @@ class LibraryIndexTest(unittest.TestCase):
     def test_readme_counts_each_category(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         section = readme.split("## Pattern library", 1)[1].split("\n## ", 1)[0]
-        rows = dict(re.findall(r"^\| ([A-Z][\w ]*) \| (\d+) \|", section, re.M))
+        rows = dict(re.findall(r"^\| ([A-Z][\w -]*) \| (\d+) \|", section, re.M))
         expected = {c.capitalize(): str(sum(1 for p in self.patterns if p.startswith(f"{c}/"))) for c in self.categories}
         self.assertEqual(rows, expected)
 
