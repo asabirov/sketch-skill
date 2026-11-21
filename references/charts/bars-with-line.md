@@ -21,11 +21,11 @@ The plan of each month is a dashed tick across its period, with the plan value a
 
 ## Many periods
 
-Up to 24 months fit at 390 px. The bars get narrower. From 600 px, each month has a label and a plan value. The plan value sits above the tick or above the bar, whichever is higher. Below 600 px, only the first month and the current month keep a label, and the plan values hide, because a value is wider than its period. Three grid lines give the scale, the summary gives the plan of the current month, and the data table gives each value. For more than 24 months, group the months into quarters.
+Up to 24 months fit at 390 px. The bars get narrower. From 600 px, each month has a label and a plan value. The plan value sits above the tick or above the bar, whichever is higher. Below 600 px, only the first month and the current month keep a label, and the plan values hide, because a value is wider than its period. Three grid lines give the scale, the summary gives the plan of the current month, and the data table gives each value to screen readers. For more than 24 months, group the months into quarters.
 
 ## Above and below plan
 
-A complete month at or above its plan is solid. A complete month below its plan is in the thinned ink of `below`. The tone is not the only sign: the top of the bar is above or below its tick. The key names both, and the data table gives the difference from plan of each month.
+A complete month at or above its plan is solid. A complete month below its plan is in the thinned ink of `below`. The tone is not the only sign: the top of the bar is above or below its tick. The key names both, and the data table gives screen readers the difference from plan of each month.
 
 ## Current and projected periods
 

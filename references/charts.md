@@ -23,7 +23,7 @@ Use this page to choose a chart template and to draw a chart in a sketch. The pr
 - Never use a second value axis. If two series have different units, draw two charts.
 - Never scroll inside a chart. Each rule page says how many periods fit and what to do with more.
 - Name each mark in words in a `sketch-key`. Never use a hue.
-- Give the chart `role="img"` and an `aria-label` with a summary and the values. Put the data in a `details` table below the chart, with the class `sketch-data`. A sparkline in a table row gives every value in its `aria-label` in place of a table.
+- Give the chart `role="img"` and an `aria-label` with a summary and the values. Put the data in a table with the class `sketch-data` below the chart. The kit shows it to screen readers only, so the page has no visible data control. A sparkline in a table row gives every value in its `aria-label` in place of a table.
 - Put the main numbers above the chart in a `sketch-summary`, such as "November 1 to 21: €39k" and "November, projected: ~€57k". Give each value its change against the same days of the earlier period.
 - Split a bar into at most 2 parts. Draw the lower part solid and the upper part in the thinned ink of `second`. A projected bar is not split, because the split of a projection is not known.
 - Draw a reference level, such as a minimum cash level, as a `sketch-ref` line with its name and value on the line.
