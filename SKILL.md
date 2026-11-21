@@ -29,6 +29,6 @@ Never give a sketch value to a builder as a value to build.
 
 ## Start from a category
 
-Before you draw a sketch, look in `library/` for a pattern that fits the screen. A name check runs in a private flow before a pattern reaches this repository.
+Before you draw a sketch, look in `library/` for a pattern that fits the screen. [docs/library.md](docs/library.md) lists each pattern with its "Best for" line. A name check runs in a private flow before a pattern reaches this repository.
 
 Before you draw a sketch, choose the category that fits the screen. Then copy one template whose "Best for" line fits it. Read "Start from a template" in [references/sketch-prototypes.md](references/sketch-prototypes.md). Never start a sketch from an empty page.
