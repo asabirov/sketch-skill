@@ -300,18 +300,123 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 [data-sketch] .sketch-thread > p.own { justify-self: end; background: var(--sketch-ink); color: var(--sketch-page); }
 /* A sparkline: an inline <svg viewBox="0 0 100 24" preserveAspectRatio="none"> with one <polyline>. */
 [data-sketch] .sketch-spark { width: 100%; height: 32px; fill: none; stroke: currentColor; stroke-width: var(--sketch-stroke); stroke-linejoin: round; } [data-sketch] .sketch-spark * { vector-effect: non-scaling-stroke; }
+/* A chart over time: a sketch-plot and a sketch-periods row, both with --n columns, one for each period. Each column of the plot gets its value as --v, a percent of the plot height.
+   An actual value is solid and a projected value is hatched, as in the IBCS notation. "projected" marks a future period. "partial" marks the current period, which is not complete:
+   its first <i class="rest"> is the projected rest of the period, and its second <i> is the actual value to date. Below 600 px, a "minor" column hides its value and its label. Nothing scrolls. */
+[data-sketch] .sketch-chart { display: grid; gap: 6px; min-width: 0; }
+[data-sketch] .sketch-chart:has(.sketch-tick) { padding-left: 44px; }
+[data-sketch] :is(.sketch-plot, .sketch-periods) { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); margin: 0; }
+[data-sketch] .sketch-plot { position: relative; height: var(--h, 180px); border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+[data-sketch] .sketch-plot > div { position: relative; display: flex; flex-direction: column; justify-content: end; align-items: center; min-width: 0; padding: 0 clamp(1px, .6vw, 8px); }
+[data-sketch] .sketch-plot:has(> div > b) { margin-top: 20px; } /* Room for the value label of a full-height bar. */
+[data-sketch] .sketch-plot > div > i { flex-shrink: 0; width: 100%; max-width: 48px; height: var(--v); background: var(--sketch-ink); border-radius: 4px 4px 0 0; }
+[data-sketch] .sketch-plot > div > i + i { border-radius: 0; }
+[data-sketch] .sketch-plot > div > b { margin-bottom: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+[data-sketch] .sketch-plot > div:last-child > b { align-self: end; } /* The last value stays inside the plot. */
+[data-sketch] .sketch-plot > :is(.projected, .partial) > i:is(.rest, :only-of-type) { background: repeating-linear-gradient(135deg, var(--sketch-ink) 0 2px, transparent 2px 6px); border: var(--sketch-stroke) solid var(--sketch-ink); border-bottom: 0; }
+/* In a line plot, each <i> is a point on the line, and the line is one <svg class="sketch-line" viewBox="0 0 <n × 10> 100" preserveAspectRatio="none">. Point k sits at x = 10k + 5 and y = 100 − value. */
+[data-sketch] .sketch-plot.line > div > i { position: absolute; left: 50%; bottom: var(--v); width: 10px; height: 10px; translate: -50% 50%; border-radius: 50%; z-index: 2; }
+[data-sketch] .sketch-plot.line > :is(.partial, .projected) > i { background: var(--sketch-page); border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+[data-sketch] .sketch-plot.line > .projected > i { border-style: dashed; }
+[data-sketch] .sketch-plot.line > div > b { position: absolute; bottom: calc(var(--v) + 10px); margin: 0; }
+[data-sketch] .sketch-plot.line > div:last-child > b { right: 0; }
+[data-sketch] .sketch-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; stroke: currentColor; stroke-width: var(--sketch-stroke); stroke-linejoin: round; pointer-events: none; z-index: 1; }
+[data-sketch] .sketch-line .halo { stroke: var(--sketch-page); stroke-width: 6px; } /* A line that crosses filled bars keeps a gap of page around it. */
+[data-sketch] .sketch-line * { vector-effect: non-scaling-stroke; }
+[data-sketch] :is(.sketch-line, .sketch-spark) .projected { stroke-dasharray: 6 5; } /* A line cannot be hatched, so its projected part is dashed. */
+/* A grid line with its value outside the plot, on the left. */
+[data-sketch] .sketch-tick { position: absolute; left: 0; right: 0; bottom: var(--v); border-bottom: 1px dashed var(--sketch-muted); pointer-events: none; }
+[data-sketch] .sketch-tick > span { position: absolute; right: calc(100% + 8px); bottom: -.6em; font-size: 12px; line-height: 1.2; color: var(--sketch-muted); white-space: nowrap; }
+[data-sketch] .sketch-periods { padding: 0; list-style: none; font-size: 12px; line-height: 1.3; color: var(--sketch-muted); text-align: center; }
+[data-sketch] .sketch-periods > li { min-width: 0; white-space: nowrap; } [data-sketch] .sketch-periods small { display: block; font-size: inherit; }
+/* The key names each mark in words: a solid or a hatched sample, or a solid or a dashed line. */
+[data-sketch] .sketch-key { display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 0; padding: 0; list-style: none; font-size: 12px; color: var(--sketch-muted); }
+[data-sketch] .sketch-key i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; background: var(--sketch-ink); border-radius: 2px; }
+[data-sketch] .sketch-key i.projected { background: repeating-linear-gradient(135deg, var(--sketch-ink) 0 2px, transparent 2px 5px); border: 1px solid var(--sketch-ink); }
+[data-sketch] .sketch-key i.line { width: 18px; height: 0; border-radius: 0; background: none; border-top: var(--sketch-stroke) solid var(--sketch-ink); vertical-align: 3px; }
+[data-sketch] .sketch-key i.line.projected { border: 0; border-top: var(--sketch-stroke) dashed var(--sketch-ink); }
+/* A summary above a chart: <dl class="sketch-summary"> with one <div> of <dt> and <dd> for each value. The first value is the largest. A <span> after the value is its change. */
+[data-sketch] .sketch-summary { display: flex; flex-wrap: wrap; gap: 8px 48px; margin: 0; }
+[data-sketch] .sketch-summary dt { font-size: 12px; color: var(--sketch-muted); }
+[data-sketch] .sketch-summary dd { margin: 0; }
+[data-sketch] .sketch-summary dd > b { font-size: 18px; font-variant-numeric: tabular-nums; }
+[data-sketch] .sketch-summary > div:first-child dd > b { font-size: 30px; line-height: 1.2; }
+[data-sketch] .sketch-summary dd > span { display: block; font-size: 12px; }
+/* A bar of two parts: <i class="second"> is the upper part, in a thinned ink, with a gap of page below it. */
+[data-sketch] :is(.sketch-plot > div, .sketch-key) i.second { background: color-mix(in srgb, var(--sketch-ink) 55%, var(--sketch-page)); }
+[data-sketch] .sketch-plot > div > i.second { box-shadow: inset 0 -2px var(--sketch-page); }
+/* An area below a line: a <polygon class="area"> in a sketch-line or a sketch-spark. "compare" is a thin line for an earlier period. */
+[data-sketch] :is(.sketch-line, .sketch-spark) .area { fill: var(--sketch-wash); stroke: none; }
+[data-sketch] .sketch-line .compare { stroke: var(--sketch-muted); stroke-width: 1px; }
+[data-sketch] .sketch-key i.line.compare { border-top: 1px solid var(--sketch-muted); }
+/* A reference level in a plot, such as a minimum: <span class="sketch-ref" style="--v:25%"><span>Minimum €100k</span></span>. Its label is on the right. */
+[data-sketch] .sketch-ref { position: absolute; left: 0; right: 0; bottom: var(--v); border-bottom: var(--sketch-stroke) dotted var(--sketch-ink); pointer-events: none; }
+[data-sketch] .sketch-ref > span { position: absolute; right: 0; bottom: 3px; padding: 0 4px; font-size: 12px; line-height: 1.2; background: var(--sketch-page); }
+/* "ends" on a sketch-periods row keeps its first and last label inside the chart. A label that is wider than its period spills to both sides. */
+[data-sketch] .sketch-periods.ends > li { display: flex; flex-direction: column; align-items: center; }
+[data-sketch] .sketch-periods.ends > li:first-child { align-items: flex-start; }
+[data-sketch] .sketch-periods.ends > li:last-child { align-items: flex-end; }
+/* A trend cell in a table row: <td class="sketch-trend"> with the change in a <span> above a sketch-spark. */
+[data-sketch] .sketch-trend { text-align: right; white-space: nowrap; }
+[data-sketch] .sketch-trend > span { display: block; font-variant-numeric: tabular-nums; }
+[data-sketch] .sketch-trend > svg { width: 120px; height: 28px; }
+/* A plan or a target on a period: <span class="plan" style="--p:90%"></span> and <b class="plan-value" style="--t:95%">54k</b> before the bars of the period. The tick is dashed.
+   A band of page around it keeps it visible on a solid bar. "below" on a period draws its bar in the thinned ink, so a bar below its plan differs in tone and in its place against the tick. */
+[data-sketch] .sketch-plot:has(> div > .plan) { margin-top: 20px; }
+[data-sketch] .sketch-plot > div > .plan { position: absolute; left: 0; right: 0; bottom: var(--p); z-index: 1; height: 6px; translate: 0 50%; background: var(--sketch-page); }
+[data-sketch] .sketch-plot > div > .plan::before { content: ""; position: absolute; left: 0; right: 0; top: 2px; border-top: 2px dashed var(--sketch-ink); }
+[data-sketch] .sketch-plot > div > b.plan-value { position: absolute; bottom: calc(var(--t) + 4px); left: 50%; translate: -50%; margin: 0; font-size: 11px; } /* The plan value: --t is the top of the plan tick or of the bar, whichever is higher. */
+[data-sketch] .sketch-plot > div.below > i { background: color-mix(in srgb, var(--sketch-ink) 55%, var(--sketch-page)); }
+[data-sketch] .sketch-key i.plan { width: 18px; height: 0; border-radius: 0; background: none; border-top: 2px dashed var(--sketch-ink); vertical-align: 3px; }
+/* Today in a plot: <span class="sketch-today" style="--x:83.6%"><span>Today</span></span>. A dashed vertical line with its label on the left, above the plot and its value labels. */
+[data-sketch] .sketch-plot:has(> .sketch-today) { margin-top: 36px; } /* Room for the label of today above the plan values. */
+[data-sketch] .sketch-today { position: absolute; top: -36px; bottom: 0; left: var(--x); z-index: 2; border-left: var(--sketch-stroke) dashed var(--sketch-ink); pointer-events: none; }
+[data-sketch] .sketch-today > span { position: absolute; top: 0; right: 4px; font-size: 12px; line-height: 1.2; white-space: nowrap; }
+@media (max-width: 599px) {
+  [data-sketch] .sketch-plot > div > b.plan-value { display: none; } /* Below 600 px, a plan value is wider than its period. */
+}
+/* Stat tiles that choose a chart: <div class="sketch-tabs sketch-tiles"> with a <button role="tab"> for each tile. A tile holds a label, a <b> value, a change and a sketch-spark. The chosen tile has a drawn frame. */
+[data-sketch] .sketch-tabs.sketch-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; overflow: visible; }
+[data-sketch] .sketch-tiles [role="tab"] { display: grid; gap: 2px; align-content: start; justify-items: start; padding: 12px; text-align: left; white-space: normal; border-bottom: 0; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-tiles [role="tab"] > b { font-size: 24px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+[data-sketch] .sketch-tiles [role="tab"] > span:not(.sketch-muted) { font-size: 12px; }
+[data-sketch] .sketch-tiles [role="tab"] > svg { justify-self: stretch; margin-top: 8px; }
+[data-sketch] .sketch-tiles [role="tab"][aria-selected="true"] { font-weight: inherit; box-shadow: inset 0 0 0 var(--sketch-stroke) var(--sketch-ink); }
+[data-sketch] .sketch-tiles [role="tab"]:focus-visible { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 2px; }
+/* A value against a total: <div class="sketch-goal" role="meter"> with a <span class="mark" style="--v:68%"> label, a <div class="track"> with an <i style="--v:68%">, and a row of the two ends.
+   The actual part is solid and the projected rest is hatched. */
+[data-sketch] .sketch-goal { display: grid; gap: 4px; font-size: 12px; }
+[data-sketch] .sketch-goal > .mark { position: relative; left: var(--v); justify-self: start; translate: -50%; font-weight: 600; white-space: nowrap; }
+[data-sketch] .sketch-goal > .mark::after { content: ""; display: block; width: 0; margin: 2px auto 0; border: 5px solid transparent; border-bottom: 0; border-top-color: var(--sketch-ink); }
+[data-sketch] .sketch-goal > .track { height: 16px; overflow: hidden; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px; background: repeating-linear-gradient(135deg, var(--sketch-ink) 0 2px, transparent 2px 6px); }
+[data-sketch] .sketch-goal > .track > i { display: block; width: var(--v); height: 100%; background: var(--sketch-ink); }
+@media (min-width: 600px) {
+  [data-sketch] .sketch-tabs.sketch-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 599px) {
+  [data-sketch] .sketch-trend > svg { width: 80px; }
+}
+[data-sketch] details > summary { min-height: 44px; line-height: 44px; cursor: pointer; } [data-sketch] details > summary:hover { text-decoration: underline; }
 /* Step dots: one <i> for each step, the current one with class "on". */
 [data-sketch] .sketch-dots { display: flex; gap: 8px; margin: 0; } [data-sketch] .sketch-dots i { width: 10px; height: 10px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; } [data-sketch] .sketch-dots .on { background: var(--sketch-ink); }
 [data-sketch] .sketch-steps { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 0; padding: 0; list-style: decimal inside; } [data-sketch] .sketch-steps [aria-current] { font-weight: 600; }
 /* A meter: a drawn track with an <i> that gets its value as a width. Give the box role="meter" and the aria-value attributes. */
 [data-sketch] .sketch-meter { height: 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 7px 5px 6px 4px; overflow: hidden; }
 [data-sketch] .sketch-meter i { display: block; height: 100%; background: var(--sketch-ink); }
+/* A chart's data table is for screen readers only. The chart's aria-label and key give the values to a sighted reader. */
+[data-sketch] .sketch-chart-data { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* A menu button shows or hides the element right after it, below 1000 px. */
 [data-sketch] .sketch-collapse { display: grid; flex-basis: 100%; }
 @media (max-width: 599px) {
   [data-sketch] :is(.sketch-from-tablet, .sketch-from-desktop, .sketch-table thead) { display: none !important; }
   [data-sketch] .sketch-table tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; padding: 12px 0; border-bottom: var(--sketch-stroke) solid var(--sketch-wash); }
   [data-sketch] .sketch-table td { padding: 0; border: 0; }
+  [data-sketch] .sketch-data thead { display: table-header-group !important; } /* A data table keeps its headers and rows, so each value keeps its period and its series. */
+  [data-sketch] .sketch-data tr { display: table-row; padding: 0; }
+  [data-sketch] .sketch-data :is(th, td) { padding: 6px 8px; }
+  [data-sketch] .sketch-plot:not(.line) > div:last-child > b { position: absolute; top: -20px; right: 0; margin: 0; } /* A narrow last bar puts its value above the plot, clear of a taller bar before it. */
+  [data-sketch] :is(.sketch-plot > .minor > b, .sketch-periods > .minor, .sketch-periods small) { visibility: hidden; }
+  [data-sketch] .sketch-periods small { display: none; }
 }
 @media (max-width: 999px) {
   [data-sketch] .sketch-from-desktop, [data-sketch] .sketch-menu-button[aria-expanded="false"] + .sketch-collapse { display: none !important; }

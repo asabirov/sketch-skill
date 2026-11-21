@@ -1,10 +1,10 @@
 # Templates
 
-The skill has 43 page templates in 22 categories. Copy the file at the path of an entry to start a sketch. A click on a picture opens it at its full size.
+The skill has 48 page templates in 23 categories. Copy the file at the path of an entry to start a sketch. A click on a picture opens it at its full size.
 
 Run `python3 docs/render.py` from the repository root to refresh these pictures after a template changes. It needs Python 3 with Pillow and the `agent-browser` CLI.
 
-[App shell](#app-shell), [Home](#home), [Conversation](#conversation), [List](#list), [Catalog](#catalog), [Projects](#projects), [Project](#project), [Search](#search), [Menu](#menu), [Settings](#settings), [Landing](#landing), [Notes](#notes), [Detail](#detail), [Form](#form), [Dashboard](#dashboard), [Board](#board), [Checkout](#checkout), [Pricing](#pricing), [Sign in](#sign-in), [Onboarding](#onboarding), [Empty](#empty), [Mobile](#mobile)
+[App shell](#app-shell), [Home](#home), [Conversation](#conversation), [List](#list), [Catalog](#catalog), [Projects](#projects), [Project](#project), [Search](#search), [Menu](#menu), [Settings](#settings), [Landing](#landing), [Notes](#notes), [Detail](#detail), [Form](#form), [Dashboard](#dashboard), [Chart](#chart), [Board](#board), [Checkout](#checkout), [Pricing](#pricing), [Sign in](#sign-in), [Onboarding](#onboarding), [Empty](#empty), [Mobile](#mobile)
 
 ## App shell
 
@@ -214,6 +214,31 @@ Run `python3 docs/render.py` from the repository root to refresh these pictures 
 <tr>
 <td width="460"><a href="templates/dashboard/metrics.png"><img src="templates/dashboard/metrics.png" width="440" alt="Dashboard: Metrics"></a></td>
 <td><b>Metrics</b><br>A first page that shows a small number of key numbers and one chart, such as sales or sign-ups.<br><a href="../templates/dashboard/metrics.html"><code>templates/dashboard/metrics.html</code></a></td>
+</tr>
+</table>
+
+## Chart
+
+<table>
+<tr>
+<td width="460"><a href="templates/chart/bars-with-line.png"><img src="templates/chart/bars-with-line.png" width="440" alt="Chart: Bars with a line"></a></td>
+<td><b>Bars with a line</b><br>A report that compares each monthly total with a plan or a target in the same unit, such as revenue against budget.<br><a href="../templates/chart/bars-with-line.html"><code>templates/chart/bars-with-line.html</code></a></td>
+</tr>
+<tr>
+<td width="460"><a href="templates/chart/line-over-time.png"><img src="templates/chart/line-over-time.png" width="440" alt="Chart: Line over time"></a></td>
+<td><b>Line over time</b><br>A report that follows one level over time, such as a cash balance, active users or a price, against one reference level.<br><a href="../templates/chart/line-over-time.html"><code>templates/chart/line-over-time.html</code></a></td>
+</tr>
+<tr>
+<td width="460"><a href="templates/chart/monthly-bars.png"><img src="templates/chart/monthly-bars.png" width="440" alt="Chart: Monthly bars"></a></td>
+<td><b>Monthly bars</b><br>A report that compares a total for each month, such as revenue, costs or orders, split into at most 2 parts.<br><a href="../templates/chart/monthly-bars.html"><code>templates/chart/monthly-bars.html</code></a></td>
+</tr>
+<tr>
+<td width="460"><a href="templates/chart/stat-trend.png"><img src="templates/chart/stat-trend.png" width="440" alt="Chart: Stat with a small trend"></a></td>
+<td><b>Stat with a small trend</b><br>A first row of a report that shows 2 to 4 key numbers, each with the trend of its last months, and a daily chart of the chosen number.<br><a href="../templates/chart/stat-trend.html"><code>templates/chart/stat-trend.html</code></a></td>
+</tr>
+<tr>
+<td width="460"><a href="templates/chart/table-sparkline.png"><img src="templates/chart/table-sparkline.png" width="440" alt="Chart: Sparkline in a table row"></a></td>
+<td><b>Sparkline in a table row</b><br>A table where each row needs its own trend next to its numbers, such as revenue by client or usage by plan.<br><a href="../templates/chart/table-sparkline.html"><code>templates/chart/table-sparkline.html</code></a></td>
 </tr>
 </table>
 

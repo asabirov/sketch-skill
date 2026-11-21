@@ -1,0 +1,83 @@
+<!-- Best for: A report that compares each monthly total with a plan or a target in the same unit, such as revenue against budget. -->
+<!-- Many periods: Up to 24 months fit at 390 px. The bars get narrower. Below 600 px, only the first month and the current month keep a label, and the plan values hide. The hatch shows the projected months, and the summary gives the plan of the current month. For more than 24 months, group the months into quarters. The plan ticks and the bars share one axis, so there is never a second scale. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chart: Bars with a line</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <h1>Revenue against plan</h1>
+  <section class="sketch-panel sketch-frame sketch-stack">
+    <h2>Revenue and plan by month</h2>
+    <dl class="sketch-summary">
+      <div><dt>November 1 to 21</dt><dd><b>€39k</b> <span class="sketch-muted">of €54k plan</span></dd></div>
+      <div><dt>November, projected</dt><dd><b>~€57k</b> <span class="sketch-muted">€3k above plan</span></dd></div>
+    </dl>
+    <div class="sketch-chart" style="--n:14" role="img" aria-label="Revenue against plan by month, in thousand euro: Dec 2025 41 against 40, at or above plan, Jan 2026 38 against 40, below plan, Feb 2026 36 against 40, below plan, Mar 2026 44 against 42, at or above plan, Apr 2026 47 against 44, at or above plan, May 2026 45 against 46, below plan, Jun 2026 50 against 48, at or above plan, Jul 2026 48 against 48, at or above plan, Aug 2026 42 against 46, below plan, Sep 2026 52 against 50, at or above plan, Oct 2026 55 against 52, at or above plan. November to date 39, projected 57, against 54. Projected December 60 against 58, January 54 against 50.">
+    <div class="sketch-plot">
+      <span class="sketch-tick" style="--v:0%"><span>0</span></span>
+      <span class="sketch-tick" style="--v:50%"><span>30k</span></span>
+      <span class="sketch-tick" style="--v:100%"><span>60k</span></span>
+      <span class="sketch-today" style="--x:83.6%"><span>Today</span></span>
+      <div><span class="plan" style="--p:66.7%"></span><b class="plan-value" style="--t:68.3%">40k</b><i style="--v:68.3%"></i></div>
+      <div class="below minor"><span class="plan" style="--p:66.7%"></span><b class="plan-value" style="--t:66.7%">40k</b><i style="--v:63.3%"></i></div>
+      <div class="below minor"><span class="plan" style="--p:66.7%"></span><b class="plan-value" style="--t:66.7%">40k</b><i style="--v:60%"></i></div>
+      <div class="minor"><span class="plan" style="--p:70%"></span><b class="plan-value" style="--t:73.3%">42k</b><i style="--v:73.3%"></i></div>
+      <div class="minor"><span class="plan" style="--p:73.3%"></span><b class="plan-value" style="--t:78.3%">44k</b><i style="--v:78.3%"></i></div>
+      <div class="below minor"><span class="plan" style="--p:76.7%"></span><b class="plan-value" style="--t:76.7%">46k</b><i style="--v:75%"></i></div>
+      <div class="minor"><span class="plan" style="--p:80%"></span><b class="plan-value" style="--t:83.3%">48k</b><i style="--v:83.3%"></i></div>
+      <div class="minor"><span class="plan" style="--p:80%"></span><b class="plan-value" style="--t:80%">48k</b><i style="--v:80%"></i></div>
+      <div class="below minor"><span class="plan" style="--p:76.7%"></span><b class="plan-value" style="--t:76.7%">46k</b><i style="--v:70%"></i></div>
+      <div class="minor"><span class="plan" style="--p:83.3%"></span><b class="plan-value" style="--t:86.7%">50k</b><i style="--v:86.7%"></i></div>
+      <div class="minor"><span class="plan" style="--p:86.7%"></span><b class="plan-value" style="--t:91.7%">52k</b><i style="--v:91.7%"></i></div>
+      <div class="partial"><span class="plan" style="--p:90%"></span><b class="plan-value" style="--t:95%">54k</b><i class="rest" style="--v:30%"></i><i style="--v:65%"></i></div>
+      <div class="projected minor"><span class="plan" style="--p:96.7%"></span><b class="plan-value" style="--t:100%">58k</b><i style="--v:100%"></i></div>
+      <div class="projected minor"><span class="plan" style="--p:83.3%"></span><b class="plan-value" style="--t:90%">50k</b><i style="--v:90%"></i></div>
+    </div>
+    <ol class="sketch-periods ends" aria-hidden="true">
+      <li>Dec 2025</li>
+      <li class="minor">Jan</li>
+      <li class="minor">Feb</li>
+      <li class="minor">Mar</li>
+      <li class="minor">Apr</li>
+      <li class="minor">May</li>
+      <li class="minor">Jun</li>
+      <li class="minor">Jul</li>
+      <li class="minor">Aug</li>
+      <li class="minor">Sep</li>
+      <li class="minor">Oct</li>
+      <li>Nov<small>to date</small></li>
+      <li class="minor">Dec<small>proj.</small></li>
+      <li class="minor">Jan 2027<small>proj.</small></li>
+    </ol>
+    </div>
+    <ul class="sketch-key" aria-hidden="true">
+      <li><i></i>At or above plan</li><li><i class="second"></i>Below plan</li><li><i class="projected"></i>Projected</li><li><i class="plan"></i>Plan</li>
+    </ul>
+    <table class="sketch-chart-data">
+    <caption>Data</caption>
+    <thead><tr><th>Month</th><th>Revenue</th><th>Plan</th><th>vs. plan</th></tr></thead>
+    <tbody>
+      <tr><td>Dec 2025</td><td>€41k</td><td>€40k</td><td>+1k</td></tr>
+      <tr><td>Jan 2026</td><td>€38k</td><td>€40k</td><td>−2k</td></tr>
+      <tr><td>Feb 2026</td><td>€36k</td><td>€40k</td><td>−4k</td></tr>
+      <tr><td>Mar 2026</td><td>€44k</td><td>€42k</td><td>+2k</td></tr>
+      <tr><td>Apr 2026</td><td>€47k</td><td>€44k</td><td>+3k</td></tr>
+      <tr><td>May 2026</td><td>€45k</td><td>€46k</td><td>−1k</td></tr>
+      <tr><td>Jun 2026</td><td>€50k</td><td>€48k</td><td>+2k</td></tr>
+      <tr><td>Jul 2026</td><td>€48k</td><td>€48k</td><td>+0k</td></tr>
+      <tr><td>Aug 2026</td><td>€42k</td><td>€46k</td><td>−4k</td></tr>
+      <tr><td>Sep 2026</td><td>€52k</td><td>€50k</td><td>+2k</td></tr>
+      <tr><td>Oct 2026</td><td>€55k</td><td>€52k</td><td>+3k</td></tr>
+      <tr><td>Nov 2026 to date</td><td>€39k</td><td>€54k</td><td>–</td></tr>
+      <tr><td>Nov 2026 proj.</td><td>€57k</td><td>€54k</td><td>+3k</td></tr>
+      <tr><td>Dec 2026 proj.</td><td>€60k</td><td>€58k</td><td>+2k</td></tr>
+      <tr><td>Jan 2027 proj.</td><td>€54k</td><td>€50k</td><td>+4k</td></tr>
+    </tbody>
+  </table>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>

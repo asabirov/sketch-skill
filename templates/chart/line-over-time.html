@@ -1,0 +1,83 @@
+<!-- Best for: A report that follows one level over time, such as a cash balance, active users or a price, against one reference level. -->
+<!-- Many periods: Up to 24 months fit at 390 px. Below 600 px, only the first month and today keep a label. The dashed line shows the projected months. For more than 24 months, show quarters. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chart: Line over time</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <h1>Cash balance</h1>
+  <section class="sketch-panel sketch-frame sketch-stack">
+    <dl class="sketch-summary">
+      <div><dt>Today, 21 November</dt><dd><b>€131k</b></dd></div>
+      <div><dt>In, November so far</dt><dd><b>€48k</b></dd></div>
+      <div><dt>Out, November so far</dt><dd><b>€53k</b></dd></div>
+    </dl>
+    <div class="sketch-chart" style="--n:14" role="img" aria-label="Cash balance at month end, in thousand euro, on a scale from 80k to 160k: Dec 120k, Jan 112k, Feb 104k, Mar 110k, Apr 118k, May 121k, Jun 130k, Jul 126k, Aug 119k, Sep 128k, Oct 136k. Today, 21 November, 131k. Projected December 142k, January 150k. Minimum cash level 100k.">
+    <div class="sketch-plot line">
+      <span class="sketch-tick" style="--v:0%"><span>80k</span></span>
+      <span class="sketch-tick" style="--v:50%"><span>120k</span></span>
+      <span class="sketch-tick" style="--v:100%"><span>160k</span></span>
+      <span class="sketch-ref" style="--v:25%"><span>Minimum €100k</span></span>
+      <svg class="sketch-line" viewBox="0 0 140 100" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="5,50 15,60 25,70 35,62.5 45,52.5 55,48.8 65,37.5 75,42.5 85,51.2 95,40 105,30 115,36.3 115,100 5,100"/><polyline points="5,50 15,60 25,70 35,62.5 45,52.5 55,48.8 65,37.5 75,42.5 85,51.2 95,40 105,30 115,36.3"/><polyline class="projected" points="115,36.3 125,22.5 135,12.5"/></svg>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div style="--v:63.7%"><i></i></div>
+      <div></div>
+      <div class="projected" style="--v:87.5%"><b>~€150k</b><i></i></div>
+    </div>
+    <ol class="sketch-periods ends" aria-hidden="true">
+      <li>Dec 2025</li>
+      <li class="minor">Jan</li>
+      <li class="minor">Feb</li>
+      <li class="minor">Mar</li>
+      <li class="minor">Apr</li>
+      <li class="minor">May</li>
+      <li class="minor">Jun</li>
+      <li class="minor">Jul</li>
+      <li class="minor">Aug</li>
+      <li class="minor">Sep</li>
+      <li class="minor">Oct</li>
+      <li>Nov<small>today</small></li>
+      <li class="minor">Dec<small>proj.</small></li>
+      <li class="minor">Jan 2027<small>proj.</small></li>
+    </ol>
+    </div>
+    <ul class="sketch-key" aria-hidden="true">
+      <li><i class="line"></i>Actual</li><li><i class="line projected"></i>Projected</li>
+    </ul>
+    <table class="sketch-chart-data">
+    <caption>Data</caption>
+    <thead><tr><th>Month</th><th>State</th><th>Balance</th></tr></thead>
+    <tbody>
+      <tr><td>Dec 2025</td><td>Actual, month end</td><td>€120k</td></tr>
+      <tr><td>Jan 2026</td><td>Actual, month end</td><td>€112k</td></tr>
+      <tr><td>Feb 2026</td><td>Actual, month end</td><td>€104k</td></tr>
+      <tr><td>Mar 2026</td><td>Actual, month end</td><td>€110k</td></tr>
+      <tr><td>Apr 2026</td><td>Actual, month end</td><td>€118k</td></tr>
+      <tr><td>May 2026</td><td>Actual, month end</td><td>€121k</td></tr>
+      <tr><td>Jun 2026</td><td>Actual, month end</td><td>€130k</td></tr>
+      <tr><td>Jul 2026</td><td>Actual, month end</td><td>€126k</td></tr>
+      <tr><td>Aug 2026</td><td>Actual, month end</td><td>€119k</td></tr>
+      <tr><td>Sep 2026</td><td>Actual, month end</td><td>€128k</td></tr>
+      <tr><td>Oct 2026</td><td>Actual, month end</td><td>€136k</td></tr>
+      <tr><td>Nov 2026</td><td>Actual, today 21 November</td><td>€131k</td></tr>
+      <tr><td>Dec 2026</td><td>Projected</td><td>€142k</td></tr>
+      <tr><td>Jan 2027</td><td>Projected</td><td>€150k</td></tr>
+    </tbody>
+  </table>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>
