@@ -49,6 +49,7 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 | `references/` | The sketch rules |
 | `assets/` | The kit and the template gallery |
 | `templates/` | The categorized template library |
+| `library/` | Reusable pattern records and sketches |
 
 ## Template categories
 

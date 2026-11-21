@@ -1,0 +1,90 @@
+[
+  {
+    "label": "playing",
+    "trigger": "tap on Play",
+    "element": "the Play button",
+    "property": "transform",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "playing",
+    "trigger": "tap on Play",
+    "element": "the Play button",
+    "property": "background-color",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "recording",
+    "trigger": "the finger goes down on the microphone button",
+    "element": "the microphone button",
+    "property": "transform",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "recording",
+    "trigger": "the finger goes down on the microphone button",
+    "element": "the microphone button",
+    "property": "background-color",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "sent",
+    "trigger": "tap on the filled microphone button",
+    "element": "the filled microphone button",
+    "property": "transform",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "sent",
+    "trigger": "tap on the filled microphone button",
+    "element": "the filled microphone button",
+    "property": "background-color",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "idle",
+    "trigger": "tap on Pause",
+    "element": "the pressed button",
+    "property": "transform",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "idle",
+    "trigger": "tap on Pause",
+    "element": "the pressed button",
+    "property": "background-color",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  }
+]

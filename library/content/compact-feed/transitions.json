@@ -1,0 +1,189 @@
+[
+  {
+    "label": "tab-popular",
+    "trigger": "click the Popular tab",
+    "element": "tab",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  },
+  {
+    "label": "tab-popular",
+    "trigger": "click the Popular tab",
+    "element": "tab",
+    "property": "color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  },
+  {
+    "label": "comment-sent",
+    "trigger": "click Send in the comment field",
+    "element": "comment count on the comment button",
+    "property": "width",
+    "animation": null,
+    "duration": 200,
+    "delay": 0,
+    "easing": "ease-in-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "reaction-picker",
+    "trigger": "click the add reaction button",
+    "element": "reaction picker",
+    "property": "opacity",
+    "animation": null,
+    "duration": 50,
+    "delay": 0,
+    "easing": "feed",
+    "measurement": "estimated"
+  },
+  {
+    "label": "reaction-picker",
+    "trigger": "click the add reaction button",
+    "element": "reaction picker",
+    "property": "transform",
+    "animation": null,
+    "duration": 230,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "row-menu",
+    "trigger": "click the more button of a row",
+    "element": "row menu",
+    "property": "opacity",
+    "animation": null,
+    "duration": 50,
+    "delay": 0,
+    "easing": "feed",
+    "measurement": "estimated"
+  },
+  {
+    "label": "row-menu",
+    "trigger": "click the more button of a row",
+    "element": "row menu",
+    "property": "transform",
+    "animation": null,
+    "duration": 230,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "compose",
+    "trigger": "click the new update button",
+    "element": "page cover",
+    "property": "opacity",
+    "animation": null,
+    "duration": 400,
+    "delay": 0,
+    "easing": "feed(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "compose",
+    "trigger": "click the new update button",
+    "element": "composer dialog",
+    "property": "opacity",
+    "animation": null,
+    "duration": 300,
+    "delay": 0,
+    "easing": "feed(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "compose",
+    "trigger": "click the new update button",
+    "element": "composer dialog",
+    "property": "transform",
+    "animation": null,
+    "duration": 350,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "feed-saved",
+    "trigger": "click Create view",
+    "element": "new tab",
+    "property": "opacity",
+    "animation": null,
+    "duration": 300,
+    "delay": 0,
+    "easing": "cubic-bezier(0.25, 0.1, 0.35, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "feed-saved",
+    "trigger": "click Create view",
+    "element": "toast",
+    "property": "opacity",
+    "animation": null,
+    "duration": 400,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  },
+  {
+    "label": "feed-saved",
+    "trigger": "click Create view",
+    "element": "toast",
+    "property": "transform",
+    "animation": null,
+    "duration": 400,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  },
+  {
+    "label": "feed",
+    "trigger": "close the composer",
+    "element": "page cover",
+    "property": "opacity",
+    "animation": null,
+    "duration": 280,
+    "delay": 0,
+    "easing": "feed(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "feed",
+    "trigger": "close the composer",
+    "element": "composer dialog",
+    "property": "opacity",
+    "animation": null,
+    "duration": 300,
+    "delay": 0,
+    "easing": "feed(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "feed",
+    "trigger": "close the composer",
+    "element": "composer dialog",
+    "property": "transform",
+    "animation": null,
+    "duration": 330,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "feed",
+    "trigger": "close a menu",
+    "element": "menu",
+    "property": "opacity",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "feed",
+    "measurement": "estimated"
+  }
+]

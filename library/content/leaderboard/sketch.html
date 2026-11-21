@@ -1,0 +1,1100 @@
+<!doctype html>
+<!--
+  Best for: a team product where a member compares many records by their rank in one number, and then opens one record.
+  Row opens: on the record's own page. That page has its own pattern, content/product-page. The state product-page shows only a plain box for it.
+  The sketch holds only the parts that a ranked table needs. It leaves out the parts that belong to the source app.
+  Each row has the avatar of its product and the avatar of its lead.
+  The head is the head of the pattern content/fact-cards, with the same search field, the same metric switch, the same filters and the same sheet.
+  The metric switch of the head is the one control for the number of the last column and for the order: MRR, Revenue or Users in a week. The source has a select button for the number. The owner asked for the switch in its place.
+  No box is around the table. The source has a box. The owner asked for a table with no box.
+  Transition values, from transitions.json:
+  - metric-changed and table: the table plays the animation opacity, 250 ms, ease-in-out. measured.
+  - table: the pointer goes over a row, and the background of the row changes. background-color 150 ms, cubic-bezier(0.4, 0, 0.2, 1). measured.
+  - no-match, filters-open and product-page: 0 ms. The sketch shows each at once.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product ranking</title>
+<style data-sketch-kit="0.13.0">
+/* One black marker on bare paper. Scoped foundation for disposable review prototypes.
+   There is one ink; everything quieter is that ink thinned. A fill is only ever that ink or the
+   page, so a drawn frame sits on the page rather than around a card of some other colour. A
+   browser paints its own colours into a native control, a link and an autofilled field, so each
+   is taken back below. */
+[data-sketch] {
+  color-scheme: light;
+  --sketch-page: #fbfbf8; --sketch-ink: #1b1b19;
+  --sketch-muted: color-mix(in srgb, var(--sketch-ink) 68%, transparent);
+  --sketch-wash: color-mix(in srgb, var(--sketch-ink) 10%, transparent);
+  --sketch-stroke: 1.7px; --sketch-space: 8px;
+  /* A drawn box: four unequal corner radii, so no edge looks machine-made. */
+  --sketch-wobble: 18px 5px 14px 7px / 6px 16px 5px 17px;
+  margin: 0; color: var(--sketch-ink); background: var(--sketch-page);
+  font: 14px/1.5 Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
+  /* The marker is the light stroke; the page is what went dark. */
+  color-scheme: dark;
+  --sketch-page: #141513; --sketch-ink: #efeee6;
+}
+[data-sketch] *, [data-sketch] *::before, [data-sketch] *::after { box-sizing: border-box; }
+[data-sketch] h1 { font-size: 30px; line-height: 1.2; letter-spacing: -1px; }
+[data-sketch] h2 { font-size: 18px; line-height: 1.35; letter-spacing: -.3px; }
+[data-sketch] h3 { font-size: 14px; line-height: 1.5; }
+[data-sketch] :is(button, input, textarea, select) { font: inherit; color: inherit; }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]) {
+  appearance: none; -webkit-appearance: none; flex: none; margin: 0;
+  width: 18px; height: 18px; background: none; cursor: pointer;
+  border: var(--sketch-stroke) solid var(--sketch-ink);
+  border-radius: 52% 48% 51% 49% / 49% 52% 48% 51%;
+}
+[data-sketch] input[type="checkbox"] { border-radius: 5px 2px 4px 3px / 3px 4px 2px 5px; }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):checked { background: var(--sketch-ink); }
+/* Half-chosen: a struck bar, so it is not read as either of the other two. */
+[data-sketch] input[type="checkbox"]:indeterminate {
+  background: feed-gradient(var(--sketch-ink), var(--sketch-ink)) center / 60% var(--sketch-stroke) no-repeat;
+}
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):hover:not(:disabled) { box-shadow: 0 0 0 3px var(--sketch-wash); }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):active:not(:disabled) { transform: translateY(1px); }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):disabled { opacity: .4; cursor: not-allowed; }
+/* Forced colours repaints an author background, so the chosen state cannot rest on one alone. */
+@media (forced-colors: active) {
+  [data-sketch] :is(input[type="radio"], input[type="checkbox"]):checked { background: CanvasText; border-color: CanvasText; }
+}
+/* Covers what is left native: a range track, a progress bar. */
+[data-sketch] { accent-color: var(--sketch-ink); }
+/* A link keeps the browser's blue and its visited purple unless it is told not to. */
+[data-sketch] :is(a, a:link, a:visited, a:active):not(.sketch-button) { color: inherit; text-decoration-color: var(--sketch-muted); }
+[data-sketch] ::placeholder { color: var(--sketch-muted); }
+[data-sketch] ::selection { background: var(--sketch-wash); }
+
+/* A panel is spacing, not a surface: no fill, so the drawn outline is the only edge. */
+[data-sketch] .sketch-panel { background: none; padding: 24px; }
+[data-sketch] .sketch-frame { position: relative; isolation: isolate; border: 0; }
+[data-sketch] .sketch-outline { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: visible; }
+[data-sketch] .sketch-outline path {
+  stroke: var(--sketch-ink); stroke-width: var(--sketch-stroke); fill: none;
+  stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+}
+
+[data-sketch] .sketch-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; min-width: 44px; padding: 10px 16px; cursor: pointer; touch-action: manipulation;
+  background: var(--sketch-ink); color: var(--sketch-page); text-decoration: none;
+  border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+}
+/* Filled in solid with the same marker, or left as the outline alone. */
+[data-sketch] .sketch-button.secondary { background: none; color: var(--sketch-ink); }
+[data-sketch] .sketch-button:hover:not(:disabled) { background: color-mix(in srgb, var(--sketch-ink) 84%, transparent); }
+[data-sketch] .sketch-button.secondary:hover:not(:disabled) { background: var(--sketch-wash); }
+[data-sketch] .sketch-button:active:not(:disabled) { transform: translateY(1px); }
+[data-sketch] .sketch-button:disabled { opacity: .4; cursor: not-allowed; }
+[data-sketch] .sketch-input {
+  min-height: 44px; width: 100%; padding: 10px 12px; background: none;
+  border: var(--sketch-stroke) solid var(--sketch-ink);
+  border-radius: 6px 16px 5px 15px / 15px 5px 17px 6px;
+}
+/* The native clear button of a search field is blue. It is drawn again as a cross in the ink. */
+[data-sketch] input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none; width: 14px; height: 14px; cursor: pointer;
+  background: feed-gradient(45deg, transparent 43%, var(--sketch-ink) 43% 57%, transparent 57%),
+              feed-gradient(-45deg, transparent 43%, var(--sketch-ink) 43% 57%, transparent 57%);
+}
+[data-sketch] :is(.sketch-input, input):is(:-webkit-autofill, :autofill) {
+  -webkit-text-fill-color: var(--sketch-ink);
+  -webkit-box-shadow: inset 0 0 0 100px var(--sketch-page);
+}
+/* The mark stays 18px; the label around it is the target. */
+[data-sketch] .sketch-choice {
+  display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding: 10px 12px; cursor: pointer;
+}
+[data-sketch] .sketch-choice:hover { background: var(--sketch-wash); }
+[data-sketch] :focus-visible { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+
+/* Layout: the spacing every sketch would otherwise write by hand. */
+[data-sketch] .sketch-stack { display: grid; gap: 16px; align-content: start; }
+[data-sketch] .sketch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+[data-sketch] .sketch-spacer { flex: 1; }
+[data-sketch] .sketch-muted { color: var(--sketch-muted); }
+
+/* An overlay covers what lies under it, so the page fills its drawn outline. The fill follows the
+   wobble: a rectangular background or a box shadow shows its corners outside the line. */
+[data-sketch] :is(.sketch-popover, .sketch-menu, .sketch-dialog, .sketch-toast) {
+  position: fixed; z-index: 40; isolation: isolate; margin: 0; border: 0; background: none; color: inherit; overflow: visible;
+}
+[data-sketch] :is(.sketch-popover, .sketch-menu, .sketch-dialog, .sketch-toast) > .sketch-outline path { fill: var(--sketch-page); }
+[data-sketch] [hidden] { display: none !important; }
+[data-sketch] .sketch-popover { width: max-content; max-width: min(360px, calc(100vw - 16px)); padding: 16px; display: grid; gap: 12px; }
+[data-sketch] .sketch-menu { min-width: 200px; max-width: calc(100vw - 16px); padding: 8px; display: grid; }
+[data-sketch] .sketch-menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 12px;
+  background: none; border: 0; border-radius: var(--sketch-wobble); text-align: left; text-decoration: none; cursor: pointer;
+}
+[data-sketch] .sketch-menu-item:is(:hover, :focus-visible):not(:disabled) { background: var(--sketch-wash); outline: 0; }
+/* A disabled row and a disabled group label take the muted ink, not opacity, so they keep 4.5:1 on the page. */
+[data-sketch] .sketch-menu-item:disabled { color: var(--sketch-muted); cursor: not-allowed; }
+[data-sketch] .sketch-menu-group-label { padding: 12px 12px 4px; font-weight: 600; }
+[data-sketch] .sketch-menu-group[aria-disabled="true"] > .sketch-menu-group-label { color: var(--sketch-muted); cursor: not-allowed; }
+[data-sketch] .sketch-menu-item[aria-selected="true"] { background: var(--sketch-wash); font-weight: 600; }
+/* A native dialog arrives with a filled box and a dark backdrop; both are taken back. */
+[data-sketch] .sketch-dialog { inset: 0; width: min(480px, calc(100vw - 32px)); height: fit-content; margin: auto; padding: 24px; }
+[data-sketch] .sketch-dialog[open] { display: grid; gap: 16px; }
+[data-sketch] .sketch-dialog::backdrop { background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+[data-sketch] .sketch-toast { left: 50%; bottom: 24px; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+
+/* Icons: one line set drawn with the marker. Write <i data-icon="close"></i>. */
+[data-sketch] .sketch-icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+[data-sketch] .sketch-icon-button {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; flex: none;
+  background: none; border: 0; border-radius: var(--sketch-wobble); cursor: pointer; touch-action: manipulation;
+}
+[data-sketch] .sketch-icon-button:hover:not(:disabled) { background: var(--sketch-wash); }
+/* A hover rule outranks a state rule, so each state that fills names its own hover (#155). */
+[data-sketch] .sketch-icon-button:is([aria-pressed="true"], [aria-expanded="true"]),
+[data-sketch] .sketch-icon-button:is([aria-pressed="true"], [aria-expanded="true"]):hover:not(:disabled) { background: color-mix(in srgb, var(--sketch-ink) 18%, transparent); }
+[data-sketch] :is(.sketch-icon-button, .sketch-chip, .sketch-segmented label):active { transform: translateY(1px); }
+[data-sketch] :is(.sketch-icon-button, .sketch-chip):disabled { opacity: .4; cursor: not-allowed; }
+
+/* One of a few modes: native radios, so the arrow keys work. The chosen one is filled. */
+[data-sketch] .sketch-segmented {
+  display: inline-flex; gap: 2px; padding: 2px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+}
+[data-sketch] .sketch-segmented label {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-width: 44px; min-height: 44px; padding: 0 14px; cursor: pointer; border-radius: var(--sketch-wobble);
+}
+[data-sketch] .sketch-segmented input { position: absolute; opacity: 0; pointer-events: none; }
+[data-sketch] .sketch-segmented label:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-segmented label:has(input:checked) { background: var(--sketch-ink); color: var(--sketch-page); }
+[data-sketch] .sketch-segmented label:has(input:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+[data-sketch] .sketch-segmented label:has(input:disabled) { opacity: .4; cursor: not-allowed; }
+
+/* An immediate on or off setting. The label stays the same in both states. */
+[data-sketch] .sketch-switch { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+[data-sketch] .sketch-switch input[type="checkbox"] {
+  position: relative; width: 40px; height: 24px; border-radius: 13px 11px 12px 13px / 12px 13px 11px 12px;
+}
+[data-sketch] .sketch-switch input[type="checkbox"]::before {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 15px; height: 15px; border-radius: 50%;
+  background: var(--sketch-ink); transition: transform .16s;
+}
+[data-sketch] .sketch-switch input[type="checkbox"]:checked::before { background: var(--sketch-page); transform: translateX(16px); }
+@media (prefers-reduced-motion: reduce) { [data-sketch] .sketch-switch input::before { transition: none; } }
+
+/* A chip is a filter or a removable tag: a button. A badge is a passive status word. */
+[data-sketch] .sketch-chip {
+  position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px;
+  background: none; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 16px 14px 17px 13px / 14px 17px 13px 16px; cursor: pointer;
+}
+/* The pill is drawn 32px tall; its target reaches 44px. */
+[data-sketch] .sketch-chip::after { content: ""; position: absolute; inset: -7px -2px; }
+[data-sketch] .sketch-chip:hover:not(:disabled) { background: var(--sketch-wash); }
+[data-sketch] .sketch-chip[aria-pressed="true"] { background: var(--sketch-ink); color: var(--sketch-page); }
+/* Without this, a pressed chip on hover took the wash and kept the page as its words (#155). */
+[data-sketch] .sketch-chip[aria-pressed="true"]:hover:not(:disabled) { background: color-mix(in srgb, var(--sketch-ink) 84%, transparent); }
+[data-sketch] .sketch-badge {
+  display: inline-block; padding: 1px 8px; font-size: 13px; font-weight: 600; white-space: nowrap;
+  border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px 9px 5px 8px / 8px 4px 9px 5px;
+}
+/* Only the state to act on first is filled. */
+[data-sketch] .sketch-badge.strong { background: var(--sketch-ink); color: var(--sketch-page); }
+
+/* A field: a permanent label, the control, then an error tied to it. */
+[data-sketch] .sketch-field { display: grid; gap: 6px; color: var(--sketch-muted); }
+[data-sketch] .sketch-field :is(input, textarea, select), [data-sketch] .sketch-error { color: var(--sketch-ink); }
+[data-sketch] textarea.sketch-input { min-height: 88px; resize: vertical; }
+[data-sketch] select.sketch-input {
+  appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer;
+  background: feed-gradient(45deg, transparent 50%, currentColor 50%) right 19px center / 6px 6px no-repeat,
+              feed-gradient(135deg, currentColor 50%, transparent 50%) right 13px center / 6px 6px no-repeat;
+}
+/* An open select is drawn as a sketch menu. A browser with appearance: base-select draws the list
+   from these rules. Every other browser gets a sketch-menu from sketch.js (#154). */
+@supports (appearance: base-select) {
+  [data-sketch] select.sketch-input, [data-sketch] select.sketch-input::picker(select) { appearance: base-select; }
+  [data-sketch] select.sketch-input::picker-icon, [data-sketch] select.sketch-input option::checkmark { display: none; }
+  /* The browser opened the list on the side with more space and shrank it to fit, so the list of a
+     lower field hid the row above it. The list now opens below at full height, and goes above when
+     it does not fit there. A list taller than both sides shrinks and scrolls (#173). */
+  @position-try --sketch-list-short { max-block-size: stretch; min-block-size: 160px; }
+  [data-sketch] select.sketch-input::picker(select) {
+    position-try: normal flip-block, flip-inline, flip-block flip-inline, --sketch-list-short, --sketch-list-short flip-block;
+    max-block-size: none;
+    min-width: max(200px, anchor-size(width)); max-width: calc(100vw - 16px); margin-block: 8px; padding: 8px;
+    color: var(--sketch-ink); background: var(--sketch-page); font: inherit;
+    border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+  }
+  [data-sketch] select.sketch-input option {
+    display: flex; align-items: center; min-height: 44px; padding: 8px 12px; border-radius: var(--sketch-wobble); cursor: pointer;
+  }
+  [data-sketch] select.sketch-input option:is(:hover, :focus-visible):not(:disabled) { background: var(--sketch-wash); outline: 0; }
+  [data-sketch] select.sketch-input option:checked { background: var(--sketch-wash); font-weight: 600; }
+  [data-sketch] select.sketch-input optgroup { padding-top: 4px; color: var(--sketch-ink); font-weight: 600; }
+  [data-sketch] select.sketch-input optgroup option { font-weight: 400; }
+  [data-sketch] select.sketch-input :is(option, optgroup):disabled { color: var(--sketch-muted); cursor: not-allowed; }
+}
+[data-sketch] .sketch-input[aria-invalid="true"] { border-width: calc(var(--sketch-stroke) * 2); }
+[data-sketch] .sketch-error { font-weight: 600; }
+[data-sketch] .sketch-input:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Tabs: the chosen tab is underlined with the marker. */
+[data-sketch] .sketch-tabs { display: flex; gap: 4px; overflow-x: auto; }
+[data-sketch] .sketch-tabs [role="tab"] {
+  min-height: 44px; padding: 0 12px; background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap;
+}
+[data-sketch] .sketch-tabs [role="tab"]:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-tabs [role="tab"][aria-selected="true"] { border-bottom-color: var(--sketch-ink); font-weight: 600; }
+
+/* Records in a table. A wide table scrolls inside its own box, not the page. */
+[data-sketch] .sketch-table-box { overflow-x: auto; }
+[data-sketch] .sketch-table { width: 100%; border-collapse: collapse; }
+[data-sketch] .sketch-table th { text-align: left; font-weight: 600; color: var(--sketch-muted); padding: 8px 12px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); white-space: nowrap; }
+[data-sketch] .sketch-table td { padding: 10px 12px; border-bottom: 1px solid var(--sketch-wash); }
+
+/* A picture, an avatar or a chart that is not decided yet: a crossed box. */
+[data-sketch] .sketch-placeholder {
+  display: grid; place-items: center; min-height: 96px; color: var(--sketch-muted);
+  border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble);
+  background: feed-gradient(to top right, transparent calc(50% - 1px), var(--sketch-wash) 50%, transparent calc(50% + 1px)),
+              feed-gradient(to bottom right, transparent calc(50% - 1px), var(--sketch-wash) 50%, transparent calc(50% + 1px));
+}
+/* Page layouts for templates/<category>/<name>.html. Phone first, then a tablet step at 600 px and a desktop step at 1000 px.
+   .sketch-phone-only, .sketch-from-tablet, .sketch-from-desktop and .sketch-until-desktop show an element only at those widths. */
+[data-sketch] :is(.sketch-main, .sketch-narrow, .sketch-stack) > :is(h1, h2, h3, p, fieldset) { margin: 0; }
+[data-sketch] .sketch-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+[data-sketch] .sketch-nav { display: flex; gap: 4px; padding: 8px 16px; overflow-x: auto; }
+[data-sketch] :is(.sketch-nav, .sketch-bar, .sketch-list, .sketch-main, .sketch-narrow) a:not(.sketch-button), [data-sketch] .sketch-split > * > a:not(.sketch-button) { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-width: 44px; min-height: 44px; }
+[data-sketch] :is(.sketch-main, .sketch-narrow, .sketch-split > *) > a:not(.sketch-button) { justify-self: start; }
+[data-sketch] :is(.sketch-tabs [role="tab"], .sketch-switch, input[type="range"]) { min-width: 44px; min-height: 44px; } /* Every touch target is at least 44 px. */
+[data-sketch] .sketch-nav a { padding: 0 12px; white-space: nowrap; text-decoration: none; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-nav a:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-nav a[aria-current] { font-weight: 600; background: var(--sketch-wash); }
+/* An app shell: a bottom tab bar on a phone, an icon rail from 600 px with .sketch-rail, a side nav from 1000 px. */
+[data-sketch] .sketch-shell { display: grid; grid-template: auto 1fr auto / minmax(0, 1fr); min-height: 100vh; }
+[data-sketch] .sketch-shell > .sketch-bar { grid-column: 1 / -1; }
+[data-sketch] .sketch-shell > .sketch-nav { order: 1; position: sticky; bottom: 0; z-index: 1; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); padding: 4px; background: var(--sketch-page); border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+[data-sketch] .sketch-shell > .sketch-nav a { flex-direction: column; gap: 2px; padding: 4px; font-size: 12px; }
+[data-sketch] .sketch-main { display: grid; gap: 24px; align-content: start; width: 100%; min-width: 0; max-width: 1080px; margin: 0 auto; padding: 24px 16px; }
+[data-sketch] .sketch-narrow { display: grid; gap: 16px; align-content: start; width: 100%; max-width: var(--width, 440px); margin: 0 auto; padding: 48px 16px; }
+[data-sketch] .sketch-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px 48px; align-items: start; } /* Two columns from 1000 px; --cols sets them. */
+[data-sketch] .sketch-grid { display: grid; gap: 16px; grid-template-columns: repeat(var(--phone, 1), minmax(0, 1fr)); } /* 1, 2, then 4 columns; --phone, --tablet and --wide change them. */
+[data-sketch] .sketch-grid > :is(.sketch-span, .sketch-span + *) { grid-column: 1 / -1; }
+[data-sketch] .sketch-list { display: grid; align-content: start; margin: 0; padding: 0; list-style: none; }
+[data-sketch] .sketch-list > li { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; min-height: 56px; margin: 0 -8px; padding: 6px 8px; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-list > li:has([aria-current]) { background: var(--sketch-wash); }
+/* An avatar: <span class="sketch-avatar"> with initials, a circle for a person. Add "square" for a group. */
+[data-sketch] .sketch-avatar, [data-sketch] .sketch-list > li.sketch-conversation > span:first-child { display: grid; place-items: center; flex: none; width: 36px; height: 36px; box-sizing: border-box; border: var(--sketch-stroke) solid currentColor; border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; font-size: 13px; font-weight: 600; }
+[data-sketch] .sketch-avatar.square, [data-sketch] .sketch-list > li.sketch-conversation > span.square:first-child { border-radius: var(--sketch-wobble); }
+/* An inbox row: <li class="sketch-conversation"> holds, in this order, an avatar <span>, a <div> with the name link and a <p> message,
+   and a <div> with the time and an unread count. The link covers the row. A count makes the name bold. Selected is the filled ink. */
+[data-sketch] .sketch-list > li.sketch-conversation { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: start; gap: 2px 12px; padding-block: 10px; }
+[data-sketch] .sketch-list > li.sketch-conversation > div { display: grid; gap: 2px; min-width: 0; }
+[data-sketch] .sketch-list > li.sketch-conversation > div:last-child { justify-items: end; gap: 6px; font-size: 13px; color: var(--sketch-muted); }
+[data-sketch] .sketch-list > li.sketch-conversation a { display: block; min-width: 0; min-height: 0; font-weight: 400; text-decoration: none; overflow-wrap: anywhere; }
+[data-sketch] .sketch-list > li.sketch-conversation:has(> div:last-child > .sketch-badge) a { font-weight: 600; }
+[data-sketch] .sketch-list > li.sketch-conversation a::after { content: ""; position: absolute; inset: 0; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-list > li.sketch-conversation > div:nth-child(2) > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* An optional subject line between the name and the message. */
+[data-sketch] .sketch-list > li.sketch-conversation p { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+[data-sketch] .sketch-list > li.sketch-conversation a:focus-visible { outline: 0; }
+[data-sketch] .sketch-list > li.sketch-conversation:has(a:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 2px; }
+[data-sketch] .sketch-list > li.sketch-conversation:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]) { background: var(--sketch-ink); color: var(--sketch-page); }
+[data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]):hover { background: color-mix(in srgb, var(--sketch-ink) 84%, transparent); }
+[data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]) > div:last-child, [data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]) .sketch-muted { color: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+[data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]) .sketch-badge.strong { background: var(--sketch-page); color: var(--sketch-ink); border-color: var(--sketch-page); }
+[data-sketch] fieldset { border: 0; padding: 0; margin: 0; } [data-sketch] legend { padding: 0; } [data-sketch] fieldset > .sketch-choice { margin: 0 -12px; }
+[data-sketch] .sketch-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
+[data-sketch] .sketch-facts dt { color: var(--sketch-muted); } [data-sketch] .sketch-facts dd { margin: 0; }
+/* A bar chart: each <i> gets its value as a height. */
+[data-sketch] .sketch-bars { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; align-items: end; height: 160px; text-align: center; }
+[data-sketch] .sketch-bars i { background: var(--sketch-ink); border-radius: 5px 3px 0 0; }
+[data-sketch] .sketch-split { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; }
+[data-sketch] .sketch-split.panes { align-content: stretch; } /* On a phone, the open column fills the screen, so its last form is at the foot. */
+/* A board scrolls inside its own box until its columns fit. */
+[data-sketch] .sketch-board { display: grid; grid-auto-flow: column; grid-auto-columns: 85%; gap: 16px; align-items: start; overflow-x: auto; scroll-snap-type: x mandatory; }
+[data-sketch] .sketch-board > * { scroll-snap-align: start; } [data-sketch] .sketch-board .sketch-frame { padding: 12px 16px; }
+[data-sketch] .sketch-thread { display: grid; gap: 8px; align-content: end; }
+[data-sketch] .sketch-thread > p { margin: 0; justify-self: start; max-width: 80%; padding: 8px 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-thread > p.own { justify-self: end; background: var(--sketch-ink); color: var(--sketch-page); }
+/* A sparkline: an inline <svg viewBox="0 0 100 24" preserveAspectRatio="none"> with one <polyline>. */
+[data-sketch] .sketch-spark { width: 100%; height: 32px; fill: none; stroke: currentColor; stroke-width: var(--sketch-stroke); stroke-linejoin: round; } [data-sketch] .sketch-spark * { vector-effect: non-scaling-stroke; }
+/* Step dots: one <i> for each step, the current one with class "on". */
+[data-sketch] .sketch-dots { display: flex; gap: 8px; margin: 0; } [data-sketch] .sketch-dots i { width: 10px; height: 10px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; } [data-sketch] .sketch-dots .on { background: var(--sketch-ink); }
+[data-sketch] .sketch-steps { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 0; padding: 0; list-style: decimal inside; } [data-sketch] .sketch-steps [aria-current] { font-weight: 600; }
+/* A meter: a drawn track with an <i> that gets its value as a width. Give the box role="meter" and the aria-value attributes. */
+[data-sketch] .sketch-meter { height: 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 7px 5px 6px 4px; overflow: hidden; }
+[data-sketch] .sketch-meter i { display: block; height: 100%; background: var(--sketch-ink); }
+/* A menu button shows or hides the element right after it, below 1000 px. */
+[data-sketch] .sketch-collapse { display: grid; flex-basis: 100%; }
+@media (max-width: 599px) {
+  [data-sketch] :is(.sketch-from-tablet, .sketch-from-desktop, .sketch-table thead) { display: none !important; }
+  [data-sketch] .sketch-table tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; padding: 12px 0; border-bottom: var(--sketch-stroke) solid var(--sketch-wash); }
+  [data-sketch] .sketch-table td { padding: 0; border: 0; }
+}
+@media (max-width: 999px) {
+  [data-sketch] .sketch-from-desktop, [data-sketch] .sketch-menu-button[aria-expanded="false"] + .sketch-collapse { display: none !important; }
+  [data-sketch] .sketch-bar > .sketch-collapse { order: 1; }
+  [data-sketch] .sketch-split > :has(+ .sketch-from-desktop:last-child) { border-right: 0; } /* A desktop side panel is hidden, so its neighbour is the last column. */
+}
+@media (min-width: 600px) {
+  [data-sketch] .sketch-phone-only { display: none !important; }
+  [data-sketch] .sketch-rail { grid-template: auto 1fr / 88px minmax(0, 1fr); }
+  [data-sketch] .sketch-rail > .sketch-nav { order: 0; position: static; grid-auto-flow: row; align-content: start; padding: 16px 8px; border-top: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .sketch-grid { grid-template-columns: repeat(var(--tablet, 2), minmax(0, 1fr)); }
+  [data-sketch] .sketch-split { grid-template-columns: 260px minmax(0, 1fr); min-height: calc(100vh - 62px); align-content: stretch; }
+  [data-sketch] .sketch-split > :not(:last-child) { border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  /* With "panes", the split fills the screen below the bar, each column scrolls on its own, and a column's last form stays at its foot. */
+  [data-sketch] .sketch-shell:has(> .sketch-split.panes) { height: 100vh; } [data-sketch] .sketch-split.panes { grid-template-rows: minmax(0, 1fr); min-height: 0; }
+  [data-sketch] .sketch-split.panes { grid-template-columns: var(--split, 260px minmax(0, 1fr)); }
+  [data-sketch] .sketch-split.panes > * { min-height: 0; overflow-y: auto; }
+  [data-sketch] .sketch-split.panes > * > form:last-child { position: sticky; bottom: 0; padding-block: 8px; background: var(--sketch-page); }
+  [data-sketch] .sketch-split > .sketch-nav { flex-direction: column; padding: 24px 16px; } [data-sketch] .sketch-split > .sketch-nav a { justify-content: start; }
+  [data-sketch] .sketch-board { grid-auto-columns: 280px; }
+  [data-sketch] .sketch-main { padding: 32px; }
+}
+@media (min-width: 1000px) {
+  [data-sketch] :is(.sketch-menu-button, .sketch-until-desktop) { display: none !important; }
+  [data-sketch] .sketch-bar > .sketch-collapse { display: flex; flex-basis: auto; align-items: center; gap: 8px; }
+  [data-sketch] .sketch-shell { grid-template: auto 1fr / 220px minmax(0, 1fr); }
+  [data-sketch] .sketch-shell > .sketch-nav { order: 0; position: static; display: flex; flex-direction: column; padding: 24px 16px; border-top: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .sketch-shell > .sketch-nav a { flex-direction: row; justify-content: start; gap: 12px; padding: 0 12px; font-size: inherit; }
+  [data-sketch] .sketch-cols { grid-template-columns: var(--cols, minmax(0, 1fr) 300px); }
+  [data-sketch] .sketch-grid { grid-template-columns: repeat(var(--wide, 4), minmax(0, 1fr)); }
+  [data-sketch] .sketch-grid > .sketch-span { grid-column: span 3; } [data-sketch] .sketch-grid > .sketch-span + * { grid-column: auto; }
+  [data-sketch] .sketch-split { grid-template-columns: var(--split, 260px minmax(0, 1fr)); }
+  [data-sketch] .sketch-split:has(> :nth-child(3)) { grid-template-columns: var(--split, 200px 300px minmax(0, 1fr)); }
+  [data-sketch] .sketch-board { grid-auto-columns: minmax(0, 1fr); }
+  [data-sketch] .sketch-steps { flex-direction: column; }
+  [data-sketch] .sketch-cols.flip > :first-child { order: 1; } /* A band with its picture on the other side. */
+}
+</style>
+<style>
+  /* The table is 811 px wide at most. At 1024 px and up, the side column of the head makes the page 264 px wider. */
+  [data-sketch] .board_main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; width: 100%; --list-width: 843px; max-width: var(--list-width); margin: 0 auto; padding: 32px 16px; }
+
+  /* The head is the same in each pattern that lists the products. Below 1024 px, it is one row: the title, the search field, the Filters button, the control that sets the order, and one button. The Filters button names the chosen metric, because the metric switch is in the sheet. A part that does not fit goes to the next row. Below 600 px, the title and the search field are the first row, and the Filters button starts the next row. A control that sets the order is in that row from 520 px. Below 520 px, it is in a row of its own with the button. */
+  [data-sketch] .head_page { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 12px; }
+  [data-sketch] .head_title { flex: none; min-width: 0; min-height: 44px; margin: 0; display: flex; align-items: center; font-size: 24px; letter-spacing: -0.3px; overflow-wrap: anywhere; }
+  [data-sketch] .head_side { display: contents; }
+  /* The search field takes the row, less 140 px for the title. So no other part fits in the first row, and a longer metric name does not move a part. */
+  [data-sketch] .head_search { flex: 1 1 calc(100% - 140px); min-width: 0; }
+  [data-sketch] .head_open { flex: none; }
+  [data-sketch] .head_tools { flex: 1 1 auto; display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-width: 0; }
+  [data-sketch] .head_order { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; }
+  [data-sketch] .head_order > :last-child { flex: 1 1 auto; min-width: 0; }
+  [data-sketch] .head_add { flex: none; }
+  [data-sketch] .head_list { flex: 1 1 100%; min-width: 0; }
+  @media (max-width: 599px) {
+    [data-sketch] .head_tools:has(.head_order) { flex-basis: 0; }
+  }
+  @media (max-width: 519px) {
+    [data-sketch] .head_tools:has(.head_order) { flex-basis: 100%; }
+  }
+  @media (min-width: 600px) {
+    [data-sketch] .head_side { flex: 999 1 200px; display: flex; gap: 8px; min-width: 0; }
+    [data-sketch] .head_search { flex: 1; }
+  }
+
+  /* Below 1024 px, the filters are in a sheet at the bottom of the screen. The state filters-open shows it. The scrim thins the screen behind the sheet. */
+  [data-sketch] .head_scrim { position: fixed; inset: 0; z-index: 39; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+  [data-sketch] .head_filters { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; align-items: end; }
+  [data-sketch] .head_filters[role="dialog"] { display: grid; position: fixed; inset: auto 0 0; z-index: 40; max-height: calc(100% - 48px); padding: 8px 16px 24px; overflow-y: auto; overscroll-behavior: contain; background: var(--sketch-page); border-top: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 20px 24px 0 0 / 24px 20px 0 0; }
+  [data-sketch] .head_sheet_top { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  [data-sketch] .head_sheet_title { margin: 0; font-size: 18px; letter-spacing: 0; }
+  /* The metric switch is the first part of the filters: in the side column at 1024 px and up, and in the sheet below 1024 px. Its options share the width. */
+  [data-sketch] .head_metric { grid-column: 1 / -1; min-width: 0; }
+  [data-sketch] .head_metric > .sketch-segmented { display: flex; max-width: 360px; }
+  [data-sketch] .head_metric label { flex: 1 1 0; min-width: 0; padding: 0 8px; white-space: nowrap; }
+  [data-sketch] .head_hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .head_users { grid-column: 1 / -1; min-width: 0; }
+  [data-sketch] .head_legend { margin-bottom: 6px; color: var(--sketch-muted); }
+  [data-sketch] .head_range { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; }
+  [data-sketch] .head_foot { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+  [data-sketch] .head_clear { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px; background: none; border: 0; border-radius: var(--sketch-wobble); font-weight: 600; cursor: pointer; }
+  [data-sketch] .head_clear:is(:hover, :active) { background: var(--sketch-wash); }
+  [data-sketch] .head_clear > .sketch-icon { width: 16px; height: 16px; }
+  [data-sketch] .head_done { flex: 1 1 auto; }
+  @media (min-width: 600px) {
+    [data-sketch] .head_filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    [data-sketch] .head_users { grid-column: auto; }
+    [data-sketch] .head_done { flex: none; margin-left: auto; }
+  }
+
+  /* At 1024 px and up, the title, the search field and the filters are a side column at the left of the list. The control that sets the order and the button are above the list, at its right edge. */
+  @media (min-width: 1024px) {
+    [data-sketch] .head_page { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px 32px; align-items: start; max-width: calc(var(--list-width) + 264px); }
+    [data-sketch] .head_title { grid-column: 1; grid-row: 1; }
+    [data-sketch] .head_side { grid-column: 1; grid-row: 2; position: sticky; top: 24px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    [data-sketch] .head_open { display: none; }
+    [data-sketch] .head_filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    [data-sketch] .head_sheet_top { display: none; }
+    [data-sketch] .head_done { display: none; }
+    [data-sketch] .head_tools { grid-column: 2; grid-row: 1; justify-self: end; }
+    [data-sketch] .head_list { grid-column: 2; grid-row: 2; }
+  }
+
+  [data-sketch] .board_num { text-align: right; font-variant-numeric: tabular-nums; }
+  [data-sketch] .board_empty { display: grid; gap: 16px; justify-items: center; padding: 48px 16px; text-align: center; }
+  [data-sketch] .board_empty > :is(h2, p) { margin: 0; }
+  [data-sketch] .board_empty > h2 { font-size: 18px; letter-spacing: 0; overflow-wrap: anywhere; }
+
+  /* The ranked rows are 53 px high with lines, and no box is around them. */
+  [data-sketch] .board_scroll { overflow-x: auto; }
+  [data-sketch] .board_table { width: 100%; min-width: 600px; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+  [data-sketch] .board_table :is(th, td) { padding: 0 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  [data-sketch] .board_table th { height: 40px; font-weight: 600; border-bottom: 1px solid var(--sketch-ink); }
+  [data-sketch] .board_table td { height: 53px; border-bottom: 1px solid var(--sketch-wash); }
+  [data-sketch] .board_table :is(th, td).board_num { text-align: right; }
+  [data-sketch] .board_table :is(th, td).board_rank { text-align: center; }
+  /* The link of the name covers the row, so a click on each cell opens the product. */
+  [data-sketch] .board_table tbody tr { position: relative; }
+  [data-sketch] .board_table a[data-product] { font-weight: 600; text-decoration: none; }
+  /* Each row has the avatar of its product before the name, and the avatar of its lead. A long name is cut after the avatar. */
+  [data-sketch] .board_who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  [data-sketch] .board_who > :is(a, span:last-child) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  [data-sketch] .board_who > .sketch-avatar { width: 32px; height: 32px; font-size: 12px; }
+  [data-sketch] .board_table a[data-product]::after { content: ""; position: absolute; inset: 0; }
+  [data-sketch] .board_table a[data-product]:focus-visible { outline: 0; }
+  [data-sketch] .board_table tr:has(a[data-product]:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: -2px; }
+  [data-sketch] .board_table tbody tr:is(:hover, :active) > td { background: var(--sketch-wash); }
+
+  /* The page of a product has its own pattern, so it shows as a plain box with the name of that pattern. A link leads back. */
+  [data-sketch] .board_back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+  [data-sketch] .board_back > .sketch-icon { width: 14px; height: 14px; }
+  [data-sketch] .board_other { min-height: 320px; padding: 16px; text-align: center; color: var(--sketch-ink); }
+  [data-sketch] .board_other :is(h1, p) { margin: 0; font: inherit; letter-spacing: 0; }
+  [data-sketch] .board_other h1 { font-weight: 600; }
+
+  @media (max-width: 599px) {
+    /* The table keeps its width, and it scrolls sideways below the head. The first 2 columns get narrower, as in the source. */
+    [data-sketch] .board_table { --board-rank: 36px; --board-name: 200px; }
+  }
+  /* The page script writes the value of transitions.json into --board-row-play. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .board_table tbody td { transition: var(--board-row-play, none); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each list state, and it fills the rows from the list of products. -->
+<section data-state="table"></section>
+<section data-state="metric-changed"></section>
+<section data-state="no-match"></section>
+<section data-state="filters-open"></section>
+<section data-state="product-page"></section>
+
+<!-- The head has the title, the search field, the Filters button with the metric switch and the filters, and one button. The table shows the number of the chosen metric in its last column. -->
+<template id="screen">
+  <main class="board_main head_page">
+    <h1 class="head_title">Products</h1>
+    <div class="head_side">
+      <input class="sketch-input head_search" type="search" aria-label="Search" placeholder="Search" data-search>
+      <button type="button" class="sketch-button secondary head_open" aria-haspopup="dialog" data-filters-open><i data-icon="filter"></i><span data-filters-label>Filters</span></button>
+      <div class="head_scrim" data-filters-close hidden></div>
+      <div class="head_filters" role="group" aria-label="Filters" data-filters>
+        <div class="head_sheet_top"><h2 class="head_sheet_title">Filters</h2><button type="button" class="sketch-icon-button" aria-label="Close" data-filters-close><i data-icon="close"></i></button></div>
+        <fieldset class="head_metric"><legend class="head_legend">Metric</legend>
+          <div class="sketch-segmented" data-metric-switch><!--metric-options--></div></fieldset>
+        <label class="sketch-field head_stage">Stage <select class="sketch-input" data-stage-select><option value="">All stages</option><!--stage-options--></select></label>
+        <label class="sketch-field head_lead">Lead <select class="sketch-input" data-lead-select><option value="">Any lead</option><!--lead-options--></select></label>
+        <fieldset class="head_users"><legend class="head_legend">Users in a week</legend>
+          <div class="head_range"><input class="sketch-input" inputmode="numeric" aria-label="Fewest users in a week" placeholder="Min" data-users="min"><span aria-hidden="true">–</span><input class="sketch-input" inputmode="numeric" aria-label="Most users in a week" placeholder="Max" data-users="max"></div></fieldset>
+        <div class="head_foot">
+          <button type="button" class="head_clear" aria-label="Clear filters" data-clear="filters" hidden><i data-icon="close"></i>Clear</button>
+          <button type="button" class="sketch-button head_done" data-filters-close data-filters-done></button>
+        </div>
+      </div>
+    </div>
+    <div class="head_tools">
+      <button type="button" class="sketch-button head_add" data-sketch-toast="New product form (sample)"><i data-icon="plus"></i>Add</button>
+    </div>
+    <div class="head_list" data-slot="list"></div>
+  </main>
+</template>
+
+<!-- The page of a product has its own pattern, content/product-page. This state shows a link back and a plain box with the name of that pattern. -->
+<template id="page">
+  <main class="board_main">
+    <nav aria-label="Back"><a class="board_back" href="#table" data-back><i data-icon="chevron-left"></i>Back to the table</a></nav>
+    <div class="sketch-placeholder board_other"><div><h1 data-fill="name"></h1><p>Pattern: content/product-page</p></div></div>
+  </main>
+</template>
+
+<script data-sketch-kit="0.13.0">
+/* Local-only presentation helper. Load after markup; no network requests. */
+(() => {
+  const page = document.querySelector('[data-sketch]');
+  if (!page) return;
+  // A page can set html[data-theme] and may change it at any time; the CSS reads it.
+  // Until the page sets it, follow the system theme. Never overwrite a value the page set.
+  const root = document.documentElement;
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  /* A gallery opens a page with ?theme=dark or ?theme=light. That counts as a value the page set. */
+  const asked = new URLSearchParams(location.search).get('theme');
+  if (!root.hasAttribute('data-theme') && ['light', 'dark'].includes(asked)) root.dataset.theme = asked;
+  let pageTheme = root.hasAttribute('data-theme');
+  const watch = new MutationObserver(() => { pageTheme = true; watch.disconnect(); });
+  if (!pageTheme) watch.observe(root, {attributeFilter: ['data-theme']});
+  function applyTheme() {
+    if (watch.takeRecords().length) { pageTheme = true; watch.disconnect(); }
+    if (pageTheme) return;
+    root.dataset.theme = system.matches ? 'dark' : 'light';
+    watch.takeRecords();
+  }
+  system.addEventListener('change', applyTheme);
+  const observer = new ResizeObserver(entries => entries.forEach(({target}) => {
+    const w = target.clientWidth, h = target.clientHeight;
+    const svg = target.querySelector(':scope > .sketch-outline');
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.firstChild.setAttribute('d', `M7 3 Q${w*.18} -.5 ${w*.38} 2.5 T${w*.7} 2 Q${w*.9} .5 ${w-7} 3 Q${w-1} 1 ${w-2} 8 Q${w+1} ${h*.45} ${w-2} ${h-8} Q${w} ${h-2} ${w-8} ${h-2} Q${w*.7} ${h+1} ${w*.5} ${h-2} T7 ${h-2} Q1 ${h-1} 2 ${h-8} Q-1 ${h*.6} 2 9 Q1 2 7 3`);
+  }));
+  const outlined = '.sketch-frame, .sketch-popover, .sketch-menu, .sketch-dialog, .sketch-toast';
+  const outline = frame => {
+    if (frame.querySelector(':scope > .sketch-outline')) return;
+    svg.setAttribute('class', 'sketch-outline');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.append(document.createElementNS(svg.namespaceURI, 'path'));
+    frame.prepend(svg);
+    observer.observe(frame);
+  };
+  /* Line icons, drawn on a 24px grid. <i data-icon="close"></i> becomes the svg. */
+  const icons = {
+    close: 'M6 6l12 12M18 6L6 18', plus: 'M12 5v14M5 12h14', minus: 'M5 12h14', check: 'M5 12.5l4.5 4.5L19 7',
+    'chevron-down': 'M6 9l6 6 6-6', 'chevron-up': 'M6 15l6-6 6 6', 'chevron-left': 'M15 6l-6 6 6 6', 'chevron-right': 'M9 6l6 6-6 6',
+    'arrow-left': 'M19 12H5M11 6l-6 6 6 6', 'arrow-right': 'M5 12h14M13 6l6 6-6 6',
+    search: 'M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13zM15.5 15.5L20 20', menu: 'M4 7h16M4 12h16M4 17h16',
+    more: 'M5 12h1M11.5 12h1M18 12h1', edit: 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4',
+    trash: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13', sliders: 'M4 7h10M18 7h2M16 5v4M4 17h4M12 17h8M10 15v4',
+    settings: 'M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1',
+    comment: 'M4 5h16v11H9l-5 4z', user: 'M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM4 21c1-4 4-6 8-6s7 2 8 6',
+    home: 'M4 11l8-7 8 7M6 9.5V20h12V9.5', bell: 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4',
+    calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', copy: 'M8 8h12v12H8zM16 8V4H4v12h4',
+    link: 'M10 14l4-4M9 7l2-2a4 4 0 0 1 6 6l-2 2M15 17l-2 2a4 4 0 0 1-6-6l2-2',
+    upload: 'M12 16V4M7 9l5-5 5 5M4 20h16', download: 'M12 4v12M7 11l5 5 5-5M4 20h16',
+    eye: 'M2 12c3-5 6.5-7 10-7s7 2 10 7c-3 5-6.5 7-10 7S5 17 2 12zM12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z',
+    filter: 'M4 5h16l-6 8v6l-4 2v-8z', external: 'M14 4h6v6M20 4l-9 9M18 14v6H4V6h6',
+    info: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 11v6M12 7.5v.5', warning: 'M12 3L2 20h20zM12 10v5M12 17.5v.5',
+    image: 'M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4', send: 'M20 4L4 11l7 2 3 7zM11 13l9-9',
+    smile: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM8 14c1 1.5 2.4 2 4 2s3-.5 4-2M9 9.5v.5M15 9.5v.5', box: 'M4 7.5L12 3l8 4.5v9L12 21l-8-4.5zM4 7.5L12 12l8-4.5M12 12v9',
+  };
+  const drawIcon = slot => {
+    svg.setAttribute('class', 'sketch-icon');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(svg.namespaceURI, 'path');
+    path.setAttribute('d', icons[slot.dataset.icon] || icons.image);
+    svg.append(path);
+    slot.replaceWith(svg);
+  };
+
+  /* Popover and menu: a trigger with data-sketch-popover="id" opens the element with that id. */
+  let open = null;
+  const focusables = root => [...root.querySelectorAll('a[href], button:not(:disabled), input:not(:disabled), select, textarea, [tabindex="0"]')];
+  const place = (layer, trigger) => {
+    layer.style.maxHeight = `${innerHeight - 16}px`;
+    layer.style.overflowY = '';
+    if (layer.scrollHeight > layer.clientHeight) layer.style.overflowY = 'auto';
+    const t = trigger.getBoundingClientRect(), w = layer.offsetWidth, h = layer.offsetHeight;
+    const below = t.bottom + 8, above = t.top - h - 8;
+    const top = below + h > innerHeight - 8 && above > 8 ? above : below;
+    layer.style.top = `${Math.max(8, Math.min(top, innerHeight - h - 8))}px`;
+    const start = t.left + w > innerWidth - 8 ? t.right - w : t.left;
+    layer.style.left = `${Math.max(8, Math.min(start, innerWidth - w - 8))}px`;
+  };
+  const closeLayer = (returnFocus = true) => {
+    if (!open) return;
+    const {layer, trigger} = open;
+    open = null;
+    layer.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    if (returnFocus) trigger.focus();
+  };
+  const openLayer = (layer, trigger, moveFocus = true) => {
+    closeLayer(false);
+    open = {layer, trigger};
+    layer.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+    place(layer, trigger);
+    if (moveFocus) focusables(layer)[0]?.focus();
+  };
+  const menuItems = menu => [...menu.querySelectorAll('.sketch-menu-item:not(:disabled)')];
+
+  /* An open select: sketch.css draws the list where the browser has appearance: base-select.
+     Every other browser paints its own list, so a sketch-menu of the options takes its place (#154). */
+  const drawnList = !CSS.supports('appearance', 'base-select');
+  const ownsList = target => drawnList && target.matches?.('select.sketch-input:not([multiple], :disabled)') && target.size <= 1;
+  /* The list takes the field's name: the select's aria-label, or its label's words without the options. */
+  const fieldName = select => select.getAttribute('aria-label') || [...select.labels].map(label => {
+    const copy = label.cloneNode(true);
+    copy.querySelectorAll('select, .sketch-menu').forEach(part => part.remove());
+    return copy.textContent.trim();
+  }).join(' ');
+  let lists = 0;
+  const openList = select => {
+    if (!select.sketchList) {
+      select.sketchList = Object.assign(document.createElement('div'), {className: 'sketch-menu', hidden: true, id: `sketch-list-${++lists}`});
+      select.sketchList.setAttribute('role', 'listbox');
+      select.setAttribute('aria-controls', select.sketchList.id);
+      /* Next to its field, so the list stays in the same dialog and landmark as the select. */
+      (select.closest('label') || select).after(select.sketchList);
+      outline(select.sketchList);
+    }
+    const list = select.sketchList;
+    list.setAttribute('aria-label', fieldName(select));
+    list.querySelectorAll(':scope > :is(.sketch-menu-item, .sketch-menu-group)').forEach(item => item.remove());
+    /* A hidden option stays out, and :disabled also covers an option in a disabled optgroup.
+       An optgroup becomes a group with its label as a heading. */
+    let group = null;
+    [...select.options].forEach((option, index) => {
+      if (option.hidden) return;
+      const optgroup = option.parentElement.closest('optgroup');
+      if (optgroup && optgroup !== group?.sketchGroup) {
+        group = Object.assign(document.createElement('div'), {className: 'sketch-menu-group', sketchGroup: optgroup});
+        group.setAttribute('role', 'group');
+        group.setAttribute('aria-label', optgroup.label);
+        if (optgroup.disabled) group.setAttribute('aria-disabled', 'true');
+        const label = Object.assign(document.createElement('div'), {className: 'sketch-menu-group-label', textContent: optgroup.label});
+        label.setAttribute('aria-hidden', 'true');
+        group.append(label);
+        list.append(group);
+      } else if (!optgroup) group = null;
+      const item = Object.assign(document.createElement('button'), {type: 'button', className: 'sketch-menu-item', textContent: option.text, disabled: option.matches(':disabled')});
+      item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', String(option.selected));
+      item.sketchIndex = index;
+      (group || list).append(item);
+    });
+    list.style.minWidth = `${select.offsetWidth}px`;
+    openLayer(list, select, false);
+    (list.querySelector('[aria-selected="true"]:not(:disabled)') || menuItems(list)[0])?.focus();
+  };
+  const chooseOption = (select, item) => {
+    if (select.selectedIndex === item.sketchIndex) return;
+    select.selectedIndex = item.sketchIndex;
+    select.dispatchEvent(new Event('input', {bubbles: true}));
+    select.dispatchEvent(new Event('change', {bubbles: true}));
+  };
+
+  /* A native dialog: data-sketch-open="id" shows it, data-sketch-close closes the nearest one. */
+  const showDialog = (dialog, opener) => {
+    if (dialog.open) return;
+    /* Focus goes back to something that stays visible: the trigger of a menu that held the opener. */
+    opener = opener || page.querySelector(`[data-sketch-open="${dialog.id}"]`);
+    dialog.sketchOpener = open?.layer.contains(opener) ? open.trigger : opener;
+    dialog.showModal();
+  };
+
+  /* One toast at a time, announced politely, gone after four seconds. */
+  let toastTimer, toastOpener;
+  const hideToast = () => {
+    const toast = page.querySelector(':scope > .sketch-toast:not([hidden])');
+    if (!toast) return false;
+    toast.hidden = true;
+    clearTimeout(toastTimer);
+    toastOpener?.focus();
+    return true;
+  };
+  window.sketchToast = (text, opener) => {
+    toastOpener = opener;
+    let toast = page.querySelector(':scope > .sketch-toast');
+    if (!toast) {
+      toast = Object.assign(document.createElement('div'), {className: 'sketch-toast', hidden: true});
+      toast.setAttribute('role', 'status');
+      toast.append(document.createElement('span'));
+      page.append(toast);
+      outline(toast);
+    }
+    toast.lastChild.textContent = text;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 4000);
+  };
+
+  const selectTab = (tab, moveFocus) => {
+    tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]').forEach(other => {
+      const chosen = other === tab;
+      other.setAttribute('aria-selected', String(chosen));
+      other.tabIndex = chosen ? 0 : -1;
+      const panel = document.getElementById(other.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !chosen;
+    });
+    if (moveFocus) tab.focus();
+  };
+
+  page.addEventListener('click', event => {
+    const target = event.target;
+    /* A menu button opens or closes the .sketch-collapse right after it. */
+    const menu = target.closest('.sketch-menu-button');
+    if (menu) menu.setAttribute('aria-expanded', String(menu.getAttribute('aria-expanded') !== 'true'));
+    const layerTrigger = open?.layer.contains(target) ? open.trigger : null;
+    const popoverTrigger = target.closest('[data-sketch-popover]');
+    if (popoverTrigger) {
+      const layer = document.getElementById(popoverTrigger.dataset.sketchPopover);
+      if (open?.layer === layer) closeLayer(); else openLayer(layer, popoverTrigger);
+      return;
+    }
+    const opener = target.closest('[data-sketch-open]');
+    if (opener) showDialog(document.getElementById(opener.dataset.sketchOpen), opener);
+    if (target.closest('[data-sketch-close]')) {
+      const dialog = target.closest('dialog');
+      if (dialog) dialog.close(); else closeLayer();
+    }
+    if (target.matches('dialog.sketch-dialog')) {
+      const r = target.getBoundingClientRect();
+      if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) target.close();
+    }
+    const option = open && target.closest('[role="option"].sketch-menu-item');
+    if (option) chooseOption(open.trigger, option);
+    if (open && target.closest('.sketch-menu-item')) closeLayer();
+    const chip = target.closest('.sketch-chip[aria-pressed]');
+    if (chip) chip.setAttribute('aria-pressed', String(chip.getAttribute('aria-pressed') !== 'true'));
+    const tab = target.closest('.sketch-tabs [role="tab"]');
+    if (tab) selectTab(tab, false);
+    const toast = target.closest('[data-sketch-toast]');
+    if (toast) sketchToast(toast.dataset.sketchToast, layerTrigger || toast);
+  });
+  page.addEventListener('pointerdown', event => {
+    if (open && !open.layer.contains(event.target) && !open.trigger.contains(event.target)) closeLayer(false);
+  });
+  page.addEventListener('mousedown', event => {
+    if (!ownsList(event.target)) return;
+    event.preventDefault();
+    event.target.focus();
+    if (open?.trigger === event.target) closeLayer(); else openList(event.target);
+  });
+  page.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && open) { event.preventDefault(); closeLayer(); return; }
+    if (event.key === 'Escape' && !event.target.closest('dialog') && hideToast()) { event.preventDefault(); return; }
+    if (ownsList(event.target) && [' ', 'Enter', 'ArrowDown', 'ArrowUp'].includes(event.key)) { event.preventDefault(); openList(event.target); return; }
+    const menu = event.target.closest('.sketch-menu');
+    if (menu && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      const items = menuItems(menu), at = items.indexOf(event.target);
+      const next = {ArrowDown: at + 1, ArrowUp: at - 1, Home: 0, End: items.length - 1}[event.key];
+      items[(next + items.length) % items.length]?.focus();
+      event.preventDefault();
+    }
+    const tab = event.target.closest('.sketch-tabs [role="tab"]');
+    if (tab && ['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) {
+      const tabs = [...tab.parentElement.querySelectorAll('[role="tab"]')], at = tabs.indexOf(tab);
+      const next = {ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1}[event.key];
+      selectTab(tabs[(next + tabs.length) % tabs.length], true);
+      event.preventDefault();
+    }
+  });
+  addEventListener('resize', () => open && place(open.layer, open.trigger));
+
+  /* States: each [data-state="id"] is one screen. The address #id shows it; no address shows the
+     first. An overlay marked data-open inside a state opens with it, so a review can link to it. */
+  const showState = () => {
+    const states = [...page.querySelectorAll('[data-state]')];
+    if (!states.length) return;
+    const current = states.find(state => state.dataset.state === location.hash.slice(1)) || states[0];
+    closeLayer(false);
+    page.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
+    states.forEach(state => { state.hidden = state !== current; });
+    current.querySelectorAll('[data-open]').forEach(layer => {
+      if (layer.matches('dialog')) { showDialog(layer, null); return; }
+      const trigger = page.querySelector(`[data-sketch-popover="${layer.id}"]`);
+      if (trigger) openLayer(layer, trigger, false);
+    });
+  };
+  addEventListener('hashchange', showState);
+
+  window.initSketch = () => {
+    page.querySelectorAll('i[data-icon]').forEach(drawIcon);
+    page.querySelectorAll(outlined).forEach(outline);
+    page.querySelectorAll('.sketch-popover, .sketch-menu').forEach(layer => {
+      if (!layer.matches('dialog')) layer.hidden = !open || open.layer !== layer;
+      if (!layer.sketchReady) {
+        layer.sketchReady = true;
+        /* A layer taller than the screen scrolls, and its outline stays on the visible box. */
+        layer.addEventListener('scroll', () => {
+          const svg = layer.querySelector(':scope > .sketch-outline');
+          if (svg) svg.style.transform = `translateY(${layer.scrollTop}px)`;
+        });
+      }
+      if (layer.matches('.sketch-menu:not([role="listbox"])')) {
+        layer.setAttribute('role', 'menu');
+        layer.querySelectorAll('.sketch-menu-item').forEach(item => item.setAttribute('role', 'menuitem'));
+      }
+    });
+    page.querySelectorAll('[data-sketch-popover]').forEach(trigger => {
+      trigger.setAttribute('aria-controls', trigger.dataset.sketchPopover);
+      trigger.setAttribute('aria-haspopup', document.getElementById(trigger.dataset.sketchPopover)?.matches('.sketch-menu') ? 'menu' : 'dialog');
+      if (!trigger.hasAttribute('aria-expanded')) trigger.setAttribute('aria-expanded', 'false');
+    });
+    page.querySelectorAll('dialog.sketch-dialog').forEach(dialog => {
+      if (dialog.sketchReady) return;
+      dialog.sketchReady = true;
+      dialog.addEventListener('close', () => dialog.sketchOpener?.focus());
+    });
+    page.querySelectorAll('.sketch-tabs').forEach(list => {
+      list.setAttribute('role', 'tablist');
+      const tabs = [...list.querySelectorAll('[role="tab"]')];
+      const chosen = tabs.find(tab => tab.getAttribute('aria-selected') === 'true') || tabs[0];
+      if (chosen) selectTab(chosen, false);
+    });
+    applyTheme();
+    showState();
+  };
+  window.initSketch();
+})();
+</script>
+<script>
+  // The values of transitions.json. The sketch plays each with the same duration and easing.
+  const transition_records = [
+    { label: 'metric-changed', trigger: 'choose a metric', element: 'list', property: null, animation: 'opacity', duration: 250, delay: 0, easing: 'ease-in-out', measurement: 'measured' },
+    { label: 'table', trigger: 'choose the first metric', element: 'list', property: null, animation: 'opacity', duration: 250, delay: 0, easing: 'ease-in-out', measurement: 'measured' },
+    { label: 'table', trigger: 'the pointer goes over a row', element: 'row', property: 'background-color', animation: null, duration: 150, delay: 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', measurement: 'measured' }
+  ];
+  window.__sketchTransitions = transition_records;
+
+  const stages = ['Idea', 'Prototype', 'Pilot', 'Launch', 'Scale'];
+  // Sample products: name, one line about it, stage, lead, users in a week, growth in a week in percent, next review.
+  const products = [
+    ['Parcel Pilot', 'Route plans for small courier firms', 'Launch', 'Mara Lindqvist', 8420, 4, '2 Dec'],
+    ['Greenhouse Log for growers with many sites', 'Climate notes for growers', 'Launch', 'Ines Okafor', 2310, 9, '4 Dec'],
+    ['Clinic Queue', 'Waiting lists for small clinics', 'Pilot', 'Tomas Reyes', 640, 12, '9 Dec'],
+    ['Fare Split', 'Shared bills for flat mates', 'Prototype', 'Yuki Arai', 85, 30, '11 Dec'],
+    ['Mill Sensor', 'Wear alerts for saw mills', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Harbor Desk', 'Berth booking for marinas', 'Launch', 'Mara Lindqvist', 1975, 6, '2 Dec'],
+    ['Lesson Loop', 'Homework feedback for tutors', 'Pilot', 'Ines Okafor', 410, 15, '9 Dec'],
+    ['Stock Shelf', 'Shelf counts with a phone camera', 'Prototype', 'Tomas Reyes', 52, 21, '11 Dec'],
+    ['Rent Ready', 'Move-in checks for landlords', 'Launch', 'Yuki Arai', 12060, 2, '4 Dec'],
+    ['Field Crew', 'Shift plans for farm teams', 'Pilot', 'Noor Haddad', 730, 8, '9 Dec'],
+    ['Paper Trail', 'Receipts that become ledger rows', 'Launch', 'Tomas Reyes', 3150, 5, '2 Dec'],
+    ['Quiet Hours', 'Noise reports for housing blocks', 'Idea', 'Ines Okafor', 0, null, '16 Dec'],
+    ['Kiln Timer', 'Firing schedules for potters', 'Prototype', 'Mara Lindqvist', 31, 18, '11 Dec'],
+    ['Tool Library', 'Lending records for maker spaces', 'Pilot', 'Yuki Arai', 290, 10, '9 Dec'],
+    ['Depot Board', 'Task board for bus depots', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Well Check', 'Water tests for rural wells', 'Pilot', 'Ines Okafor', 5640, 3, '4 Dec']
+  ].map(([name, about, stage, lead, users, growth, review], at) => ({ at, name, about, stage, lead, users, growth, review }));
+  const leads = [...new Set(products.map(product => product.lead))];
+  // The MRR, its growth in a week in percent, the revenue and its growth in a week in percent, for each product in the same order. An amount is in dollars.
+  const money = [[48200, 3, 386500, 3], [31600, 7, 198700, 4], [4100, 11, 22800, 5], [240, 25, 480, 13], [0, null, 0, null], [12750, 5, 96400, 3], [2200, 14, 9600, 6], [120, 17, 240, 12],
+    [27900, 2, 412000, 2], [3650, 9, 15900, 6], [18400, 4, 240300, 2], [0, null, 0, null], [60, 20, 90, 17], [1480, 8, 5300, 7], [0, null, 0, null], [9300, 6, 61200, 4]];
+  products.forEach(product => { [product.mrr, product.mrr_growth, product.revenue, product.revenue_growth] = money[product.at]; });
+  // The metric switch of the head chooses the number that the list shows, and the order follows that number. MRR is the first metric.
+  const metrics = [
+    { id: 'mrr', label: 'MRR', short: 'MRR', noun: 'MRR', money: true },
+    { id: 'revenue', label: 'Revenue', short: 'Revenue', noun: 'revenue', money: true },
+    { id: 'users', label: 'Users in a week', short: 'Users', noun: 'users', money: false }
+  ];
+  const metric_of = id => metrics.find(metric => metric.id === id);
+  const amount_of = (product, metric) => product[metric.id];
+  const growth_of = (product, metric) => metric.id === 'users' ? product.growth : product[`${metric.id}_growth`];
+  const amount_text = (number, metric) => `${metric.money ? '$' : ''}${number.toLocaleString('en-US')}`;
+  const percent_text = percent => percent === null ? 'None' : `+${percent}%`;
+  const metric_options = metrics.map(metric => `<label><input type="radio" name="metric___state__" value="${metric.id}">${metric.short}<span class="head_hidden">${metric.label.slice(metric.short.length)}</span></label>`).join('');
+
+  const root = document.documentElement;
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  const list_states = ['table', 'metric-changed', 'no-match', 'filters-open'];
+  const no_filter = { stage: '', lead: '', min: '', max: '' };
+  const first_view = { term: '', ...no_filter, metric: 'mrr' };
+  const template_html = id => document.getElementById(id).innerHTML;
+  const shown_section = () => state_sections.find(section => !section.hidden);
+  const escape_html = text => String(text).replace(/[&<>"]/g, sign => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[sign]);
+
+  let view = { ...first_view };
+  let shown_product = 8;
+  let pending_focus = null;
+  // Below 1024 px, the filters are in a sheet. The state filters-open shows the sheet over the list that the member has.
+  const wide = matchMedia('(min-width: 1024px)');
+  const sheet_open = () => shown_section().dataset.state === 'filters-open' && !wide.matches;
+
+  // The products that match the words of the search field and each filter.
+  function found_products(wanted) {
+    const term = wanted.term.trim().toLowerCase();
+    return products.filter(product => (!wanted.stage || product.stage === wanted.stage)
+      && (!wanted.lead || product.lead === wanted.lead)
+      && (!term || `${product.name} ${product.about}`.toLowerCase().includes(term))
+      && (wanted.min === '' || product.users >= Number(wanted.min))
+      && (wanted.max === '' || product.users <= Number(wanted.max)));
+  }
+  const has_filter = wanted => Object.keys(no_filter).some(key => wanted[key] !== '');
+  // One line, one hint and one button take the place of the list when no product matches.
+  function empty_html(wanted) {
+    const only_words = wanted.term.trim() !== '' && !has_filter(wanted);
+    const title = only_words ? `No product matches “${escape_html(wanted.term.trim())}”` : 'No product matches the filters';
+    const help = only_words ? 'Try a different word.' : 'Change a filter, or clear the filters.';
+    return `<div class="board_empty"><h2>${title}</h2><p>${help}</p><button type="button" class="sketch-button secondary" data-clear="${only_words ? 'search' : 'filters'}">${only_words ? 'Clear search' : 'Clear filters'}</button></div>`;
+  }
+  // Write the view into the head of one state. The field that has the focus keeps its text. The Clear button shows only while a filter is set.
+  function fill_head(section, wanted) {
+    const fields = { '[data-search]': wanted.term, '[data-stage-select]': wanted.stage, '[data-lead-select]': wanted.lead, '[data-users="min"]': wanted.min, '[data-users="max"]': wanted.max };
+    Object.entries(fields).forEach(([selector, value]) => {
+      const field = section.querySelector(selector);
+      if (field !== document.activeElement) field.value = value;
+    });
+    section.querySelectorAll('[data-metric-switch] input').forEach(input => { input.checked = input.value === wanted.metric; });
+    section.querySelector('[data-clear="filters"]').hidden = !has_filter(wanted);
+    // The Filters button has the count of the filters that are set, and the name of the chosen metric. The last button of the sheet has the count of the products that match.
+    const count = [wanted.stage, wanted.lead, wanted.min + wanted.max].filter(Boolean).length;
+    const found = found_products(wanted).length;
+    const metric = metric_of(wanted.metric);
+    section.querySelector('[data-filters-label]').textContent = `Filters${count ? ` (${count})` : ''}, ${metric.short}`;
+    section.querySelector('[data-filters-open]').setAttribute('aria-label', `Filters${count ? `, ${count} set` : ''}, metric ${metric.label}`);
+    section.querySelector('[data-filters-done]').textContent = `Show ${found} ${found === 1 ? 'product' : 'products'}`;
+    // Below 1024 px, the state filters-open has the filters in a sheet, and the parts behind the sheet take no input.
+    const sheet = section.dataset.state === 'filters-open' && !wide.matches;
+    const filters = section.querySelector('[data-filters]');
+    filters.setAttribute('role', sheet ? 'dialog' : 'group');
+    if (sheet) filters.setAttribute('aria-modal', 'true'); else filters.removeAttribute('aria-modal');
+    section.querySelector('.head_scrim').hidden = !sheet;
+    section.querySelectorAll('.head_search, .head_open, .head_tools, .head_list').forEach(part => { part.inert = sheet; });
+  }
+  // The rows in the order of the chosen metric, with the largest number first. Rows with the same number keep the order of the list.
+  function ranked(list, metric) {
+    return [...list].sort((a, b) => amount_of(b, metric) - amount_of(a, metric) || a.at - b.at);
+  }
+  const state_of = wanted => !found_products(wanted).length ? 'no-match' : wanted.metric !== first_view.metric ? 'metric-changed' : 'table';
+  // Each list state has a view of its own, so an address such as #metric-changed shows the revenue. No sample product has the word "ferry".
+  function default_view(state) {
+    if (state === 'metric-changed') return { ...first_view, metric: 'revenue' };
+    if (state === 'no-match') return { ...first_view, term: 'ferry' };
+    return { ...first_view };
+  }
+  // filters-open shows the sheet over the list that the member has.
+  const view_of = state => state === 'filters-open' || state === state_of(view) ? view : default_view(state);
+
+  // An avatar has 2 letters. The avatar of a product is a square, and the avatar of a person is a circle.
+  const avatar = (name, shape) => `<span class="sketch-avatar${shape}" aria-hidden="true">${escape_html(name.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase())}</span>`;
+  const name_link = product => `<span class="board_who">${avatar(product.name, ' square')}<a href="#product-page" data-product="${product.at}">${escape_html(product.name)}</a></span>`;
+  function list_html(found, wanted) {
+    const metric = metric_of(wanted.metric);
+    const rows = ranked(found, metric).map((product, at) => `<tr><td class="board_rank">${at + 1}</td><td>${name_link(product)}</td><td>${product.stage}</td><td><span class="board_who">${avatar(product.lead, '')}<span>${escape_html(product.lead)}</span></span></td><td class="board_num"><strong>${amount_text(amount_of(product, metric), metric)}</strong></td></tr>`).join('');
+    return `<div class="board_scroll" tabindex="0" role="region" aria-label="Ranking table"><table class="board_table">
+      <colgroup><col style="width:var(--board-rank, 52px)"><col style="width:var(--board-name, auto)"><col style="width:100px"><col style="width:170px"><col style="width:170px"></colgroup>
+      <thead><tr><th scope="col" class="board_rank">#</th><th scope="col">Product</th><th scope="col">Stage</th><th scope="col">Lead</th><th scope="col" class="board_num">${metric.label}</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+  }
+
+  function fill_lists() {
+    state_sections.filter(section => list_states.includes(section.dataset.state)).forEach(section => {
+      const wanted = view_of(section.dataset.state);
+      const found = found_products(wanted);
+      section.querySelector('[data-slot="list"]').innerHTML = found.length ? list_html(found, wanted) : empty_html(wanted);
+      fill_head(section, wanted);
+    });
+  }
+  // The state product-page names the product that the member opened.
+  function fill_page() {
+    const section = state_sections.find(part => part.dataset.state === 'product-page');
+    section.querySelector('[data-fill="name"]').textContent = `The page of ${products[shown_product].name}`;
+    section.querySelector('[data-back]').href = `#${state_of(view)}`;
+  }
+
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const records_of = (label, element) => transition_records.filter(record => record.label === label && record.element === element);
+  // The list of a state goes from clear to solid, when transitions.json has a value for it.
+  function fade_list(state) {
+    const [record] = records_of(state, 'list');
+    if (!record || calm.matches) return;
+    shown_section().querySelector('[data-slot="list"]').animate({ opacity: [0, 1] }, { duration: record.duration, delay: record.delay, easing: record.easing, fill: 'backwards' });
+  }
+
+  // Show the state that the view needs. A change of state puts the focus on the same control of the new state.
+  function apply_view() {
+    fill_lists();
+    const state = sheet_open() ? 'filters-open' : state_of(view);
+    if (shown_section().dataset.state !== state) location.hash = state; else { show_metric(); focus_pending(); }
+  }
+  function focus_pending() {
+    const control = pending_focus && shown_section().querySelector(pending_focus);
+    pending_focus = null;
+    if (!control) return;
+    control.focus();
+    if (control.matches('input:not([type="radio"])')) control.setSelectionRange(control.value.length, control.value.length);
+  }
+  let last_metric = null;
+  // The list fades when a choice of a metric changes the number and the order. It does not fade when the page loads.
+  function show_metric() {
+    if (last_metric && view.metric !== last_metric) fade_list(view.metric === first_view.metric ? 'table' : 'metric-changed');
+    last_metric = view.metric;
+  }
+
+  const shown_view = () => ({ ...view_of(shown_section().dataset.state) });
+
+  document.addEventListener('click', event => {
+    const hit = selector => event.target.closest(selector);
+    if (hit('[data-clear]')) {
+      // One button clears the filters, and one button clears the words of the search field.
+      const words = hit('[data-clear]').dataset.clear === 'search';
+      view = words ? { ...shown_view(), term: '' } : { ...shown_view(), ...no_filter };
+      pending_focus = words ? '[data-search]' : '[data-stage-select]';
+      apply_view();
+    } else if (hit('a[data-product]')) {
+      shown_product = Number(hit('a[data-product]').dataset.product);
+      fill_page();
+      pending_focus = '[data-back]';
+    } else if (hit('[data-back]')) {
+      // The focus goes back to the row of the product.
+      pending_focus = `a[data-product="${shown_product}"]`;
+    }
+  }, true);
+  document.addEventListener('input', event => {
+    const field = event.target;
+    if (field.matches('[data-search]')) {
+      view = { ...shown_view(), term: field.value };
+    } else if (field.matches('[data-users]')) {
+      // A users field takes only digits.
+      field.value = field.value.replace(/\D/g, '');
+      view = { ...shown_view(), [field.dataset.users]: field.value };
+    } else return;
+    pending_focus = field.matches('[data-search]') ? '[data-search]' : `[data-users="${field.dataset.users}"]`;
+    apply_view();
+  });
+  document.addEventListener('change', event => {
+    const field = event.target;
+    if (field.matches('[data-stage-select]')) { view = { ...shown_view(), stage: field.value }; pending_focus = '[data-stage-select]'; }
+    else if (field.matches('[data-lead-select]')) { view = { ...shown_view(), lead: field.value }; pending_focus = '[data-lead-select]'; }
+    else if (field.matches('[data-metric-switch] input')) { view = { ...shown_view(), metric: field.value }; pending_focus = '[data-metric-switch] input:checked'; }
+    else return;
+    apply_view();
+  });
+  // The Filters button opens the sheet. The Close button, the last button of the sheet, a press outside the sheet and Escape close it. Then the focus goes back to the Filters button.
+  function close_sheet() {
+    pending_focus = '[data-filters-open]';
+    location.hash = state_of(view);
+  }
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-filters-open]')) {
+      view = shown_view();
+      pending_focus = '[data-metric-switch] input:checked';
+      location.hash = 'filters-open';
+    } else if (event.target.closest('[data-filters-close]') && sheet_open()) close_sheet();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && sheet_open()) close_sheet();
+  });
+  // A change of the width across 1024 px draws the lists again. The page of a product has no head, so it stays open.
+  wide.addEventListener('change', () => {
+    if (list_states.includes(shown_section().dataset.state)) apply_view();
+  });
+  addEventListener('hashchange', () => {
+    const state = shown_section().dataset.state;
+    if (list_states.includes(state)) {
+      if (state !== 'filters-open' && state_of(view) !== state) view = default_view(state);
+      fill_lists();
+      show_metric();
+    } else {
+      fill_page();
+      scrollTo(0, 0);
+    }
+    focus_pending();
+  });
+
+  root.style.setProperty('--board-row-play', records_of('table', 'row').map(record => `${record.property} ${record.duration}ms ${record.easing} ${record.delay}ms`).join(', ') || 'none');
+  const options = values => values.map(value => `<option>${value}</option>`).join('');
+  state_sections.forEach(section => {
+    const state = section.dataset.state;
+    section.innerHTML = template_html(list_states.includes(state) ? 'screen' : 'page')
+      .replace('<!--stage-options-->', options(stages)).replace('<!--lead-options-->', options(leads)).replace('<!--metric-options-->', metric_options).replaceAll('__state__', state);
+  });
+  fill_lists();
+  fill_page();
+  initSketch();
+  dispatchEvent(new HashChangeEvent('hashchange'));
+</script>

@@ -1,0 +1,90 @@
+[
+  {
+    "label": "scrolled",
+    "trigger": "scroll down the posts",
+    "element": "guest wall",
+    "property": "opacity",
+    "animation": null,
+    "duration": 420,
+    "delay": 0,
+    "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "scrolled",
+    "trigger": "scroll down the posts",
+    "element": "guest wall",
+    "property": "transform",
+    "animation": null,
+    "duration": 420,
+    "delay": 0,
+    "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "guest-prompt",
+    "trigger": "click a part that needs a sign-in",
+    "element": "page cover",
+    "property": "opacity",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "guest-prompt",
+    "trigger": "click a part that needs a sign-in",
+    "element": "prompt dialog",
+    "property": "opacity",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "guest-prompt",
+    "trigger": "click a part that needs a sign-in",
+    "element": "prompt dialog",
+    "property": "scale",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "profile",
+    "trigger": "close the sign-in prompt",
+    "element": "page cover",
+    "property": "opacity",
+    "animation": null,
+    "duration": 100,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 1, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "profile",
+    "trigger": "close the sign-in prompt",
+    "element": "prompt dialog",
+    "property": "opacity",
+    "animation": null,
+    "duration": 100,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 1, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "profile",
+    "trigger": "close the sign-in prompt",
+    "element": "prompt dialog",
+    "property": "scale",
+    "animation": null,
+    "duration": 100,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 1, 1)",
+    "measurement": "measured"
+  }
+]

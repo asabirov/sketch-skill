@@ -1,0 +1,20 @@
+[
+  {
+    "label": "picker",
+    "element": "avatar preview",
+    "property": null,
+    "animation": null,
+    "duration": 0,
+    "delay": 0,
+    "easing": "feed"
+  },
+  {
+    "label": "save",
+    "element": "loading screen",
+    "property": null,
+    "animation": null,
+    "duration": 10300,
+    "delay": 0,
+    "easing": "feed"
+  }
+]

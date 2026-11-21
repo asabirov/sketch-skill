@@ -1,0 +1,30 @@
+[
+  {
+    "label": "card-action",
+    "element": "list",
+    "property": null,
+    "animation": "list-sort",
+    "duration": 200,
+    "delay": 0,
+    "easing": "not seen"
+  },
+  {
+    "label": "fullscreen",
+    "element": "full screen sheet",
+    "property": null,
+    "animation": "sheet-in",
+    "duration": 160,
+    "delay": 0,
+    "easing": "not seen"
+  },
+  {
+    "label": "return-chat",
+    "element": "inline card",
+    "property": null,
+    "animation": "card-return",
+    "duration": 360,
+    "delay": 0,
+    "easing": "not seen",
+    "trigger": "close button in full screen (the homes app, video 13:32.42 to 13:32.78), or a message sent from the full-screen composer (the design app, video 10:49.73 to 10:49.86). Estimated."
+  }
+]

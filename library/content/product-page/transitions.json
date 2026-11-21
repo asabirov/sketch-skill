@@ -1,0 +1,90 @@
+[
+  {
+    "label": "period-menu",
+    "trigger": "click the select of the period",
+    "element": "layer",
+    "property": null,
+    "animation": "enter",
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  },
+  {
+    "label": "period-changed",
+    "trigger": "choose a period",
+    "element": "chart",
+    "property": "opacity",
+    "animation": null,
+    "duration": 280,
+    "delay": 0,
+    "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "product-page",
+    "trigger": "choose the first period, or turn the switch on",
+    "element": "chart",
+    "property": "opacity",
+    "animation": null,
+    "duration": 280,
+    "delay": 0,
+    "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "product-page",
+    "trigger": "turn the switch on",
+    "element": "switch",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "compare-off",
+    "trigger": "turn the switch off",
+    "element": "chart",
+    "property": "opacity",
+    "animation": null,
+    "duration": 280,
+    "delay": 0,
+    "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "compare-off",
+    "trigger": "turn the switch off",
+    "element": "switch",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "chart-point",
+    "trigger": "the pointer goes over the chart",
+    "element": "tooltip",
+    "property": "transform",
+    "animation": null,
+    "duration": 400,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  },
+  {
+    "label": "picture-open",
+    "trigger": "click the picture",
+    "element": "dialog",
+    "property": null,
+    "animation": "enter",
+    "duration": 200,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  }
+]

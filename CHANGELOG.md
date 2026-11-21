@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added the reusable pattern library and its pull request gate.
+
 ## 0.14.0 — 2026-11-20
 
 ### Changed

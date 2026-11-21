@@ -1,0 +1,1301 @@
+<!doctype html>
+<!--
+captured 2026-11-11 from frames. Frame time 00:00.00 is 0:20 of the video.
+The Source line of pattern.md names the app and the video.
+Best for: a mobile character or avatar builder where the user picks parts and sees the result at
+once, then saves to a profile. Use it for a profile avatar maker or a game character maker.
+Row opens: no rows.
+The sketch draws a round cat named Mochi; the source app draws a person.
+Transitions, with the values of transitions.json:
+- Each part pick re-renders the preview at once, no motion (0 ms, estimated).
+- The DONE tap shows a loading screen for about 10300 ms (estimated, video 2:06.5 to 2:16.9), then the profile opens.
+Reduced motion: the loading screen shortens, and the spinner stops; the state changes stay.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avatar maker</title>
+<style data-sketch-kit="0.4.0">
+/* One black marker on bare paper. Scoped foundation for disposable review prototypes.
+   There is one ink; everything quieter is that ink thinned. A fill is only ever that ink or the
+   page, so a drawn frame sits on the page rather than around a card of some other colour. A
+   browser paints its own colours into a native control, a link and an autofilled field, so each
+   is taken back below. */
+[data-sketch] {
+  color-scheme: light;
+  --sketch-page: #fbfbf8; --sketch-ink: #1b1b19;
+  --sketch-muted: color-mix(in srgb, var(--sketch-ink) 68%, transparent);
+  --sketch-wash: color-mix(in srgb, var(--sketch-ink) 10%, transparent);
+  --sketch-stroke: 1.7px; --sketch-space: 8px;
+  /* A drawn box: four unequal corner radii, so no edge looks machine-made. */
+  --sketch-wobble: 18px 5px 14px 7px / 6px 16px 5px 17px;
+  margin: 0; color: var(--sketch-ink); background: var(--sketch-page);
+  font: 14px/1.5 Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
+  /* The marker is the light stroke; the page is what went dark. */
+  color-scheme: dark;
+  --sketch-page: #141513; --sketch-ink: #efeee6;
+}
+[data-sketch] *, [data-sketch] *::before, [data-sketch] *::after { box-sizing: border-box; }
+[data-sketch] h1 { font-size: 30px; line-height: 1.2; letter-spacing: -1px; }
+[data-sketch] h2 { font-size: 18px; line-height: 1.35; letter-spacing: -.3px; }
+[data-sketch] h3 { font-size: 14px; line-height: 1.5; }
+[data-sketch] :is(button, input, textarea, select) { font: inherit; color: inherit; }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]) {
+  appearance: none; -webkit-appearance: none; flex: none; margin: 0;
+  width: 18px; height: 18px; background: none; cursor: pointer;
+  border: var(--sketch-stroke) solid var(--sketch-ink);
+  border-radius: 52% 48% 51% 49% / 49% 52% 48% 51%;
+}
+[data-sketch] input[type="checkbox"] { border-radius: 5px 2px 4px 3px / 3px 4px 2px 5px; }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):checked { background: var(--sketch-ink); }
+/* Half-chosen: a struck bar, so it is not read as either of the other two. */
+[data-sketch] input[type="checkbox"]:indeterminate {
+  background: feed-gradient(var(--sketch-ink), var(--sketch-ink)) center / 60% var(--sketch-stroke) no-repeat;
+}
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):hover:not(:disabled) { box-shadow: 0 0 0 3px var(--sketch-wash); }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):active:not(:disabled) { transform: translateY(1px); }
+[data-sketch] :is(input[type="radio"], input[type="checkbox"]):disabled { opacity: .4; cursor: not-allowed; }
+/* Forced colours repaints an author background, so the chosen state cannot rest on one alone. */
+@media (forced-colors: active) {
+  [data-sketch] :is(input[type="radio"], input[type="checkbox"]):checked { background: CanvasText; border-color: CanvasText; }
+}
+/* Covers what is left native: a range track, a progress bar. */
+[data-sketch] { accent-color: var(--sketch-ink); }
+/* A link keeps the browser's blue and its visited purple unless it is told not to. */
+[data-sketch] :is(a, a:link, a:visited, a:active):not(.sketch-button) { color: inherit; text-decoration-color: var(--sketch-muted); }
+[data-sketch] ::placeholder { color: var(--sketch-muted); }
+[data-sketch] ::selection { background: var(--sketch-wash); }
+
+/* A panel is spacing, not a surface: no fill, so the drawn outline is the only edge. */
+[data-sketch] .sketch-panel { background: none; padding: 24px; }
+[data-sketch] .sketch-frame { position: relative; isolation: isolate; border: 0; }
+[data-sketch] .sketch-outline { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: visible; }
+[data-sketch] .sketch-outline path {
+  stroke: var(--sketch-ink); stroke-width: var(--sketch-stroke); fill: none;
+  stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+}
+
+[data-sketch] .sketch-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; min-width: 44px; padding: 10px 16px; cursor: pointer; touch-action: manipulation;
+  background: var(--sketch-ink); color: var(--sketch-page); text-decoration: none;
+  border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+}
+/* Filled in solid with the same marker, or left as the outline alone. */
+[data-sketch] .sketch-button.secondary { background: none; color: var(--sketch-ink); }
+[data-sketch] .sketch-button:hover:not(:disabled) { background: color-mix(in srgb, var(--sketch-ink) 84%, transparent); }
+[data-sketch] .sketch-button.secondary:hover:not(:disabled) { background: var(--sketch-wash); }
+[data-sketch] .sketch-button:active:not(:disabled) { transform: translateY(1px); }
+[data-sketch] .sketch-button:disabled { opacity: .4; cursor: not-allowed; }
+[data-sketch] .sketch-input {
+  min-height: 44px; width: 100%; padding: 10px 12px; background: none;
+  border: var(--sketch-stroke) solid var(--sketch-ink);
+  border-radius: 6px 16px 5px 15px / 15px 5px 17px 6px;
+}
+/* The native clear button of a search field is blue. It is drawn again as a cross in the ink. */
+[data-sketch] input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none; width: 14px; height: 14px; cursor: pointer;
+  background: feed-gradient(45deg, transparent 43%, var(--sketch-ink) 43% 57%, transparent 57%),
+              feed-gradient(-45deg, transparent 43%, var(--sketch-ink) 43% 57%, transparent 57%);
+}
+[data-sketch] :is(.sketch-input, input):is(:-webkit-autofill, :autofill) {
+  -webkit-text-fill-color: var(--sketch-ink);
+  -webkit-box-shadow: inset 0 0 0 100px var(--sketch-page);
+}
+/* The mark stays 18px; the label around it is the target. */
+[data-sketch] .sketch-choice {
+  display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding: 10px 12px; cursor: pointer;
+}
+[data-sketch] .sketch-choice:hover { background: var(--sketch-wash); }
+[data-sketch] :focus-visible { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+
+/* Layout: the spacing every sketch would otherwise write by hand. */
+[data-sketch] .sketch-stack { display: grid; gap: 16px; align-content: start; }
+[data-sketch] .sketch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+[data-sketch] .sketch-spacer { flex: 1; }
+[data-sketch] .sketch-muted { color: var(--sketch-muted); }
+
+/* An overlay covers what lies under it, so the page fills its drawn outline. The fill follows the
+   wobble: a rectangular background or a box shadow shows its corners outside the line. */
+[data-sketch] :is(.sketch-popover, .sketch-menu, .sketch-dialog, .sketch-toast) {
+  position: fixed; z-index: 40; isolation: isolate; margin: 0; border: 0; background: none; color: inherit; overflow: visible;
+}
+[data-sketch] :is(.sketch-popover, .sketch-menu, .sketch-dialog, .sketch-toast) > .sketch-outline path { fill: var(--sketch-page); }
+[data-sketch] [hidden] { display: none !important; }
+[data-sketch] .sketch-popover { width: max-content; max-width: min(360px, calc(100vw - 16px)); padding: 16px; display: grid; gap: 12px; }
+[data-sketch] .sketch-menu { min-width: 200px; max-width: calc(100vw - 16px); padding: 8px; display: grid; }
+[data-sketch] .sketch-menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 12px;
+  background: none; border: 0; border-radius: var(--sketch-wobble); text-align: left; text-decoration: none; cursor: pointer;
+}
+[data-sketch] .sketch-menu-item:is(:hover, :focus-visible):not(:disabled) { background: var(--sketch-wash); outline: 0; }
+/* A disabled row and a disabled group label take the muted ink, not opacity, so they keep 4.5:1 on the page. */
+[data-sketch] .sketch-menu-item:disabled { color: var(--sketch-muted); cursor: not-allowed; }
+[data-sketch] .sketch-menu-group-label { padding: 12px 12px 4px; font-weight: 600; }
+[data-sketch] .sketch-menu-group[aria-disabled="true"] > .sketch-menu-group-label { color: var(--sketch-muted); cursor: not-allowed; }
+[data-sketch] .sketch-menu-item[aria-selected="true"] { background: var(--sketch-wash); font-weight: 600; }
+/* A native dialog arrives with a filled box and a dark backdrop; both are taken back. */
+[data-sketch] .sketch-dialog { inset: 0; width: min(480px, calc(100vw - 32px)); height: fit-content; margin: auto; padding: 24px; }
+[data-sketch] .sketch-dialog[open] { display: grid; gap: 16px; }
+[data-sketch] .sketch-dialog::backdrop { background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+[data-sketch] .sketch-toast { left: 50%; bottom: 24px; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+
+/* Icons: one line set drawn with the marker. Write <i data-icon="close"></i>. */
+[data-sketch] .sketch-icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+[data-sketch] .sketch-icon-button {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; flex: none;
+  background: none; border: 0; border-radius: var(--sketch-wobble); cursor: pointer; touch-action: manipulation;
+}
+[data-sketch] .sketch-icon-button:hover:not(:disabled) { background: var(--sketch-wash); }
+/* A hover rule outranks a state rule, so each state that fills names its own hover (#155). */
+[data-sketch] .sketch-icon-button:is([aria-pressed="true"], [aria-expanded="true"]),
+[data-sketch] .sketch-icon-button:is([aria-pressed="true"], [aria-expanded="true"]):hover:not(:disabled) { background: color-mix(in srgb, var(--sketch-ink) 18%, transparent); }
+[data-sketch] :is(.sketch-icon-button, .sketch-chip, .sketch-segmented label):active { transform: translateY(1px); }
+[data-sketch] :is(.sketch-icon-button, .sketch-chip):disabled { opacity: .4; cursor: not-allowed; }
+
+/* One of a few modes: native radios, so the arrow keys work. The chosen one is filled. */
+[data-sketch] .sketch-segmented {
+  display: inline-flex; gap: 2px; padding: 2px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+}
+[data-sketch] .sketch-segmented label {
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-width: 44px; min-height: 44px; padding: 0 14px; cursor: pointer; border-radius: var(--sketch-wobble);
+}
+[data-sketch] .sketch-segmented input { position: absolute; opacity: 0; pointer-events: none; }
+[data-sketch] .sketch-segmented label:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-segmented label:has(input:checked) { background: var(--sketch-ink); color: var(--sketch-page); }
+[data-sketch] .sketch-segmented label:has(input:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+[data-sketch] .sketch-segmented label:has(input:disabled) { opacity: .4; cursor: not-allowed; }
+
+/* An immediate on or off setting. The label stays the same in both states. */
+[data-sketch] .sketch-switch { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+[data-sketch] .sketch-switch input[type="checkbox"] {
+  position: relative; width: 40px; height: 24px; border-radius: 13px 11px 12px 13px / 12px 13px 11px 12px;
+}
+[data-sketch] .sketch-switch input[type="checkbox"]::before {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 15px; height: 15px; border-radius: 50%;
+  background: var(--sketch-ink); transition: transform .16s;
+}
+[data-sketch] .sketch-switch input[type="checkbox"]:checked::before { background: var(--sketch-page); transform: translateX(16px); }
+@media (prefers-reduced-motion: reduce) { [data-sketch] .sketch-switch input::before { transition: none; } }
+
+/* A chip is a filter or a removable tag: a button. A badge is a passive status word. */
+[data-sketch] .sketch-chip {
+  position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 12px;
+  background: none; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 16px 14px 17px 13px / 14px 17px 13px 16px; cursor: pointer;
+}
+/* The pill is drawn 32px tall; its target reaches 44px. */
+[data-sketch] .sketch-chip::after { content: ""; position: absolute; inset: -7px -2px; }
+[data-sketch] .sketch-chip:hover:not(:disabled) { background: var(--sketch-wash); }
+[data-sketch] .sketch-chip[aria-pressed="true"] { background: var(--sketch-ink); color: var(--sketch-page); }
+/* Without this, a pressed chip on hover took the wash and kept the page as its words (#155). */
+[data-sketch] .sketch-chip[aria-pressed="true"]:hover:not(:disabled) { background: color-mix(in srgb, var(--sketch-ink) 84%, transparent); }
+[data-sketch] .sketch-badge {
+  display: inline-block; padding: 1px 8px; font-size: 13px; font-weight: 600; white-space: nowrap;
+  border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px 9px 5px 8px / 8px 4px 9px 5px;
+}
+/* Only the state to act on first is filled. */
+[data-sketch] .sketch-badge.strong { background: var(--sketch-ink); color: var(--sketch-page); }
+
+/* A field: a permanent label, the control, then an error tied to it. */
+[data-sketch] .sketch-field { display: grid; gap: 6px; color: var(--sketch-muted); }
+[data-sketch] .sketch-field :is(input, textarea, select), [data-sketch] .sketch-error { color: var(--sketch-ink); }
+[data-sketch] textarea.sketch-input { min-height: 88px; resize: vertical; }
+[data-sketch] select.sketch-input {
+  appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer;
+  background: feed-gradient(45deg, transparent 50%, currentColor 50%) right 19px center / 6px 6px no-repeat,
+              feed-gradient(135deg, currentColor 50%, transparent 50%) right 13px center / 6px 6px no-repeat;
+}
+/* An open select is drawn as a sketch menu. A browser with appearance: base-select draws the list
+   from these rules. Every other browser gets a sketch-menu from sketch.js (#154). */
+@supports (appearance: base-select) {
+  [data-sketch] select.sketch-input, [data-sketch] select.sketch-input::picker(select) { appearance: base-select; }
+  [data-sketch] select.sketch-input::picker-icon, [data-sketch] select.sketch-input option::checkmark { display: none; }
+  /* The browser opened the list on the side with more space and shrank it to fit, so the list of a
+     lower field hid the row above it. The list now opens below at full height, and goes above when
+     it does not fit there. A list taller than both sides shrinks and scrolls (#173). */
+  @position-try --sketch-list-short { max-block-size: stretch; min-block-size: 160px; }
+  [data-sketch] select.sketch-input::picker(select) {
+    position-try: normal flip-block, flip-inline, flip-block flip-inline, --sketch-list-short, --sketch-list-short flip-block;
+    max-block-size: none;
+    min-width: max(200px, anchor-size(width)); max-width: calc(100vw - 16px); margin-block: 8px; padding: 8px;
+    color: var(--sketch-ink); background: var(--sketch-page); font: inherit;
+    border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+  }
+  [data-sketch] select.sketch-input option {
+    display: flex; align-items: center; min-height: 44px; padding: 8px 12px; border-radius: var(--sketch-wobble); cursor: pointer;
+  }
+  [data-sketch] select.sketch-input option:is(:hover, :focus-visible):not(:disabled) { background: var(--sketch-wash); outline: 0; }
+  [data-sketch] select.sketch-input option:checked { background: var(--sketch-wash); font-weight: 600; }
+  [data-sketch] select.sketch-input optgroup { padding-top: 4px; color: var(--sketch-ink); font-weight: 600; }
+  [data-sketch] select.sketch-input optgroup option { font-weight: 400; }
+  [data-sketch] select.sketch-input :is(option, optgroup):disabled { color: var(--sketch-muted); cursor: not-allowed; }
+}
+[data-sketch] .sketch-input[aria-invalid="true"] { border-width: calc(var(--sketch-stroke) * 2); }
+[data-sketch] .sketch-error { font-weight: 600; }
+[data-sketch] .sketch-input:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Tabs: the chosen tab is underlined with the marker. */
+[data-sketch] .sketch-tabs { display: flex; gap: 4px; overflow-x: auto; }
+[data-sketch] .sketch-tabs [role="tab"] {
+  min-height: 44px; padding: 0 12px; background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap;
+}
+[data-sketch] .sketch-tabs [role="tab"]:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-tabs [role="tab"][aria-selected="true"] { border-bottom-color: var(--sketch-ink); font-weight: 600; }
+
+/* Records in a table. A wide table scrolls inside its own box, not the page. */
+[data-sketch] .sketch-table-box { overflow-x: auto; }
+[data-sketch] .sketch-table { width: 100%; border-collapse: collapse; }
+[data-sketch] .sketch-table th { text-align: left; font-weight: 600; color: var(--sketch-muted); padding: 8px 12px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); white-space: nowrap; }
+[data-sketch] .sketch-table td { padding: 10px 12px; border-bottom: 1px solid var(--sketch-wash); }
+
+/* A picture, an avatar or a chart that is not decided yet: a crossed box. */
+[data-sketch] .sketch-placeholder {
+  display: grid; place-items: center; min-height: 96px; color: var(--sketch-muted);
+  border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble);
+  background: feed-gradient(to top right, transparent calc(50% - 1px), var(--sketch-wash) 50%, transparent calc(50% + 1px)),
+              feed-gradient(to bottom right, transparent calc(50% - 1px), var(--sketch-wash) 50%, transparent calc(50% + 1px));
+}
+/* Page layouts for the sketch-page-*.html templates. Phone first, then a tablet step at 600 px and a desktop step at 1000 px.
+   .sketch-phone-only, .sketch-from-tablet, .sketch-from-desktop and .sketch-until-desktop show an element only at those widths. */
+[data-sketch] :is(.sketch-main, .sketch-narrow, .sketch-stack) > :is(h1, h2, h3, p, fieldset) { margin: 0; }
+[data-sketch] .sketch-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+[data-sketch] .sketch-nav { display: flex; gap: 4px; padding: 8px 16px; overflow-x: auto; }
+[data-sketch] :is(.sketch-nav, .sketch-bar, .sketch-list, .sketch-main, .sketch-narrow) a:not(.sketch-button) { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-width: 44px; min-height: 44px; }
+[data-sketch] :is(.sketch-main, .sketch-narrow) > a:not(.sketch-button) { justify-self: start; }
+[data-sketch] :is(.sketch-tabs [role="tab"], .sketch-switch, input[type="range"]) { min-width: 44px; min-height: 44px; } /* Every touch target is at least 44 px. */
+[data-sketch] .sketch-nav a { padding: 0 12px; white-space: nowrap; text-decoration: none; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-nav a:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-nav a[aria-current] { font-weight: 600; background: var(--sketch-wash); }
+/* An app shell: a bottom tab bar on a phone, an icon rail from 600 px with .sketch-rail, a side nav from 1000 px. */
+[data-sketch] .sketch-shell { display: grid; grid-template: auto 1fr auto / minmax(0, 1fr); min-height: 100vh; }
+[data-sketch] .sketch-shell > .sketch-bar { grid-column: 1 / -1; }
+[data-sketch] .sketch-shell > .sketch-nav { order: 1; position: sticky; bottom: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); padding: 4px; background: var(--sketch-page); border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+[data-sketch] .sketch-shell > .sketch-nav a { flex-direction: column; gap: 2px; padding: 4px; font-size: 12px; }
+[data-sketch] .sketch-main { display: grid; gap: 24px; align-content: start; width: 100%; min-width: 0; max-width: 1080px; margin: 0 auto; padding: 24px 16px; }
+[data-sketch] .sketch-narrow { display: grid; gap: 16px; align-content: start; width: 100%; max-width: var(--width, 440px); margin: 0 auto; padding: 48px 16px; }
+[data-sketch] .sketch-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px 48px; align-items: start; } /* Two columns from 1000 px; --cols sets them. */
+[data-sketch] .sketch-grid { display: grid; gap: 16px; grid-template-columns: repeat(var(--phone, 1), minmax(0, 1fr)); } /* 1, 2, then 4 columns; --phone, --tablet and --wide change them. */
+[data-sketch] .sketch-grid > :is(.sketch-span, .sketch-span + *) { grid-column: 1 / -1; }
+[data-sketch] .sketch-list { display: grid; align-content: start; margin: 0; padding: 0; list-style: none; }
+[data-sketch] .sketch-list > li { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; min-height: 56px; margin: 0 -8px; padding: 6px 8px; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-list > li:has([aria-current]) { background: var(--sketch-wash); }
+[data-sketch] fieldset { border: 0; padding: 0; margin: 0; } [data-sketch] legend { padding: 0; } [data-sketch] fieldset > .sketch-choice { margin: 0 -12px; }
+[data-sketch] .sketch-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
+[data-sketch] .sketch-facts dt { color: var(--sketch-muted); } [data-sketch] .sketch-facts dd { margin: 0; }
+/* A bar chart: each <i> gets its value as a height. */
+[data-sketch] .sketch-bars { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; align-items: end; height: 160px; text-align: center; }
+[data-sketch] .sketch-bars i { background: var(--sketch-ink); border-radius: 5px 3px 0 0; }
+[data-sketch] .sketch-split { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; }
+/* A board scrolls inside its own box until its columns fit. */
+[data-sketch] .sketch-board { display: grid; grid-auto-flow: column; grid-auto-columns: 85%; gap: 16px; align-items: start; overflow-x: auto; scroll-snap-type: x mandatory; }
+[data-sketch] .sketch-board > * { scroll-snap-align: start; } [data-sketch] .sketch-board .sketch-frame { padding: 12px 16px; }
+[data-sketch] .sketch-thread { display: grid; gap: 8px; align-content: end; }
+[data-sketch] .sketch-thread > p { margin: 0; justify-self: start; max-width: 80%; padding: 8px 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-thread > p.own { justify-self: end; background: var(--sketch-ink); color: var(--sketch-page); }
+/* A sparkline: an inline <svg viewBox="0 0 100 24" preserveAspectRatio="none"> with one <polyline>. */
+[data-sketch] .sketch-spark { width: 100%; height: 32px; fill: none; stroke: currentColor; stroke-width: var(--sketch-stroke); stroke-linejoin: round; } [data-sketch] .sketch-spark * { vector-effect: non-scaling-stroke; }
+/* Step dots: one <i> for each step, the current one with class "on". */
+[data-sketch] .sketch-dots { display: flex; gap: 8px; margin: 0; } [data-sketch] .sketch-dots i { width: 10px; height: 10px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; } [data-sketch] .sketch-dots .on { background: var(--sketch-ink); }
+[data-sketch] .sketch-steps { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 0; padding: 0; list-style: decimal inside; } [data-sketch] .sketch-steps [aria-current] { font-weight: 600; }
+/* A meter: a drawn track with an <i> that gets its value as a width. Give the box role="meter" and the aria-value attributes. */
+[data-sketch] .sketch-meter { height: 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 7px 5px 6px 4px; overflow: hidden; }
+[data-sketch] .sketch-meter i { display: block; height: 100%; background: var(--sketch-ink); }
+/* A menu button shows or hides the element right after it, below 1000 px. */
+[data-sketch] .sketch-collapse { display: grid; flex-basis: 100%; }
+@media (max-width: 599px) {
+  [data-sketch] :is(.sketch-from-tablet, .sketch-from-desktop, .sketch-table thead) { display: none !important; }
+  [data-sketch] .sketch-table tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; padding: 12px 0; border-bottom: var(--sketch-stroke) solid var(--sketch-wash); }
+  [data-sketch] .sketch-table td { padding: 0; border: 0; }
+}
+@media (max-width: 999px) {
+  [data-sketch] .sketch-from-desktop, [data-sketch] .sketch-menu-button[aria-expanded="false"] + .sketch-collapse { display: none !important; }
+  [data-sketch] .sketch-bar > .sketch-collapse { order: 1; }
+}
+@media (min-width: 600px) {
+  [data-sketch] .sketch-phone-only { display: none !important; }
+  [data-sketch] .sketch-rail { grid-template: auto 1fr / 88px minmax(0, 1fr); }
+  [data-sketch] .sketch-rail > .sketch-nav { order: 0; position: static; grid-auto-flow: row; align-content: start; padding: 16px 8px; border-top: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .sketch-grid { grid-template-columns: repeat(var(--tablet, 2), minmax(0, 1fr)); }
+  [data-sketch] .sketch-split { grid-template-columns: 260px minmax(0, 1fr); min-height: calc(100vh - 62px); align-content: stretch; }
+  [data-sketch] .sketch-split > :not(:last-child) { border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .sketch-split > .sketch-nav { flex-direction: column; padding: 24px 16px; } [data-sketch] .sketch-split > .sketch-nav a { justify-content: start; }
+  [data-sketch] .sketch-board { grid-auto-columns: 280px; }
+  [data-sketch] .sketch-main { padding: 32px; }
+}
+@media (min-width: 1000px) {
+  [data-sketch] :is(.sketch-menu-button, .sketch-until-desktop) { display: none !important; }
+  [data-sketch] .sketch-bar > .sketch-collapse { display: flex; flex-basis: auto; align-items: center; gap: 8px; }
+  [data-sketch] .sketch-shell { grid-template: auto 1fr / 220px minmax(0, 1fr); }
+  [data-sketch] .sketch-shell > .sketch-nav { order: 0; position: static; display: flex; flex-direction: column; padding: 24px 16px; border-top: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .sketch-shell > .sketch-nav a { flex-direction: row; justify-content: start; gap: 12px; padding: 0 12px; font-size: inherit; }
+  [data-sketch] .sketch-cols { grid-template-columns: var(--cols, minmax(0, 1fr) 300px); }
+  [data-sketch] .sketch-grid { grid-template-columns: repeat(var(--wide, 4), minmax(0, 1fr)); }
+  [data-sketch] .sketch-grid > .sketch-span { grid-column: span 3; } [data-sketch] .sketch-grid > .sketch-span + * { grid-column: auto; }
+  [data-sketch] .sketch-split { grid-template-columns: var(--split, 260px minmax(0, 1fr)); }
+  [data-sketch] .sketch-split:has(> :nth-child(3)) { grid-template-columns: var(--split, 200px 300px minmax(0, 1fr)); }
+  [data-sketch] .sketch-board { grid-auto-columns: minmax(0, 1fr); }
+  [data-sketch] .sketch-steps { flex-direction: column; }
+  [data-sketch] .sketch-cols.flip > :first-child { order: 1; } /* A band with its picture on the other side. */
+}
+</style>
+<style>
+  [data-sketch] h1, [data-sketch] h2, [data-sketch] p { margin: 0; }
+
+  /* Builder: one centred phone column. */
+  [data-sketch] .builder {
+    width: min(420px, 100%); margin: 0 auto; min-height: 100vh;
+    display: grid; grid-template-rows: auto auto auto 1fr; align-content: start;
+  }
+  [data-sketch] .bar {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-bottom: var(--sketch-stroke) solid var(--sketch-ink);
+  }
+  [data-sketch] .done {
+    min-height: 44px; padding: 0 8px; background: none; border: 0; cursor: pointer;
+    font: inherit; font-weight: 700; font-size: 15px; letter-spacing: .4px; text-transform: uppercase;
+  }
+  [data-sketch] .done:hover { background: var(--sketch-wash); }
+  [data-sketch] .done:focus-visible { outline: 2px solid var(--sketch-ink); outline-offset: 3px; }
+
+  /* Preview: the avatar stands on a grey band, its body on the bottom edge. */
+  [data-sketch] .preview {
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px;
+    padding: 12px 16px 0;
+    background: var(--sketch-wash); border-bottom: var(--sketch-stroke) solid var(--sketch-ink);
+  }
+  [data-sketch] [data-preview] { align-self: stretch; display: flex; justify-content: center; }
+  [data-sketch] .pv-svg {
+    width: 300px; max-width: 100%; height: auto; display: block;
+    fill: none; stroke: var(--sketch-ink); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+  }
+  [data-sketch] .pv-caption { overflow-wrap: anywhere; text-align: center; }
+
+  /* Icon tabs: the chosen one is underlined and lightly filled. */
+  [data-sketch] .tabs {
+    display: flex; gap: 2px; overflow-x: auto; padding: 4px 8px;
+    border-bottom: var(--sketch-stroke) solid var(--sketch-ink);
+  }
+  [data-sketch] .tab {
+    min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; padding: 6px 10px;
+    background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer;
+  }
+  [data-sketch] .tab .tab-icon { width: 22px; height: 22px; }
+  [data-sketch] .tab:hover { background: var(--sketch-wash); }
+  [data-sketch] .tab[aria-selected="true"] { border-bottom-color: var(--sketch-ink); background: var(--sketch-wash); }
+  [data-sketch] .tab:focus-visible { outline: 2px solid var(--sketch-ink); outline-offset: 3px; }
+
+  /* The chosen tab's lists: a small heading, then swatches or a two-column grid. */
+  [data-sketch] .panels { padding: 16px; overflow-y: auto; }
+  [data-sketch] .panel { display: grid; gap: 8px; align-content: start; }
+  [data-sketch] .list-heading {
+    font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase;
+    color: var(--sketch-muted); margin-top: 10px;
+  }
+  [data-sketch] .panel .list-heading:first-child { margin-top: 0; }
+  [data-sketch] .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+  [data-sketch] .thumbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+  /* A colour swatch: a square with a tone fill. The chosen one has a bold outline and a light fill. */
+  [data-sketch] .swatch { position: relative; width: 48px; height: 48px; padding: 6px; background: none; border: 0; border-radius: var(--sketch-wobble); cursor: pointer; }
+  [data-sketch] .swatch-sq { display: block; width: 100%; height: 100%; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 6px 4px 5px 4px / 4px 6px 4px 5px; }
+  [data-sketch] .swatch[data-tone="0"] .swatch-sq { background: none; }
+  [data-sketch] .swatch[data-tone="1"] .swatch-sq { background: var(--sketch-wash); }
+  [data-sketch] .swatch[data-tone="2"] .swatch-sq { background: color-mix(in srgb, var(--sketch-ink) 45%, transparent); }
+  [data-sketch] .swatch[data-tone="3"] .swatch-sq { background: var(--sketch-ink); }
+  [data-sketch] .swatch:hover { background: var(--sketch-wash); }
+  [data-sketch] .swatch[aria-pressed="true"] { background: var(--sketch-wash); }
+  [data-sketch] .swatch[aria-pressed="true"] .swatch-sq { border-width: 3px; }
+  [data-sketch] .swatch:focus-visible { outline: 2px solid var(--sketch-ink); outline-offset: 3px; }
+
+  /* A thumbnail: a small avatar in a two-column grid. The chosen one has a bold outline and a light fill. */
+  [data-sketch] .thumb {
+    position: relative; display: grid; place-items: center; aspect-ratio: 4/3; padding: 8px;
+    background: none; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); cursor: pointer;
+  }
+  [data-sketch] .thumb:hover { background: var(--sketch-wash); }
+  [data-sketch] .thumb[aria-pressed="true"] { background: var(--sketch-wash); border-width: 3px; }
+  [data-sketch] .thumb:focus-visible { outline: 2px solid var(--sketch-ink); outline-offset: 3px; }
+  [data-sketch] .thumb-svg { width: 100%; height: 100%; max-height: 64px; display: block; fill: none; stroke: var(--sketch-ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Avatar parts. Defaults show; other variants hide until their data attribute is set. */
+  [data-sketch] .pv-skin :is(.pv-head, .pv-body-slim, .pv-body-average, .pv-body-large) { fill: none; }
+  [data-sketch] .pv-body-average, [data-sketch] .pv-body-large,
+  [data-sketch] .pv-face-laughing, [data-sketch] .pv-face-surprised,
+  [data-sketch] .pv-ears-long, [data-sketch] .pv-ears-tufted,
+  [data-sketch] .pv-glasses-round, [data-sketch] .pv-glasses-square,
+  [data-sketch] .pv-freckles-freckles, [data-sketch] .pv-freckles-blush,
+  [data-sketch] .pv-earrings-hoops, [data-sketch] .pv-earrings-studs,
+  [data-sketch] .pv-whiskers-short, [data-sketch] .pv-whiskers-long,
+  [data-sketch] .pv-headwear-beanie, [data-sketch] .pv-headwear-cap { display: none; }
+  [data-sketch] .pv-body-slim, [data-sketch] .pv-face-smile, [data-sketch] .pv-ears-pointed { display: block; }
+
+  [data-sketch] .pv-ears :is(path, circle), [data-sketch] .pv-headwear path { fill: var(--sketch-ink); stroke: none; }
+  [data-sketch] .pv-freckles :is(path, circle) { fill: var(--sketch-ink); stroke: none; }
+  [data-sketch] .pv-earrings circle { fill: none; stroke: var(--sketch-ink); }
+
+  [data-sketch][data-body="average"] .pv-body-slim, [data-sketch][data-body="large"] .pv-body-slim { display: none; }
+  [data-sketch][data-body="average"] .pv-body-average { display: block; }
+  [data-sketch][data-body="large"] .pv-body-large { display: block; }
+  [data-sketch][data-expression="laughing"] .pv-face-smile, [data-sketch][data-expression="surprised"] .pv-face-smile { display: none; }
+  [data-sketch][data-expression="laughing"] .pv-face-laughing { display: block; }
+  [data-sketch][data-expression="surprised"] .pv-face-surprised { display: block; }
+  [data-sketch][data-hair="long"] .pv-ears-pointed, [data-sketch][data-hair="bun"] .pv-ears-pointed { display: none; }
+  [data-sketch][data-hair="long"] .pv-ears-long { display: block; }
+  [data-sketch][data-hair="bun"] .pv-ears-tufted { display: block; }
+  [data-sketch][data-glasses="round"] .pv-glasses-round { display: block; }
+  [data-sketch][data-glasses="square"] .pv-glasses-square { display: block; }
+  [data-sketch][data-freckles="freckles"] .pv-freckles-freckles { display: block; }
+  [data-sketch][data-freckles="blush"] .pv-freckles-blush { display: block; }
+  [data-sketch][data-earrings="hoops"] .pv-earrings-hoops { display: block; }
+  [data-sketch][data-earrings="studs"] .pv-earrings-studs { display: block; }
+  [data-sketch][data-beard="moustache"] .pv-whiskers-short { display: block; }
+  [data-sketch][data-beard="beard"] .pv-whiskers-long { display: block; }
+  [data-sketch][data-headwear="beanie"] .pv-headwear-beanie { display: block; }
+  [data-sketch][data-headwear="cap"] .pv-headwear-cap { display: block; }
+
+  /* Fur colour fills the head and body; dark fur reverses the face parts so they stay visible. */
+  [data-sketch][data-skin="tan"] :is(.pv-head, .pv-body-slim, .pv-body-average, .pv-body-large) { fill: var(--sketch-wash); }
+  [data-sketch][data-skin="brown"] :is(.pv-head, .pv-body-slim, .pv-body-average, .pv-body-large) { fill: color-mix(in srgb, var(--sketch-ink) 45%, transparent); }
+  [data-sketch][data-skin="dark"] :is(.pv-head, .pv-body-slim, .pv-body-average, .pv-body-large) { fill: var(--sketch-ink); }
+  [data-sketch][data-skin="dark"] .pv-face :is(.pv-eye, .pv-mouth), [data-sketch][data-skin="dark"] .pv-nose, [data-sketch][data-skin="dark"] .pv-whiskers path { stroke: var(--sketch-page); }
+  [data-sketch][data-skin="dark"] :is(.pv-ears path, .pv-ears circle, .pv-headwear path) { fill: var(--sketch-page); stroke: none; }
+  [data-sketch][data-skin="dark"] .pv-glasses :is(circle, path, rect) { stroke: var(--sketch-page); }
+  [data-sketch][data-skin="dark"] .pv-freckles :is(path, circle) { fill: var(--sketch-page); stroke: none; }
+  [data-sketch][data-skin="dark"] .pv-earrings circle { stroke: var(--sketch-page); }
+
+  /* The Background pick fills the grey preview band; a dark background reverses the whole avatar. */
+  [data-sketch][data-bg="medium"] .preview { background: color-mix(in srgb, var(--sketch-ink) 45%, transparent); }
+  [data-sketch][data-bg="dark"] .preview { background: var(--sketch-ink); }
+  [data-sketch][data-bg="dark"] .preview .pv-svg { stroke: var(--sketch-page); }
+  [data-sketch][data-bg="dark"] .preview :is(.pv-ears path, .pv-ears circle, .pv-headwear path, .pv-freckles path, .pv-freckles circle) { fill: var(--sketch-page); stroke: none; }
+  [data-sketch][data-bg="dark"][data-skin="dark"] .preview :is(.pv-head, .pv-body-slim, .pv-body-average, .pv-body-large) { fill: var(--sketch-wash); }
+
+  /* Loading screen. */
+  [data-sketch] .loading {
+    position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; align-content: center; gap: 16px;
+    background: var(--sketch-page);
+  }
+  [data-sketch] .spinner { width: 40px; height: 40px; border: 3px solid var(--sketch-wash); border-top-color: var(--sketch-ink); border-radius: 50%; animation: spin 1s feed infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] .spinner { animation: none; } }
+
+  /* Profile: a grey banner with the avatar and a gear, then the name, links, actions, stats and a bottom bar. */
+  [data-sketch] .profile {
+    width: min(420px, 100%); margin: 0 auto; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: stretch;
+  }
+  [data-sketch] .pf-banner {
+    position: relative; display: grid; place-items: center; align-content: end;
+    padding: 12px 16px 0; background: var(--sketch-wash); border-bottom: var(--sketch-stroke) solid var(--sketch-ink);
+  }
+  [data-sketch] .pf-gear { position: absolute; top: 8px; right: 8px; }
+  [data-sketch] .profile-avatar { width: 200px; }
+  [data-sketch] .pf-body { display: grid; gap: 12px; align-content: start; padding: 16px; }
+  [data-sketch] .pf-name-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  [data-sketch] .pf-flag { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  [data-sketch] .pf-follows { display: flex; gap: 16px; }
+  [data-sketch] .pf-actions { display: flex; align-items: center; gap: 8px; }
+  [data-sketch] .stat-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  [data-sketch] .stat-tile { display: grid; gap: 4px; padding: 16px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); text-align: left; }
+  [data-sketch] .stat-tile strong { font-size: 20px; line-height: 1.2; }
+  [data-sketch] .stat-tile span { color: var(--sketch-muted); }
+  [data-sketch] .pf-bottom-bar {
+    margin-top: auto; display: flex; gap: 4px; padding: 8px 16px;
+    border-top: var(--sketch-stroke) solid var(--sketch-ink); background: var(--sketch-page);
+  }
+  [data-sketch] .pf-bottom-bar a {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1;
+    min-width: 44px; min-height: 44px; text-decoration: none; border-radius: var(--sketch-wobble);
+  }
+  [data-sketch] .pf-bottom-bar a:hover { background: var(--sketch-wash); }
+  [data-sketch] .pf-bottom-bar a[aria-current] { font-weight: 600; background: var(--sketch-wash); }
+</style>
+<body data-sketch>
+
+<main class="builder" aria-label="Avatar builder">
+  <header class="bar">
+    <button class="sketch-icon-button" type="button" data-close aria-label="Close"><i data-icon="close"></i></button>
+    <span class="sketch-spacer"></span>
+    <button class="done" type="button" data-done>Done</button>
+  </header>
+
+  <div class="preview" aria-label="Live preview of the avatar">
+    <p class="pv-caption sketch-muted" data-caption></p>
+    <div data-preview></div>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="Part types" data-tabs></nav>
+
+  <div class="panels" data-panels></div>
+</main>
+
+<div class="loading" hidden aria-live="polite">
+  <span class="spinner" aria-hidden="true"></span>
+  <p>Saving your avatar…</p>
+</div>
+
+<section data-state="picker"></section>
+<section data-state="skin-tone"></section>
+<section data-state="body"></section>
+<section data-state="expression"></section>
+<section data-state="hairstyle"></section>
+<section data-state="glasses-none"></section>
+<section data-state="face-details"></section>
+<section data-state="earrings"></section>
+<section data-state="glasses"></section>
+<section data-state="facial-hair"></section>
+<section data-state="headwear"></section>
+<section data-state="background"></section>
+
+<section data-state="save" class="profile" aria-label="Profile with the saved avatar" hidden>
+  <header class="pf-banner">
+    <button class="sketch-icon-button pf-gear" type="button" data-sketch-toast="Settings (sample)" aria-label="Settings"><i data-icon="settings"></i></button>
+    <div class="profile-avatar" data-profile-avatar></div>
+  </header>
+  <div class="pf-body">
+    <div class="pf-name-row">
+      <h1>Mochi</h1>
+      <svg class="pf-flag" viewBox="0 0 24 24" aria-label="Learning French"><path d="M5 3v18"/><path d="M5 4h11l-3.5 4L16 12H5z"/></svg>
+    </div>
+    <p class="sketch-muted">@mochi.cat</p>
+    <p class="sketch-muted">Joined August 2023</p>
+    <div class="pf-follows">
+      <a href="#save">12 Following</a>
+      <a href="#save">34 Followers</a>
+    </div>
+    <div class="pf-actions">
+      <button class="sketch-button" type="button" data-sketch-toast="Friend request sent (sample)">Add friends</button>
+      <button class="sketch-icon-button" type="button" data-sketch-toast="Profile shared (sample)" aria-label="Share"><i data-icon="external"></i></button>
+    </div>
+    <h2>Statistics</h2>
+    <div class="stat-tiles">
+      <div class="stat-tile"><strong>7 days</strong><span>Day streak</span></div>
+      <div class="stat-tile"><strong>2,400</strong><span>Total XP</span></div>
+      <div class="stat-tile"><strong>Emerald</strong><span>League</span></div>
+      <div class="stat-tile"><strong>5</strong><span>Top 3 finishes</span></div>
+    </div>
+  </div>
+  <nav class="pf-bottom-bar" aria-label="Sections">
+    <a href="#save" aria-label="Learn"><i data-icon="home"></i></a>
+    <a href="#save" aria-label="Quests"><i data-icon="calendar"></i></a>
+    <a href="#save" aria-label="Leaderboard"><i data-icon="bell"></i></a>
+    <a href="#save" aria-label="Shop"><i data-icon="search"></i></a>
+    <a href="#save" aria-current="page" aria-label="Profile"><i data-icon="user"></i></a>
+  </nav>
+</section>
+
+<script data-sketch-kit="0.4.0">
+/* Local-only presentation helper. Load after markup; no network requests. */
+(() => {
+  const page = document.querySelector('[data-sketch]');
+  if (!page) return;
+  // The host page (Amberstone) sets html[data-theme] and may change it at any time; the CSS reads it.
+  // Until the page sets it, follow the system theme. Never overwrite a value the page set.
+  const root = document.documentElement;
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  /* A gallery opens a page with ?theme=dark or ?theme=light. That counts as a value the page set. */
+  const asked = new URLSearchParams(location.search).get('theme');
+  if (!root.hasAttribute('data-theme') && ['light', 'dark'].includes(asked)) root.dataset.theme = asked;
+  let pageTheme = root.hasAttribute('data-theme');
+  const watch = new MutationObserver(() => { pageTheme = true; watch.disconnect(); });
+  if (!pageTheme) watch.observe(root, {attributeFilter: ['data-theme']});
+  function applyTheme() {
+    if (watch.takeRecords().length) { pageTheme = true; watch.disconnect(); }
+    if (pageTheme) return;
+    root.dataset.theme = system.matches ? 'dark' : 'light';
+    watch.takeRecords();
+  }
+  system.addEventListener('change', applyTheme);
+  const observer = new ResizeObserver(entries => entries.forEach(({target}) => {
+    const w = target.clientWidth, h = target.clientHeight;
+    const svg = target.querySelector(':scope > .sketch-outline');
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.firstChild.setAttribute('d', `M7 3 Q${w*.18} -.5 ${w*.38} 2.5 T${w*.7} 2 Q${w*.9} .5 ${w-7} 3 Q${w-1} 1 ${w-2} 8 Q${w+1} ${h*.45} ${w-2} ${h-8} Q${w} ${h-2} ${w-8} ${h-2} Q${w*.7} ${h+1} ${w*.5} ${h-2} T7 ${h-2} Q1 ${h-1} 2 ${h-8} Q-1 ${h*.6} 2 9 Q1 2 7 3`);
+  }));
+  const outlined = '.sketch-frame, .sketch-popover, .sketch-menu, .sketch-dialog, .sketch-toast';
+  const outline = frame => {
+    if (frame.querySelector(':scope > .sketch-outline')) return;
+    svg.setAttribute('class', 'sketch-outline');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.append(document.createElementNS(svg.namespaceURI, 'path'));
+    frame.prepend(svg);
+    observer.observe(frame);
+  };
+  /* Line icons, drawn on a 24px grid. <i data-icon="close"></i> becomes the svg. */
+  const icons = {
+    close: 'M6 6l12 12M18 6L6 18', plus: 'M12 5v14M5 12h14', minus: 'M5 12h14', check: 'M5 12.5l4.5 4.5L19 7',
+    'chevron-down': 'M6 9l6 6 6-6', 'chevron-up': 'M6 15l6-6 6 6', 'chevron-left': 'M15 6l-6 6 6 6', 'chevron-right': 'M9 6l6 6-6 6',
+    'arrow-left': 'M19 12H5M11 6l-6 6 6 6', 'arrow-right': 'M5 12h14M13 6l6 6-6 6',
+    search: 'M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13zM15.5 15.5L20 20', menu: 'M4 7h16M4 12h16M4 17h16',
+    more: 'M5 12h1M11.5 12h1M18 12h1', edit: 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4',
+    trash: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13', sliders: 'M4 7h10M18 7h2M16 5v4M4 17h4M12 17h8M10 15v4',
+    settings: 'M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1',
+    comment: 'M4 5h16v11H9l-5 4z', user: 'M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM4 21c1-4 4-6 8-6s7 2 8 6',
+    home: 'M4 11l8-7 8 7M6 9.5V20h12V9.5', bell: 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4',
+    calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', copy: 'M8 8h12v12H8zM16 8V4H4v12h4',
+    link: 'M10 14l4-4M9 7l2-2a4 4 0 0 1 6 6l-2 2M15 17l-2 2a4 4 0 0 1-6-6l2-2',
+    upload: 'M12 16V4M7 9l5-5 5 5M4 20h16', download: 'M12 4v12M7 11l5 5 5-5M4 20h16',
+    eye: 'M2 12c3-5 6.5-7 10-7s7 2 10 7c-3 5-6.5 7-10 7S5 17 2 12zM12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z',
+    filter: 'M4 5h16l-6 8v6l-4 2v-8z', external: 'M14 4h6v6M20 4l-9 9M18 14v6H4V6h6',
+    info: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 11v6M12 7.5v.5', warning: 'M12 3L2 20h20zM12 10v5M12 17.5v.5',
+    image: 'M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4',
+  };
+  const drawIcon = slot => {
+    svg.setAttribute('class', 'sketch-icon');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(svg.namespaceURI, 'path');
+    path.setAttribute('d', icons[slot.dataset.icon] || icons.image);
+    svg.append(path);
+    slot.replaceWith(svg);
+  };
+
+  /* Popover and menu: a trigger with data-sketch-popover="id" opens the element with that id. */
+  let open = null;
+  const focusables = root => [...root.querySelectorAll('a[href], button:not(:disabled), input:not(:disabled), select, textarea, [tabindex="0"]')];
+  const place = (layer, trigger) => {
+    layer.style.maxHeight = `${innerHeight - 16}px`;
+    layer.style.overflowY = '';
+    if (layer.scrollHeight > layer.clientHeight) layer.style.overflowY = 'auto';
+    const t = trigger.getBoundingClientRect(), w = layer.offsetWidth, h = layer.offsetHeight;
+    const below = t.bottom + 8, above = t.top - h - 8;
+    const top = below + h > innerHeight - 8 && above > 8 ? above : below;
+    layer.style.top = `${Math.max(8, Math.min(top, innerHeight - h - 8))}px`;
+    const start = t.left + w > innerWidth - 8 ? t.right - w : t.left;
+    layer.style.left = `${Math.max(8, Math.min(start, innerWidth - w - 8))}px`;
+  };
+  const closeLayer = (returnFocus = true) => {
+    if (!open) return;
+    const {layer, trigger} = open;
+    open = null;
+    layer.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    if (returnFocus) trigger.focus();
+  };
+  const openLayer = (layer, trigger, moveFocus = true) => {
+    closeLayer(false);
+    open = {layer, trigger};
+    layer.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+    place(layer, trigger);
+    if (moveFocus) focusables(layer)[0]?.focus();
+  };
+  const menuItems = menu => [...menu.querySelectorAll('.sketch-menu-item:not(:disabled)')];
+
+  /* An open select: sketch.css draws the list where the browser has appearance: base-select.
+     Every other browser paints its own list, so a sketch-menu of the options takes its place (#154). */
+  const drawnList = !CSS.supports('appearance', 'base-select');
+  const ownsList = target => drawnList && target.matches?.('select.sketch-input:not([multiple], :disabled)') && target.size <= 1;
+  /* The list takes the field's name: the select's aria-label, or its label's words without the options. */
+  const fieldName = select => select.getAttribute('aria-label') || [...select.labels].map(label => {
+    const copy = label.cloneNode(true);
+    copy.querySelectorAll('select, .sketch-menu').forEach(part => part.remove());
+    return copy.textContent.trim();
+  }).join(' ');
+  let lists = 0;
+  const openList = select => {
+    if (!select.sketchList) {
+      select.sketchList = Object.assign(document.createElement('div'), {className: 'sketch-menu', hidden: true, id: `sketch-list-${++lists}`});
+      select.sketchList.setAttribute('role', 'listbox');
+      select.setAttribute('aria-controls', select.sketchList.id);
+      /* Next to its field, so the list stays in the same dialog and landmark as the select. */
+      (select.closest('label') || select).after(select.sketchList);
+      outline(select.sketchList);
+    }
+    const list = select.sketchList;
+    list.setAttribute('aria-label', fieldName(select));
+    list.querySelectorAll(':scope > :is(.sketch-menu-item, .sketch-menu-group)').forEach(item => item.remove());
+    /* A hidden option stays out, and :disabled also covers an option in a disabled optgroup.
+       An optgroup becomes a group with its label as a heading. */
+    let group = null;
+    [...select.options].forEach((option, index) => {
+      if (option.hidden) return;
+      const optgroup = option.parentElement.closest('optgroup');
+      if (optgroup && optgroup !== group?.sketchGroup) {
+        group = Object.assign(document.createElement('div'), {className: 'sketch-menu-group', sketchGroup: optgroup});
+        group.setAttribute('role', 'group');
+        group.setAttribute('aria-label', optgroup.label);
+        if (optgroup.disabled) group.setAttribute('aria-disabled', 'true');
+        const label = Object.assign(document.createElement('div'), {className: 'sketch-menu-group-label', textContent: optgroup.label});
+        label.setAttribute('aria-hidden', 'true');
+        group.append(label);
+        list.append(group);
+      } else if (!optgroup) group = null;
+      const item = Object.assign(document.createElement('button'), {type: 'button', className: 'sketch-menu-item', textContent: option.text, disabled: option.matches(':disabled')});
+      item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', String(option.selected));
+      item.sketchIndex = index;
+      (group || list).append(item);
+    });
+    list.style.minWidth = `${select.offsetWidth}px`;
+    openLayer(list, select, false);
+    (list.querySelector('[aria-selected="true"]:not(:disabled)') || menuItems(list)[0])?.focus();
+  };
+  const chooseOption = (select, item) => {
+    if (select.selectedIndex === item.sketchIndex) return;
+    select.selectedIndex = item.sketchIndex;
+    select.dispatchEvent(new Event('input', {bubbles: true}));
+    select.dispatchEvent(new Event('change', {bubbles: true}));
+  };
+
+  /* A native dialog: data-sketch-open="id" shows it, data-sketch-close closes the nearest one. */
+  const showDialog = (dialog, opener) => {
+    if (dialog.open) return;
+    /* Focus goes back to something that stays visible: the trigger of a menu that held the opener. */
+    opener = opener || page.querySelector(`[data-sketch-open="${dialog.id}"]`);
+    dialog.sketchOpener = open?.layer.contains(opener) ? open.trigger : opener;
+    dialog.showModal();
+  };
+
+  /* One toast at a time, announced politely, gone after four seconds. */
+  let toastTimer, toastOpener;
+  const hideToast = () => {
+    const toast = page.querySelector(':scope > .sketch-toast:not([hidden])');
+    if (!toast) return false;
+    toast.hidden = true;
+    clearTimeout(toastTimer);
+    toastOpener?.focus();
+    return true;
+  };
+  window.sketchToast = (text, opener) => {
+    toastOpener = opener;
+    let toast = page.querySelector(':scope > .sketch-toast');
+    if (!toast) {
+      toast = Object.assign(document.createElement('div'), {className: 'sketch-toast', hidden: true});
+      toast.setAttribute('role', 'status');
+      toast.append(document.createElement('span'));
+      page.append(toast);
+      outline(toast);
+    }
+    toast.lastChild.textContent = text;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 4000);
+  };
+
+  const selectTab = (tab, moveFocus) => {
+    tab.closest('[role="tablist"]').querySelectorAll('[role="tab"]').forEach(other => {
+      const chosen = other === tab;
+      other.setAttribute('aria-selected', String(chosen));
+      other.tabIndex = chosen ? 0 : -1;
+      const panel = document.getElementById(other.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !chosen;
+    });
+    if (moveFocus) tab.focus();
+  };
+
+  page.addEventListener('click', event => {
+    const target = event.target;
+    /* A menu button opens or closes the .sketch-collapse right after it. */
+    const menu = target.closest('.sketch-menu-button');
+    if (menu) menu.setAttribute('aria-expanded', String(menu.getAttribute('aria-expanded') !== 'true'));
+    const layerTrigger = open?.layer.contains(target) ? open.trigger : null;
+    const popoverTrigger = target.closest('[data-sketch-popover]');
+    if (popoverTrigger) {
+      const layer = document.getElementById(popoverTrigger.dataset.sketchPopover);
+      if (open?.layer === layer) closeLayer(); else openLayer(layer, popoverTrigger);
+      return;
+    }
+    const opener = target.closest('[data-sketch-open]');
+    if (opener) showDialog(document.getElementById(opener.dataset.sketchOpen), opener);
+    if (target.closest('[data-sketch-close]')) {
+      const dialog = target.closest('dialog');
+      if (dialog) dialog.close(); else closeLayer();
+    }
+    if (target.matches('dialog.sketch-dialog')) {
+      const r = target.getBoundingClientRect();
+      if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) target.close();
+    }
+    const option = open && target.closest('[role="option"].sketch-menu-item');
+    if (option) chooseOption(open.trigger, option);
+    if (open && target.closest('.sketch-menu-item')) closeLayer();
+    const chip = target.closest('.sketch-chip[aria-pressed]');
+    if (chip) chip.setAttribute('aria-pressed', String(chip.getAttribute('aria-pressed') !== 'true'));
+    const tab = target.closest('.sketch-tabs [role="tab"]');
+    if (tab) selectTab(tab, false);
+    const toast = target.closest('[data-sketch-toast]');
+    if (toast) sketchToast(toast.dataset.sketchToast, layerTrigger || toast);
+  });
+  page.addEventListener('pointerdown', event => {
+    if (open && !open.layer.contains(event.target) && !open.trigger.contains(event.target)) closeLayer(false);
+  });
+  page.addEventListener('mousedown', event => {
+    if (!ownsList(event.target)) return;
+    event.preventDefault();
+    event.target.focus();
+    if (open?.trigger === event.target) closeLayer(); else openList(event.target);
+  });
+  page.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && open) { event.preventDefault(); closeLayer(); return; }
+    if (event.key === 'Escape' && !event.target.closest('dialog') && hideToast()) { event.preventDefault(); return; }
+    if (ownsList(event.target) && [' ', 'Enter', 'ArrowDown', 'ArrowUp'].includes(event.key)) { event.preventDefault(); openList(event.target); return; }
+    const menu = event.target.closest('.sketch-menu');
+    if (menu && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+      const items = menuItems(menu), at = items.indexOf(event.target);
+      const next = {ArrowDown: at + 1, ArrowUp: at - 1, Home: 0, End: items.length - 1}[event.key];
+      items[(next + items.length) % items.length]?.focus();
+      event.preventDefault();
+    }
+    const tab = event.target.closest('.sketch-tabs [role="tab"]');
+    if (tab && ['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) {
+      const tabs = [...tab.parentElement.querySelectorAll('[role="tab"]')], at = tabs.indexOf(tab);
+      const next = {ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1}[event.key];
+      selectTab(tabs[(next + tabs.length) % tabs.length], true);
+      event.preventDefault();
+    }
+  });
+  addEventListener('resize', () => open && place(open.layer, open.trigger));
+
+  /* States: each [data-state="id"] is one screen. The address #id shows it; no address shows the
+     first. An overlay marked data-open inside a state opens with it, so a review can link to it. */
+  const showState = () => {
+    const states = [...page.querySelectorAll('[data-state]')];
+    if (!states.length) return;
+    const current = states.find(state => state.dataset.state === location.hash.slice(1)) || states[0];
+    closeLayer(false);
+    page.querySelectorAll('dialog[open]').forEach(dialog => dialog.close());
+    states.forEach(state => { state.hidden = state !== current; });
+    current.querySelectorAll('[data-open]').forEach(layer => {
+      if (layer.matches('dialog')) { showDialog(layer, null); return; }
+      const trigger = page.querySelector(`[data-sketch-popover="${layer.id}"]`);
+      if (trigger) openLayer(layer, trigger, false);
+    });
+  };
+  addEventListener('hashchange', showState);
+
+  window.initSketch = () => {
+    page.querySelectorAll('i[data-icon]').forEach(drawIcon);
+    page.querySelectorAll(outlined).forEach(outline);
+    page.querySelectorAll('.sketch-popover, .sketch-menu').forEach(layer => {
+      if (!layer.matches('dialog')) layer.hidden = !open || open.layer !== layer;
+      if (!layer.sketchReady) {
+        layer.sketchReady = true;
+        /* A layer taller than the screen scrolls, and its outline stays on the visible box. */
+        layer.addEventListener('scroll', () => {
+          const svg = layer.querySelector(':scope > .sketch-outline');
+          if (svg) svg.style.transform = `translateY(${layer.scrollTop}px)`;
+        });
+      }
+      if (layer.matches('.sketch-menu:not([role="listbox"])')) {
+        layer.setAttribute('role', 'menu');
+        layer.querySelectorAll('.sketch-menu-item').forEach(item => item.setAttribute('role', 'menuitem'));
+      }
+    });
+    page.querySelectorAll('[data-sketch-popover]').forEach(trigger => {
+      trigger.setAttribute('aria-controls', trigger.dataset.sketchPopover);
+      trigger.setAttribute('aria-haspopup', document.getElementById(trigger.dataset.sketchPopover)?.matches('.sketch-menu') ? 'menu' : 'dialog');
+      if (!trigger.hasAttribute('aria-expanded')) trigger.setAttribute('aria-expanded', 'false');
+    });
+    page.querySelectorAll('dialog.sketch-dialog').forEach(dialog => {
+      if (dialog.sketchReady) return;
+      dialog.sketchReady = true;
+      dialog.addEventListener('close', () => dialog.sketchOpener?.focus());
+    });
+    page.querySelectorAll('.sketch-tabs').forEach(list => {
+      list.setAttribute('role', 'tablist');
+      const tabs = [...list.querySelectorAll('[role="tab"]')];
+      const chosen = tabs.find(tab => tab.getAttribute('aria-selected') === 'true') || tabs[0];
+      if (chosen) selectTab(chosen, false);
+    });
+    applyTheme();
+    showState();
+  };
+  window.initSketch();
+})();
+</script>
+<script>
+(() => {
+  const body = document.body;
+  const $ = s => document.querySelector(s);
+
+  const ICONS = {
+    skin: '<circle cx="12" cy="8" r="4"/><path d="M8.5 5.5 L7 1.5 L13 3.5 Z"/><path d="M15.5 5.5 L17 1.5 L11 3.5 Z"/><path d="M4 21 C5 16.5 8 14.5 12 14.5 C16 14.5 19 16.5 20 21"/>',
+    expression: '<circle cx="12" cy="12" r="8"/><path d="M8.5 9.5v.01M15.5 9.5v.01M8.5 14c1.3 1.6 5.7 1.6 7 0"/>',
+    hairstyle: '<circle cx="12" cy="14" r="5.5"/><path d="M6.5 11 L4.5 3 L13 8 Z"/><path d="M17.5 11 L19.5 3 L11 8 Z"/>',
+    glasses: '<circle cx="8" cy="12" r="3.2"/><circle cx="16" cy="12" r="3.2"/><path d="M11.2 12h1.6"/>',
+    'face-details': '<circle cx="12" cy="12" r="8"/><path d="M8.5 9.5v.01M15.5 9.5v.01M8.5 15.5v.01M15.5 15.5v.01"/>',
+    earrings: '<circle cx="12" cy="10" r="3"/><path d="M12 13v3.5"/>',
+    'facial-hair': '<circle cx="12" cy="12" r="6"/><path d="M6 11 L1 9.5 M6 13.5 L1.5 15 M18 11 L23 9.5 M18 13.5 L22.5 15"/>',
+    headwear: '<path d="M4 14c1-6 6-8 8-8s7 2 8 8z"/><path d="M4 14h16"/>',
+    background: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="12" cy="12" r="4"/>',
+  };
+
+  const TABS = [
+    { id: 'skin', label: 'Fur and body', lists: [
+      { heading: 'Fur color', kind: 'swatches', key: 'skin', options: [
+        { value: 'light', label: 'Cream', tone: 0 },
+        { value: 'tan', label: 'Ginger', tone: 1 },
+        { value: 'brown', label: 'Grey', tone: 2 },
+        { value: 'dark', label: 'Black', tone: 3 },
+      ]},
+      { heading: 'Body shape', kind: 'thumbs', key: 'body', options: [
+        { value: 'slim', label: 'Slim' },
+        { value: 'average', label: 'Round' },
+        { value: 'large', label: 'Large' },
+      ]},
+    ]},
+    { id: 'expression', label: 'Expression', lists: [
+      { heading: 'Expression', kind: 'thumbs', key: 'expression', options: [
+        { value: 'smile', label: 'Smile' },
+        { value: 'laughing', label: 'Laughing' },
+        { value: 'surprised', label: 'Surprised' },
+      ]},
+    ]},
+    { id: 'hairstyle', label: 'Ears', lists: [
+      { heading: 'Ears', kind: 'thumbs', key: 'hair', options: [
+        { value: 'short', label: 'Pointed' },
+        { value: 'long', label: 'Long' },
+        { value: 'bun', label: 'Tufted' },
+      ]},
+    ]},
+    { id: 'glasses', label: 'Glasses', lists: [
+      { heading: 'Glasses color', kind: 'swatches', key: 'glassesColor', options: [
+        { value: 'black', label: 'Black', tone: 3 },
+        { value: 'brown', label: 'Brown', tone: 2 },
+        { value: 'blue', label: 'Blue', tone: 1 },
+        { value: 'clear', label: 'Clear', tone: 0 },
+      ]},
+      { heading: 'Glasses', kind: 'thumbs', key: 'glasses', options: [
+        { value: 'none', label: 'None' },
+        { value: 'round', label: 'Round' },
+        { value: 'square', label: 'Square' },
+      ]},
+    ]},
+    { id: 'face-details', label: 'Face details', lists: [
+      { heading: 'Face details', kind: 'thumbs', key: 'freckles', options: [
+        { value: 'none', label: 'None' },
+        { value: 'freckles', label: 'Freckles' },
+        { value: 'blush', label: 'Blush' },
+      ]},
+    ]},
+    { id: 'earrings', label: 'Earrings', lists: [
+      { heading: 'Earrings', kind: 'thumbs', key: 'earrings', options: [
+        { value: 'none', label: 'None' },
+        { value: 'hoops', label: 'Hoops' },
+        { value: 'studs', label: 'Studs' },
+      ]},
+    ]},
+    { id: 'facial-hair', label: 'Whiskers', lists: [
+      { heading: 'Whisker color', kind: 'swatches', key: 'facialHairColor', options: [
+        { value: 'black', label: 'Black', tone: 3 },
+        { value: 'brown', label: 'Brown', tone: 2 },
+        { value: 'blond', label: 'Grey', tone: 1 },
+        { value: 'grey', label: 'White', tone: 0 },
+      ]},
+      { heading: 'Whiskers', kind: 'thumbs', key: 'beard', options: [
+        { value: 'none', label: 'None' },
+        { value: 'moustache', label: 'Short' },
+        { value: 'beard', label: 'Long' },
+      ]},
+    ]},
+    { id: 'headwear', label: 'Headwear', lists: [
+      { heading: 'Headwear color', kind: 'swatches', key: 'headwearColor', options: [
+        { value: 'black', label: 'Black', tone: 3 },
+        { value: 'brown', label: 'Brown', tone: 2 },
+        { value: 'blue', label: 'Blue', tone: 1 },
+        { value: 'red', label: 'Red', tone: 0 },
+      ]},
+      { heading: 'Headwear', kind: 'thumbs', key: 'headwear', options: [
+        { value: 'none', label: 'None' },
+        { value: 'beanie', label: 'Beanie' },
+        { value: 'cap', label: 'Cap' },
+      ]},
+    ]},
+    { id: 'background', label: 'Background', lists: [
+      { heading: 'Background', kind: 'swatches', key: 'bg', options: [
+        { value: 'plain', label: 'Plain', tone: 0 },
+        { value: 'light', label: 'Light', tone: 1 },
+        { value: 'medium', label: 'Medium', tone: 2 },
+        { value: 'dark', label: 'Dark', tone: 3 },
+      ]},
+    ]},
+  ];
+
+  const DEFAULT_PARTS = {
+    skin: 'light', body: 'slim', expression: 'smile', hair: 'short',
+    glasses: 'none', freckles: 'none', earrings: 'none', beard: 'none',
+    headwear: 'none', bg: 'plain',
+    glassesColor: 'black', facialHairColor: 'black', headwearColor: 'black',
+  };
+
+  const STATES = {
+    picker:         { tab: 'skin', parts: {}, caption: 'A round cat' },
+    'skin-tone':    { tab: 'skin', parts: { skin: 'dark' }, caption: 'Black fur' },
+    body:           { tab: 'skin', parts: { body: 'large' }, caption: 'Large body' },
+    expression:     { tab: 'expression', parts: { expression: 'laughing' }, caption: 'Laughing expression' },
+    hairstyle:      { tab: 'hairstyle', parts: { hair: 'long' }, caption: 'Long ears' },
+    'glasses-none': { tab: 'glasses', parts: { glasses: 'none' }, caption: 'No glasses' },
+    'face-details': { tab: 'face-details', parts: { freckles: 'freckles' }, caption: 'Freckles' },
+    earrings:       { tab: 'earrings', parts: { earrings: 'hoops' }, caption: 'Hoop earrings' },
+    glasses:        { tab: 'glasses', parts: { glasses: 'round', glassesColor: 'blue' }, caption: 'Round glasses with a colour' },
+    'facial-hair':  { tab: 'facial-hair', parts: { beard: 'beard' }, caption: 'Whiskers' },
+    headwear:       { tab: 'headwear', parts: { headwear: 'beanie', headwearColor: 'blue' }, caption: 'Beanie with a colour' },
+    background:     { tab: 'background', parts: { bg: 'dark' }, caption: 'Solid background' },
+    save:           { tab: 'skin', parts: {}, caption: 'Saved' },
+  };
+
+  const ORDER = ['picker', 'skin-tone', 'body', 'expression', 'hairstyle', 'glasses-none', 'face-details', 'earrings', 'glasses', 'facial-hair', 'headwear', 'background', 'save'];
+  const CUMULATIVE = {};
+  { let acc = {}; ORDER.forEach(id => { acc = { ...acc, ...STATES[id].parts }; CUMULATIVE[id] = { ...acc }; }); }
+
+  const P = {
+    body_slim: 'M52 178 C52 150 66 136 80 136 C94 136 108 150 108 178 Z',
+    body_average: 'M48 178 C48 148 64 133 80 133 C96 133 112 148 112 178 Z',
+    body_large: 'M44 178 C44 146 62 130 80 130 C98 130 116 146 116 178 Z',
+    ears_pointed: 'M60 50 L64 22 L84 44 Z M100 50 L96 22 L76 44 Z',
+    ears_long: 'M60 50 L62 12 L84 44 Z M100 50 L98 12 L76 44 Z',
+    whiskers_short: 'M58 72 L46 68 M58 78 L46 78 M102 72 L114 68 M102 78 L114 78',
+    whiskers_long: 'M58 72 L40 66 M58 78 L38 78 M58 84 L42 90 M102 72 L120 66 M102 78 L122 78 M102 84 L118 90',
+    beanie: 'M52 62 C52 44 108 44 108 62 L104 62 C104 52 96 48 80 48 C64 48 56 52 56 62 Z',
+    cap: 'M54 62 C54 44 106 44 106 62 C106 56 98 50 80 50 C62 50 54 56 54 62 Z',
+  };
+
+  function avatar_svg(label, extra_class) {
+    return `<svg class="pv-svg${extra_class ? ' ' + extra_class : ''}" viewBox="0 0 160 178" role="img" aria-label="${label}">
+      <g class="pv-skin">
+        <path class="pv-body-slim" d="${P.body_slim}"/>
+        <path class="pv-body-average" d="${P.body_average}"/>
+        <path class="pv-body-large" d="${P.body_large}"/>
+        <circle class="pv-head" cx="80" cy="70" r="26"/>
+      </g>
+      <g class="pv-ears pv-ears-pointed"><path d="${P.ears_pointed}"/></g>
+      <g class="pv-ears pv-ears-long"><path d="${P.ears_long}"/></g>
+      <g class="pv-ears pv-ears-tufted"><path d="${P.ears_pointed}"/><circle cx="64" cy="17" r="4.5"/><circle cx="96" cy="17" r="4.5"/></g>
+      <path class="pv-nose" d="M80 75 L77 71 L83 71 Z"/>
+      <g class="pv-face pv-face-smile"><circle class="pv-eye" cx="69" cy="70" r="2.6"/><circle class="pv-eye" cx="91" cy="70" r="2.6"/><path class="pv-mouth" d="M71 82 Q80 88 89 82"/></g>
+      <g class="pv-face pv-face-laughing"><path class="pv-eye" d="M64 69 Q69 65 74 69"/><path class="pv-eye" d="M86 69 Q91 65 96 69"/><path class="pv-mouth" d="M71 82 Q80 92 89 82 Z"/></g>
+      <g class="pv-face pv-face-surprised"><circle class="pv-eye" cx="69" cy="69" r="3"/><circle class="pv-eye" cx="91" cy="69" r="3"/><circle class="pv-mouth" cx="80" cy="84" r="4"/></g>
+      <g class="pv-glasses pv-glasses-round"><circle cx="69" cy="70" r="9"/><circle cx="91" cy="70" r="9"/><path d="M78 70 H82"/></g>
+      <g class="pv-glasses pv-glasses-square"><rect x="59" y="61" width="20" height="18" rx="3"/><rect x="81" y="61" width="20" height="18" rx="3"/><path d="M79 70 H81"/></g>
+      <g class="pv-freckles pv-freckles-freckles"><circle cx="63" cy="80" r="1.6"/><circle cx="68" cy="84" r="1.6"/><circle cx="92" cy="84" r="1.6"/><circle cx="97" cy="80" r="1.6"/></g>
+      <g class="pv-freckles pv-freckles-blush"><circle cx="60" cy="82" r="3.2"/><circle cx="100" cy="82" r="3.2"/></g>
+      <g class="pv-earrings pv-earrings-hoops"><circle cx="53" cy="86" r="4"/><circle cx="107" cy="86" r="4"/></g>
+      <g class="pv-earrings pv-earrings-studs"><circle cx="54" cy="88" r="2.4"/><circle cx="106" cy="88" r="2.4"/></g>
+      <g class="pv-whiskers pv-whiskers-short"><path d="${P.whiskers_short}"/></g>
+      <g class="pv-whiskers pv-whiskers-long"><path d="${P.whiskers_long}"/></g>
+      <g class="pv-headwear pv-headwear-beanie"><path d="${P.beanie}"/></g>
+      <g class="pv-headwear pv-headwear-cap"><path d="${P.cap}"/><path d="M106 62 C112 61 115 60 117 57"/></g>
+    </svg>`;
+  }
+
+  const CAT_HEAD = '<circle cx="32" cy="28" r="13"/><path d="M21 22 L23 6 L35 15 Z"/><path d="M43 22 L41 6 L29 15 Z"/>';
+  const CAT_BODY_HEAD = '<circle cx="32" cy="20" r="11"/><path d="M23 15 L25 2 L34 10 Z"/><path d="M41 15 L39 2 L30 10 Z"/>';
+  const NONE = '<path d="M22 18 L42 38"/>';
+  function thumb_svg(part, value) {
+    let inner = '';
+    if (part === 'body') {
+      inner = CAT_BODY_HEAD + {
+        slim: '<path d="M21 62c0-11 5-16 11-16s11 5 11 16z"/>',
+        average: '<path d="M19 62c0-11 6-16 13-16s13 5 13 16z"/>',
+        large: '<path d="M16 62c0-11 7-16 16-16s16 5 16 16z"/>',
+      }[value];
+    } else if (part === 'expression') {
+      inner = CAT_HEAD + {
+        smile: '<circle cx="27" cy="27" r="1.5"/><circle cx="37" cy="27" r="1.5"/><path d="M28 33.5c1.6 1.6 6.4 1.6 8 0"/>',
+        laughing: '<path d="M25.5 25.5c1.4-1 3-1 4.4 0M34.1 25.5c1.4-1 3-1 4.4 0"/><path d="M28 33c1.6 2.4 6.4 2.4 8 0z"/>',
+        surprised: '<circle cx="27" cy="27" r="1.8"/><circle cx="37" cy="27" r="1.8"/><circle cx="32" cy="33.5" r="2.6"/>',
+      }[value];
+    } else if (part === 'hair') {
+      inner = '<circle cx="32" cy="28" r="13"/>' + {
+        short: '<path d="M21 22 L23 6 L35 15 Z"/><path d="M43 22 L41 6 L29 15 Z"/>',
+        long: '<path d="M20 22 L21 2 L36 15 Z"/><path d="M44 22 L43 2 L28 15 Z"/>',
+        bun: '<path d="M21 22 L23 6 L35 15 Z"/><path d="M43 22 L41 6 L29 15 Z"/><circle cx="24" cy="4" r="2.6"/><circle cx="40" cy="4" r="2.6"/>',
+      }[value];
+    } else if (part === 'glasses') {
+      inner = CAT_HEAD + (value === 'none' ? NONE : {
+        round: '<circle cx="26" cy="28" r="4.5"/><circle cx="38" cy="28" r="4.5"/><path d="M30.5 28h3"/>',
+        square: '<rect x="21" y="24" width="10" height="9" rx="2"/><rect x="33" y="24" width="10" height="9" rx="2"/><path d="M31 28.5h2"/>',
+      }[value]);
+    } else if (part === 'freckles') {
+      inner = CAT_HEAD + (value === 'none' ? NONE : {
+        freckles: '<circle cx="22" cy="33" r="1"/><circle cx="25" cy="36" r="1"/><circle cx="39" cy="36" r="1"/><circle cx="42" cy="33" r="1"/>',
+        blush: '<circle cx="22" cy="33" r="2"/><circle cx="42" cy="33" r="2"/>',
+      }[value]);
+    } else if (part === 'earrings') {
+      inner = CAT_HEAD + (value === 'none' ? NONE : {
+        hoops: '<circle cx="19" cy="36" r="3"/><circle cx="45" cy="36" r="3"/>',
+        studs: '<circle cx="19" cy="36" r="1.6"/><circle cx="45" cy="36" r="1.6"/>',
+      }[value]);
+    } else if (part === 'beard') {
+      inner = CAT_HEAD + (value === 'none' ? NONE : {
+        moustache: '<path d="M22 32 L10 29 M22 36 L10 37 M42 32 L54 29 M42 36 L54 37"/>',
+        beard: '<path d="M22 32 L6 28 M22 36 L4 36 M22 40 L8 44 M42 32 L58 28 M42 36 L60 36 M42 40 L56 44"/>',
+      }[value]);
+    } else if (part === 'headwear') {
+      inner = CAT_HEAD + (value === 'none' ? NONE : {
+        beanie: '<path d="M18 26c1-8 27-8 28 0l-1 3c0 1-26 1-27 0z"/>',
+        cap: '<path d="M18 26c1-8 27-8 28 0z"/><path d="M46 26c3 0 5-1 6-2"/>',
+      }[value]);
+    }
+    return `<svg class="thumb-svg" viewBox="0 0 64 64" aria-hidden="true">${inner}</svg>`;
+  }
+
+  const builder = $('.builder');
+  const tabs_box = $('[data-tabs]');
+  const panels_box = $('[data-panels]');
+  const caption = $('[data-caption]');
+  const loading_el = $('.loading');
+  const done_btn = $('[data-done]');
+  const close_btn = $('[data-close]');
+
+  let current_parts = { ...DEFAULT_PARTS };
+  let active_tab = 'skin';
+  let loading = false;
+  let opened = false;
+
+  function apply_parts(parts) {
+    current_parts = { ...DEFAULT_PARTS, ...parts };
+    Object.entries(current_parts).forEach(([k, v]) => { body.dataset[k] = v; });
+  }
+
+  function highlight() {
+    tabs_box.querySelectorAll('.tab').forEach(t => {
+      const sel = t.dataset.tab === active_tab;
+      t.setAttribute('aria-selected', String(sel));
+      t.tabIndex = sel ? 0 : -1;
+      const panel = document.getElementById('panel-' + t.dataset.tab);
+      if (panel) panel.hidden = !sel;
+    });
+    panels_box.querySelectorAll('.swatch, .thumb').forEach(el => {
+      el.setAttribute('aria-pressed', String(current_parts[el.dataset.key] === el.dataset.value));
+    });
+  }
+
+  function render_panels() {
+    panels_box.textContent = '';
+    TABS.forEach(tab => {
+      const section = document.createElement('section');
+      section.className = 'panel';
+      section.id = 'panel-' + tab.id;
+      section.setAttribute('role', 'tabpanel');
+      section.setAttribute('aria-label', tab.label);
+      section.hidden = true;
+      tab.lists.forEach(list => {
+        const h = document.createElement('h2');
+        h.className = 'list-heading';
+        h.textContent = list.heading;
+        section.appendChild(h);
+        const box = document.createElement('div');
+        box.className = list.kind === 'swatches' ? 'swatches' : 'thumbs';
+        box.setAttribute('role', 'group');
+        box.setAttribute('aria-label', list.heading);
+        list.options.forEach(opt => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = list.kind === 'swatches' ? 'swatch' : 'thumb';
+          b.dataset.key = list.key;
+          b.dataset.value = opt.value;
+          b.setAttribute('aria-pressed', 'false');
+          b.setAttribute('aria-label', opt.label);
+          if (list.kind === 'swatches') {
+            b.dataset.tone = opt.tone;
+            const sq = document.createElement('span');
+            sq.className = 'swatch-sq';
+            b.appendChild(sq);
+          } else {
+            b.innerHTML = thumb_svg(list.key, opt.value);
+          }
+          box.appendChild(b);
+        });
+        section.appendChild(box);
+      });
+      panels_box.appendChild(section);
+    });
+  }
+
+  function state_id() {
+    const hash = location.hash.slice(1);
+    return STATES[hash] ? hash : 'picker';
+  }
+
+  function sync() {
+    const id = state_id();
+    const is_save = id === 'save';
+    builder.hidden = is_save || loading;
+    loading_el.hidden = !loading;
+    if (is_save) {
+      if (!opened) apply_parts(CUMULATIVE.save);
+      return;
+    }
+    if (loading) return;
+    const st = STATES[id];
+    active_tab = st.tab;
+    apply_parts(CUMULATIVE[id]);
+    caption.textContent = st.caption;
+    highlight();
+  }
+
+  tabs_box.addEventListener('click', event => {
+    const t = event.target.closest('.tab');
+    if (t && !builder.hidden) { active_tab = t.dataset.tab; highlight(); }
+  });
+
+  tabs_box.addEventListener('keydown', event => {
+    const t = event.target.closest('.tab');
+    if (!t) return;
+    const tabs = [...tabs_box.querySelectorAll('.tab')];
+    const at = tabs.indexOf(t);
+    const next = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: tabs.length - 1 }[event.key];
+    if (next === undefined) return;
+    event.preventDefault();
+    const tab = tabs[(next + tabs.length) % tabs.length];
+    active_tab = tab.dataset.tab;
+    highlight();
+    tab.focus();
+  });
+
+  panels_box.addEventListener('click', event => {
+    const el = event.target.closest('.swatch, .thumb');
+    if (el && !builder.hidden && el.dataset.value) {
+      current_parts[el.dataset.key] = el.dataset.value;
+      apply_parts(current_parts);
+      highlight();
+      const opt = (TABS.flatMap(t => t.lists).find(l => l.key === el.dataset.key) || {}).options || [];
+      const chosen = opt.find(o => o.value === el.dataset.value);
+      caption.textContent = chosen ? chosen.label : caption.textContent;
+    }
+  });
+
+  done_btn.addEventListener('click', () => {
+    if (loading || builder.hidden) return;
+    loading = true;
+    sync();
+    const ms = matchMedia('(prefers-reduced-motion: reduce)').matches ? 120 : 10300;
+    setTimeout(() => {
+      loading = false;
+      location.hash = 'save';
+    }, ms);
+  });
+
+  close_btn.addEventListener('click', () => {
+    if (window.sketchToast) window.sketchToast('Avatar builder closed (sample)', close_btn);
+  });
+
+  addEventListener('hashchange', sync);
+
+  // Build the dynamic content, then re-run the kit so it can see any frames it owns.
+  tabs_box.textContent = '';
+  TABS.forEach(tab => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tab';
+    b.setAttribute('role', 'tab');
+    b.dataset.tab = tab.id;
+    b.setAttribute('aria-controls', 'panel-' + tab.id);
+    b.setAttribute('aria-label', tab.label);
+    b.innerHTML = `<svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[tab.id]}</svg>`;
+    tabs_box.appendChild(b);
+  });
+  render_panels();
+  $('[data-preview]').innerHTML = avatar_svg('Avatar preview');
+  $('[data-profile-avatar]').innerHTML = avatar_svg('Saved avatar', 'profile-avatar');
+  if (window.initSketch) window.initSketch();
+  sync();
+  opened = true;
+})();
+</script>
+</body>
+</html>
