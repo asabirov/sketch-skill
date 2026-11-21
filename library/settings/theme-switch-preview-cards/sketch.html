@@ -1,0 +1,117 @@
+<!doctype html>
+<!--
+  Best for: a signed-in reader chooses how the product looks in a section of its own, and sees a small picture of each choice before choosing. The choice applies at once, with no Save button.
+  For a product that has the look only as a short choice in its account menu, use the theme submenu of navigation/user-menu.
+  Row opens: no rows. The page holds settings, and it holds no records.
+  Related: navigation/user-menu is the menu whose Preferences row opens this page, with a theme submenu of its own.
+  The theme control is 3 cards in one row: Light, Match system and Dark, in this order. Each card is a small picture of a page in that look, with its name below it.
+  The Match system card shows the light look in its left half and the dark look in its right half.
+  Transition values, from transitions.json. The file is empty: the capture is still pictures, so it read no transition.
+  - system, light and dark: the ring moves to the chosen card at once, and the page changes its look at once. 0 ms, estimated.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theme switch with preview cards</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* 3 cards share the width at each size. Each card is a picture with its name below it. */
+  [data-sketch] .mode_cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; border: 0; min-width: 0; }
+  [data-sketch] .mode_cards legend { margin-bottom: 12px; padding: 0; font-weight: 700; font-size: 1.15em; }
+  [data-sketch] .mode_card { position: relative; display: grid; gap: 8px; justify-items: center; min-width: 0; cursor: pointer; text-align: center; overflow-wrap: anywhere; }
+  /* The input covers its card, so a click on the picture or on the name chooses it. */
+  [data-sketch] .mode_card > input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  [data-sketch] .mode_picture { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 1.1; padding: 10%; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); overflow: hidden; }
+  /* The chosen card has a thick ring. The focus has a second ring outside it. */
+  [data-sketch] .mode_card:has(input:checked) .mode_picture { box-shadow: 0 0 0 3px var(--sketch-ink); }
+  [data-sketch] .mode_card:has(input:focus-visible) .mode_picture { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 6px; }
+  /* Each picture is a small message box with 2 lines. The light picture keeps the light look, and the dark picture keeps the dark look, in each theme of the page. */
+  [data-sketch] .mode_cards { --mode-light: var(--sketch-page); --mode-dark: var(--sketch-ink); }
+  html[data-theme="dark"] [data-sketch] .mode_cards { --mode-light: var(--sketch-ink); --mode-dark: var(--sketch-page); }
+  [data-sketch] .mode_picture { --mode-fill: var(--mode-light); --mode-line: var(--mode-dark); background: var(--mode-fill); }
+  [data-sketch] .mode_picture.dark { --mode-fill: var(--mode-dark); --mode-line: var(--mode-light); }
+  [data-sketch] .mode_box { display: grid; gap: 8%; align-content: center; width: 100%; height: 100%; padding: 8%; border: 1px solid var(--mode-line); border-radius: var(--sketch-wobble); }
+  [data-sketch] .mode_box > i { display: block; height: 4px; border-radius: 2px; background: var(--mode-line); }
+  [data-sketch] .mode_box > i:last-child { width: 55%; opacity: .5; }
+  /* The Match system picture is light in its left half and dark in its right half. */
+  [data-sketch] .mode_picture.split { background: linear-gradient(90deg, var(--mode-light) 50%, var(--mode-dark) 50%); }
+  /* Each line and the edge of the box change colour at the middle of the picture. The short line ends at 55% of the box, so its middle is at 91% of its own width. */
+  [data-sketch] .mode_picture.split .mode_box { border-image: linear-gradient(90deg, var(--mode-dark) 50%, var(--mode-light) 50%) 1; }
+  [data-sketch] .mode_picture.split .mode_box > i { background: linear-gradient(90deg, var(--mode-dark) 50%, var(--mode-light) 50%); }
+  [data-sketch] .mode_picture.split .mode_box > i:last-child { background: linear-gradient(90deg, var(--mode-dark) 91%, var(--mode-light) 91%); }
+  /* A part of a different pattern is a plain box with the name of that pattern. */
+  [data-sketch] .mode_part { display: grid; place-items: center; min-height: 96px; margin: 0; padding: 16px; text-align: center; overflow-wrap: anywhere; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  @media (max-width: 359px) {
+    /* On a very narrow screen, the cards are in one column. */
+    [data-sketch] .mode_cards { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each state. The states differ only in the chosen theme. -->
+<section class="sketch-shell" data-state="system"></section>
+<section class="sketch-shell" data-state="light"></section>
+<section class="sketch-shell" data-state="dark"></section>
+
+<template id="page">
+  <header class="sketch-bar" role="banner"><strong>[Product]</strong><span class="sketch-spacer"></span>
+    <button type="button" class="sketch-icon-button" aria-label="Account menu" data-sketch-toast="Account menu. Pattern: navigation/user-menu"><i data-icon="user"></i></button>
+  </header>
+  <nav class="sketch-nav" aria-label="Main">
+    <a href="#"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="comment"></i>Feed</a><a href="#"><i data-icon="box"></i>Catalog</a><a href="#"><i data-icon="user"></i>Members</a>
+  </nav>
+  <main class="sketch-main sketch-stack" style="max-width:720px">
+    <h1>Preferences</h1>
+    <h2>Appearance</h2>
+    <fieldset class="mode_cards">
+      <legend>Color mode</legend>
+      <label class="mode_card"><input type="radio" name="mode___state__" value="light"><span class="mode_picture" aria-hidden="true"><span class="mode_box"><i></i><i></i></span></span><span>Light</span></label>
+      <label class="mode_card"><input type="radio" name="mode___state__" value="system"><span class="mode_picture split" aria-hidden="true"><span class="mode_box"><i></i><i></i></span></span><span>Match system</span></label>
+      <label class="mode_card"><input type="radio" name="mode___state__" value="dark"><span class="mode_picture dark" aria-hidden="true"><span class="mode_box"><i></i><i></i></span></span><span>Dark</span></label>
+    </fieldset>
+    <p class="mode_part">Other settings of the look, such as the font of the text. Not a part of this pattern.</p>
+  </main>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The values of transitions.json. The file is empty, so each change shows at once.
+  const transition_records = [];
+  window.__sketchTransitions = transition_records;
+
+  const root = document.documentElement;
+  const sections = [...document.querySelectorAll('[data-state]')];
+  const device_dark = matchMedia('(prefers-color-scheme: dark)');
+  const shown_section = () => sections.find(section => !section.hidden);
+
+  sections.forEach(section => {
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__state__', section.dataset.state);
+    section.querySelector(`input[value="${section.dataset.state}"]`).checked = true;
+  });
+
+  // The chosen theme applies at once. Match system follows the device. A frame that sets the theme keeps its theme for Match system.
+  const frame_theme = root.dataset.theme;
+  function apply_theme() {
+    const state = shown_section().dataset.state;
+    if (state === 'system') { root.dataset.theme = frame_theme || (device_dark.matches ? 'dark' : 'light'); return; }
+    root.dataset.theme = state;
+  }
+  device_dark.addEventListener('change', apply_theme);
+
+  // A click or an arrow key on a card opens the state of that theme. The focus stays on the same card in the new copy.
+  let focus_value = null;
+  document.addEventListener('change', event => {
+    const choice = event.target.closest('.mode_card input');
+    if (!choice) return;
+    focus_value = choice.value;
+    location.hash = choice.value;
+  });
+  addEventListener('hashchange', () => {
+    apply_theme();
+    if (focus_value) shown_section().querySelector(`input[value="${focus_value}"]`)?.focus();
+    focus_value = null;
+  });
+
+  initSketch();
+  apply_theme();
+</script>
