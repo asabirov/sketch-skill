@@ -1,0 +1,411 @@
+<!doctype html>
+<!--
+  Best for: a product with more than 4 groups of settings, where a person finds one setting of their account or of a shared workspace.
+  For at most 4 groups of settings, use settings/settings-window.
+  Row opens: no rows. The modal holds settings, and it holds no records.
+  Related: settings/settings-window is the second pattern of the same part, for a product with at most 4 groups of settings.
+  navigation/user-menu and navigation/foot-menu are the menus whose settings row can open this modal.
+  settings/notification-settings-by-event and settings/notification-settings-by-channel are the notification settings that the notifications section holds.
+  Transition values, from transitions.json. Each value is estimated: the capture is public pictures, and the sketch plays the values of the menu of navigation/user-menu.
+  - account: the modal goes from clear to solid, opacity 35 ms, ease-out, estimated.
+    The modal grows from 98% of its size to its full size, transform 160 ms, cubic-bezier(0, 0, 0.2, 1), estimated.
+  - closed: the modal goes to 98% of its size, transform 20 ms, linear, estimated.
+    After a delay of 20 ms, the modal goes from solid to clear, opacity 110 ms, cubic-bezier(0, 0, 0.2, 1), estimated.
+  - A change of section, a search and the end of a search: 0 ms, estimated.
+  The row of a setting that the search found has a light fill for 2000 ms, estimated.
+  The modal is in the middle of the screen from 600 px. Below 600 px it fills the screen, and a list field replaces the list of sections.
+  The pictures show the notifications section and a part of the My account section. Each other section and both search states are drawn.
+  The notification settings are a part of other patterns. This sketch draws them as a plain box with the names of these patterns.
+  It starts from the sketch of settings/settings-window and from the layout of the page template settings/form of the sketch skill.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings modal</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* The modal is large. The list of sections is at the left, and the open section is at the right. */
+  [data-sketch] .modal_window { width: min(1040px, calc(100vw - 48px)); height: min(720px, calc(100dvh - 48px)); padding: 0; grid-template: minmax(0, 1fr) / clamp(200px, 24%, 260px) minmax(0, 1fr); }
+  [data-sketch] .modal_window[open] { gap: 0; }
+  /* The close button is at the top of the right side. Its row holds the name of the modal, which shows only on a phone. */
+  [data-sketch] .modal_head { grid-area: 1 / 2; justify-self: end; align-self: start; z-index: 1; display: flex; align-items: center; padding: 12px 16px 0 0; }
+  [data-sketch] .modal_name { margin: 0; }
+  /* The column keeps 3 px above and below it, so its line stays inside the drawn outline of the modal. */
+  [data-sketch] .modal_sections { grid-area: 1 / 1; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; min-height: 0; margin-block: 3px; padding: 13px 12px; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  /* The list scrolls on its own. Its padding keeps the focus ring of a row inside it. */
+  [data-sketch] .modal_list { display: grid; gap: 16px; align-content: start; min-height: 0; margin: -6px; padding: 6px; overflow-y: auto; }
+  [data-sketch] .modal_group { display: grid; }
+  [data-sketch] .modal_group_name { padding: 4px 12px; }
+  [data-sketch] .modal_link { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 4px 12px; text-decoration: none; border-radius: var(--sketch-wobble); }
+  [data-sketch] .modal_link:hover { background: var(--sketch-wash); }
+  [data-sketch] .modal_link[aria-current] { background: var(--sketch-wash); font-weight: 600; }
+  [data-sketch] .modal_empty { margin: 0; padding: 4px 12px; overflow-wrap: anywhere; }
+  [data-sketch] .modal_side { grid-area: 1 / 2; display: grid; min-width: 0; min-height: 0; }
+  /* The title of the open section keeps its place, and the rows below it scroll. So no words go below the close button. */
+  [data-sketch] .modal_section { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+  [data-sketch] .modal_title { margin: 0; padding: 20px 72px 8px 32px; font-size: 18px; line-height: 1.35; letter-spacing: -.3px; }
+  [data-sketch] .modal_rows { display: grid; gap: 4px; align-content: start; padding: 8px 32px 24px; overflow-y: auto; }
+  /* A setting is a row: its name and one line about it at the left, and its control at the right. */
+  [data-sketch] .modal_row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 24px; min-height: 60px; margin: 0 -12px; padding: 8px 12px; border-radius: var(--sketch-wobble); }
+  [data-sketch] .modal_fact { display: grid; flex: 1 1 160px; min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .modal_control { flex: 0 1 240px; }
+  /* The row of a setting that the search found has a light fill for a short time. */
+  [data-sketch] .modal_row[data-found] { background: var(--sketch-wash); }
+  /* A part of a different pattern is a plain box with the name of that pattern. */
+  [data-sketch] .modal_fill { align-content: stretch; }
+  [data-sketch] .modal_part { display: grid; place-items: center; min-height: 160px; margin: 0; padding: 16px; text-align: center; overflow-wrap: anywhere; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  @media (max-width: 599px) {
+    /* On a phone, the modal fills the screen. Its head row has its name and the close button. */
+    [data-sketch] .modal_window { width: 100%; max-width: none; height: 100dvh; max-height: none; grid-template: auto auto minmax(0, 1fr) / minmax(0, 1fr); }
+    [data-sketch] .modal_head { grid-area: 1 / 1; justify-self: stretch; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; padding: 8px 8px 0; }
+    [data-sketch] .modal_name { grid-column: 2; text-align: center; }
+    /* A list field replaces the list of sections. The open section is below it. */
+    [data-sketch] .modal_sections { grid-area: 2 / 1; margin-block: 0; padding: 8px 16px; border-right: 0; }
+    [data-sketch] .modal_side { grid-area: 3 / 1; }
+    /* The list field shows the name of the open section, so the title of the section is only for a screen reader. */
+    [data-sketch] .modal_section { grid-template-rows: minmax(0, 1fr); }
+    [data-sketch] .modal_title { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    [data-sketch] .modal_rows { padding: 8px 16px 24px; }
+    /* A text field or a list field is below its name. A switch stays at the right. */
+    [data-sketch] .modal_control { flex-basis: 100%; }
+    /* The results take the place of the list field and of the open section. */
+    [data-sketch] .modal_searching > .modal_sections { grid-row: 2 / 4; }
+    [data-sketch] .modal_searching > .modal_side { display: none; }
+  }
+  @media (min-width: 600px) {
+    /* The right side shows the title of the open section, so the name of the modal is only for a screen reader. */
+    [data-sketch] .modal_name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  }
+  @media (min-width: 1000px) {
+    /* The bar is the head of the side list, so the page takes the full height beside it. */
+    /* The head keeps 4 px below its controls, so the side list does not cover the focus ring of a control. */
+    [data-sketch] .modal_shell > .modal_bar { grid-column: 1; grid-row: 1; padding: 16px 8px 4px; border-bottom: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+    [data-sketch] .modal_shell > .sketch-nav { grid-column: 1; grid-row: 2; padding-top: 8px; }
+    [data-sketch] .modal_shell > .sketch-main { grid-column: 2; grid-row: 1 / 3; }
+  }
+  /* The page script writes the values of transitions.json into --modal-enter and --modal-leave. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .modal_layer { transition: var(--modal-enter); }
+    [data-sketch] .modal_layer:not([open]) { opacity: 0; transform: scale(0.98); transition: var(--modal-leave); }
+    /* The modal enters only from the closed state. A change between two open states shows at once. */
+    @starting-style { [data-from="closed"] [data-sketch] .modal_layer { opacity: 0; transform: scale(0.98); } }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each state. -->
+<section class="sketch-shell modal_shell" data-state="closed"></section>
+<section class="sketch-shell modal_shell" data-state="account"></section>
+<section class="sketch-shell modal_shell" data-state="preferences"></section>
+<section class="sketch-shell modal_shell" data-state="notifications"></section>
+<section class="sketch-shell modal_shell" data-state="general"></section>
+<section class="sketch-shell modal_shell" data-state="security"></section>
+<section class="sketch-shell modal_shell" data-state="search-results"></section>
+<section class="sketch-shell modal_shell" data-state="search-empty"></section>
+
+<!-- The settings button at the head opens the modal. Each section of the modal is a state, and the 2 search states show the results in place of the list of sections. -->
+<template id="shell">
+  <header class="sketch-bar modal_bar" role="banner"><strong>[Product]</strong><span class="sketch-spacer"></span>
+    <button type="button" class="sketch-icon-button" aria-label="Settings" data-opens="account"><i data-icon="settings"></i></button>
+  </header>
+  <nav class="sketch-nav" aria-label="Main">
+    <a href="#" aria-current="page"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="comment"></i>Feed</a><a href="#"><i data-icon="box"></i>Catalog</a><a href="#"><i data-icon="user"></i>Members</a>
+  </nav>
+  <dialog class="sketch-dialog modal_window modal_layer" id="modal___state__" aria-labelledby="modal_name___state__">
+    <header class="modal_head"><h2 class="modal_name" id="modal_name___state__">Settings</h2><button type="button" class="sketch-icon-button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button></header>
+    <nav class="modal_sections" aria-label="Sections">
+      <input class="sketch-input modal_search" type="search" aria-label="Search settings" placeholder="Search settings" autocomplete="off">
+      <div class="modal_list modal_groups sketch-from-tablet">
+        <div class="modal_group" role="group" aria-labelledby="group_account___state__">
+          <span class="sketch-muted modal_group_name" id="group_account___state__">Account</span>
+          <a class="modal_link" href="#account" data-shows="account"><i data-icon="user"></i>My account</a>
+          <a class="modal_link" href="#preferences" data-shows="preferences"><i data-icon="sliders"></i>Preferences</a>
+          <a class="modal_link" href="#notifications" data-shows="notifications"><i data-icon="bell"></i>Notifications</a>
+        </div>
+        <div class="modal_group" role="group" aria-labelledby="group_workspace___state__">
+          <span class="sketch-muted modal_group_name" id="group_workspace___state__">Workspace</span>
+          <a class="modal_link" href="#general" data-shows="general"><i data-icon="settings"></i>General</a>
+          <a class="modal_link" href="#security" data-shows="security"><svg class="sketch-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>Security</a>
+        </div>
+      </div>
+      <select class="sketch-input sketch-phone-only modal_select" aria-label="Section">
+        <optgroup label="Account"><option value="account">My account</option><option value="preferences">Preferences</option><option value="notifications">Notifications</option></optgroup>
+        <optgroup label="Workspace"><option value="general">General</option><option value="security">Security</option></optgroup>
+      </select>
+      <div class="modal_list modal_results" hidden></div>
+    </nav>
+    <div class="modal_side">
+      <section class="modal_section" data-section="account" data-group="Account" aria-labelledby="account_title___state__">
+        <h3 class="modal_title" id="account_title___state__">My account</h3>
+        <div class="modal_rows">
+          <label class="modal_row" data-setting="name"><span class="modal_fact"><b>Name</b></span><input class="sketch-input modal_control" value="Mara Lindqvist" autocomplete="off"></label>
+          <label class="modal_row" data-setting="email"><span class="modal_fact"><b>Email</b></span><input class="sketch-input modal_control" type="email" value="mara@portal.example" autocomplete="off"></label>
+          <label class="modal_row" data-setting="two-step"><span class="modal_fact"><b>Two-step sign-in</b><span>Ask for a code at each sign-in.</span></span><span class="sketch-switch"><input type="checkbox" role="switch"></span></label>
+        </div>
+      </section>
+      <section class="modal_section" data-section="preferences" data-group="Account" aria-labelledby="preferences_title___state__">
+        <h3 class="modal_title" id="preferences_title___state__">Preferences</h3>
+        <div class="modal_rows">
+          <label class="modal_row" data-setting="language"><span class="modal_fact"><b>Language</b></span><select class="sketch-input modal_control"><option>English</option><option>Deutsch</option><option>Español</option></select></label>
+          <label class="modal_row" data-setting="start-page"><span class="modal_fact"><b>Start page</b></span><select class="sketch-input modal_control"><option>Home</option><option>Feed</option><option>Catalog</option><option>Members</option></select></label>
+          <label class="modal_row" data-setting="time-format"><span class="modal_fact"><b>Time format</b></span><select class="sketch-input modal_control"><option>24-hour</option><option>12-hour</option></select></label>
+        </div>
+      </section>
+      <section class="modal_section" data-section="notifications" data-group="Account" aria-labelledby="notifications_title___state__">
+        <h3 class="modal_title" id="notifications_title___state__">Notifications</h3>
+        <div class="modal_rows modal_fill">
+          <p class="modal_part">Notification settings. Pattern: settings/notification-settings-by-event or settings/notification-settings-by-channel</p>
+        </div>
+      </section>
+      <section class="modal_section" data-section="general" data-group="Workspace" aria-labelledby="general_title___state__">
+        <h3 class="modal_title" id="general_title___state__">General</h3>
+        <div class="modal_rows">
+          <label class="modal_row" data-setting="workspace-name"><span class="modal_fact"><b>Workspace name</b></span><input class="sketch-input modal_control" value="Portal" autocomplete="off"></label>
+          <label class="modal_row" data-setting="page-analytics"><span class="modal_fact"><b>Page analytics</b><span>Editors see the view count of a page.</span></span><span class="sketch-switch"><input type="checkbox" role="switch" checked></span></label>
+          <label class="modal_row" data-setting="week-start"><span class="modal_fact"><b>Week start</b></span><select class="sketch-input modal_control"><option>Monday</option><option>Sunday</option></select></label>
+        </div>
+      </section>
+      <section class="modal_section" data-section="security" data-group="Workspace" aria-labelledby="security_title___state__">
+        <h3 class="modal_title" id="security_title___state__">Security</h3>
+        <div class="modal_rows">
+          <label class="modal_row" data-setting="guest-invites"><span class="modal_fact"><b>Guest invites</b><span>Members can invite a guest to a page.</span></span><span class="sketch-switch"><input type="checkbox" role="switch" checked></span></label>
+          <label class="modal_row" data-setting="public-pages"><span class="modal_fact"><b>Public pages</b><span>Members can publish a page to the web.</span></span><span class="sketch-switch"><input type="checkbox" role="switch"></span></label>
+          <label class="modal_row" data-setting="page-export"><span class="modal_fact"><b>Page export</b><span>Members can export a page as a file.</span></span><span class="sketch-switch"><input type="checkbox" role="switch" checked></span></label>
+        </div>
+      </section>
+    </div>
+  </dialog>
+  <main class="sketch-main"><h1>Home</h1><div class="sketch-placeholder" style="min-height:240px">Portal page</div></main>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The values of transitions.json. The sketch plays each with the same duration, delay and easing.
+  const transition_records = [
+    { label: 'account', trigger: 'click the settings button', element: 'modal', property: 'opacity', animation: null, duration: 35, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'account', trigger: 'click the settings button', element: 'modal', property: 'transform', animation: null, duration: 160, delay: 0, easing: 'cubic-bezier(0, 0, 0.2, 1)', measurement: 'estimated' },
+    { label: 'closed', trigger: 'press Escape, click the close button or press outside the modal', element: 'modal', property: 'transform', animation: null, duration: 20, delay: 0, easing: 'linear', measurement: 'estimated' },
+    { label: 'closed', trigger: 'press Escape, click the close button or press outside the modal', element: 'modal', property: 'opacity', animation: null, duration: 110, delay: 20, easing: 'cubic-bezier(0, 0, 0.2, 1)', measurement: 'estimated' }
+  ];
+  window.__sketchTransitions = transition_records;
+
+  const root = document.documentElement;
+  const shell = document.getElementById('shell');
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  // Each section of the modal is a state. A search state opens with these sample words when the address names it.
+  const section_states = [...shell.content.querySelectorAll('[data-section]')].map(part => part.dataset.section);
+  const sample_words = { 'search-results': 'page', 'search-empty': 'printer' };
+  const open_states = [...section_states, ...Object.keys(sample_words)];
+  // The row of a setting that the search found keeps its light fill for this time. The value is estimated.
+  const found_ms = 2000;
+  const reduced_motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_section = () => state_sections.find(section => !section.hidden);
+  const transition_css = label => transition_records
+    .filter(record => record.label === label)
+    .map(record => `${record.property} ${record.duration}ms ${record.easing} ${record.delay}ms`).join(', ');
+  // The modal stays on the screen until the last step of the close ends.
+  const leave_ms = Math.max(...transition_records.filter(record => record.label === 'closed').map(record => record.delay + record.duration));
+  root.style.setProperty('--modal-leave', `${transition_css('closed')}, display ${leave_ms}ms allow-discrete, overlay ${leave_ms}ms allow-discrete`);
+
+  // The search reads the sample settings of the template: the name, the line below it, and the name of the section.
+  const settings = [...shell.content.querySelectorAll('[data-setting]')].map(row => {
+    const part = row.closest('[data-section]');
+    const title = part.querySelector('.modal_title').textContent;
+    return {
+      id: row.dataset.setting, name: row.querySelector('b').textContent, section: part.dataset.section,
+      place: `${part.dataset.group} / ${title}`, words: `${row.querySelector('.modal_fact').textContent} ${title}`.toLowerCase(),
+    };
+  });
+  const find_settings = words => (words.trim() ? settings.filter(setting => setting.words.includes(words.trim().toLowerCase())) : []);
+
+  let search_words = '';
+  // The place of the text cursor in the search field. A change of state keeps it.
+  let search_cursor = 0;
+  // The right side keeps this section while the left column shows the results of a search.
+  let last_section = section_states[0];
+  let found_setting = null;
+  // The values that the person changed. Each copy of the screen shows them.
+  const changed_values = {};
+  // The state that shows the result of a search for these words. No words show the last section.
+  const search_state = words => {
+    if (!words.trim()) return last_section;
+    return find_settings(words).length ? 'search-results' : 'search-empty';
+  };
+
+  // Copy the template into one state. The modal of an open state opens with the state.
+  function render_state(section) {
+    const state = section.dataset.state;
+    section.innerHTML = shell.innerHTML.replaceAll('__state__', state);
+    const layer = section.querySelector('.modal_layer');
+    if (open_states.includes(state)) {
+      // The modal has one set of entry values, with the label of the first section.
+      layer.style.setProperty('--modal-enter', transition_css(section_states[0]));
+      layer.setAttribute('data-open', '');
+    }
+    layer.addEventListener('close', sync_address);
+  }
+
+  // Show the results of a search in the left column, in place of the list of sections. `null` shows the list of sections.
+  function draw_results(layer, found) {
+    const searching = found !== null;
+    layer.classList.toggle('modal_searching', searching);
+    layer.querySelector('.modal_groups').hidden = searching;
+    layer.querySelector('.modal_select').hidden = searching;
+    const results = layer.querySelector('.modal_results');
+    results.hidden = !searching;
+    if (!searching) { results.replaceChildren(); return; }
+    if (!found.length) {
+      const line = Object.assign(document.createElement('p'), { className: 'modal_empty', textContent: `No setting for "${search_words.trim()}"` });
+      line.setAttribute('role', 'status');
+      results.replaceChildren(line);
+      return;
+    }
+    // Each result has the name of the setting and its place: the group and the section.
+    results.replaceChildren(...found.map(setting => {
+      const link = Object.assign(document.createElement('a'), { className: 'modal_link', href: `#${setting.section}` });
+      link.dataset.result = setting.id;
+      const fact = Object.assign(document.createElement('span'), { className: 'modal_fact' });
+      fact.append(
+        Object.assign(document.createElement('b'), { textContent: setting.name }),
+        Object.assign(document.createElement('span'), { className: 'sketch-muted', textContent: setting.place }),
+      );
+      link.append(fact);
+      return link;
+    }));
+  }
+
+  // Put the open section, the search words and the results into the copy of the state that shows.
+  function fill_state(section) {
+    const state = section.dataset.state;
+    const searching = state in sample_words;
+    if (section_states.includes(state)) last_section = state;
+    // A search state that the address opens has no words yet, so it gets its sample words.
+    if (!searching) search_words = '';
+    else if (search_state(search_words) !== state) { search_words = sample_words[state]; search_cursor = search_words.length; }
+    const layer = section.querySelector('.modal_layer');
+    layer.querySelector('.modal_search').value = search_words;
+    layer.querySelectorAll('[data-section]').forEach(part => { part.hidden = part.dataset.section !== last_section; });
+    layer.querySelectorAll('[data-shows]').forEach(link => {
+      if (link.dataset.shows === last_section) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+    });
+    layer.querySelector('.modal_select').value = last_section;
+    Object.entries(changed_values).forEach(([id, value]) => {
+      const control = layer.querySelector(`[data-setting="${id}"] :is(input, select)`);
+      if (control.type === 'checkbox') control.checked = value; else control.value = value;
+    });
+    draw_results(layer, searching ? find_settings(search_words) : null);
+    // On a short screen, the list of sections scrolls. The row of the open section stays in view.
+    layer.querySelector('[data-shows][aria-current]').scrollIntoView({ block: 'nearest' });
+  }
+
+  // Each state has its own copy of the screen. So a change of state puts the focus on the same control of the new copy.
+  let focus_target = null;
+  let last_shown = null;
+  let last_focus = null;
+  const focus_trigger = section => section.querySelector('[data-opens]');
+  const focus_select = section => section.querySelector('.modal_select');
+  function focus_search(section) {
+    const field = section.querySelector('.modal_search');
+    field.setSelectionRange(search_cursor, search_cursor);
+    return field;
+  }
+  // Mark the row of the setting that the person chose in the results, and give the focus to its control.
+  function focus_found(section) {
+    const row = section.querySelector(`[data-setting="${found_setting}"]`);
+    found_setting = null;
+    row.dataset.found = '';
+    setTimeout(() => { delete row.dataset.found; }, found_ms);
+    row.scrollIntoView({ block: 'nearest' });
+    return row.querySelector('input, select');
+  }
+
+  // The modal plays its entry only when the state before was closed. The kit shows a state before this script names it.
+  // So the entry starts while data-from still names the state before. Read the modal first, then name the state.
+  function name_state() {
+    const section = shown_section();
+    section.querySelector('.modal_layer').getBoundingClientRect();
+    root.dataset.from = section.dataset.state;
+  }
+
+  // Open a state. A search changes the address in place, so the Back button does not go through each letter.
+  function go(state, target, in_place) {
+    focus_target = target || null;
+    if (in_place) location.replace(`#${state}`); else location.hash = state;
+  }
+
+  // Keep the address the same as the screen. A closed modal plays its close before the state changes.
+  let leave_timer = 0;
+  function sync_address() {
+    const section = shown_section();
+    if (!open_states.includes(section.dataset.state) || section.querySelector('.modal_layer').open || leave_timer) return;
+    leave_timer = setTimeout(() => {
+      leave_timer = 0;
+      if (shown_section() === section) go('closed', focus_trigger);
+    }, reduced_motion.matches ? 0 : leave_ms);
+  }
+
+  // Search for the words. The results show in the state that fits them.
+  function search_for(words) {
+    search_words = words;
+    const section = shown_section();
+    const state = search_state(words);
+    if (state !== section.dataset.state) { go(state, focus_search, true); return; }
+    fill_state(section);
+  }
+
+  // These listeners run before the listeners of the kit.
+  document.addEventListener('click', event => {
+    const opener = event.target.closest('[data-opens]');
+    if (opener) {
+      go(opener.dataset.opens);
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    // A section row and a result are links to a state. The focus goes to the same row, or to the control of the found setting.
+    const result = event.target.closest('[data-result]');
+    const link = event.target.closest('[data-shows]');
+    if (result) {
+      found_setting = result.dataset.result;
+      focus_target = focus_found;
+    } else if (link && link.dataset.shows !== shown_section().dataset.state) {
+      focus_target = section => section.querySelector(`[data-shows="${link.dataset.shows}"]`);
+    }
+  }, true);
+  document.addEventListener('keydown', event => {
+    // In the search field, Escape first clears the words. Without words, Escape closes the modal.
+    if (event.key !== 'Escape' || !event.target.matches('.modal_search') || !event.target.value) return;
+    event.preventDefault();
+    search_cursor = 0;
+    search_for('');
+  }, true);
+  document.addEventListener('input', event => {
+    if (!event.target.matches('.modal_search')) return;
+    search_cursor = event.target.selectionStart;
+    search_for(event.target.value);
+  });
+  document.addEventListener('change', event => {
+    if (event.target.matches('.modal_select')) { go(event.target.value, focus_select); return; }
+    const row = event.target.closest('[data-setting]');
+    if (row) changed_values[row.dataset.setting] = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+  });
+  addEventListener('hashchange', () => {
+    clearTimeout(leave_timer);
+    leave_timer = 0;
+    const section = shown_section();
+    fill_state(section);
+    // The kit opens the modal again at each change of the address, and the modal then takes the focus.
+    // So a second change that shows the same state puts the focus back on the same control.
+    if (focus_target) last_focus = focus_target(section);
+    else if (section !== last_shown) last_focus = null;
+    last_focus?.focus();
+    last_shown = section;
+    focus_target = null;
+    name_state();
+  });
+
+  state_sections.forEach(render_state);
+  initSketch();
+  fill_state(shown_section());
+  name_state();
+</script>

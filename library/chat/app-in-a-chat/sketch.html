@@ -1,0 +1,213 @@
+<!doctype html>
+<!--
+and a homes app, shown in a public keynote video. The Source line of pattern.md names each app and the video.
+The frames of the learning app and of the design app start at video time 6:30; frame 00:00.00 is
+video 6:30. The frames of the homes app start at video time 11:35; frame 00:00.00 is video 11:35.
+Best for: an assistant that puts a small working app into a conversation. Use it when a person does a
+short task in an app without leaving the chat, and a longer task needs the whole screen.
+Row opens: no rows.
+Transitions: the values below are estimated from the frames.
+- The action inside the card: list-sort 200 ms, easing not seen (the homes app, map zoom, frames 00:23.46 to
+  00:23.66, video 11:58.46 to 11:58.66).
+- Full screen: sheet-in 160 ms, easing not seen (the homes app, frames 00:26.63 to 00:26.79, video 12:01.63
+  to 12:01.79; the design app opens in 430 ms, frames 03:43.49 to 03:43.92, video 10:13.49 to 10:13.92).
+- Return: the full screen closes on the close button (the homes app, video 13:32.42 to 13:32.78) or on a
+  message sent from the full-screen composer (the design app, video 10:49.73 to 10:49.86). card-return 360 ms,
+  easing not seen. Only the homes app shows the inline card again.
+Reduced motion: the list sort, the sheet movement and the return fade stop. The state changes stay.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App in a Chat</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<body data-sketch>
+
+<div class="chat-shell">
+  <header class="sketch-bar"><strong>[Assistant]</strong></header>
+
+  <main class="chat-main">
+    <section data-state="card-inline" class="thread" aria-labelledby="h-inline">
+      <h1 id="h-inline" class="sr-only" tabindex="-1">App card in the chat</h1>
+      <p class="msg own">Find me a few books for the weekend.</p>
+      <div class="turn">
+        <div class="turn-head">
+          <span class="turn-ic" aria-hidden="true"><i data-icon="image"></i></span>
+          <strong>Bookline</strong>
+          <span class="sketch-muted">found 3 books</span>
+        </div>
+        <div class="card sketch-frame">
+          <div class="card-head">
+            <strong>Bookline</strong>
+            <span class="sketch-muted">3 books for you</span>
+            <span class="sketch-spacer"></span>
+            <button class="sketch-icon-button" type="button" data-go="fullscreen" aria-label="Open full screen"><i data-icon="external"></i></button>
+          </div>
+          <ul class="list">
+            <li><span class="list-title">The Quiet Harbor</span><span class="sketch-muted">Ada Reyes</span></li>
+            <li><span class="list-title">Signals in the Fog</span><span class="sketch-muted">Tom Iversen</span></li>
+            <li><span class="list-title">A Field Guide to Moss</span><span class="sketch-muted">Priya Nair</span></li>
+          </ul>
+          <button class="sketch-button secondary" type="button" data-go="card-action">Sort by title</button>
+        </div>
+        <p class="follow sketch-muted">Sort the list, or open it full screen.</p>
+      </div>
+    </section>
+
+    <section data-state="card-action" class="thread" aria-labelledby="h-action">
+      <h1 id="h-action" class="sr-only" tabindex="-1">List sorted in the card</h1>
+      <p class="msg own">Find me a few books for the weekend.</p>
+      <div class="turn">
+        <div class="turn-head">
+          <span class="turn-ic" aria-hidden="true"><i data-icon="image"></i></span>
+          <strong>Bookline</strong>
+          <span class="sketch-muted">found 3 books</span>
+        </div>
+        <div class="card sketch-frame">
+          <div class="card-head">
+            <strong>Bookline</strong>
+            <span class="sketch-muted">sorted by title</span>
+            <span class="sketch-spacer"></span>
+            <button class="sketch-icon-button" type="button" data-go="fullscreen" aria-label="Open full screen"><i data-icon="external"></i></button>
+          </div>
+          <ul class="list">
+            <li><span class="list-title">A Field Guide to Moss</span><span class="sketch-muted">Priya Nair</span></li>
+            <li><span class="list-title">Signals in the Fog</span><span class="sketch-muted">Tom Iversen</span></li>
+            <li><span class="list-title">The Quiet Harbor</span><span class="sketch-muted">Ada Reyes</span></li>
+          </ul>
+          <button class="sketch-button secondary" type="button" data-go="card-inline">Undo sort</button>
+        </div>
+        <p class="follow sketch-muted">The list re-sorts by title inside the card.</p>
+      </div>
+    </section>
+
+    <section data-state="return-chat" class="thread" aria-labelledby="h-return">
+      <h1 id="h-return" class="sr-only" tabindex="-1">Back to the chat</h1>
+      <p class="msg own">Find me a few books for the weekend.</p>
+      <div class="turn">
+        <div class="turn-head">
+          <span class="turn-ic" aria-hidden="true"><i data-icon="image"></i></span>
+          <strong>Bookline</strong>
+          <span class="sketch-muted">found 3 books</span>
+        </div>
+        <div class="card sketch-frame">
+          <div class="card-head">
+            <strong>Bookline</strong>
+            <span class="sketch-muted">3 books for you</span>
+            <span class="sketch-spacer"></span>
+            <button class="sketch-icon-button" type="button" data-go="fullscreen" aria-label="Open full screen"><i data-icon="external"></i></button>
+          </div>
+          <ul class="list">
+            <li><span class="list-title">The Quiet Harbor</span><span class="sketch-muted">Ada Reyes</span></li>
+            <li><span class="list-title">Signals in the Fog</span><span class="sketch-muted">Tom Iversen</span></li>
+            <li><span class="list-title">A Field Guide to Moss</span><span class="sketch-muted">Priya Nair</span></li>
+          </ul>
+          <button class="sketch-button secondary" type="button" data-go="card-action">Sort by title</button>
+        </div>
+        <p class="follow sketch-muted">The card returns to the first list order.</p>
+      </div>
+    </section>
+  </main>
+
+  <form class="composer sketch-row" action="#">
+    <input class="sketch-input" aria-label="Message" placeholder="Ask anything" style="flex:1">
+    <button class="sketch-button">Send</button>
+  </form>
+</div>
+
+<main data-state="fullscreen" class="fs" aria-labelledby="h-fs">
+  <header class="fs-bar">
+    <button class="sketch-icon-button" type="button" data-go="return-chat" aria-label="Close and return to the chat"><i data-icon="close"></i></button>
+    <span class="sketch-spacer"></span>
+    <strong>Bookline</strong>
+    <span class="sketch-spacer"></span>
+    <button class="sketch-button secondary" type="button" data-sketch-toast="Would open the app in a browser">Open in Bookline</button>
+  </header>
+  <div class="fs-body">
+    <h1 id="h-fs" tabindex="-1" style="font-size:18px;margin:0">Bookline <span class="sketch-muted">5 books</span></h1>
+    <ul class="list">
+      <li><span class="list-title">A Field Guide to Moss</span><span class="sketch-muted">Priya Nair</span></li>
+      <li><span class="list-title">Signals in the Fog</span><span class="sketch-muted">Tom Iversen</span></li>
+      <li><span class="list-title">The Quiet Harbor</span><span class="sketch-muted">Ada Reyes</span></li>
+      <li><span class="list-title">The Last Ferry</span><span class="sketch-muted">Mina Okafor</span></li>
+      <li><span class="list-title">Notes from the Orchard</span><span class="sketch-muted">Leo Brandt</span></li>
+    </ul>
+  </div>
+  <form class="composer sketch-row" action="#">
+    <input class="sketch-input" aria-label="Message" placeholder="Ask Bookline" style="flex:1">
+    <button class="sketch-button" type="button" data-go="return-chat">Send</button>
+  </form>
+</main>
+
+<script src="../../../assets/sketch.js"></script>
+<style>
+  [data-sketch] .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] h1 { margin: 0; }
+  [data-sketch] p { margin: 0; }
+
+  /* The chat shell holds the three chat states; it hides when full screen shows. */
+  [data-sketch] .chat-shell { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+  [data-sketch] .chat-shell:not(:has([data-state]:not([hidden]))) { display: none; }
+  [data-sketch] .chat-main { width: min(760px, 100%); margin: 0 auto; padding: 24px 16px; }
+  [data-sketch] .thread { display: grid; gap: 16px; align-content: start; }
+  [data-sketch] .msg { justify-self: start; max-width: 80%; padding: 8px 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .msg.own { justify-self: end; background: var(--sketch-ink); color: var(--sketch-page); }
+  [data-sketch] .turn { display: grid; gap: 8px; justify-self: start; width: 100%; }
+  [data-sketch] .turn-head { display: flex; align-items: center; gap: 8px; }
+  [data-sketch] .turn-ic { display: grid; place-items: center; width: 24px; height: 24px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: 6px; color: var(--sketch-muted); }
+  [data-sketch] .follow { padding-left: 4px; }
+
+  /* The plain app card: a title, a content area, one action and an expand button. */
+  [data-sketch] .card { display: grid; gap: 12px; padding: 16px; max-width: 560px; }
+  [data-sketch] .card-head { display: flex; align-items: center; gap: 8px; }
+  [data-sketch] .card-head strong { font-weight: 600; }
+
+  /* The content area: a short list of items. */
+  [data-sketch] .list { margin: 0; padding: 0; list-style: none; display: grid; }
+  [data-sketch] .list li {
+    display: flex; align-items: baseline; gap: 12px; min-height: 44px; padding: 8px 12px;
+    border-bottom: 1px solid var(--sketch-wash);
+  }
+  [data-sketch] .list li:last-child { border-bottom: 0; }
+  [data-sketch] .list-title { font-weight: 600; min-width: 0; }
+  [data-sketch] .list .sketch-muted { margin-left: auto; text-align: right; }
+
+  /* The composer: one row that stays at the bottom in both the chat and full screen. */
+  [data-sketch] .composer { padding: 12px 16px; border-top: var(--sketch-stroke) solid var(--sketch-ink); align-items: center; }
+  [data-sketch] .composer .sketch-input { min-width: 0; }
+
+  /* Full screen: the view rises from the bottom. The composer stays available. */
+  [data-sketch] .fs { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+  [data-sketch] .fs-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .fs-body { display: grid; gap: 16px; padding: 24px 16px; align-content: start; width: 100%; max-width: 760px; margin: 0 auto; }
+
+  @keyframes list-sort { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } }
+  @keyframes card-return { from { opacity: 0; } }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-state="card-action"] .list { animation: list-sort 200ms ease; }
+    [data-sketch] .fs { animation: sheet-in 160ms ease; }
+    [data-state="return-chat"] .card { animation: card-return 360ms ease; }
+  }
+</style>
+<script>
+(() => {
+  const body = document.body;
+  const state_of = id => document.querySelector(`[data-state="${id}"]`);
+  const sync = moved => {
+    const state = state_of(location.hash.slice(1)) || document.querySelector('[data-state]');
+    body.dataset.at = state.dataset.state;
+    if (!moved) return;
+    const target = state.querySelector('[tabindex="-1"]');
+    if (target) requestAnimationFrame(() => target.focus({ preventScroll: true }));
+  };
+  document.addEventListener('click', event => {
+    const go = event.target.closest('[data-go]');
+    if (go) location.hash = go.dataset.go;
+  });
+  addEventListener('hashchange', () => sync(true));
+  sync(false);
+})();
+</script>
+</body>
+</html>

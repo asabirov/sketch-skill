@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feed of full posts sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* A reaction is an emoji with no word. The sketch has one ink, so each emoji is drawn in grey, with more contrast. Its name is the label of its button. */
+  [data-sketch] .emoji { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-style: normal; line-height: 1; filter: grayscale(1) contrast(1.8) brightness(0.72); }
+  /* A plain box stands for a picture. A plain box with a play button stands for a video. */
+  [data-sketch] .feed_media { position: relative; min-height: 180px; }
+  [data-sketch] .feed_media > span { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .feed_media .feed_play { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; width: 56px; height: 56px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; background: var(--sketch-page); color: var(--sketch-ink); }
+  [data-sketch] .feed_media .feed_play:hover { background: var(--sketch-wash); }
+  [data-sketch] .feed_media .feed_play .sketch-icon { fill: currentColor; margin-left: 3px; }
+  [data-sketch] .feed_media .feed_length { position: absolute; right: 8px; bottom: 8px; font-size: 14px; color: var(--sketch-ink); }
+  /* A long text shows its first lines. The Show more button opens the rest in place. */
+  [data-sketch] .feed_cut { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+  [data-sketch] .feed_more { justify-self: start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-left: -12px; padding: 0 12px; border: 0; border-radius: var(--sketch-wobble); background: none; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
+  [data-sketch] .feed_more:hover { background: var(--sketch-wash); }
+  [data-sketch] .feed_more:active { background: color-mix(in srgb, var(--sketch-ink) 18%, transparent); }
+  /* A reply field starts as one line and grows with its text. Its buttons stand next to it, at the level of its last line. */
+  [data-sketch] .reply_row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 8px; }
+  [data-sketch] .reply_row textarea.sketch-input { flex: 1 1 120px; width: auto; min-width: 0; min-height: 44px; max-height: 196px; resize: none; }
+  [data-sketch] .reply_row > .sketch-avatar { align-self: flex-start; width: 32px; height: 32px; margin-top: 6px; font-size: 12px; }
+  @media (max-width: 599px) { [data-sketch] .reply_row > .sketch-avatar { display: none; } }
+  [data-sketch] .feed_post :is(h2, p, ul) { margin: 0; }
+  [data-sketch] .feed_day::after { content: ""; flex: 1; border-top: var(--sketch-stroke) solid var(--sketch-muted); }
+  [data-sketch] .feed_count { display: inline-block; width: 10ch; overflow: hidden; white-space: nowrap; }
+  /* The comment count has 3 forms: words, a number, or the avatars of the members who commented with the words.
+     A block with data-count shows that form. A row with no comment shows the comment icon only, in each form. */
+  [data-sketch] .feed_faces { display: none; gap: 2px; }
+  [data-sketch] .feed_faces .sketch-avatar { width: 22px; height: 22px; font-size: 9px; }
+  [data-sketch] [data-count="number"] .feed_word { display: none; }
+  [data-sketch] [data-count="number"] .feed_count { width: 1.5ch; }
+  [data-sketch] [data-count="faces"] .feed_faces:not([hidden]) { display: inline-flex; }
+  [data-sketch] .feed_reactions { display: grid; grid-template-columns: repeat(4, 44px); gap: 4px; }
+  [data-sketch] .feed_reactions button { width: 44px; height: 44px; padding: 0; border: 0; border-radius: var(--sketch-wobble); background: none; font-size: 22px; cursor: pointer; }
+  [data-sketch] .feed_reactions button:hover { background: var(--sketch-wash); }
+  [data-sketch] .feed_reaction .emoji { font-size: 16px; }
+  /* The pinned update stands first, under a mark with a pin. */
+  [data-sketch] .feed_post .feed_pin { display: flex; align-items: center; gap: 6px; margin-bottom: -18px; font-size: 14px; color: var(--sketch-muted); }
+  [data-sketch] .feed_pin .sketch-icon { width: 16px; height: 16px; }
+  /* The row menu has an icon on each item and 2 groups. Space parts the groups. */
+  [data-sketch] .feed_menu .sketch-menu-item { display: flex; align-items: center; gap: 10px; }
+  [data-sketch] .feed_menu .feed_group { margin-top: 12px; }
+  /* The composer: the group at the top, the text with no frame, and the actions at the foot. */
+  [data-sketch] dialog.feed_composer { width: min(720px, calc(100vw - 32px)); }
+  [data-sketch] .feed_composer select.sketch-input { width: auto; max-width: 100%; min-height: 36px; }
+  [data-sketch] .feed_composer textarea.sketch-input { min-height: 132px; padding: 4px 0; border-color: transparent; font-size: 17px; resize: none; }
+  /* One column. The title with the new update button, and the full posts. The sketch draws no side nav and no bar. */
+  [data-sketch] .sketch-main.feed_column { max-width: 784px; padding-block: 24px 64px; }
+  [data-sketch] .feed_title { display: flex; align-items: center; gap: 4px; margin-bottom: 16px; }
+  [data-sketch] .feed_title h1 { flex: 1; min-width: 0; margin: 0; font-size: 26px; }
+  [data-sketch] .feed_posts { display: grid; gap: 48px; }
+  [data-sketch] .feed_day { display: flex; align-items: center; gap: 12px; margin: 0 0 -24px; font-size: 14px; color: var(--sketch-muted); }
+  [data-sketch] .feed_post { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 0; }
+  [data-sketch] .feed_head { display: flex; align-items: center; gap: 8px; margin-bottom: -18px; }
+  [data-sketch] .feed_head h2 { flex: 1; min-width: 0; font-size: 20px; }
+  [data-sketch] .feed_head .sketch-icon-button { margin-right: -10px; }
+  [data-sketch] .feed_meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 14px; }
+  [data-sketch] .feed_meta > span { display: inline-flex; align-items: center; gap: 6px; }
+  [data-sketch] .feed_meta .sketch-avatar { width: 22px; height: 22px; font-size: 9px; }
+  [data-sketch] .feed_post > ul { display: grid; gap: 8px; margin-top: -4px; padding-left: 24px; }
+  [data-sketch] .feed_post > .feed_more { margin-block: -12px; }
+  [data-sketch] .feed_actions { gap: 6px; }
+  [data-sketch] .feed_actions > .sketch-icon-button:first-child { margin-left: -10px; }
+  /* The page of a post: a back link, the post and the box of the comment thread. */
+  [data-sketch] .feed_page { display: grid; gap: 24px; }
+  [data-sketch] .sketch-main a.feed_back { justify-self: start; margin-bottom: -12px; }
+  [data-sketch] .feed_head h1 { flex: 1; min-width: 0; margin: 0; font-size: 26px; }
+  /* Each value below comes from transitions.json. */
+  [data-sketch] .feed_count { animation: feed_count_in 200ms ease-in-out; }
+  [data-sketch] :is(.sketch-menu, .sketch-popover):not([hidden]) { transform-origin: top left; animation: feed_fade_in 50ms linear, feed_layer_grow 230ms ease-out; }
+  [data-sketch] dialog.sketch-dialog[open] { animation: feed_fade_in 300ms linear(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1), feed_dialog_grow 350ms ease-out; }
+  [data-sketch] dialog.sketch-dialog[open]::backdrop { animation: feed_fade_in 400ms linear(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1); }
+  /* A layer that closes plays its close values, then leaves the page. */
+  [data-sketch] :is(.sketch-menu, .sketch-popover) { transition: opacity 150ms linear, display 150ms allow-discrete; }
+  [data-sketch] :is(.sketch-menu, .sketch-popover)[hidden] { opacity: 0; }
+  [data-sketch] dialog.sketch-dialog { transition: opacity 300ms linear(0, 0.24, 0.55, 0.76, 0.88, 0.94, 0.97, 0.99, 0.99, 1, 1), transform 330ms ease-out, display 330ms allow-discrete, overlay 330ms allow-discrete; }
+  [data-sketch] dialog.sketch-dialog:not([open]) { opacity: 0; transform: scale(0.95); }
+  [data-sketch] dialog.sketch-dialog::backdrop { transition: opacity 280ms linear(0, 0.19, 0.36, 0.51, 0.64, 0.75, 0.84, 0.91, 0.96, 0.99, 1), display 280ms allow-discrete, overlay 280ms allow-discrete; }
+  [data-sketch] dialog.sketch-dialog:not([open])::backdrop { opacity: 0; }
+  @keyframes feed_fade_in { from { opacity: 0; } }
+  @keyframes feed_count_in { from { width: 0; } }
+  @keyframes feed_layer_grow { from { transform: scale(0.98); } }
+  @keyframes feed_dialog_grow { from { transform: scale(0.95); } }
+  @media (prefers-reduced-motion: reduce) {
+    [data-sketch] :is(.feed_count, .sketch-menu, .sketch-popover, .sketch-dialog), [data-sketch] .sketch-dialog::backdrop { animation: none !important; }
+    [data-sketch] :is(.sketch-menu, .sketch-popover, .sketch-dialog), [data-sketch] .sketch-dialog::backdrop { transition: none !important; }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="feed">
+  <div data-screen="base_feed"></div>
+</section>
+<section data-state="feed-number">
+  <div data-screen="base_feed" data-count="number"></div>
+</section>
+<section data-state="feed-faces">
+  <div data-screen="base_feed" data-count="faces"></div>
+</section>
+<section data-state="text-open">
+  <div data-screen="base_feed" data-show="long"></div>
+</section>
+<section data-state="comments-open">
+  <div data-screen="base_feed" data-show="comments"></div>
+</section>
+<section data-state="comment-sent">
+  <div data-screen="base_feed" data-show="sent"></div>
+</section>
+<section data-state="reaction-picker">
+  <div data-screen="base_feed" data-show="picker"></div>
+</section>
+<section data-state="reaction-added">
+  <div data-screen="base_feed" data-show="reacted"></div>
+</section>
+<section data-state="post">
+  <div data-screen="base_feed" data-show="post"></div>
+</section>
+<section data-state="row-menu">
+  <div data-screen="base_feed" data-show="menu"></div>
+</section>
+<section data-state="compose">
+  <div data-screen="base_feed" data-show="compose"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="base_feed" data-show="empty"></div>
+</section>
+
+<!-- One column with no app shell. Each row is one full update: its text, its picture or its video, and its comment count. A long
+     text shows its first lines. The comment button opens a comment field of one line under the row. The row menu opens the page
+     of the post. -->
+<template id="base_feed">
+<main class="sketch-main feed_column">
+  <div class="feed_title" data-part="!post"><h1>Updates</h1>
+    <button class="sketch-button secondary" type="button" data-sketch-open="compose" data-part="!empty">New update</button>
+  </div>
+
+  <div class="sketch-stack" style="justify-items:center;text-align:center;padding:48px 0" data-part="empty">
+    <div class="sketch-placeholder" style="width:160px">Drawing</div>
+    <h2>No updates yet</h2>
+    <p style="margin:0;max-width:44ch">Updates from the groups that you follow show here, the newest first.</p>
+    <div class="sketch-row"><button class="sketch-button" type="button" data-sketch-open="compose">New update</button><a href="#">How updates work</a></div>
+  </div>
+
+  <div class="feed_posts" data-part="!empty !post">
+    <article class="feed_post">
+      <p class="feed_pin"><i data-glyph="pin"></i>Pinned</p>
+      <div class="feed_head"><h2>Route change on 1 December</h2><button class="sketch-icon-button" type="button" aria-label="Update actions"><i data-icon="more"></i></button></div>
+      <p class="feed_meta"><span><span class="sketch-avatar">ML</span>Mara Lind</span><span class="sketch-muted">2 weeks ago</span></p>
+      <p>From 1 December, lines 7 and 12 use the new stops on the east side. The map shows each new stop. Read this before you plan a trip.</p>
+      <div class="sketch-placeholder feed_media" role="img" aria-label="Picture"><span>Picture</span></div>
+      <div class="sketch-row feed_actions"><button class="sketch-chip feed_comments" type="button" aria-label="14 comments" data-sketch-toast="The update Stop signs refresh shows the comment field (sample)"><i data-icon="comment"></i><span class="feed_faces" aria-hidden="true"><span class="sketch-avatar">AP</span><span class="sketch-avatar">LO</span><span class="sketch-avatar">SK</span></span><span>14<span class="feed_word"> comments</span></span></button><button class="sketch-chip feed_reaction" type="button" aria-pressed="false" aria-label="Thumbs up, 21 members" title="21 members reacted with thumbs up"><span class="emoji" aria-hidden="true">👍</span>21</button><button class="sketch-icon-button" type="button" aria-label="Add a reaction"><i data-icon="smile"></i></button></div>
+    </article>
+    <p class="feed_day">Today</p>
+    <article class="feed_post">
+      <div class="feed_head"><h2>Stop signs refresh</h2><button class="sketch-icon-button" type="button" aria-label="Update actions" data-sketch-popover="row_menu"><i data-icon="more"></i></button></div>
+      <p class="feed_meta"><span><span class="sketch-avatar">SK</span>Sam Kim</span><span class="sketch-muted">4 minutes ago</span></p>
+      <p>The printer moved our slot by two weeks, so the new signs for the east line do not arrive before the route change.</p>
+      <p>We keep the old signs and add a paper notice at each of the 31 stops. The new date for the signs is the first week of next month.</p>
+      <div class="sketch-row feed_actions">
+        <button class="sketch-chip feed_comments" type="button" aria-label="Comments" aria-expanded="false" data-go="comments-open" data-part="!comments !sent"><i data-icon="comment"></i></button>
+        <button class="sketch-chip feed_comments" type="button" aria-label="Comments" aria-expanded="true" data-go="feed" data-part="comments sent"><i data-icon="comment"></i><span class="feed_faces" aria-hidden="true" data-part="sent"><span class="sketch-avatar">YO</span></span><span class="feed_count" data-part="sent">1<span class="feed_word"> comment</span></span></button>
+        <button class="sketch-chip feed_reaction" type="button" aria-pressed="true" aria-label="Thumbs up, 1 member" data-go="feed" data-part="reacted" data-reaction-chip="reaction-added"><span class="emoji" aria-hidden="true">👍</span>1</button>
+        <button class="sketch-icon-button" type="button" aria-label="Add a reaction" data-sketch-popover="picker"><i data-icon="smile"></i></button>
+      </div>
+      <div class="sketch-popover" id="picker" data-part="picker" role="group" aria-label="Reactions">
+        <div class="feed_reactions"><button type="button" aria-label="Thumbs up" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">👍</span></button><button type="button" aria-label="Heart" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">❤️</span></button><button type="button" aria-label="Laugh" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">😄</span></button><button type="button" aria-label="Party" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">🎉</span></button><button type="button" aria-label="Eyes" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">👀</span></button><button type="button" aria-label="Thanks" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">🙏</span></button><button type="button" aria-label="Not sure" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">😕</span></button><button type="button" aria-label="Thumbs down" data-reaction="reaction-added" data-sketch-close><span class="emoji" aria-hidden="true">👎</span></button></div>
+      </div>
+      <div class="sketch-placeholder pattern_part" data-part="sent"><b>Comment thread</b><span>Pattern: content/comment-thread</span></div>
+      <div class="reply_row" data-part="comments sent" data-reply-form data-focus>
+        <span class="sketch-avatar">YO</span>
+        <textarea class="sketch-input" rows="1" aria-label="Comment on Stop signs refresh" placeholder="Leave a comment"></textarea>
+        <button class="sketch-button secondary" type="button" data-go="feed">Cancel</button>
+        <button class="sketch-button" type="button" disabled data-reply-send="comment-sent">Comment</button>
+      </div>
+    </article>
+    <article class="feed_post">
+      <div class="feed_head"><h2>Rider alerts</h2><button class="sketch-icon-button" type="button" aria-label="Update actions"><i data-icon="more"></i></button></div>
+      <p class="feed_meta"><span><span class="sketch-avatar">AP</span>Ada Park</span><span class="sketch-muted">3 hours ago</span></p>
+      <p class="feed_cut" data-part="!long">The text alert test reached 3 of 5 phone networks. Two networks hold each message for about ten minutes, which is too late for a missed bus. We sent 40 test messages from the depot on Monday and on Tuesday, at the morning peak and at midnight, and we wrote down the time of each one on 5 phones. The 3 good networks delivered each message in less than 20 seconds. The 2 slow networks put our messages in a queue for bulk senders, and that queue is long at the peak.</p>
+      <button class="feed_more" type="button" aria-expanded="false" data-go="text-open" data-part="!long">Show more<i data-icon="chevron-down"></i></button>
+      <p data-part="long">The text alert test reached 3 of 5 phone networks. Two networks hold each message for about ten minutes, which is too late for a missed bus. We sent 40 test messages from the depot on Monday and on Tuesday, at the morning peak and at midnight, and we wrote down the time of each one on 5 phones. The 3 good networks delivered each message in less than 20 seconds. The 2 slow networks put our messages in a queue for bulk senders, and that queue is long at the peak.</p>
+      <p data-part="long">What we do now:</p>
+      <ul data-part="long"><li>Ask both networks for a priority route.</li><li>Test the app message as a second way.</li><li>Decide on Thursday if the launch date moves.</li></ul>
+      <button class="feed_more" type="button" aria-expanded="true" data-go="feed" data-part="long">Show less<i data-icon="chevron-up"></i></button>
+      <div class="sketch-row feed_actions"><button class="sketch-chip feed_comments" type="button" aria-label="2 comments" data-sketch-toast="The update Stop signs refresh shows the comment field (sample)"><i data-icon="comment"></i><span class="feed_faces" aria-hidden="true"><span class="sketch-avatar">LO</span><span class="sketch-avatar">SK</span></span><span>2<span class="feed_word"> comments</span></span></button><button class="sketch-chip feed_reaction" type="button" aria-pressed="false" aria-label="Thumbs up, 3 members" title="3 members reacted with thumbs up"><span class="emoji" aria-hidden="true">👍</span>3</button><button class="sketch-chip feed_reaction" type="button" aria-pressed="false" aria-label="Eyes, 1 member" title="1 member reacted with eyes"><span class="emoji" aria-hidden="true">👀</span>1</button><button class="sketch-icon-button" type="button" aria-label="Add a reaction"><i data-icon="smile"></i></button></div>
+    </article>
+    <article class="feed_post">
+      <div class="feed_head"><h2>Night bus timetable</h2><button class="sketch-icon-button" type="button" aria-label="Update actions"><i data-icon="more"></i></button></div>
+      <p class="feed_meta"><span><span class="sketch-avatar">LO</span>Lee Ortiz</span><span class="sketch-muted">5 hours ago</span></p>
+      <p>The printer has the new timetable. All 14 night lines keep their first and last trip. The video shows how to read the new board.</p>
+      <div class="sketch-placeholder feed_media" role="group" aria-label="Video, 48 seconds"><button class="sketch-icon-button feed_play" type="button" aria-label="Play the video" data-sketch-toast="The video plays in place (sample)"><i data-glyph="play"></i></button><span class="feed_length">0:48</span></div>
+      <div class="sketch-row feed_actions"><button class="sketch-chip feed_comments" type="button" aria-label="6 comments" data-sketch-toast="The update Stop signs refresh shows the comment field (sample)"><i data-icon="comment"></i><span class="feed_faces" aria-hidden="true"><span class="sketch-avatar">AP</span><span class="sketch-avatar">SK</span><span class="sketch-avatar">ML</span></span><span>6<span class="feed_word"> comments</span></span></button><button class="sketch-chip feed_reaction" type="button" aria-pressed="false" aria-label="Thumbs up, 9 members" title="9 members reacted with thumbs up"><span class="emoji" aria-hidden="true">👍</span>9</button><button class="sketch-icon-button" type="button" aria-label="Add a reaction"><i data-icon="smile"></i></button></div>
+    </article>
+  </div>
+
+  <div class="feed_page" data-part="post">
+    <a class="feed_back" href="#feed"><i data-icon="chevron-left"></i>Updates</a>
+    <article class="feed_post">
+      <div class="feed_head"><h1>Stop signs refresh</h1><button class="sketch-icon-button" type="button" aria-label="Update actions"><i data-icon="more"></i></button></div>
+      <p class="feed_meta"><span><span class="sketch-avatar">SK</span>Sam Kim</span><span class="sketch-muted">4 minutes ago</span></p>
+      <p>The printer moved our slot by two weeks, so the new signs for the east line do not arrive before the route change.</p>
+      <p>We keep the old signs and add a paper notice at each of the 31 stops. The new date for the signs is the first week of next month.</p>
+      <div class="sketch-row feed_actions"><button class="sketch-chip feed_reaction" type="button" aria-pressed="false" aria-label="Thumbs up, 3 members" title="3 members reacted with thumbs up"><span class="emoji" aria-hidden="true">👍</span>3</button><button class="sketch-icon-button" type="button" aria-label="Add a reaction"><i data-icon="smile"></i></button></div>
+    </article>
+    <div class="sketch-placeholder pattern_part"><b>Comment thread with its comment field</b><span>Pattern: content/comment-thread</span></div>
+  </div>
+<div class="sketch-menu feed_menu" id="row_menu" data-part="menu">
+  <button class="sketch-menu-item" type="button" data-go="post"><i data-icon="arrow-right"></i>Open the post</button>
+  <button class="sketch-menu-item" type="button"><i data-icon="box"></i>Open in its group</button>
+  <button class="sketch-menu-item" type="button" data-sketch-toast="Link copied"><i data-icon="link"></i>Copy link</button>
+  <button class="sketch-menu-item" type="button" data-sketch-toast="Text copied"><i data-icon="copy"></i>Copy as text</button>
+  <button class="sketch-menu-item feed_group" type="button" data-sketch-toast="Pinned to the top (sample)"><i data-glyph="pin"></i>Pin to top</button>
+  <button class="sketch-menu-item" type="button" data-sketch-toast="You get no more updates from this group (sample)"><i data-glyph="bell-off"></i>Unfollow this group</button>
+  <button class="sketch-menu-item" type="button" data-sketch-toast="You follow the group Stop signs refresh"><i data-icon="info"></i>Why do I see this?</button>
+</div>
+</main>
+<dialog class="sketch-dialog feed_composer" id="compose" data-part="compose" aria-label="New update">
+  <div class="sketch-row"><select class="sketch-input" aria-label="Group"><option>Choose a group</option><option>Night bus timetable</option><option>Rider alerts</option><option>Stop signs refresh</option></select><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button></div>
+  <textarea class="sketch-input" aria-label="Update" placeholder="Write an update"></textarea>
+  <div class="sketch-row"><button class="sketch-icon-button" type="button" aria-label="Attach a file"><i data-glyph="paperclip"></i></button><span class="sketch-spacer"></span><button class="sketch-button" type="button" data-sketch-close data-sketch-toast="Update posted">Post</button></div>
+</dialog>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+/* Line icons that the kit does not have. The kit draws <i data-glyph="name"></i> with the paths in window.sketchGlyphs. */
+window.sketchGlyphs = {
+    pin: 'M9 4h6l-1 6 3 3H7l3-3zM12 13v7', heart: 'M12 20c-4-3-7-6-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 4-3 7-7 10z',
+    repost: 'M7 7h9a2 2 0 0 1 2 2v6M15 12l3 3 3-3M17 17H8a2 2 0 0 1-2-2V9M9 12L6 9l-3 3', views: 'M6 20v-6M12 20V4M18 20v-9',
+    'bell-off': 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4M4 4l16 16', 'bell-ring': 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4M3 8c0-2 1-3.5 2.5-4.5M21 8c0-2-1-3.5-2.5-4.5',
+    mail: 'M4 6h16v12H4zM4 7l8 6 8-6', phone: 'M8 3h8v18H8zM11 18h2', rss: 'M5 19v.5M5 12a7 7 0 0 1 7 7M5 5a14 14 0 0 1 14 14',
+    'arrow-up': 'M12 19V5M6 11l6-6 6 6', 'arrow-down': 'M12 5v14M6 13l6 6 6-6', reply: 'M10 8l-5 4 5 4M5 12h9a5 5 0 0 1 5 5v1',
+    code: 'M9 7l-5 5 5 5M15 7l5 5-5 5', tag: 'M4 4h8l8 8-8 8-8-8zM8.5 8.5v.5', play: 'M8 5l11 7-11 7z', paperclip: 'M19 11l-7 7a4 4 0 0 1-6-6l8-8a3 3 0 0 1 4 4l-8 8a1.5 1.5 0 0 1-2-2l7-7',
+  };
+/* A reply field grows with its text. Its send button stays off until the field has text. The send button opens the state in
+   data-reply-send, and an element with data-reply-text in that state takes the typed text. A form with data-focus takes the focus
+   when its state opens. */
+(() => {
+  const fit = field => { field.style.height = 'auto'; field.style.height = `${field.scrollHeight + field.offsetHeight - field.clientHeight}px`; };
+  document.addEventListener('input', event => {
+    const field = event.target.closest('[data-reply-form] textarea');
+    if (!field) return;
+    fit(field);
+    field.closest('[data-reply-form]').querySelector('.sketch-button:not(.secondary)').disabled = !field.value.trim();
+  });
+  document.addEventListener('click', event => {
+    const send = event.target.closest('[data-reply-send]');
+    if (!send) return;
+    const field = send.closest('[data-reply-form]').querySelector('textarea'), to = send.dataset.replySend;
+    const text = to && document.querySelector(`[data-state="${to}"] [data-reply-text]`);
+    if (text) text.textContent = field.value.trim();
+    field.value = '';
+    field.style.height = '';
+    setTimeout(() => { send.disabled = true; });
+    if (to) location.hash = to;
+  });
+  ['load', 'hashchange'].forEach(name => addEventListener(name, () =>
+    document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-reply-form][data-focus]:not([hidden]) textarea`)?.focus({ preventScroll: true })));
+})();
+/* A choice in the reaction picker opens the state that shows the reaction. The chip of that state takes the chosen emoji. */
+document.addEventListener('click', event => {
+  const choice = event.target.closest('[data-reaction]');
+  if (!choice) return;
+  const to = choice.dataset.reaction, chip = document.querySelector(`[data-state="${to}"] [data-reaction-chip]`);
+  chip.firstElementChild.textContent = choice.textContent;
+  chip.setAttribute('aria-label', `${choice.getAttribute('aria-label')}, 1 member`);
+  /* The picker closes with its fade, and the state changes after the fade. A change of the state at once hides the picker and stops the fade. */
+  const picker = choice.closest('.sketch-popover');
+  let gone = false;
+  const go = () => { if (!gone) { gone = true; location.hash = to; } };
+  if (!picker || matchMedia('(prefers-reduced-motion: reduce)').matches) return go();
+  /* In some states the browser reports the end of the fade as a cancel after the full 150 ms. */
+  const faded = end => { if (end.target === picker && end.propertyName === 'opacity') go(); };
+  picker.addEventListener('transitionend', faded);
+  picker.addEventListener('transitioncancel', faded);
+  setTimeout(go, 400); /* The fade did not run, such as in a picker that another script closed. */
+});
+/* ?count=<id> in the address shows that form of the comment count in each state that does not set a form. */
+(() => {
+  const asked = new URLSearchParams(location.search).get('count');
+  if (['words', 'number', 'faces'].includes(asked)) document.querySelectorAll('[data-screen]:not([data-count])').forEach(block => { block.dataset.count = asked; });
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

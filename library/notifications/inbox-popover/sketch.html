@@ -1,0 +1,290 @@
+<!--
+Pattern record community-inbox. Sample words are the designer's own. No brand, text or picture of the source.
+Best for: a community chat where unread messages from many channels and servers come to one popover, grouped by channel.
+States: channel, for-you, unreads, mentions, mention-filter, empty.
+Transitions: the source gives no values. The designer chose them from the kit motion tokens.
+- channel to unreads: the popover fades in, opacity 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+- a group folds: the chevron turns, transform 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+-->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inbox popover pattern</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>/* Inbox parts. A count on a nav link, an inbox head, a row, an avatar, row actions, a group,
+   reactions and a reading pane. Each part takes the one ink and the kit motion tokens. */
+/* The kit shell puts its nav in the first row when no top bar comes first. Keep the phone tab bar at the
+   bottom, and let a side nav take the full height. */
+@media (max-width: 599px) { [data-sketch] .sketch-shell:not(:has(> .sketch-bar)) { grid-template-rows: 1fr auto; } }
+@media (min-width: 600px) { [data-sketch] .sketch-shell:not(:has(> .sketch-bar)) { grid-template-rows: 1fr; } }
+[data-sketch] .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* 1. A count on a nav link: over the icon in a rail or a tab bar, at the end of the link in a side nav. */
+[data-sketch] a:has(> .sketch-count) { position: relative; }
+[data-sketch] .sketch-count { position: absolute; top: 2px; right: 2px; min-width: 20px; padding: 0 5px; font-size: 12px; line-height: 16px; text-align: center; }
+[data-sketch] .sketch-nav a > .sketch-badge:last-child:not(.sketch-count) { margin-left: auto; }
+@media (min-width: 1000px) { [data-sketch] .sketch-shell > .sketch-nav .sketch-count { top: 50%; right: 12px; transform: translateY(-50%); } }
+/* 2. An inbox head: the title, the actions at the end, then the tabs with counts on their own line. */
+[data-sketch] .sketch-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 44px; }
+[data-sketch] .sketch-head > :is(h1, h2) { margin: 0 auto 0 0; font-size: 20px; line-height: 1.3; letter-spacing: -.3px; }
+[data-sketch] .sketch-head > .sketch-tabs { flex-basis: 100%; }
+[data-sketch] .sketch-head .sketch-tabs [role="tab"] { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+/* 3. A row: an avatar, the text lines, the time and a count. The first link covers the whole row. */
+[data-sketch] .sketch-list > li.sketch-item { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 2px 12px; padding-block: 10px; }
+[data-sketch] .sketch-item p { margin: 0; overflow-wrap: anywhere; }
+[data-sketch] .sketch-item-body { display: grid; gap: 2px; min-width: 0; }
+[data-sketch] .sketch-item-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+[data-sketch] .sketch-item-title > :is(a, b) { font-weight: 600; }
+[data-sketch] .sketch-item-context { color: var(--sketch-muted); font-size: 14px; }
+[data-sketch] .sketch-item-meta { display: grid; justify-items: end; gap: 4px; white-space: nowrap; }
+[data-sketch] .sketch-item-preview { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+[data-sketch] .sketch-item.unread :is(.sketch-item-meta time, .sketch-item-preview) { font-weight: 600; }
+[data-sketch] .sketch-list .sketch-item a.sketch-item-link { display: inline; min-width: 0; min-height: 0; text-decoration: none; }
+[data-sketch] .sketch-item a.sketch-item-link::after { content: ""; position: absolute; inset: 0; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-item a.sketch-item-link:hover::after { background: var(--sketch-wash); }
+[data-sketch] .sketch-item a.sketch-item-link:focus-visible { outline: none; }
+[data-sketch] .sketch-item a.sketch-item-link:focus-visible::after { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: -2px; }
+[data-sketch] .sketch-item :is(.sketch-reactions, .sketch-item-body a:not(.sketch-item-link), input) { position: relative; z-index: 1; }
+/* 4. An avatar: initials in a drawn circle, an optional glyph at its corner. A square one is a place. */
+[data-sketch] .sketch-avatar {
+  position: relative; display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none;
+  border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%;
+  font-size: 12px; font-weight: 600; line-height: 1;
+}
+[data-sketch] .sketch-avatar.square { border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-avatar.small { width: 24px; height: 24px; font-size: 10px; }
+[data-sketch] .sketch-avatar > .sketch-icon { position: absolute; right: -7px; bottom: -7px; width: 20px; height: 20px; padding: 2px; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; }
+/* 5. Row actions: they show on hover and on keyboard focus. A touch screen shows them under the text. */
+[data-sketch] .sketch-item-actions {
+  position: absolute; z-index: 1; top: 2px; right: 2px; display: flex; gap: 2px; padding: 2px;
+  background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+  opacity: 0; pointer-events: none;
+}
+[data-sketch] .sketch-item:is(:hover, :focus-within) > .sketch-item-actions, [data-sketch] .sketch-item-actions.shown { opacity: 1; pointer-events: auto; }
+@media (hover: none) {
+  [data-sketch] .sketch-item-actions { position: static; grid-column: 2 / -1; justify-self: start; opacity: 1; pointer-events: auto; border: 0; padding: 0; }
+}
+/* 6. A group: a heading that folds its rows, a count, and group actions at the end. */
+[data-sketch] .sketch-group { position: relative; display: grid; }
+[data-sketch] .sketch-group > details > summary {
+  display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 104px 0 8px; margin: 0 -8px;
+  list-style: none; cursor: pointer; border-radius: var(--sketch-wobble);
+}
+[data-sketch] .sketch-group > details > summary::-webkit-details-marker { display: none; }
+[data-sketch] .sketch-group > details > summary:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-group > details:not([open]) > summary > .sketch-icon:first-child { transform: rotate(-90deg); }
+[data-sketch] .sketch-group-actions { position: absolute; top: 0; right: 0; display: flex; }
+/* 7. Reactions: pressed chips with a count, then a chip that adds one. */
+[data-sketch] .sketch-reactions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+[data-sketch] .sketch-reactions .sketch-icon { width: 16px; height: 16px; }
+/* 8. A reading pane: a head, the open item and a composer. On a phone it replaces the list. */
+[data-sketch] .sketch-pane { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 16px; min-width: 0; padding: 16px; }
+[data-sketch] .sketch-pane > .sketch-list { align-content: end; }
+[data-sketch] .sketch-pane > form { display: flex; gap: 8px; align-items: end; }
+[data-sketch] .sketch-pane > form .sketch-input { flex: 1; min-height: 44px; }
+@media (max-width: 599px) { [data-sketch] .sketch-pane { min-height: calc(100vh - 62px); } }
+@media (min-width: 600px) { [data-sketch] .sketch-split:has(> .sketch-pane) { min-height: 100vh; } }
+@media (prefers-reduced-motion: no-preference) {
+  [data-sketch] .sketch-item-actions { transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .sketch-pane { animation: sketch-pane-in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .sketch-group > details > summary > .sketch-icon:first-child { transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+}
+@keyframes sketch-pane-in { from { opacity: 0; } }</style>
+<style>
+/* Glue for this sketch only: the popover width, the day label, the channel names, the filter set and the composer row. */
+[data-sketch] .inbox { width: min(480px, calc(100vw - 16px)); max-width: none; }
+[data-sketch] .day { margin: 8px 0; color: var(--sketch-muted); font-size: 14px; text-align: center; }
+[data-sketch] .server { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 0 0 8px; font-size: 16px; }
+[data-sketch] .composer { display: flex; gap: 8px; align-items: end; }
+[data-sketch] .composer .sketch-input { flex: 1; min-height: 44px; }
+[data-sketch] .group-name { display: grid; line-height: 1.3; }
+[data-sketch] .filters { margin: 0; padding: 0; border: 0; }
+[data-sketch] .quiet { display: grid; justify-items: center; gap: 8px; text-align: center; padding: 32px 16px; }
+@media (prefers-reduced-motion: no-preference) {
+  [data-sketch] .sketch-popover:not([hidden]) { animation: fade-in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+}
+@keyframes fade-in { from { opacity: 0; } }
+</style>
+<body data-sketch>
+<section data-state="channel" class="sketch-split" style="--split: 240px minmax(0, 1fr)">
+<nav class="sketch-nav sketch-from-tablet" aria-label="Channels">
+<p class="server"><span class="sketch-avatar square small">NW</span><b>North Works</b></p>
+<a href="#channel"># general</a>
+<a href="#channel" aria-current="page"># launch</a>
+<a href="#channel"><b># support</b><span class="sketch-badge strong" aria-label="2 mentions">2</span></a>
+<a href="#channel"><b># design</b></a>
+<a href="#channel"># random</a>
+</nav>
+<main class="sketch-pane">
+<div class="sketch-head"><a class="sketch-icon-button sketch-phone-only" href="#channel" aria-label="Channels"><i data-icon="menu"></i></a><h1># launch</h1>
+<a class="sketch-icon-button" href="#channel" aria-label="Search"><i data-icon="search"></i></a>
+<a class="sketch-icon-button" href="#unreads" aria-label="Inbox"><i data-icon="bell"></i></a></div>
+<ul class="sketch-list" aria-label="Messages in launch">
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Ola Brandt</b><time class="sketch-muted">Yesterday at 17:20</time></p><p>The landing page copy is final.</p></div></li>
+<li class="day" aria-hidden="false">Today</li>
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">Today at 10:42</time></p><p><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p>
+<div class="sketch-reactions"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Check, 3 people, you reacted"><i data-icon="check"></i>3</button><button class="sketch-chip" type="button" aria-label="Add reaction"><i data-icon="plus"></i></button></div></div></li>
+</ul>
+<form class="composer" onsubmit="return false"><button class="sketch-icon-button" type="button" aria-label="Add a file"><i data-icon="plus"></i></button><label class="vh" for="msg-channel">Message # launch</label><textarea id="msg-channel" class="sketch-input" rows="1" placeholder="Message # launch"></textarea></form>
+</main>
+
+</section>
+
+<section data-state="for-you" class="sketch-split" style="--split: 240px minmax(0, 1fr)">
+<nav class="sketch-nav sketch-from-tablet" aria-label="Channels">
+<p class="server"><span class="sketch-avatar square small">NW</span><b>North Works</b></p>
+<a href="#for-you"># general</a>
+<a href="#for-you" aria-current="page"># launch</a>
+<a href="#for-you"><b># support</b><span class="sketch-badge strong" aria-label="2 mentions">2</span></a>
+<a href="#for-you"><b># design</b></a>
+<a href="#for-you"># random</a>
+</nav>
+<main class="sketch-pane">
+<div class="sketch-head"><a class="sketch-icon-button sketch-phone-only" href="#for-you" aria-label="Channels"><i data-icon="menu"></i></a><h1># launch</h1>
+<a class="sketch-icon-button" href="#for-you" aria-label="Search"><i data-icon="search"></i></a>
+<button class="sketch-icon-button" type="button" data-sketch-popover="inbox-for-you" aria-label="Inbox"><i data-icon="bell"></i></button></div>
+<ul class="sketch-list" aria-label="Messages in launch">
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Ola Brandt</b><time class="sketch-muted">Yesterday at 17:20</time></p><p>The landing page copy is final.</p></div></li>
+<li class="day" aria-hidden="false">Today</li>
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">Today at 10:42</time></p><p><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p>
+<div class="sketch-reactions"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Check, 3 people, you reacted"><i data-icon="check"></i>3</button><button class="sketch-chip" type="button" aria-label="Add reaction"><i data-icon="plus"></i></button></div></div></li>
+</ul>
+<form class="composer" onsubmit="return false"><button class="sketch-icon-button" type="button" aria-label="Add a file"><i data-icon="plus"></i></button><label class="vh" for="msg-for-you">Message # launch</label><textarea id="msg-for-you" class="sketch-input" rows="1" placeholder="Message # launch"></textarea></form>
+</main>
+<div class="sketch-popover inbox" id="inbox-for-you" data-open role="dialog" aria-label="Inbox">
+<div class="sketch-head"><h2>Inbox</h2>
+<div class="sketch-tabs" role="tablist" aria-label="Inbox views"><a role="tab" aria-selected="true" href="#for-you">For you</a><a role="tab" aria-selected="false" href="#unreads">Unreads</a><a role="tab" aria-selected="false" href="#mentions">Mentions</a></div></div>
+<ul class="sketch-list" aria-label="For you"><li class="sketch-item"><span class="sketch-avatar">TW</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Tess Ward</a><time class="sketch-muted">11:02</time></p><p class="sketch-item-preview">Tess Ward reacted to your message in # design.</p></div></li><li class="sketch-item"><span class="sketch-avatar">NO</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Night Owls</a><time class="sketch-muted">Mon</time></p><p class="sketch-item-preview">Your friend joined the server Night Owls.</p></div></li></ul>
+</div>
+</section>
+
+<section data-state="unreads" class="sketch-split" style="--split: 240px minmax(0, 1fr)">
+<nav class="sketch-nav sketch-from-tablet" aria-label="Channels">
+<p class="server"><span class="sketch-avatar square small">NW</span><b>North Works</b></p>
+<a href="#unreads"># general</a>
+<a href="#unreads" aria-current="page"># launch</a>
+<a href="#unreads"><b># support</b><span class="sketch-badge strong" aria-label="2 mentions">2</span></a>
+<a href="#unreads"><b># design</b></a>
+<a href="#unreads"># random</a>
+</nav>
+<main class="sketch-pane">
+<div class="sketch-head"><a class="sketch-icon-button sketch-phone-only" href="#unreads" aria-label="Channels"><i data-icon="menu"></i></a><h1># launch</h1>
+<a class="sketch-icon-button" href="#unreads" aria-label="Search"><i data-icon="search"></i></a>
+<button class="sketch-icon-button" type="button" data-sketch-popover="inbox-unreads" aria-label="Inbox"><i data-icon="bell"></i></button></div>
+<ul class="sketch-list" aria-label="Messages in launch">
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Ola Brandt</b><time class="sketch-muted">Yesterday at 17:20</time></p><p>The landing page copy is final.</p></div></li>
+<li class="day" aria-hidden="false">Today</li>
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">Today at 10:42</time></p><p><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p>
+<div class="sketch-reactions"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Check, 3 people, you reacted"><i data-icon="check"></i>3</button><button class="sketch-chip" type="button" aria-label="Add reaction"><i data-icon="plus"></i></button></div></div></li>
+</ul>
+<form class="composer" onsubmit="return false"><button class="sketch-icon-button" type="button" aria-label="Add a file"><i data-icon="plus"></i></button><label class="vh" for="msg-unreads">Message # launch</label><textarea id="msg-unreads" class="sketch-input" rows="1" placeholder="Message # launch"></textarea></form>
+</main>
+<div class="sketch-popover inbox" id="inbox-unreads" data-open role="dialog" aria-label="Inbox">
+<div class="sketch-head"><h2>Inbox</h2><button class="sketch-icon-button" type="button" aria-label="Mark inbox as read" data-sketch-toast="Inbox marked read"><i data-icon="check"></i></button>
+<div class="sketch-tabs" role="tablist" aria-label="Inbox views"><a role="tab" aria-selected="false" href="#for-you">For you</a><a role="tab" aria-selected="true" href="#unreads">Unreads</a><a role="tab" aria-selected="false" href="#mentions">Mentions</a></div></div>
+<div class="sketch-group">
+<details open><summary><i data-icon="chevron-down"></i><span class="sketch-avatar square small">NW</span><span class="group-name"><b># support</b><span class="sketch-muted">North Works</span></span><span class="sketch-badge strong" aria-label="2 unread">2</span></summary>
+<ul class="sketch-list" aria-label="# support"><li class="sketch-item"><span class="sketch-avatar">TW</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Tess Ward</a><time class="sketch-muted">09:05</time></p><p class="sketch-item-preview"><b>@support</b> the refund queue has 12 open cases.</p></div></li><li class="sketch-item"><span class="sketch-avatar">JA</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Jon Avery</a><time class="sketch-muted">09:15</time></p><p class="sketch-item-preview">I can take half of them after lunch.</p></div></li></ul></details>
+<div class="sketch-group-actions"><button class="sketch-icon-button" type="button" aria-label="Mute # support"><i data-icon="bell"></i></button><button class="sketch-icon-button" type="button" aria-label="Mark # support read" data-sketch-toast="Marked read"><i data-icon="check"></i></button></div>
+</div>
+<div class="sketch-group">
+<details open><summary><i data-icon="chevron-down"></i><span class="sketch-avatar square small">NW</span><span class="group-name"><b># design</b><span class="sketch-muted">North Works</span></span></summary>
+<ul class="sketch-list" aria-label="# design"><li class="sketch-item"><span class="sketch-avatar">TW</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Tess Ward</a><time class="sketch-muted">11:00</time></p><p class="sketch-item-preview">New price table is ready for review.</p></div></li></ul></details>
+<div class="sketch-group-actions"><button class="sketch-icon-button" type="button" aria-label="Mute # design"><i data-icon="bell"></i></button><button class="sketch-icon-button" type="button" aria-label="Mark # design read" data-sketch-toast="Marked read"><i data-icon="check"></i></button></div>
+</div>
+<div class="sketch-group">
+<details><summary><i data-icon="chevron-down"></i><span class="sketch-avatar square small">NO</span><span class="group-name"><b># events</b><span class="sketch-muted">Night Owls</span></span><span class="sketch-badge strong" aria-label="1 unread">1</span></summary>
+<ul class="sketch-list" aria-label="# events"><li class="sketch-item"><span class="sketch-avatar">AL</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Ari Lund</a><time class="sketch-muted">Mon</time></p><p class="sketch-item-preview"><b>@everyone</b> the meetup moves to the big room.</p></div></li></ul></details>
+<div class="sketch-group-actions"><button class="sketch-icon-button" type="button" aria-label="Mute # events"><i data-icon="bell"></i></button><button class="sketch-icon-button" type="button" aria-label="Mark # events read" data-sketch-toast="Marked read"><i data-icon="check"></i></button></div>
+</div>
+</div>
+</section>
+
+<section data-state="mentions" class="sketch-split" style="--split: 240px minmax(0, 1fr)">
+<nav class="sketch-nav sketch-from-tablet" aria-label="Channels">
+<p class="server"><span class="sketch-avatar square small">NW</span><b>North Works</b></p>
+<a href="#mentions"># general</a>
+<a href="#mentions" aria-current="page"># launch</a>
+<a href="#mentions"><b># support</b><span class="sketch-badge strong" aria-label="2 mentions">2</span></a>
+<a href="#mentions"><b># design</b></a>
+<a href="#mentions"># random</a>
+</nav>
+<main class="sketch-pane">
+<div class="sketch-head"><a class="sketch-icon-button sketch-phone-only" href="#mentions" aria-label="Channels"><i data-icon="menu"></i></a><h1># launch</h1>
+<a class="sketch-icon-button" href="#mentions" aria-label="Search"><i data-icon="search"></i></a>
+<button class="sketch-icon-button" type="button" data-sketch-popover="inbox-mentions" aria-label="Inbox"><i data-icon="bell"></i></button></div>
+<ul class="sketch-list" aria-label="Messages in launch">
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Ola Brandt</b><time class="sketch-muted">Yesterday at 17:20</time></p><p>The landing page copy is final.</p></div></li>
+<li class="day" aria-hidden="false">Today</li>
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">Today at 10:42</time></p><p><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p>
+<div class="sketch-reactions"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Check, 3 people, you reacted"><i data-icon="check"></i>3</button><button class="sketch-chip" type="button" aria-label="Add reaction"><i data-icon="plus"></i></button></div></div></li>
+</ul>
+<form class="composer" onsubmit="return false"><button class="sketch-icon-button" type="button" aria-label="Add a file"><i data-icon="plus"></i></button><label class="vh" for="msg-mentions">Message # launch</label><textarea id="msg-mentions" class="sketch-input" rows="1" placeholder="Message # launch"></textarea></form>
+</main>
+<div class="sketch-popover inbox" id="inbox-mentions" data-open role="dialog" aria-label="Inbox">
+<div class="sketch-head"><h2>Inbox</h2><button class="sketch-icon-button" type="button" aria-label="Mention filters" aria-pressed="false" onclick="location.hash='mention-filter'"><i data-icon="sliders"></i></button>
+<div class="sketch-tabs" role="tablist" aria-label="Inbox views"><a role="tab" aria-selected="false" href="#for-you">For you</a><a role="tab" aria-selected="false" href="#unreads">Unreads</a><a role="tab" aria-selected="true" href="#mentions">Mentions</a></div></div>
+<ul class="sketch-list" aria-label="Mentions"><li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-context"># launch in North Works</p><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Mira Kade</a><time class="sketch-muted">10:42</time></p><p class="sketch-item-preview"><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p></div><div class="sketch-item-actions shown"><a class="sketch-button secondary" href="#channel">Jump</a><button class="sketch-icon-button" type="button" aria-label="Remove mention"><i data-icon="close"></i></button></div></li><li class="sketch-item"><span class="sketch-avatar">TW</span><div class="sketch-item-body"><p class="sketch-item-context"># support in North Works</p><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Tess Ward</a><time class="sketch-muted">09:05</time></p><p class="sketch-item-preview"><b>@support</b> the refund queue has 12 open cases.</p></div><div class="sketch-item-actions"><a class="sketch-button secondary" href="#channel">Jump</a><button class="sketch-icon-button" type="button" aria-label="Remove mention"><i data-icon="close"></i></button></div></li><li class="sketch-item"><span class="sketch-avatar">AL</span><div class="sketch-item-body"><p class="sketch-item-context"># events in Night Owls</p><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Ari Lund</a><time class="sketch-muted">Mon</time></p><p class="sketch-item-preview"><b>@everyone</b> the meetup moves to the big room.</p></div><div class="sketch-item-actions"><a class="sketch-button secondary" href="#channel">Jump</a><button class="sketch-icon-button" type="button" aria-label="Remove mention"><i data-icon="close"></i></button></div></li></ul>
+</div>
+</section>
+
+<section data-state="mention-filter" class="sketch-split" style="--split: 240px minmax(0, 1fr)">
+<nav class="sketch-nav sketch-from-tablet" aria-label="Channels">
+<p class="server"><span class="sketch-avatar square small">NW</span><b>North Works</b></p>
+<a href="#mention-filter"># general</a>
+<a href="#mention-filter" aria-current="page"># launch</a>
+<a href="#mention-filter"><b># support</b><span class="sketch-badge strong" aria-label="2 mentions">2</span></a>
+<a href="#mention-filter"><b># design</b></a>
+<a href="#mention-filter"># random</a>
+</nav>
+<main class="sketch-pane">
+<div class="sketch-head"><a class="sketch-icon-button sketch-phone-only" href="#mention-filter" aria-label="Channels"><i data-icon="menu"></i></a><h1># launch</h1>
+<a class="sketch-icon-button" href="#mention-filter" aria-label="Search"><i data-icon="search"></i></a>
+<button class="sketch-icon-button" type="button" data-sketch-popover="inbox-mention-filter" aria-label="Inbox"><i data-icon="bell"></i></button></div>
+<ul class="sketch-list" aria-label="Messages in launch">
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Ola Brandt</b><time class="sketch-muted">Yesterday at 17:20</time></p><p>The landing page copy is final.</p></div></li>
+<li class="day" aria-hidden="false">Today</li>
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">Today at 10:42</time></p><p><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p>
+<div class="sketch-reactions"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Check, 3 people, you reacted"><i data-icon="check"></i>3</button><button class="sketch-chip" type="button" aria-label="Add reaction"><i data-icon="plus"></i></button></div></div></li>
+</ul>
+<form class="composer" onsubmit="return false"><button class="sketch-icon-button" type="button" aria-label="Add a file"><i data-icon="plus"></i></button><label class="vh" for="msg-mention-filter">Message # launch</label><textarea id="msg-mention-filter" class="sketch-input" rows="1" placeholder="Message # launch"></textarea></form>
+</main>
+<div class="sketch-popover inbox" id="inbox-mention-filter" data-open role="dialog" aria-label="Inbox">
+<div class="sketch-head"><h2>Inbox</h2><button class="sketch-icon-button" type="button" aria-label="Mention filters" aria-pressed="true" onclick="location.hash='mentions'"><i data-icon="sliders"></i></button>
+<div class="sketch-tabs" role="tablist" aria-label="Inbox views"><a role="tab" aria-selected="false" href="#for-you">For you</a><a role="tab" aria-selected="false" href="#unreads">Unreads</a><a role="tab" aria-selected="true" href="#mentions">Mentions</a></div></div>
+<fieldset class="sketch-stack filters"><legend class="vh">Mention filters</legend>
+<label class="sketch-switch"><input type="checkbox" role="switch" checked> Include @everyone and @here</label>
+<label class="sketch-switch"><input type="checkbox" role="switch" checked> Include role mentions</label>
+<label class="sketch-switch"><input type="checkbox" role="switch"> Include all servers</label>
+</fieldset><ul class="sketch-list" aria-label="Mentions"><li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-context"># launch in North Works</p><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Mira Kade</a><time class="sketch-muted">10:42</time></p><p class="sketch-item-preview"><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p></div><div class="sketch-item-actions"><a class="sketch-button secondary" href="#channel">Jump</a><button class="sketch-icon-button" type="button" aria-label="Remove mention"><i data-icon="close"></i></button></div></li><li class="sketch-item"><span class="sketch-avatar">TW</span><div class="sketch-item-body"><p class="sketch-item-context"># support in North Works</p><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Tess Ward</a><time class="sketch-muted">09:05</time></p><p class="sketch-item-preview"><b>@support</b> the refund queue has 12 open cases.</p></div><div class="sketch-item-actions"><a class="sketch-button secondary" href="#channel">Jump</a><button class="sketch-icon-button" type="button" aria-label="Remove mention"><i data-icon="close"></i></button></div></li><li class="sketch-item"><span class="sketch-avatar">AL</span><div class="sketch-item-body"><p class="sketch-item-context"># events in Night Owls</p><p class="sketch-item-title"><a class="sketch-item-link" href="#channel">Ari Lund</a><time class="sketch-muted">Mon</time></p><p class="sketch-item-preview"><b>@everyone</b> the meetup moves to the big room.</p></div><div class="sketch-item-actions"><a class="sketch-button secondary" href="#channel">Jump</a><button class="sketch-icon-button" type="button" aria-label="Remove mention"><i data-icon="close"></i></button></div></li></ul>
+</div>
+</section>
+
+<section data-state="empty" class="sketch-split" style="--split: 240px minmax(0, 1fr)">
+<nav class="sketch-nav sketch-from-tablet" aria-label="Channels">
+<p class="server"><span class="sketch-avatar square small">NW</span><b>North Works</b></p>
+<a href="#empty"># general</a>
+<a href="#empty" aria-current="page"># launch</a>
+<a href="#empty"><b># support</b><span class="sketch-badge strong" aria-label="2 mentions">2</span></a>
+<a href="#empty"><b># design</b></a>
+<a href="#empty"># random</a>
+</nav>
+<main class="sketch-pane">
+<div class="sketch-head"><a class="sketch-icon-button sketch-phone-only" href="#empty" aria-label="Channels"><i data-icon="menu"></i></a><h1># launch</h1>
+<a class="sketch-icon-button" href="#empty" aria-label="Search"><i data-icon="search"></i></a>
+<button class="sketch-icon-button" type="button" data-sketch-popover="inbox-empty" aria-label="Inbox"><i data-icon="bell"></i></button></div>
+<ul class="sketch-list" aria-label="Messages in launch">
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Ola Brandt</b><time class="sketch-muted">Yesterday at 17:20</time></p><p>The landing page copy is final.</p></div></li>
+<li class="day" aria-hidden="false">Today</li>
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">Today at 10:42</time></p><p><b>@Jon Avery</b> can we move the launch call to Thursday at 10?</p>
+<div class="sketch-reactions"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Check, 3 people, you reacted"><i data-icon="check"></i>3</button><button class="sketch-chip" type="button" aria-label="Add reaction"><i data-icon="plus"></i></button></div></div></li>
+</ul>
+<form class="composer" onsubmit="return false"><button class="sketch-icon-button" type="button" aria-label="Add a file"><i data-icon="plus"></i></button><label class="vh" for="msg-empty">Message # launch</label><textarea id="msg-empty" class="sketch-input" rows="1" placeholder="Message # launch"></textarea></form>
+</main>
+<div class="sketch-popover inbox" id="inbox-empty" data-open role="dialog" aria-label="Inbox">
+<div class="sketch-head"><h2>Inbox</h2><button class="sketch-icon-button" type="button" aria-label="Mention filters" aria-pressed="false" onclick="location.hash='mention-filter'"><i data-icon="sliders"></i></button>
+<div class="sketch-tabs" role="tablist" aria-label="Inbox views"><a role="tab" aria-selected="false" href="#for-you">For you</a><a role="tab" aria-selected="false" href="#unreads">Unreads</a><a role="tab" aria-selected="true" href="#mentions">Mentions</a></div></div>
+<div class="quiet"><i data-icon="check"></i><h3>No mentions</h3><p>Mentions stay here for 7 days.</p></div>
+</div>
+</section>
+<script src="../../../assets/sketch.js"></script>

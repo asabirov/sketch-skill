@@ -1,0 +1,419 @@
+<!doctype html>
+<!--
+  Best for: a team product where a member scans many records by their main numbers, and then opens one record.
+  Row opens: on the record's own page. That page has its own pattern, content/product-page. The state product-page shows only a plain box for it.
+  The sketch holds only the parts that a catalog of cards needs. It leaves out the parts that belong to the source app.
+  At 1024 px and up, the title, the search field and the filters are a side column at the left of the cards. The source has its filters in such a panel. Below 1024 px, the head is one row, and a Filters button opens the filters in a sheet. The owner asked for the side column, and for a head that takes less of the first screen on a tablet. The sheet is the designer's drawing.
+  Each card has the avatar and the name of the lead of its product.
+  A metric switch is the first part of the filters: MRR, Revenue and Users in a week. A choice changes the first number of each card, and the card with the largest number is first. The owner asked for the switch. The capture recorded no such switch on the source.
+  Transition values, from transitions.json:
+  - cards: the pointer goes over a card, and the border of the card goes from grey to ink. border-color 150 ms, cubic-bezier(0.4, 0, 0.2, 1), measured.
+  - filtered, metric-changed, no-match and product-page: 0 ms. The capture read no transition for a change of the cards or for the page of a card.
+  - filters-open: 0 ms. The sketch shows the sheet at once.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product cards</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .cards_hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* The cards are 811 px wide at most. At 1024 px and up, the side column of the head makes the page 264 px wider. */
+  [data-sketch] .cards_main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; width: 100%; --list-width: 843px; max-width: var(--list-width); margin: 0 auto; padding: 32px 16px; }
+
+  /* The head is the same in each pattern that lists the products. Below 1024 px, it is one row: the title, the search field, the Filters button, the control that sets the order, and one button. The Filters button names the chosen metric, because the metric switch is in the sheet. A part that does not fit goes to the next row. Below 600 px, the title and the search field are the first row, and the Filters button starts the next row. A control that sets the order is in that row from 520 px. Below 520 px, it is in a row of its own with the button. */
+  [data-sketch] .head_page { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 12px; }
+  [data-sketch] .head_title { flex: none; min-width: 0; min-height: 44px; margin: 0; display: flex; align-items: center; font-size: 24px; letter-spacing: -0.3px; overflow-wrap: anywhere; }
+  [data-sketch] .head_side { display: contents; }
+  /* The search field takes the row, less 140 px for the title. So no other part fits in the first row, and a longer metric name does not move a part. */
+  [data-sketch] .head_search { flex: 1 1 calc(100% - 140px); min-width: 0; }
+  [data-sketch] .head_open { flex: none; }
+  [data-sketch] .head_tools { flex: 1 1 auto; display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-width: 0; }
+  [data-sketch] .head_order { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; }
+  [data-sketch] .head_order > :last-child { flex: 1 1 auto; min-width: 0; }
+  [data-sketch] .head_add { flex: none; }
+  [data-sketch] .head_list { flex: 1 1 100%; min-width: 0; }
+  @media (max-width: 599px) {
+    [data-sketch] .head_tools:has(.head_order) { flex-basis: 0; }
+  }
+  @media (max-width: 519px) {
+    [data-sketch] .head_tools:has(.head_order) { flex-basis: 100%; }
+  }
+  @media (min-width: 600px) {
+    [data-sketch] .head_side { flex: 999 1 200px; display: flex; gap: 8px; min-width: 0; }
+    [data-sketch] .head_search { flex: 1; }
+  }
+
+  /* Below 1024 px, the filters are in a sheet at the bottom of the screen. The state filters-open shows it. The scrim thins the screen behind the sheet. */
+  [data-sketch] .head_scrim { position: fixed; inset: 0; z-index: 39; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+  [data-sketch] .head_filters { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; align-items: end; }
+  [data-sketch] .head_filters[role="dialog"] { display: grid; position: fixed; inset: auto 0 0; z-index: 40; max-height: calc(100% - 48px); padding: 8px 16px 24px; overflow-y: auto; overscroll-behavior: contain; background: var(--sketch-page); border-top: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 20px 24px 0 0 / 24px 20px 0 0; }
+  [data-sketch] .head_sheet_top { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  [data-sketch] .head_sheet_title { margin: 0; font-size: 18px; letter-spacing: 0; }
+  /* The metric switch is the first part of the filters: in the side column at 1024 px and up, and in the sheet below 1024 px. Its options share the width. */
+  [data-sketch] .head_metric { grid-column: 1 / -1; min-width: 0; }
+  [data-sketch] .head_metric > .sketch-segmented { display: flex; max-width: 360px; }
+  [data-sketch] .head_metric label { flex: 1 1 0; min-width: 0; padding: 0 8px; white-space: nowrap; }
+  [data-sketch] .head_hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .head_users { grid-column: 1 / -1; min-width: 0; }
+  [data-sketch] .head_legend { margin-bottom: 6px; color: var(--sketch-muted); }
+  [data-sketch] .head_range { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: center; }
+  [data-sketch] .head_foot { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+  [data-sketch] .head_clear { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px; background: none; border: 0; border-radius: var(--sketch-wobble); font-weight: 600; cursor: pointer; }
+  [data-sketch] .head_clear:is(:hover, :active) { background: var(--sketch-wash); }
+  [data-sketch] .head_clear > .sketch-icon { width: 16px; height: 16px; }
+  [data-sketch] .head_done { flex: 1 1 auto; }
+  @media (min-width: 600px) {
+    [data-sketch] .head_filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    [data-sketch] .head_users { grid-column: auto; }
+    [data-sketch] .head_done { flex: none; margin-left: auto; }
+  }
+
+  /* At 1024 px and up, the title, the search field and the filters are a side column at the left of the list. The control that sets the order and the button are above the list, at its right edge. */
+  @media (min-width: 1024px) {
+    [data-sketch] .head_page { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px 32px; align-items: start; max-width: calc(var(--list-width) + 264px); }
+    [data-sketch] .head_title { grid-column: 1; grid-row: 1; }
+    [data-sketch] .head_side { grid-column: 1; grid-row: 2; position: sticky; top: 24px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    [data-sketch] .head_open { display: none; }
+    [data-sketch] .head_filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    [data-sketch] .head_sheet_top { display: none; }
+    [data-sketch] .head_done { display: none; }
+    [data-sketch] .head_tools { grid-column: 2; grid-row: 1; justify-self: end; }
+    [data-sketch] .head_list { grid-column: 2; grid-row: 2; }
+  }
+
+  /* The card: a picture, the name and the stage, 2 lines about the product, the lead, and 3 numbers. */
+  /* The grid has as many columns as fit, and each column is 240 px wide or more. */
+  [data-sketch] .cards_grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 24px; }
+  [data-sketch] .cards_fact { display: grid; grid-template-rows: auto 1fr auto auto; gap: 16px; padding: 16px; text-decoration: none; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] .cards_fact:is(:hover, :focus-visible) { border-color: var(--sketch-ink); }
+  [data-sketch] .cards_fact:active { background: var(--sketch-wash); }
+  [data-sketch] .cards_fact_head { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 16px; align-items: center; }
+  [data-sketch] .cards_picture { width: 48px; height: 48px; min-height: 0; font-size: 0; }
+  [data-sketch] .cards_fact_title { display: grid; gap: 4px; justify-items: start; min-width: 0; }
+  [data-sketch] .cards_name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; font-size: 18px; line-height: 1.3; }
+  [data-sketch] .cards_fact_about { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  /* The lead of the product: a small round avatar and the name, in smaller and quieter text than the product. A long name is cut after the avatar. The hidden word "Lead" stays in this row. */
+  [data-sketch] .cards_lead { position: relative; display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; color: var(--sketch-muted); }
+  [data-sketch] .cards_lead_avatar { width: 24px; height: 24px; font-size: 10px; }
+  [data-sketch] .cards_lead_name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  [data-sketch] .cards_numbers { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 12px; margin: 0; padding-top: 12px; border-top: 1px solid var(--sketch-wash); }
+  [data-sketch] .cards_number { display: grid; align-content: space-between; }
+  [data-sketch] .cards_number_label { font-size: 12px; color: var(--sketch-muted); }
+  [data-sketch] .cards_number_value { margin: 0; font-weight: 700; }
+  [data-sketch] .cards_empty { justify-items: center; padding: 48px 16px; text-align: center; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] .cards_empty_title { margin: 0; font-size: 18px; letter-spacing: 0; overflow-wrap: anywhere; }
+  [data-sketch] .cards_empty_help { margin: 0; }
+
+  /* The page of a product has its own pattern, so it shows as a plain box with the name of that pattern. A link leads back. */
+  [data-sketch] .cards_back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+  [data-sketch] .cards_back > .sketch-icon { width: 14px; height: 14px; }
+  [data-sketch] .cards_other { min-height: 320px; padding: 16px; text-align: center; color: var(--sketch-ink); }
+  [data-sketch] .cards_other_title { margin: 0; font: inherit; font-weight: 600; letter-spacing: 0; }
+  [data-sketch] .cards_other_pattern { margin: 0; }
+
+  /* The page script writes the value of transitions.json into --cards-hover. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .cards_fact { transition: var(--cards-hover); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each list state, and it fills the cards from the list of products. -->
+<section data-state="cards"></section>
+<section data-state="filtered"></section>
+<section data-state="metric-changed"></section>
+<section data-state="no-match"></section>
+<section data-state="filters-open"></section>
+<section data-state="product-page"></section>
+
+<!-- The head has the title, the search field, the Filters button with the metric switch and the filters, the sort select and one button. The cards are below the head, or at the right of its side column. -->
+<template id="screen">
+  <main class="cards_main head_page">
+    <h1 class="head_title">Products</h1>
+    <div class="head_side">
+      <input class="sketch-input head_search" type="search" aria-label="Search" placeholder="Search" data-search>
+      <button type="button" class="sketch-button secondary head_open" aria-haspopup="dialog" data-filters-open><i data-icon="filter"></i><span data-filters-label>Filters</span></button>
+      <div class="head_scrim" data-filters-close hidden></div>
+      <div class="head_filters" role="group" aria-label="Filters" data-filters>
+        <div class="head_sheet_top"><h2 class="head_sheet_title">Filters</h2><button type="button" class="sketch-icon-button" aria-label="Close" data-filters-close><i data-icon="close"></i></button></div>
+        <fieldset class="head_metric"><legend class="head_legend">Metric</legend>
+          <div class="sketch-segmented" data-metric-switch><!--metric-options--></div></fieldset>
+        <label class="sketch-field head_stage">Stage <select class="sketch-input" data-stage-select><option value="">All stages</option><!--stage-options--></select></label>
+        <label class="sketch-field head_lead">Lead <select class="sketch-input" data-lead-select><option value="">Any lead</option><!--lead-options--></select></label>
+        <fieldset class="head_users"><legend class="head_legend">Users in a week</legend>
+          <div class="head_range"><input class="sketch-input" inputmode="numeric" aria-label="Fewest users in a week" placeholder="Min" data-users="min"><span aria-hidden="true">–</span><input class="sketch-input" inputmode="numeric" aria-label="Most users in a week" placeholder="Max" data-users="max"></div></fieldset>
+        <div class="head_foot">
+          <button type="button" class="head_clear" aria-label="Clear filters" data-clear="filters" hidden><i data-icon="close"></i>Clear</button>
+          <button type="button" class="sketch-button head_done" data-filters-close data-filters-done></button>
+        </div>
+      </div>
+    </div>
+    <div class="head_tools">
+      <label class="sketch-field head_order">Sort <select class="sketch-input" data-sort-select><option value="metric" data-sort-metric></option><option value="newest">Newest first</option><option value="name">Name</option></select></label>
+      <button type="button" class="sketch-button head_add" data-sketch-toast="New product form (sample)"><i data-icon="plus"></i>Add</button>
+    </div>
+    <div class="head_list" data-slot="grid"></div>
+  </main>
+</template>
+
+<!-- The page of a product has its own pattern, content/product-page. This state shows a link back and a plain box with the name of that pattern. -->
+<template id="page">
+  <main class="cards_main">
+    <nav aria-label="Back"><a class="cards_back" href="#cards" data-back><i data-icon="chevron-left"></i>Back to the cards</a></nav>
+    <div class="sketch-placeholder cards_other"><div><h1 class="cards_other_title" data-fill="name"></h1><p class="cards_other_pattern">Pattern: content/product-page</p></div></div>
+  </main>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The value of transitions.json. The sketch plays it with the same duration and easing.
+  const transition_records = [
+    { label: 'cards', trigger: 'the pointer goes over a card', element: 'card', property: 'border-color', animation: null, duration: 150, delay: 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', measurement: 'measured' }
+  ];
+  window.__sketchTransitions = transition_records;
+
+  const stages = ['Idea', 'Prototype', 'Pilot', 'Launch', 'Scale'];
+  // Sample products: name, one line about it, stage, lead, users in a week, growth in a week in percent, next review.
+  const products = [
+    ['Parcel Pilot', 'Route plans for small courier firms', 'Launch', 'Mara Lindqvist', 8420, 4, '2 Dec'],
+    ['Greenhouse Log for growers with many sites', 'Climate notes for growers', 'Launch', 'Ines Okafor', 2310, 9, '4 Dec'],
+    ['Clinic Queue', 'Waiting lists for small clinics', 'Pilot', 'Tomas Reyes', 640, 12, '9 Dec'],
+    ['Fare Split', 'Shared bills for flat mates', 'Prototype', 'Yuki Arai', 85, 30, '11 Dec'],
+    ['Mill Sensor', 'Wear alerts for saw mills', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Harbor Desk', 'Berth booking for marinas', 'Launch', 'Mara Lindqvist', 1975, 6, '2 Dec'],
+    ['Lesson Loop', 'Homework feedback for tutors', 'Pilot', 'Ines Okafor', 410, 15, '9 Dec'],
+    ['Stock Shelf', 'Shelf counts with a phone camera', 'Prototype', 'Tomas Reyes', 52, 21, '11 Dec'],
+    ['Rent Ready', 'Move-in checks for landlords', 'Launch', 'Yuki Arai', 12060, 2, '4 Dec'],
+    ['Field Crew', 'Shift plans for farm teams', 'Pilot', 'Noor Haddad', 730, 8, '9 Dec'],
+    ['Paper Trail', 'Receipts that become ledger rows', 'Launch', 'Tomas Reyes', 3150, 5, '2 Dec'],
+    ['Quiet Hours', 'Noise reports for housing blocks', 'Idea', 'Ines Okafor', 0, null, '16 Dec'],
+    ['Kiln Timer', 'Firing schedules for potters', 'Prototype', 'Mara Lindqvist', 31, 18, '11 Dec'],
+    ['Tool Library', 'Lending records for maker spaces', 'Pilot', 'Yuki Arai', 290, 10, '9 Dec'],
+    ['Depot Board', 'Task board for bus depots', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Well Check', 'Water tests for rural wells', 'Pilot', 'Ines Okafor', 5640, 3, '4 Dec']
+  ].map(([name, about, stage, lead, users, growth, review], at) => ({ at, name, about, stage, lead, users, growth, review }));
+  const leads = [...new Set(products.map(product => product.lead))];
+  // The MRR, its growth in a week in percent, the revenue and its growth in a week in percent, for each product in the same order. An amount is in dollars.
+  const money = [[48200, 3, 386500, 3], [31600, 7, 198700, 4], [4100, 11, 22800, 5], [240, 25, 480, 13], [0, null, 0, null], [12750, 5, 96400, 3], [2200, 14, 9600, 6], [120, 17, 240, 12],
+    [27900, 2, 412000, 2], [3650, 9, 15900, 6], [18400, 4, 240300, 2], [0, null, 0, null], [60, 20, 90, 17], [1480, 8, 5300, 7], [0, null, 0, null], [9300, 6, 61200, 4]];
+  products.forEach(product => { [product.mrr, product.mrr_growth, product.revenue, product.revenue_growth] = money[product.at]; });
+  // The metric switch of the head chooses the number that the list shows, and the order follows that number. MRR is the first metric.
+  const metrics = [
+    { id: 'mrr', label: 'MRR', short: 'MRR', noun: 'MRR', money: true },
+    { id: 'revenue', label: 'Revenue', short: 'Revenue', noun: 'revenue', money: true },
+    { id: 'users', label: 'Users in a week', short: 'Users', noun: 'users', money: false }
+  ];
+  const metric_of = id => metrics.find(metric => metric.id === id);
+  const amount_of = (product, metric) => product[metric.id];
+  const growth_of = (product, metric) => metric.id === 'users' ? product.growth : product[`${metric.id}_growth`];
+  const amount_text = (number, metric) => `${metric.money ? '$' : ''}${number.toLocaleString('en-US')}`;
+  const percent_text = percent => percent === null ? 'None' : `+${percent}%`;
+  const metric_options = metrics.map(metric => `<label><input type="radio" name="metric___state__" value="${metric.id}">${metric.short}<span class="head_hidden">${metric.label.slice(metric.short.length)}</span></label>`).join('');
+
+  const root = document.documentElement;
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  const list_states = ['cards', 'filtered', 'metric-changed', 'no-match', 'filters-open'];
+  const no_filter = { stage: '', lead: '', min: '', max: '' };
+  const empty_view = { term: '', ...no_filter, metric: 'mrr' };
+  const template_html = id => document.getElementById(id).innerHTML;
+  const shown_section = () => state_sections.find(section => !section.hidden);
+  const escape_html = text => String(text).replace(/[&<>"]/g, sign => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[sign]);
+  root.style.setProperty('--cards-hover', transition_records.map(record => `${record.property} ${record.duration}ms ${record.easing} ${record.delay}ms`).join(', '));
+
+  let view = { ...empty_view };
+  let sort_by = 'metric';
+  let shown_product = 2;
+  let last_list = 'cards';
+  let pending_focus = null;
+  // Below 1024 px, the filters are in a sheet. The state filters-open shows the sheet over the list that the member has.
+  const wide = matchMedia('(min-width: 1024px)');
+  const sheet_open = () => shown_section().dataset.state === 'filters-open' && !wide.matches;
+
+  // The products that match the words of the search field and each filter.
+  function found_products(wanted) {
+    const term = wanted.term.trim().toLowerCase();
+    return products.filter(product => (!wanted.stage || product.stage === wanted.stage)
+      && (!wanted.lead || product.lead === wanted.lead)
+      && (!term || `${product.name} ${product.about}`.toLowerCase().includes(term))
+      && (wanted.min === '' || product.users >= Number(wanted.min))
+      && (wanted.max === '' || product.users <= Number(wanted.max)));
+  }
+  const has_filter = wanted => Object.keys(no_filter).some(key => wanted[key] !== '');
+  // One line, one hint and one button take the place of the list when no product matches.
+  function empty_html(wanted) {
+    const only_words = wanted.term.trim() !== '' && !has_filter(wanted);
+    const title = only_words ? `No product matches “${escape_html(wanted.term.trim())}”` : 'No product matches the filters';
+    const help = only_words ? 'Try a different word.' : 'Change a filter, or clear the filters.';
+    return `<div class="sketch-stack cards_empty"><h2 class="cards_empty_title">${title}</h2><p class="cards_empty_help">${help}</p><button type="button" class="sketch-button secondary" data-clear="${only_words ? 'search' : 'filters'}">${only_words ? 'Clear search' : 'Clear filters'}</button></div>`;
+  }
+  // Write the view into the head of one state. The field that has the focus keeps its text. The Clear button shows only while a filter is set.
+  function fill_head(section, wanted) {
+    const fields = { '[data-search]': wanted.term, '[data-stage-select]': wanted.stage, '[data-lead-select]': wanted.lead, '[data-users="min"]': wanted.min, '[data-users="max"]': wanted.max };
+    Object.entries(fields).forEach(([selector, value]) => {
+      const field = section.querySelector(selector);
+      if (field !== document.activeElement) field.value = value;
+    });
+    section.querySelectorAll('[data-metric-switch] input').forEach(input => { input.checked = input.value === wanted.metric; });
+    section.querySelector('[data-clear="filters"]').hidden = !has_filter(wanted);
+    // The Filters button has the count of the filters that are set, and the name of the chosen metric. The last button of the sheet has the count of the products that match.
+    const count = [wanted.stage, wanted.lead, wanted.min + wanted.max].filter(Boolean).length;
+    const found = found_products(wanted).length;
+    const metric = metric_of(wanted.metric);
+    section.querySelector('[data-filters-label]').textContent = `Filters${count ? ` (${count})` : ''}, ${metric.short}`;
+    section.querySelector('[data-filters-open]').setAttribute('aria-label', `Filters${count ? `, ${count} set` : ''}, metric ${metric.label}`);
+    section.querySelector('[data-filters-done]').textContent = `Show ${found} ${found === 1 ? 'product' : 'products'}`;
+    // Below 1024 px, the state filters-open has the filters in a sheet, and the parts behind the sheet take no input.
+    const sheet = section.dataset.state === 'filters-open' && !wide.matches;
+    const filters = section.querySelector('[data-filters]');
+    filters.setAttribute('role', sheet ? 'dialog' : 'group');
+    if (sheet) filters.setAttribute('aria-modal', 'true'); else filters.removeAttribute('aria-modal');
+    section.querySelector('.head_scrim').hidden = !sheet;
+    section.querySelectorAll('.head_search, .head_open, .head_tools, .head_list').forEach(part => { part.inert = sheet; });
+  }
+  // The cards in the order of the sort select. The first order has the largest number of the chosen metric first. "Newest first" is the order of the list.
+  function sorted_products(found, metric) {
+    if (sort_by === 'name') return [...found].sort((a, b) => a.name.localeCompare(b.name));
+    if (sort_by === 'metric') return [...found].sort((a, b) => amount_of(b, metric) - amount_of(a, metric) || a.at - b.at);
+    return found;
+  }
+  const state_of = wanted => !found_products(wanted).length ? 'no-match' : wanted.term.trim() !== '' || has_filter(wanted) ? 'filtered' : wanted.metric !== empty_view.metric ? 'metric-changed' : 'cards';
+  // Each list state has a view of its own, so an address such as #filtered shows a filtered list. No sample product is in the Scale stage.
+  function default_view(state) {
+    if (state === 'filtered') return { ...empty_view, stage: 'Pilot' };
+    if (state === 'metric-changed') return { ...empty_view, metric: 'revenue' };
+    if (state === 'no-match') return { ...empty_view, stage: 'Scale' };
+    return { ...empty_view };
+  }
+  const view_of = state => state === 'filters-open' || state === state_of(view) ? view : default_view(state);
+
+  // An avatar has 2 letters. The avatar of a product is a square, and the avatar of a person is a circle.
+  const avatar = (name, shape) => `<span class="sketch-avatar${shape}" aria-hidden="true">${escape_html(name.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase())}</span>`;
+  const number_cell = (label, value) => `<div class="cards_number"><dt class="cards_number_label">${label}</dt><dd class="cards_number_value">${value}</dd></div>`;
+  const numbers = (product, metric) => `<dl class="cards_numbers">${number_cell(metric.label, amount_text(amount_of(product, metric), metric))}${number_cell('Growth', percent_text(growth_of(product, metric)))}${number_cell('Review', product.review)}</dl>`;
+  const fact_card = (product, metric) => `<a class="cards_fact" href="#product-page" data-product="${product.at}">
+    <span class="cards_fact_head"><span class="sketch-placeholder cards_picture">Picture</span><span class="cards_fact_title"><strong class="cards_name">${escape_html(product.name)}</strong><span>${product.stage}</span></span></span>
+    <p class="cards_fact_about">${escape_html(product.about)}</p>
+    <span class="cards_lead">${avatar(product.lead, ' cards_lead_avatar')}<span class="cards_lead_name"><span class="cards_hidden">Lead: </span>${escape_html(product.lead)}</span></span>
+    ${numbers(product, metric)}</a>`;
+
+  function fill_lists() {
+    state_sections.filter(section => list_states.includes(section.dataset.state)).forEach(section => {
+      const wanted = view_of(section.dataset.state);
+      const metric = metric_of(wanted.metric);
+      const found = sorted_products(found_products(wanted), metric);
+      section.querySelector('[data-slot="grid"]').innerHTML = found.length ? `<div class="cards_grid">${found.map(product => fact_card(product, metric)).join('')}</div>` : empty_html(wanted);
+      fill_head(section, wanted);
+      section.querySelector('[data-sort-metric]').textContent = metric.id === 'users' ? 'Most users' : `Highest ${metric.noun}`;
+      const sort_select = section.querySelector('[data-sort-select]');
+      if (sort_select !== document.activeElement) sort_select.value = sort_by;
+    });
+    initSketch();
+  }
+  // The state product-page names the product that the member opened.
+  function fill_page() {
+    const section = state_sections.find(part => part.dataset.state === 'product-page');
+    section.querySelector('[data-fill="name"]').textContent = `The page of ${products[shown_product].name}`;
+    section.querySelector('[data-back]').href = `#${last_list}`;
+  }
+
+  // Show the state that the view needs. A change of state puts the focus on the same control of the new state.
+  function apply_view() {
+    const state = sheet_open() ? 'filters-open' : state_of(view);
+    fill_lists();
+    if (shown_section().dataset.state !== state) location.hash = state; else focus_pending();
+  }
+  function focus_pending() {
+    const control = pending_focus && shown_section().querySelector(pending_focus);
+    pending_focus = null;
+    if (!control) return;
+    control.focus();
+    if (control.matches('input:not([type="radio"])')) control.setSelectionRange(control.value.length, control.value.length);
+  }
+  const shown_view = () => ({ ...view_of(shown_section().dataset.state) });
+
+  document.addEventListener('click', event => {
+    const hit = selector => event.target.closest(selector);
+    if (hit('[data-clear]')) {
+      // One button clears the filters, and one button clears the words of the search field.
+      const words = hit('[data-clear]').dataset.clear === 'search';
+      view = words ? { ...shown_view(), term: '' } : { ...shown_view(), ...no_filter };
+      pending_focus = words ? '[data-search]' : '[data-stage-select]';
+      apply_view();
+    } else if (hit('[data-product]')) {
+      shown_product = Number(hit('[data-product]').dataset.product);
+      pending_focus = '[data-back]';
+    } else if (hit('[data-back]')) {
+      // The focus goes back to the card of the product.
+      pending_focus = `[data-product="${shown_product}"]`;
+    }
+  }, true);
+  document.addEventListener('input', event => {
+    const field = event.target;
+    if (field.matches('[data-search]')) {
+      view = { ...shown_view(), term: field.value };
+    } else if (field.matches('[data-users]')) {
+      // A users field takes only digits.
+      field.value = field.value.replace(/\D/g, '');
+      view = { ...shown_view(), [field.dataset.users]: field.value };
+    } else return;
+    pending_focus = field.matches('[data-search]') ? '[data-search]' : `[data-users="${field.dataset.users}"]`;
+    apply_view();
+  });
+  document.addEventListener('change', event => {
+    const field = event.target;
+    if (field.matches('[data-stage-select]')) { view = { ...shown_view(), stage: field.value }; pending_focus = '[data-stage-select]'; }
+    else if (field.matches('[data-lead-select]')) { view = { ...shown_view(), lead: field.value }; pending_focus = '[data-lead-select]'; }
+    else if (field.matches('[data-metric-switch] input')) { view = { ...shown_view(), metric: field.value }; pending_focus = '[data-metric-switch] input:checked'; sort_by = 'metric'; }
+    else return;
+    apply_view();
+  });
+  document.addEventListener('change', event => {
+    if (!event.target.matches('[data-sort-select]')) return;
+    sort_by = event.target.value;
+    pending_focus = '[data-sort-select]';
+    apply_view();
+  });
+  // The Filters button opens the sheet. The Close button, the last button of the sheet, a press outside the sheet and Escape close it. Then the focus goes back to the Filters button.
+  function close_sheet() {
+    pending_focus = '[data-filters-open]';
+    location.hash = state_of(view);
+  }
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-filters-open]')) {
+      view = shown_view();
+      pending_focus = '[data-metric-switch] input:checked';
+      location.hash = 'filters-open';
+    } else if (event.target.closest('[data-filters-close]') && sheet_open()) close_sheet();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && sheet_open()) close_sheet();
+  });
+  // A change of the width across 1024 px draws the lists again. The page of a product has no head, so it stays open.
+  wide.addEventListener('change', () => {
+    if (list_states.includes(shown_section().dataset.state)) apply_view();
+  });
+  addEventListener('hashchange', () => {
+    const state = shown_section().dataset.state;
+    if (list_states.includes(state)) {
+      last_list = state;
+      if (state !== 'filters-open' && state_of(view) !== state) view = default_view(state);
+      fill_lists();
+    } else {
+      fill_page();
+      scrollTo(0, 0);
+    }
+    focus_pending();
+  });
+
+  const options = values => values.map(value => `<option>${value}</option>`).join('');
+  state_sections.forEach(section => {
+    const state = section.dataset.state;
+    section.innerHTML = template_html(list_states.includes(state) ? 'screen' : 'page')
+      .replace('<!--stage-options-->', options(stages)).replace('<!--lead-options-->', options(leads)).replace('<!--metric-options-->', metric_options).replaceAll('__state__', state);
+  });
+  fill_lists();
+  if (list_states.includes(shown_section().dataset.state)) last_list = shown_section().dataset.state;
+  dispatchEvent(new HashChangeEvent('hashchange'));
+</script>

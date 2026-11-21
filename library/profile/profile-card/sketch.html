@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile card sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .profile_head { position: relative; margin-bottom: 40px; }
+  [data-sketch] .profile_banner, [data-sketch] .sketch-main a.profile_banner { display: grid; min-height: 160px; text-decoration: none; }
+  [data-sketch] .profile_avatar { position: absolute; left: 16px; bottom: -40px; width: 96px; height: 96px; font-size: 24px; background: var(--sketch-page); text-decoration: none; }
+  [data-sketch] .profile_status { position: absolute; left: 88px; bottom: -40px; width: 20px; height: 20px; border: var(--sketch-stroke) solid var(--sketch-page); border-radius: 50%; background: var(--sketch-ink); }
+  [data-sketch] .sketch-list > .profile_post, [data-sketch] .profile_post { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 4px 12px; align-items: start; padding: 12px 8px; }
+  [data-sketch] .profile_post p { margin: 0; }
+  [data-sketch] .profile_room { position: relative; min-height: calc(100vh - 124px); }
+  [data-sketch] .profile_cover { position: absolute; inset: 0; z-index: 2; display: grid; justify-items: center; align-content: start; padding: 24px 16px; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+  [data-sketch] .profile_card { width: min(480px, 100%); padding: 16px; }
+  [data-sketch] .profile_card > .sketch-outline path { fill: var(--sketch-page); }
+  [data-sketch] .profile_mini { width: min(300px, calc(100vw - 16px)); }
+  [data-sketch] .profile_mini .profile_banner { min-height: 56px; }
+  @media (min-width: 1000px) {
+  }
+  @media (max-width: 999px) {
+  }
+</style>
+<body data-sketch>
+
+<section data-state="card">
+  <div data-screen="card_profile"></div>
+</section>
+<section data-state="mini">
+  <div data-screen="card_profile" data-show="mini"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="card_profile" data-show="empty"></div>
+</section>
+
+<!-- The profile comes to the reader as a card over the conversation. The conversation stays. -->
+<template id="card_profile">
+<header class="sketch-bar" role="banner"><strong>[Product]</strong><h1 class="sketch-muted pattern_plain_title">Night lines</h1></header>
+<div class="profile_room">
+  <main class="sketch-main" style="max-width:760px">
+    <ul class="sketch-list">
+      <li class="profile_post"><span class="sketch-avatar">ML</span><div class="sketch-stack" style="gap:4px"><div class="sketch-row"><button class="sketch-chip" type="button" data-sketch-popover="mini">Mara Lind</button><span class="sketch-muted">23:14</span></div><p>Line 7 has the new signs at each stop.</p></div></li>
+      <li class="profile_post"><span class="sketch-avatar">LO</span><div class="sketch-stack" style="gap:4px"><div class="sketch-row"><b>Lee Ortiz</b><span class="sketch-muted">23:16</span></div><p>Does the last trip wait for the train?</p></div></li>
+      <li class="profile_post"><span class="sketch-avatar">ML</span><div class="sketch-stack" style="gap:4px"><div class="sketch-row"><b>Mara Lind</b><span class="sketch-muted">23:17</span></div><p>Yes. It waits 4 minutes.</p></div></li>
+    </ul>
+    <input class="sketch-input" aria-label="Message" placeholder="Write a message">
+<div class="sketch-popover" id="badge">
+  <b>Helper</b>
+  <span>Answers questions in the help group.</span>
+</div>
+<div class="sketch-menu" id="more">
+  <button class="sketch-menu-item" type="button" data-sketch-toast="Name copied">Copy the user name</button>
+  <button class="sketch-menu-item" type="button">Block</button>
+  <button class="sketch-menu-item" type="button">Report</button>
+</div>
+  </main>
+  <div class="sketch-popover profile_mini" id="mini" data-part="mini" role="dialog" aria-label="Profile of Mara Lind">
+    <div class="profile_head"><div class="sketch-placeholder profile_banner">Banner</div><span class="sketch-avatar profile_avatar" style="width:64px;height:64px;bottom:-32px">ML</span></div>
+    <div><b>Mara Lind</b></div>
+    <div><span class="sketch-muted">Member since</span><br>12 March 2019</div>
+    <div class="sketch-row"><span class="sketch-muted">Role</span><span class="sketch-badge">Driver</span></div>
+    <input class="sketch-input" aria-label="Note" placeholder="Add a note">
+    <a href="#card">Open the full profile</a>
+  </div>
+  <div class="profile_cover" data-part="!mini">
+    <div class="sketch-panel sketch-frame sketch-stack profile_card" role="dialog" aria-label="Member profile">
+      <div class="profile_head"><div class="sketch-placeholder profile_banner" style="min-height:96px">Banner</div><span class="sketch-avatar profile_avatar">ML</span><span class="profile_status" title="Online"></span></div>
+      <div class="sketch-row"><span class="sketch-spacer"></span>
+        <button class="sketch-icon-button" type="button" aria-label="Badge: helper" data-sketch-popover="badge"><i data-icon="smile"></i></button>
+        <button class="sketch-icon-button" type="button" aria-label="Profile actions" data-sketch-popover="more"><i data-icon="more"></i></button>
+        <button class="sketch-icon-button" type="button" aria-label="Close the profile" data-close-card><i data-icon="close"></i></button>
+      </div>
+      <div><h2 style="margin:0">Mara Lind</h2></div>
+      <div class="sketch-stack">
+        <div data-part="!empty"><b>About me</b><p style="margin:0">Bus driver on the night lines. Ask me about stops.</p></div>
+        <div><b>Member since</b><p style="margin:0">12 March 2019</p></div>
+        <div><b>Shared</b><div class="sketch-row"><a href="#">1 shared group</a></div></div>
+        <label class="sketch-field">Note, only you see it<input class="sketch-input" placeholder="Add a note"></label>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+/* The close button of the card shows the conversation. The card comes back when the state changes. */
+document.addEventListener('click', event => {
+  const cover = event.target.closest('[data-close-card]')?.closest('.profile_cover');
+  if (cover) cover.hidden = cover.closed_card = true;
+});
+addEventListener('hashchange', () => document.querySelectorAll('.profile_cover').forEach(cover => {
+  if (cover.closed_card) cover.hidden = cover.closed_card = false;
+}));
+</script>
+<script src="../../../assets/sketch.js"></script>

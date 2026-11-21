@@ -1,0 +1,88 @@
+<!doctype html>
+<!--
+Pattern record notifications/notification-inbox. Sample words are the designer's own. No brand, text or picture of the source.
+Best for: a work tool where a notification points at a record to act on, and a person works through many in one sitting.
+Row opens: in a pane. A product that has a page for each record opens the row on that page.
+States: inbox, other, item-open, display-options, empty, error.
+Transitions: the source gives no values. The designer chose them from the kit motion tokens.
+- inbox to item-open: the detail pane fades in, opacity 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+- inbox to display-options: the panel fades and moves 4 px down, opacity and transform 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inbox pattern</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+/* Glue for this sketch only: badge placement, the row grid, the drawer edge and the motion. */
+@media (min-width: 1000px) { [data-sketch] .side-shell { grid-template-rows: 1fr; } }
+[data-sketch] .nav-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+[data-sketch] .bell { position: relative; }
+[data-sketch] .sketch-nav .nav-head a.bell { padding: 0; justify-content: center; }
+[data-sketch] .bell .count { position: absolute; top: 2px; right: 0; min-width: 20px; padding: 0 5px; font-size: 12px; line-height: 16px; text-align: center; }
+[data-sketch] .sketch-icon-button[aria-current] { background: var(--sketch-wash); }
+[data-sketch] .sketch-list > li.row { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: start; gap: 2px 12px; padding-block: 10px; }
+[data-sketch] .sketch-list .row a { display: inline; min-height: 0; min-width: 0; text-decoration: none; }
+[data-sketch] .sketch-list .row a::after { content: ""; position: absolute; inset: 0; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-list .row a:hover::after { background: var(--sketch-wash); }
+[data-sketch] .sketch-list .row a:focus-visible { outline: none; }
+[data-sketch] .sketch-list .row a:focus-visible::after { outline: 2px solid var(--sketch-ink); outline-offset: -2px; }
+[data-sketch] .row .icon-cell { padding-top: 2px; }
+[data-sketch] .row .text { display: grid; gap: 2px; }
+[data-sketch] .row.unread a { font-weight: 600; }
+[data-sketch] .row time { white-space: nowrap; }
+[data-sketch] .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+[data-sketch] .list-head { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+[data-sketch] .list-head h1, [data-sketch] .list-head h2 { margin: 0; }
+[data-sketch] .empty { justify-items: center; text-align: center; padding: 32px 16px; }
+[data-sketch] .sketch-popover.panel { width: min(360px, calc(100vw - 16px)); }
+@media (max-width: 559px) { [data-sketch] .sketch-popover.panel { width: calc(100vw - 16px); } }
+@media (max-width: 999px) { [data-sketch] .sketch-list > li.row:has([aria-current]) { background: none; } }
+[data-sketch] .sketch-dialog.drawer { inset: 0 0 0 auto; margin: 0; width: min(420px, 100vw); max-width: 100vw; height: 100vh; max-height: none; align-content: start; }
+@media (min-width: 1000px) { [data-sketch] .sketch-dialog.drawer.left { inset: 0 auto 0 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  [data-sketch] .sketch-popover.panel:not([hidden]) { animation: panel-in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .sketch-dialog.drawer[open] { animation: drawer-in-right 250ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .sketch-dialog.drawer[open]::backdrop { animation: fade-in 250ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .detail { animation: fade-in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 1000px) {
+  [data-sketch] .sketch-dialog.drawer.left[open] { animation-name: drawer-in-left; }
+}
+@keyframes panel-in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes drawer-in-right { from { transform: translateX(100%); } }
+@keyframes drawer-in-left { from { transform: translateX(-100%); } }
+@keyframes fade-in { from { opacity: 0; } }
+</style>
+<body data-sketch>
+<section data-state="inbox">
+<main class="sketch-main sketch-stack"><div class="sketch-cols" style="--cols: minmax(0, 420px) minmax(0, 1fr)"><div class="sketch-stack"><div class="list-head"><h1>Inbox</h1><span class="sketch-spacer"></span><a class="sketch-icon-button" href="#inbox" aria-label="Mark all read"><i data-icon="check"></i></a><a class="sketch-icon-button" href="#display-options" aria-label="Display options"><i data-icon="sliders"></i></a></div><div class="sketch-tabs" role="tablist" aria-label="Inbox tabs"><a role="tab" aria-selected="true" href="#inbox">Priority <span class="sketch-badge">3</span></a><a role="tab" aria-selected="false" href="#other">Other <span class="sketch-badge">3</span></a></div><ul class="sketch-list" aria-label="Notifications"><li class="row unread"><span class="icon-cell"><i data-icon="warning"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Payout run PR-204 failed</a><span>The bank refused 2 transfers.</span></span><time>4 min</time></li><li class="row unread"><span class="icon-cell"><i data-icon="user"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Mira Kade assigned you CMP-88</a><span>Spring offer landing page</span></span><time>1 h</time></li><li class="row unread"><span class="icon-cell"><i data-icon="comment"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Jon Avery commented on Spring offer</a><span>Can we move the start date?</span></span><time>3 h</time></li></ul></div></div></main>
+</section>
+<section data-state="other">
+<main class="sketch-main sketch-stack"><div class="list-head"><h1>Inbox</h1><span class="sketch-spacer"></span><a class="sketch-icon-button" href="#inbox" aria-label="Mark all read"><i data-icon="check"></i></a><a class="sketch-icon-button" href="#display-options" aria-label="Display options"><i data-icon="sliders"></i></a></div><div class="sketch-tabs" role="tablist" aria-label="Inbox tabs"><a role="tab" aria-selected="false" href="#inbox">Priority <span class="sketch-badge">3</span></a><a role="tab" aria-selected="true" href="#other">Other <span class="sketch-badge">3</span></a></div><ul class="sketch-list" aria-label="Notifications"><li class="row"><span class="icon-cell"><i data-icon="download"></i></span><span class="text"><a href="#item-open">Report March totals is ready</a><span>CSV, 412 rows</span></span><time>Yesterday</time></li><li class="row"><span class="icon-cell"><i data-icon="check"></i></span><span class="text"><a href="#item-open">Export of campaign stats finished</a><span>CSV, 96 rows</span></span><time>2 d</time></li><li class="row"><span class="icon-cell"><i data-icon="user"></i></span><span class="text"><a href="#item-open">Lee Moreno joined the Growth team</a><span>Invited by you</span></span><time>3 d</time></li></ul></main>
+</section>
+<section data-state="item-open">
+<main class="sketch-main sketch-stack"><div class="sketch-cols" style="--cols: minmax(0, 420px) minmax(0, 1fr)"><div class="sketch-stack"><div class="list-head"><h1>Inbox</h1><span class="sketch-spacer"></span><a class="sketch-icon-button" href="#inbox" aria-label="Mark all read"><i data-icon="check"></i></a><a class="sketch-icon-button" href="#display-options" aria-label="Display options"><i data-icon="sliders"></i></a></div><div class="sketch-tabs" role="tablist" aria-label="Inbox tabs"><a role="tab" aria-selected="true" href="#inbox">Priority <span class="sketch-badge">3</span></a><a role="tab" aria-selected="false" href="#other">Other <span class="sketch-badge">3</span></a></div><ul class="sketch-list" aria-label="Notifications"><li class="row unread"><span class="icon-cell"><i data-icon="warning"></i></span><span class="text"><a href="#item-open" aria-current="true"><span class="vh">Unread: </span>Payout run PR-204 failed</a><span>The bank refused 2 transfers.</span></span><time>4 min</time></li><li class="row unread"><span class="icon-cell"><i data-icon="user"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Mira Kade assigned you CMP-88</a><span>Spring offer landing page</span></span><time>1 h</time></li><li class="row unread"><span class="icon-cell"><i data-icon="comment"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Jon Avery commented on Spring offer</a><span>Can we move the start date?</span></span><time>3 h</time></li></ul></div><section class="sketch-panel sketch-frame sketch-stack detail" aria-label="Selected notification">
+<h2>Payout run PR-204 failed</h2>
+<p>The bank refused 2 of 18 transfers in payout run PR-204.</p>
+<div class="sketch-row"><button class="sketch-button" type="button" data-sketch-toast="Opens payout run PR-204">Open payout run</button><button class="sketch-button secondary" type="button" data-sketch-toast="Snoozed until tomorrow 09:00">Snooze</button></div>
+</section></div></main>
+</section>
+<section data-state="display-options">
+<main class="sketch-main sketch-stack"><div class="sketch-cols" style="--cols: minmax(0, 420px) minmax(0, 1fr)"><div class="sketch-stack"><div class="list-head"><h1>Inbox</h1><span class="sketch-spacer"></span><a class="sketch-icon-button" href="#inbox" aria-label="Mark all read"><i data-icon="check"></i></a><button type="button" class="sketch-icon-button" aria-label="Display options" data-sketch-popover="options" aria-expanded="true"><i data-icon="sliders"></i></button></div><div class="sketch-tabs" role="tablist" aria-label="Inbox tabs"><a role="tab" aria-selected="true" href="#inbox">Priority <span class="sketch-badge">3</span></a><a role="tab" aria-selected="false" href="#other">Other <span class="sketch-badge">3</span></a></div><ul class="sketch-list" aria-label="Notifications"><li class="row unread"><span class="icon-cell"><i data-icon="warning"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Payout run PR-204 failed</a><span>The bank refused 2 transfers.</span></span><time>4 min</time></li><li class="row unread"><span class="icon-cell"><i data-icon="user"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Mira Kade assigned you CMP-88</a><span>Spring offer landing page</span></span><time>1 h</time></li><li class="row unread"><span class="icon-cell"><i data-icon="comment"></i></span><span class="text"><a href="#item-open"><span class="vh">Unread: </span>Jon Avery commented on Spring offer</a><span>Can we move the start date?</span></span><time>3 h</time></li></ul></div></div><div class="sketch-popover panel sketch-stack" id="options" role="dialog" aria-label="Display options" data-open>
+<label class="sketch-switch"><input type="checkbox" role="switch" checked> Priority tab</label>
+<label class="sketch-field">Badge count<select class="sketch-input"><option>Priority and other</option><option>Priority only</option><option>None</option></select></label>
+<label class="sketch-field">Order<select class="sketch-input"><option>Newest</option><option>Oldest</option></select></label>
+<label class="sketch-switch"><input type="checkbox" role="switch"> Show snoozed</label>
+<label class="sketch-switch"><input type="checkbox" role="switch"> Unread first</label>
+</div></main>
+</section>
+<section data-state="empty">
+<main class="sketch-main sketch-stack"><div class="list-head"><h1>Inbox</h1><span class="sketch-spacer"></span><a class="sketch-icon-button" href="#inbox" aria-label="Mark all read"><i data-icon="check"></i></a><a class="sketch-icon-button" href="#display-options" aria-label="Display options"><i data-icon="sliders"></i></a></div><div class="sketch-tabs" role="tablist" aria-label="Inbox tabs"><a role="tab" aria-selected="true" href="#inbox">Priority</a><a role="tab" aria-selected="false" href="#other">Other</a></div><div class="sketch-stack empty"><i data-icon="bell"></i><h2>No notifications</h2><p>Mentions, assignments and failed runs show here.</p><button class="sketch-button secondary" type="button" data-sketch-toast="Opens notification settings">Notification settings</button></div></main>
+</section>
+<section data-state="error">
+<main class="sketch-main sketch-stack"><div class="list-head"><h1>Inbox</h1><span class="sketch-spacer"></span><a class="sketch-icon-button" href="#inbox" aria-label="Mark all read"><i data-icon="check"></i></a><a class="sketch-icon-button" href="#display-options" aria-label="Display options"><i data-icon="sliders"></i></a></div><div class="sketch-tabs" role="tablist" aria-label="Inbox tabs"><a role="tab" aria-selected="true" href="#inbox">Priority</a><a role="tab" aria-selected="false" href="#other">Other</a></div><div class="sketch-panel sketch-frame sketch-stack" role="alert"><p><strong>Error: Notifications did not load.</strong> Check the connection, then try again.</p><div><a class="sketch-button" href="#inbox">Retry</a></div></div></main>
+</section>
+
+
+<script src="../../../assets/sketch.js"></script>

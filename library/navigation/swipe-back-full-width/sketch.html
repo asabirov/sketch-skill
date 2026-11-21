@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swipe back from the full width sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A phone screen. The frame keeps the width of a phone in a wide window, so each part acts as it does on a phone. */
+  html { height: 100%; }
+  body[data-sketch] { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  [data-sketch] > [data-state] { flex: 1; min-height: 0; }
+  [data-sketch] [data-screen] { height: 100%; }
+  [data-sketch] .phone { position: relative; isolation: isolate; width: min(100%, 430px); height: 100%; margin: 0 auto; overflow: hidden; }
+  [data-sketch] .phone_screen { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); }
+  [data-sketch] .phone_bar { grid-row: 1; display: flex; align-items: center; gap: 4px; min-height: 56px; padding: 6px 8px; }
+  [data-sketch] .phone_bar :is(h1, h2) { flex: 1; min-width: 0; margin: 0 8px; font-size: 20px; letter-spacing: -.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .phone_body { grid-row: 2; min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_body > p { margin: 0 0 12px; }
+  @media (min-width: 600px) { [data-sketch] .phone { border-inline: var(--sketch-stroke) solid var(--sketch-muted); } }
+  /* A plain box stands for a part that this pattern does not draw. It names the part, and the pattern that draws it. */
+  [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; text-decoration: none; }
+  [data-sketch] .part_box.fill { height: 100%; }
+  [data-sketch] .part_box.press { width: 100%; background: none; cursor: pointer; }
+  [data-sketch] .part_box.press:hover { background: var(--sketch-wash); }
+  /* Each motion value below comes from transitions.json. */
+  [data-sketch] { --phone_spring: linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%); }
+  /* A screen that opens comes in from the right, and the screen before it leaves to the left. Back plays the opposite. */
+  [data-sketch] .phone_ghost { pointer-events: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_screen.enter_push { animation: push-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_screen.exit_push { animation: push-exit 520ms var(--phone_spring) forwards; }
+    [data-sketch] .phone_screen.enter_back { animation: back-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_screen.exit_back { animation: back-exit 520ms var(--phone_spring) forwards; }
+  }
+  @keyframes push-enter { from { transform: translateX(100%); } }
+  @keyframes push-exit { to { transform: translateX(-100%); } }
+  @keyframes back-enter { from { transform: translateX(-100%); } }
+  @keyframes back-exit { to { transform: translateX(100%); } }
+  /* A drag from the left edge moves the screen with the finger. The screen before it shows under it, moved 48px to the left and thinned. */
+  [data-sketch] .phone_screen.swipe_surface { transform: translateX(calc(var(--swipe_progress, 0) * 100%)); box-shadow: calc(-1 * var(--sketch-stroke)) 0 0 var(--sketch-ink); touch-action: none; }
+  [data-sketch] .swipe_underlay { transform: translateX(calc(48px * (var(--swipe_progress, 0) - 1))); pointer-events: none; }
+  [data-sketch] .swipe_underlay::after { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); opacity: calc(1 - var(--swipe_progress, 0)); }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .swipe_settle :is(.swipe_surface, .swipe_underlay) { transition: transform 520ms var(--phone_spring); }
+    [data-sketch] .swipe_settle .swipe_underlay::after { transition: opacity 520ms var(--phone_spring); }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="list">
+  <div data-screen="swipe_stack"></div>
+</section>
+<section data-state="detail">
+  <div data-screen="swipe_stack" data-show="detail"></div>
+</section>
+<section data-state="dragging">
+  <div data-screen="swipe_stack" data-show="detail held"></div>
+</section>
+
+<!-- Two screens of the phone: a list, and the page of one row. -->
+<template id="swipe_stack">
+<div class="phone">
+  <main class="phone_screen" data-part="!detail">
+    <header class="phone_bar"><h1>Chats</h1></header>
+    <div class="phone_body"><a class="part_box fill press" href="#detail" data-move="push" data-focus="!detail"><strong>Chat list</strong><span class="sketch-muted">chat/chat-list</span><span>A tap opens the page of a row.</span></a></div>
+  </main>
+  <main class="phone_screen" data-part="detail" data-swipe-back="list" data-swipe-rest="detail">
+    <header class="phone_bar">
+      <a class="sketch-icon-button" href="#list" data-move="back" aria-label="Back" data-focus="detail"><i data-icon="chevron-left"></i></a>
+      <h1>Mara Lind</h1>
+    </header>
+    <div class="phone_body"><div class="part_box fill"><strong>Chat page</strong></div></div>
+  </main>
+</div>
+</template>
+
+<script>
+/* The screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it.
+   A link to "#state" and a button with data-go change the state. data-move names the transition that the change plays.
+   After the change, the element whose data-focus names a shown part takes the focus. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' ').filter(Boolean), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  const parts_of = block => (block.dataset.show || '').split(' ');
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = parts_of(block);
+    ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    block.append(copy);
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_block = () => document.querySelector('[data-state]:not([hidden]) [data-screen]');
+  /* A move plays one transition of transitions.json. play adds the class that holds the animation, and takes it away at the end. */
+  window.pattern_moves = {};
+  window.pattern_play = (node, name, after) => {
+    if (reduced.matches) { if (after) after(); return; }
+    const done = event => {
+      if (event.target !== node) return;
+      node.removeEventListener('animationend', done);
+      node.classList.remove(name);
+      if (after) after();
+    };
+    node.addEventListener('animationend', done);
+    node.classList.add(name);
+  };
+  let focus_next = false;
+  window.pattern_go = (state, move, from) => {
+    const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
+    if (to && to !== from && move && !reduced.matches) pattern_moves[move](from, to);
+    focus_next = true;
+    location.hash = state;
+  };
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-go], a[href^="#"]');
+    const block = control && control.closest('[data-screen]');
+    if (!block || control.matches(':disabled')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pattern_go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
+  }, true);
+  addEventListener('hashchange', () => requestAnimationFrame(() => {
+    const block = shown_block();
+    const target = focus_next && block && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    focus_next = false;
+    if (target) target.focus({preventScroll: true});
+  }));
+})();
+/* push and back: a copy of the screen that the reader leaves moves out, while the new screen moves in. */
+(() => {
+  const slide = kind => (from, to) => {
+    const ghost = from.querySelector('.phone_screen:not([hidden])').cloneNode(true);
+    ghost.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    ghost.classList.add('phone_ghost');
+    ghost.inert = true;
+    ghost.setAttribute('aria-hidden', 'true');
+    to.querySelector('.phone').append(ghost);
+    pattern_play(ghost, `exit_${kind}`, () => ghost.remove());
+    pattern_play(to.querySelector('.phone_screen:not([hidden])'), `enter_${kind}`);
+  };
+  pattern_moves.push = slide('push');
+  pattern_moves.back = slide('back');
+})();
+/* A drag from each point of the screen moves the screen with the pointer, and a copy of the screen before it shows under it. A release after a
+   third of the width, or after a fast flick, goes back. A shorter drag returns the screen. data-swipe-back on a screen names the
+   state that the drag opens, and data-swipe-rest the state of the screen itself. A block that shows the part "held" draws the screen
+   under the finger, at half of the width. */
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const progress_of = phone => parseFloat(phone.style.getPropertyValue('--swipe_progress')) || 0;
+  const lay_under = screen => {
+    const phone = screen.parentElement;
+    screen.classList.add('swipe_surface');
+    if (phone.querySelector('.swipe_underlay')) return;
+    const under = document.querySelector(`[data-state="${screen.dataset.swipeBack}"] [data-screen] .phone_screen:not([hidden])`).cloneNode(true);
+    under.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    under.classList.add('swipe_underlay');
+    under.inert = true;
+    under.setAttribute('aria-hidden', 'true');
+    phone.prepend(under);
+  };
+  const clear = screen => {
+    const phone = screen.parentElement;
+    phone.classList.remove('swipe_settle');
+    phone.style.removeProperty('--swipe_progress');
+    screen.classList.remove('swipe_surface');
+    phone.querySelectorAll('.swipe_underlay').forEach(under => under.remove());
+  };
+  const hold = () => document.querySelectorAll('[data-show~="held"] .phone_screen[data-swipe-back]:not([hidden])').forEach(screen => {
+    clear(screen);
+    lay_under(screen);
+    screen.parentElement.style.setProperty('--swipe_progress', '0.5');
+  });
+  addEventListener('hashchange', hold);
+  hold();
+  let drag = null;
+  document.addEventListener('pointerdown', event => {
+    const screen = event.target.closest('.phone_screen[data-swipe-back]');
+    if (!screen || event.button !== 0) return;
+    const phone = screen.parentElement, box = phone.getBoundingClientRect(), held = progress_of(phone) * box.width;
+    drag = {screen, phone, id: event.pointerId, moved: held > 0, start: event.clientX - held, last: event.clientX, time: event.timeStamp, velocity: 0, distance: held, extent: box.width};
+  });
+  document.addEventListener('pointermove', event => {
+    if (!drag) return;
+    const elapsed = event.timeStamp - drag.time;
+    if (elapsed > 0) drag.velocity = (event.clientX - drag.last) / elapsed;
+    drag.last = event.clientX;
+    drag.time = event.timeStamp;
+    drag.distance = Math.max(0, Math.min(drag.extent, event.clientX - drag.start));
+    if (!drag.moved && drag.distance < 8) return;
+    if (!drag.captured) {
+      lay_under(drag.screen);
+      drag.screen.setPointerCapture(drag.id);
+    }
+    drag.moved = drag.captured = true;
+    drag.phone.classList.remove('swipe_settle');
+    drag.phone.style.setProperty('--swipe_progress', drag.distance / drag.extent);
+  });
+  const release = event => {
+    if (!drag) return;
+    const {screen, phone, moved, distance, extent, velocity, time} = drag, block = phone.closest('[data-screen]');
+    drag = null;
+    if (!moved) return;
+    /* The release of a drag must not press the row or the button under the pointer. */
+    const stop_click = pressed => { pressed.stopPropagation(); pressed.preventDefault(); };
+    addEventListener('click', stop_click, {capture: true, once: true});
+    setTimeout(() => removeEventListener('click', stop_click, {capture: true}));
+    const goes_back = event.type !== 'pointercancel' && (distance >= extent / 3 || distance > 24 && velocity > .5 && event.timeStamp - time < 120);
+    const finish = () => {
+      const state = goes_back ? screen.dataset.swipeBack : screen.dataset.swipeRest;
+      if (block.parentElement.dataset.state !== state) pattern_go(state, null, block);
+      clear(screen);
+    };
+    const target = goes_back ? 1 : 0;
+    if (reduced.matches || Math.abs(distance / extent - target) < .002) { finish(); return; }
+    const done = ended => {
+      if (ended.target !== screen || ended.propertyName !== 'transform') return;
+      screen.removeEventListener('transitionend', done);
+      finish();
+    };
+    screen.addEventListener('transitionend', done);
+    phone.classList.add('swipe_settle');
+    screen.getBoundingClientRect();
+    phone.style.setProperty('--swipe_progress', target);
+  };
+  document.addEventListener('pointerup', release);
+  document.addEventListener('pointercancel', release);
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

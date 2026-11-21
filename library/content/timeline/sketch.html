@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timeline of short posts sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .feed_tabs a[role="tab"] { border-bottom: 0; border-radius: var(--sketch-wobble); text-decoration: none; }
+  [data-sketch] .feed_tabs a[role="tab"][aria-selected="true"] { background-color: var(--sketch-wash); }
+  /* The comment count of the base has 3 forms: words, a number, or the avatars of the members who commented with the words.
+     The review buttons set data-count on the body. A row with no comment shows the comment icon only, in each form. */
+  [data-sketch] .sketch-list > .feed_short, [data-sketch] .feed_short { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 4px 12px; align-items: start; padding: 12px 8px; }
+  [data-sketch] .feed_short p { margin: 0; }
+  [data-sketch] .sketch-main a.feed_text { display: block; text-decoration: none; }
+  [data-sketch] .feed_compose { position: fixed; right: 24px; bottom: 24px; z-index: 5; width: 56px; height: 56px; padding: 0; border-radius: 50%; }
+  @media (min-width: 1000px) {
+  }
+  @media (max-width: 999px) {
+  }
+  /* Base: one column. The title with the new update button, pill tabs, and the full posts. The base draws no side nav and no bar. */
+  [data-sketch] .sketch-main a.sketch-chip { min-width: 0; min-height: 32px; text-decoration: none; }
+  /* A thread: one box holds a comment, its replies in one level and the reply field. A line joins the replies. */
+  /* The page of a post: a back link, the post, one box for each thread, and the comment form. */
+</style>
+<body data-sketch>
+
+<section data-state="feed">
+  <div data-screen="timeline_feed"></div>
+</section>
+<section data-state="tab-following">
+  <div data-screen="timeline_feed" data-show="following"></div>
+</section>
+<section data-state="liked">
+  <div data-screen="timeline_feed" data-show="liked"></div>
+</section>
+<section data-state="post">
+  <div data-screen="timeline_feed" data-show="post"></div>
+</section>
+<section data-state="custom-feed">
+  <div data-screen="timeline_feed" data-show="pin"></div>
+</section>
+<section data-state="feed-saved">
+  <div data-screen="timeline_feed" data-show="saved" data-toast="Tab added"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="timeline_feed" data-show="empty"></div>
+</section>
+
+<!-- Short posts with an action row on each row. A row opens the page of the post. -->
+<template id="timeline_feed">
+<header class="sketch-bar" role="banner"><strong>[Product]</strong></header>
+<main class="sketch-main sketch-cols" style="--cols:minmax(0,1fr) 300px">
+  <section class="sketch-stack" aria-label="Timeline" data-part="!post">
+    <h1>Home</h1>
+    <div class="sketch-row"><div class="sketch-tabs feed_tabs" aria-label="Feed">
+      <a role="tab" href="#feed" aria-selected="true">For you</a>
+      <a role="tab" href="#tab-following" data-select-in="following">Following</a>
+      <a role="tab" href="#feed-saved" class="feed_new_tab" data-part="saved" data-select-in="saved">Night routes</a>
+    </div><a href="#custom-feed" aria-label="Pin a topic" data-part="!pin"><i data-icon="plus"></i></a></div>
+
+    <div class="sketch-panel sketch-frame sketch-stack" style="padding:16px" data-part="pin">
+      <h2>Pin a topic as a tab</h2>
+      <input class="sketch-input" type="search" aria-label="Find a topic" placeholder="Find a topic">
+      <div class="sketch-row"><button class="sketch-chip" type="button" aria-pressed="true">Night routes</button><button class="sketch-chip" type="button" aria-pressed="false">Tickets</button><button class="sketch-chip" type="button" aria-pressed="false">Road works</button></div>
+      <div class="sketch-row"><span class="sketch-spacer"></span><a class="sketch-button secondary" href="#feed">Cancel</a><a class="sketch-button" href="#feed-saved">Pin</a></div>
+    </div>
+
+    <div class="sketch-stack" style="justify-items:center;text-align:center;padding:48px 0" data-part="empty">
+      <h2>No posts yet</h2>
+      <p style="margin:0;max-width:44ch">Follow members or pin a topic to fill this feed.</p>
+      <a class="sketch-button" href="#custom-feed">Pin a topic</a>
+    </div>
+
+    <ul class="sketch-list" data-part="!empty">
+      <li class="feed_short" data-part="!saved">
+        <span class="sketch-avatar">AP</span>
+        <div class="sketch-stack" style="gap:8px">
+          <div class="sketch-row"><b>Ada Park</b><span class="sketch-muted">@ada</span><span class="sketch-muted">2 h</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions" data-sketch-popover="row_menu"><i data-icon="more"></i></button></div>
+          <a class="feed_text" href="#post">Two phone networks hold the text alerts for ten minutes. We test the app message next.</a>
+          <div class="sketch-row"><button class="sketch-chip" type="button" aria-label="4 replies" data-go="post"><i data-icon="comment"></i>4</button><button class="sketch-chip" type="button" aria-pressed="false">Repost 2</button><button class="sketch-chip" type="button" aria-pressed="false" data-go="liked" data-part="!liked">Like 31</button><button class="sketch-chip" type="button" aria-pressed="true" data-go="feed" data-part="liked">Like 32</button><span class="sketch-muted">1.2k views</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Share" data-sketch-toast="Link copied"><i data-icon="upload"></i></button></div>
+        </div>
+      </li>
+      <li class="feed_short" data-part="!following">
+        <span class="sketch-avatar square">CD</span>
+        <div class="sketch-stack" style="gap:8px">
+          <div class="sketch-row"><b>City depot</b><span class="sketch-muted">@depot</span><span class="sketch-muted">3 h</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions"><i data-icon="more"></i></button></div>
+          <a class="feed_text" href="#post">The first night bus with the new signs left the depot at 23:10.</a>
+          <div class="sketch-placeholder" style="min-height:180px">Picture</div>
+          <div class="sketch-row"><button class="sketch-chip" type="button"><i data-icon="comment"></i>12</button><button class="sketch-chip" type="button" aria-pressed="false">Repost 8</button><button class="sketch-chip" type="button" aria-pressed="false">Like 96</button><span class="sketch-muted">4.1k views</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Share" data-sketch-toast="Link copied"><i data-icon="upload"></i></button></div>
+        </div>
+      </li>
+      <li class="feed_short">
+        <span class="sketch-avatar">LO</span>
+        <div class="sketch-stack" style="gap:8px">
+          <div class="sketch-row"><b>Lee Ortiz</b><span class="sketch-muted">@lee</span><span class="sketch-muted">5 h</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions"><i data-icon="more"></i></button></div>
+          <a class="feed_text" href="#post">All 14 night lines keep their first and last trip in the new timetable. The long version has each stop and each change of minute, line by line, for the riders who plan a connection. <b>Show more</b></a>
+          <div class="sketch-row"><button class="sketch-chip" type="button"><i data-icon="comment"></i>1</button><button class="sketch-chip" type="button" aria-pressed="false">Repost 0</button><button class="sketch-chip" type="button" aria-pressed="false">Like 7</button><span class="sketch-muted">310 views</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Share" data-sketch-toast="Link copied"><i data-icon="upload"></i></button></div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="sketch-stack" aria-label="Post" data-part="post">
+    <h1 class="pattern_plain_title" style="justify-self:start"><a href="#feed"><i data-icon="arrow-left"></i>Post</a></h1>
+    <div class="sketch-row"><span class="sketch-avatar">AP</span><div><b>Ada Park</b><br><span class="sketch-muted">@ada</span></div><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions"><i data-icon="more"></i></button></div>
+    <p style="font-size:18px">Two phone networks hold the text alerts for ten minutes. We test the app message next.</p>
+    <p class="sketch-muted">Today at 9:12</p>
+    <div class="sketch-row"><span><b>4</b> replies</span><span><b>2</b> reposts</span><span><b>31</b> likes</span><span><b>1.2k</b> views</span></div>
+    <div class="sketch-row"><button class="sketch-chip" type="button" aria-pressed="false">Repost</button><button class="sketch-chip" type="button" aria-pressed="false">Like</button><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Share" data-sketch-toast="Link copied"><i data-icon="upload"></i></button></div>
+    <div class="sketch-placeholder pattern_part"><b>Comment thread</b><span>Pattern: comment-comment-thread</span></div>
+  </section>
+
+  <aside class="sketch-stack sketch-from-desktop" aria-label="Search and trends">
+    <input class="sketch-input" type="search" aria-label="Search" placeholder="Search">
+    <div class="sketch-panel sketch-frame sketch-stack" style="padding:16px">
+      <h2>Trends</h2>
+      <ul class="sketch-list"><li><a href="#">Night routes</a><span class="sketch-spacer"></span><span class="sketch-muted">2.4k posts</span></li><li><a href="#">Road works</a><span class="sketch-spacer"></span><span class="sketch-muted">980 posts</span></li><li><a href="#">Tickets</a><span class="sketch-spacer"></span><span class="sketch-muted">412 posts</span></li></ul>
+      <a href="#">Show more</a>
+    </div>
+  </aside>
+<div class="sketch-menu" id="row_menu"><div class="sketch-placeholder pattern_part"><b>Row menu</b><span>Pattern: feed-feed</span></div></div>
+</main>
+<button class="sketch-button feed_compose" type="button" aria-label="New post" data-sketch-open="compose" data-part="!post"><i data-icon="plus"></i></button>
+<dialog class="sketch-dialog" id="compose" aria-label="New post">
+  <div class="sketch-row"><button class="sketch-icon-button" type="button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button></div>
+  <div class="sketch-placeholder pattern_part"><b>Composer</b><span>Pattern: feed-feed</span></div>
+</dialog>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalogue sheet sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A phone screen. The frame keeps the width of a phone in a wide window, so each part acts as it does on a phone. */
+  html { height: 100%; }
+  body[data-sketch] { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  [data-sketch] > [data-state] { flex: 1; min-height: 0; }
+  [data-sketch] [data-screen] { height: 100%; }
+  [data-sketch] .phone { position: relative; isolation: isolate; width: min(100%, 430px); height: 100%; margin: 0 auto; overflow: hidden; }
+  [data-sketch] .phone_screen { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); }
+  [data-sketch] .phone_body { grid-row: 2; min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_body > p { margin: 0 0 12px; }
+  [data-sketch] .phone_foot { grid-row: 3; display: flex; align-items: center; gap: 8px; padding: 8px 16px 16px; }
+  [data-sketch] .phone_search { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 44px; padding: 0 14px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 22px 20px 23px 19px / 20px 23px 19px 22px; text-decoration: none; }
+  [data-sketch] .phone_search input { flex: 1; min-width: 0; min-height: 40px; padding: 0; background: none; border: 0; outline: 0; }
+  [data-sketch] .phone_search:has(input:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 2px; }
+  [data-sketch] .phone_round { border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
+  @media (min-width: 600px) { [data-sketch] .phone { border-inline: var(--sketch-stroke) solid var(--sketch-muted); } }
+  /* A plain box stands for a part that this pattern does not draw. It names the part, and the pattern that draws it. */
+  [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; text-decoration: none; }
+  [data-sketch] .part_box.fill { height: 100%; }
+  /* Each motion value below comes from transitions.json. */
+  [data-sketch] { --phone_spring: linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%); --phone_out: cubic-bezier(0.23, 1, 0.32, 1); }
+  /* A pressed row or button shrinks and takes a soft fill while the finger is down. */
+  [data-sketch] .phone_press:active { background-color: var(--sketch-wash); transform: scale(0.96); }
+  @media (prefers-reduced-motion: no-preference) { [data-sketch] .phone_press { transition: transform 120ms var(--phone_out), background-color 120ms var(--phone_out); } }
+  /* A sheet covers the lower part of the screen. The scrim thins the screen behind it. */
+  [data-sketch] .phone_scrim { position: absolute; inset: 0; z-index: 2; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+  [data-sketch] .phone_sheet { position: absolute; inset: auto 0 0; z-index: 3; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: calc(100% - 48px); background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-bottom: 0; border-radius: 24px 20px 0 0 / 20px 24px 0 0; }
+  [data-sketch] .phone_sheet.full { height: calc(100% - 48px); }
+  [data-sketch] .phone_sheet_head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 8px 4px 16px; touch-action: none; }
+  [data-sketch] .phone_sheet_head h2 { margin: 0; font-size: 20px; }
+  [data-sketch] .phone_grab { grid-column: 1 / -1; justify-self: center; width: 36px; height: 4px; margin: 8px 0 4px; border-radius: 2px; background: var(--sketch-ink); }
+  [data-sketch] .phone_sheet_body { min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_sheet_foot { display: flex; align-items: center; gap: 8px; padding: 8px 16px 16px; }
+  [data-sketch] .exit_scrim { pointer-events: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_scrim.enter_scrim { animation: scrim-enter 120ms var(--phone_out); }
+    [data-sketch] .phone_scrim.exit_scrim { animation: scrim-exit 120ms var(--phone_out) forwards; }
+    [data-sketch] .phone_sheet.enter_sheet { animation: directory-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_sheet.settle { transition: transform 520ms var(--phone_spring); }
+  }
+  @keyframes scrim-enter { from { opacity: 0; } }
+  @keyframes scrim-exit { to { opacity: 0; } }
+  @keyframes directory-enter { from { transform: translateY(100%); } }
+  /* The head: the title, and the number of the rows that show. */
+  [data-sketch] .catalogue_title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  [data-sketch] .catalogue_unseen { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .catalogue_chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0 4px; }
+  [data-sketch] .catalogue_group h3 { margin: 16px 0 0; font-size: 16px; }
+  /* A row: an avatar, a name with one line below it, and the action of the row. */
+  [data-sketch] .sketch-list > li.catalogue_row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+  [data-sketch] .catalogue_who p { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .catalogue_who { display: grid; gap: 2px; min-width: 0; }
+  [data-sketch] .catalogue_none { display: grid; justify-items: start; gap: 12px; padding-top: 16px; }
+  [data-sketch] .catalogue_none p { margin: 0; }
+  /* A row is one label with a checkbox, and one button acts on each checked row. */
+  [data-sketch] .phone_sheet_foot .sketch-button { flex: 1; }
+</style>
+<body data-sketch>
+
+<section data-state="closed">
+  <div data-screen="catalogue_base"></div>
+</section>
+<section data-state="catalogue">
+  <div data-screen="catalogue_base" data-show="sheet"></div>
+</section>
+<section data-state="filtered">
+  <div data-screen="catalogue_base" data-show="sheet online"></div>
+</section>
+<section data-state="search">
+  <div data-screen="catalogue_base" data-show="sheet found"></div>
+</section>
+<section data-state="no-match">
+  <div data-screen="catalogue_base" data-show="sheet none"></div>
+</section>
+
+<!-- The sheet has the full height. Each row has one action. The search field stays at the bottom of the sheet. -->
+<template id="catalogue_base">
+<div class="phone">
+  <main class="phone_screen" data-inert-in="sheet">
+    <div class="phone_body"><div class="part_box fill"><strong>Screen</strong></div></div>
+    <footer class="phone_foot">
+      <button class="sketch-icon-button phone_round" type="button" aria-label="People" data-go="catalogue" data-move="sheet" data-focus="!sheet"><i data-icon="user"></i></button>
+    </footer>
+  </main>
+  <div class="phone_scrim" data-part="sheet" data-go="closed" data-move="close"></div>
+  <section class="phone_sheet full" role="dialog" aria-modal="true" aria-labelledby="catalogue_title" data-part="sheet" data-closed="closed" data-filter-scope>
+    <header class="phone_sheet_head" data-sheet-drag>
+      <span class="phone_grab"></span>
+      <div class="catalogue_title"><h2 id="catalogue_title">People</h2><span class="sketch-badge"><span data-count>6</span><span class="catalogue_unseen"> people in the list</span></span></div>
+      <button class="sketch-icon-button" type="button" aria-label="Close" data-go="closed" data-move="close" data-escape data-focus="sheet"><i data-icon="close"></i></button>
+    </header>
+    <div class="phone_sheet_body">
+      <div class="catalogue_chips" role="group" aria-label="Filter">
+        <button class="sketch-chip phone_press" type="button" data-tag="" data-pressed-in="!online">All</button>
+        <button class="sketch-chip phone_press" type="button" data-tag="online" data-pressed-in="online">Online</button>
+      </div>
+      <section class="catalogue_group" data-group aria-labelledby="catalogue_team">
+        <h3 id="catalogue_team">Your team</h3>
+        <ul class="sketch-list">
+          <li class="catalogue_row" data-row="online"><span class="sketch-avatar">ID</span><span class="catalogue_who"><span>Ines Duarte</span><p class="sketch-muted">Design</p></span><a class="sketch-button secondary phone_press" href="#closed" data-move="close" data-toast="The chat with Ines Duarte opens (sample)" aria-label="Message Ines Duarte">Message</a></li>
+          <li class="catalogue_row" data-row=""><span class="sketch-avatar">JP</span><span class="catalogue_who"><span>Jonas Petit</span><p class="sketch-muted">Sales</p></span><a class="sketch-button secondary phone_press" href="#closed" data-move="close" data-toast="The chat with Jonas Petit opens (sample)" aria-label="Message Jonas Petit">Message</a></li>
+          <li class="catalogue_row" data-row="online"><span class="sketch-avatar">NS</span><span class="catalogue_who"><span>Noor Sayed</span><p class="sketch-muted">Support</p></span><a class="sketch-button secondary phone_press" href="#closed" data-move="close" data-toast="The chat with Noor Sayed opens (sample)" aria-label="Message Noor Sayed">Message</a></li>
+        </ul>
+      </section>
+      <section class="catalogue_group" data-group aria-labelledby="catalogue_other">
+        <h3 id="catalogue_other">Other teams</h3>
+        <ul class="sketch-list">
+          <li class="catalogue_row" data-row=""><span class="sketch-avatar">AB</span><span class="catalogue_who"><span>Ada Brandt</span><p class="sketch-muted">Finance, Lisbon</p></span><a class="sketch-button secondary phone_press" href="#closed" data-move="close" data-toast="The chat with Ada Brandt opens (sample)" aria-label="Message Ada Brandt">Message</a></li>
+          <li class="catalogue_row" data-row="online"><span class="sketch-avatar">CN</span><span class="catalogue_who"><span>Chidi Nwosu</span><p class="sketch-muted">Operations, Lagos</p></span><a class="sketch-button secondary phone_press" href="#closed" data-move="close" data-toast="The chat with Chidi Nwosu opens (sample)" aria-label="Message Chidi Nwosu">Message</a></li>
+          <li class="catalogue_row" data-row=""><span class="sketch-avatar">YT</span><span class="catalogue_who"><span>Yuki Tanaka</span><p class="sketch-muted">Legal, Osaka</p></span><a class="sketch-button secondary phone_press" href="#closed" data-move="close" data-toast="The chat with Yuki Tanaka opens (sample)" aria-label="Message Yuki Tanaka">Message</a></li>
+        </ul>
+      </section>
+      <div class="catalogue_none" data-none hidden>
+        <p>No person matches.</p>
+        <button class="sketch-button secondary phone_press" type="button" data-clear>Clear filters</button>
+      </div>
+    </div>
+    <footer class="phone_sheet_foot">
+      <label class="phone_search"><i data-icon="search"></i><input type="search" aria-label="Search people" placeholder="Search" data-filter data-value-in="found=in|none=zq"></label>
+    </footer>
+  </section>
+</div>
+</template>
+
+<script>
+/* The screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it.
+   data-pressed-in presses a chip. data-inert-in locks a region. data-value-in="name=text" fills a field.
+   A link to "#state" and a button with data-go change the state. data-move names the transition that the change plays.
+   After the change, the element whose data-focus names a shown part takes the focus.
+   Escape presses the shown data-escape button. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' ').filter(Boolean), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  const parts_of = block => (block.dataset.show || '').split(' ');
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = parts_of(block);
+    ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    copy.querySelectorAll('[data-pressed-in]').forEach(node => node.setAttribute('aria-pressed', String(has_part(shown, node.dataset.pressedIn))));
+    copy.querySelectorAll('[data-inert-in]').forEach(region => { region.inert = has_part(shown, region.dataset.inertIn); });
+    copy.querySelectorAll('[data-value-in]').forEach(field => field.dataset.valueIn.split('|').forEach(pair => {
+      const [name, text] = pair.split('=');
+      if (shown.includes(name)) field.setAttribute('value', text);
+    }));
+    block.append(copy);
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_block = () => document.querySelector('[data-state]:not([hidden]) [data-screen]');
+  /* A move plays one transition of transitions.json. play adds the class that holds the animation, and takes it away at the end. */
+  window.pattern_moves = {};
+  window.pattern_play = (node, name, after) => {
+    if (reduced.matches) { if (after) after(); return; }
+    const done = event => {
+      if (event.target !== node) return;
+      node.removeEventListener('animationend', done);
+      node.classList.remove(name);
+      if (after) after();
+    };
+    node.addEventListener('animationend', done);
+    node.classList.add(name);
+  };
+  let focus_next = false;
+  window.pattern_go = (state, move, from) => {
+    const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
+    if (to && to !== from && move && !reduced.matches) pattern_moves[move](from, to);
+    focus_next = true;
+    location.hash = state;
+  };
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-go], a[href^="#"]');
+    const block = control && control.closest('[data-screen]');
+    if (!block || control.matches(':disabled')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (control.dataset.toast) sketchToast(control.dataset.toast);
+    pattern_go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
+  }, true);
+  addEventListener('hashchange', () => requestAnimationFrame(() => {
+    const block = shown_block();
+    const target = focus_next && block && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    focus_next = false;
+    if (target) target.focus({preventScroll: true});
+  }));
+  document.addEventListener('keydown', event => {
+    const block = event.key === 'Escape' && shown_block();
+    const close = block && [...block.querySelectorAll('[data-escape]')].find(button => button.checkVisibility());
+    if (close) close.click();
+  });
+})();
+/* sheet: the sheet rises and the scrim shows. close: the sheet leaves at once, and a copy of the scrim fades out.
+   A drag on the head of a sheet moves the sheet with the pointer. A release after a third of the height, or after a fast flick,
+   closes the sheet. A shorter drag returns it. data-closed on the sheet names the state that a long drag opens. */
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  pattern_moves.sheet = (from, to) => {
+    to.querySelectorAll('.phone_sheet:not([hidden])').forEach(sheet => pattern_play(sheet, 'enter_sheet'));
+    to.querySelectorAll('.phone_scrim:not([hidden])').forEach(scrim => pattern_play(scrim, 'enter_scrim'));
+  };
+  pattern_moves.close = (from, to) => {
+    if (!from.querySelector('.phone_scrim:not([hidden])')) return;
+    const ghost = document.createElement('div');
+    ghost.className = 'phone_scrim';
+    to.querySelector('.phone').append(ghost);
+    pattern_play(ghost, 'exit_scrim', () => ghost.remove());
+  };
+  const offset = sheet => new DOMMatrix(getComputedStyle(sheet).transform).m42;
+  let drag = null;
+  document.addEventListener('pointerdown', event => {
+    const head = event.target.closest('[data-sheet-drag]');
+    if (!head || event.button !== 0 || event.target.closest('button, a, input')) return;
+    const sheet = head.closest('.phone_sheet'), held = offset(sheet);
+    sheet.classList.remove('enter_sheet', 'settle');
+    sheet.style.transform = `translateY(${held}px)`;
+    head.setPointerCapture(event.pointerId);
+    drag = {sheet, start: event.clientY - held, last: event.clientY, time: event.timeStamp, velocity: 0, distance: held};
+  });
+  document.addEventListener('pointermove', event => {
+    if (!drag) return;
+    const elapsed = event.timeStamp - drag.time;
+    if (elapsed > 0) drag.velocity = (event.clientY - drag.last) / elapsed;
+    drag.last = event.clientY;
+    drag.time = event.timeStamp;
+    drag.distance = Math.max(0, event.clientY - drag.start);
+    drag.sheet.style.transform = `translateY(${drag.distance}px)`;
+  });
+  const release = event => {
+    if (!drag) return;
+    const {sheet, distance, velocity, time} = drag, block = sheet.closest('[data-screen]');
+    drag = null;
+    const closes = event.type !== 'pointercancel' && (distance >= sheet.offsetHeight / 3 || distance > 24 && velocity > .5 && event.timeStamp - time < 120);
+    const finish = () => {
+      sheet.classList.remove('settle');
+      if (closes) pattern_go(sheet.dataset.closed, 'close', block);
+      sheet.style.transform = '';
+    };
+    if (reduced.matches || !closes && distance < 1) { finish(); return; }
+    const done = ended => {
+      if (ended.target !== sheet) return;
+      sheet.removeEventListener('transitionend', done);
+      finish();
+    };
+    sheet.addEventListener('transitionend', done);
+    sheet.classList.add('settle');
+    sheet.style.transform = closes ? 'translateY(100%)' : 'translateY(0px)';
+  };
+  document.addEventListener('pointerup', release);
+  document.addEventListener('pointercancel', release);
+})();
+/* In a region with data-filter-scope, the shown search field with data-filter and the pressed chip with data-tag filter the rows with
+   data-row. data-count takes the number of the rows that show. A group with data-group hides when none of its rows shows. data-none
+   shows when no row shows. A button with data-clear takes the text and the chip away. */
+(() => {
+  const filter = scope => {
+    const field = [...scope.querySelectorAll('[data-filter]')].find(input => !input.closest('[hidden]')), chip = scope.querySelector('[data-tag][aria-pressed="true"]');
+    const text = field ? field.value.trim().toLowerCase() : '', tag = chip ? chip.dataset.tag : '';
+    const rows = [...scope.querySelectorAll('[data-row]')];
+    rows.forEach(row => { row.hidden = !row.textContent.toLowerCase().includes(text) || Boolean(tag) && !row.dataset.row.split(' ').includes(tag); });
+    const shown = rows.filter(row => !row.hidden).length;
+    scope.querySelectorAll('[data-group]').forEach(group => { group.hidden = !group.querySelector('[data-row]:not([hidden])'); });
+    scope.querySelectorAll('[data-count]').forEach(count => { count.textContent = shown; });
+    scope.querySelectorAll('[data-none]').forEach(none => { none.hidden = shown > 0; });
+  };
+  document.querySelectorAll('[data-screen] [data-filter-scope]').forEach(filter);
+  document.addEventListener('input', event => { if (event.target.matches('[data-filter]')) filter(event.target.closest('[data-filter-scope]')); });
+  /* The capture phase keeps the kit from changing the chip a second time. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-tag], [data-clear]'), scope = control && control.closest('[data-filter-scope]');
+    if (!scope) return;
+    event.stopPropagation();
+    if (control.matches('[data-clear]')) scope.querySelectorAll('[data-filter]').forEach(field => { field.value = ''; });
+    const chosen = control.matches('[data-tag]') ? control : scope.querySelector('[data-tag=""]');
+    scope.querySelectorAll('[data-tag]').forEach(chip => chip.setAttribute('aria-pressed', String(chip === chosen)));
+    filter(scope);
+  }, true);
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

@@ -1,0 +1,272 @@
+<!doctype html>
+<!--
+  Best for: a team product where a signed-in member checks which account is signed in, then reaches their settings and the way out.
+  Row opens: no rows. The menu holds actions, and it holds no records.
+  Related: navigation/user-menu is the same menu at the head of the side list. settings/settings-window is the window that the settings row opens.
+  Transition values, from transitions.json. Each value is estimated: the capture is one still picture, and the sketch plays the values of navigation/user-menu.
+  - menu-open: the menu goes from clear to solid, opacity 35 ms, ease-out, estimated.
+    The menu grows from 98% of its size to its full size, transform 160 ms, cubic-bezier(0, 0, 0.2, 1), estimated.
+  - closed: the menu goes to 98% of its size, transform 20 ms, linear, estimated.
+    After a delay of 20 ms, the menu goes from solid to clear, opacity 110 ms, cubic-bezier(0, 0, 0.2, 1), estimated.
+  - theme-open, settings-open and signed-out: 0 ms, estimated.
+  The menu opens up from the foot of the side list, so the submenu of theme-open opens up from its row.
+  The settings window is a part of settings/settings-window, and the signed-out page is a part of navigation/user-menu. This sketch draws each as a plain box with the name of its pattern.
+  The sketch draws only the parts that each product of this kind needs. It draws no part that belongs to one source.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foot menu</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .foot_trigger { width: auto; max-width: 100%; min-width: 0; }
+  [data-sketch] .foot_trigger > .sketch-avatar { width: 28px; height: 28px; font-size: 11px; }
+  [data-sketch] .foot_name { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* The menu opens up from the foot of the side list. */
+  [data-sketch] .foot_menu { min-width: 240px; transform-origin: bottom left; }
+  [data-sketch] .foot_group { margin-top: 8px; }
+  /* The menu is in the side list, next to its trigger. The kit draws a link there as a tab, and a menu row is a row. */
+  [data-sketch] .foot_menu a.sketch-menu-item { display: flex; flex-direction: row; justify-content: flex-start; gap: 10px; padding: 8px 12px; font-size: inherit; }
+  [data-sketch] .foot_identity { display: grid; margin: 4px 12px; overflow-wrap: anywhere; }
+  /* The submenu shows beside its row, and it opens up from the row. It shows at once, so it has no transition. */
+  [data-sketch] .foot_sub_anchor { position: relative; display: grid; }
+  [data-sketch] .foot_submenu { position: absolute; bottom: -8px; left: calc(100% + 4px); min-width: 180px; }
+  [data-sketch] .foot_submenu [aria-checked="false"] .sketch-icon { visibility: hidden; }
+  /* One line stands before the sign-out row, as in the source. */
+  [data-sketch] .foot_rule { width: 100%; margin: 4px 0; border: 0; border-top: 1px solid var(--sketch-ink); }
+  /* The settings window is a part of settings/settings-window. Here it is a plain box with that name, and it shows at once. */
+  [data-sketch] .foot_part { min-height: min(280px, calc(100dvh - 32px)); place-items: center; text-align: center; overflow-wrap: anywhere; }
+  [data-sketch] .foot_part > p { margin: 0; text-wrap: balance; }
+  /* The box has no control, so the box takes the focus. The box is not a control, so it shows no focus ring. */
+  [data-sketch] .foot_part:focus-visible { outline: none; }
+  /* The signed-out page is a part of navigation/user-menu. Here it is a plain box with that name. The box is the heading of the page. */
+  [data-sketch] h1.foot_page_part { display: grid; place-items: center; min-height: 160px; margin: 0; padding: 16px; font: inherit; letter-spacing: normal; text-align: center; overflow-wrap: anywhere; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  @media (max-width: 599px) {
+    /* On a phone, the submenu has no room beside its row. It covers the rows of the menu. */
+    [data-sketch] .foot_submenu { left: 24px; right: -4px; min-width: 0; }
+  }
+  @media (min-width: 600px) and (max-width: 999px) {
+    /* The trigger is the last tab of the tab bar. The submenu has no room at the right, so it shows at the left of the menu. */
+    [data-sketch] .foot_submenu { left: auto; right: calc(100% + 4px); }
+  }
+  @media (max-width: 999px) {
+    /* In the tab bar, the trigger is one more tab: the avatar above the name. */
+    [data-sketch] .sketch-nav .foot_trigger { flex-direction: column; justify-content: center; gap: 2px; padding: 4px; font-size: 12px; }
+    [data-sketch] .sketch-nav .foot_trigger > .sketch-avatar { width: 24px; height: 24px; font-size: 10px; }
+  }
+  @media (min-width: 1000px) {
+    /* The bar is the head of the side list, so the page takes the full height beside it. */
+    [data-sketch] .foot_shell > .foot_head { grid-column: 1; grid-row: 1; padding: 16px 8px 4px; border-bottom: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+    [data-sketch] .foot_shell > .sketch-nav { grid-column: 1; grid-row: 2; padding-top: 8px; }
+    [data-sketch] .foot_shell > .sketch-main { grid-column: 2; grid-row: 1 / 3; }
+  }
+  /* The page script writes the values of transitions.json into --foot-enter and --foot-leave. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .foot_layer { transition: var(--foot-enter); }
+    [data-sketch] .foot_layer[hidden] { opacity: 0; transform: scale(0.98); transition: var(--foot-leave); }
+    /* The menu enters only from the closed state. A change between two open states shows at once. */
+    @starting-style { [data-from="closed"] [data-sketch] .foot_layer { opacity: 0; transform: scale(0.98); } }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each of the first 4 states. -->
+<section class="sketch-shell foot_shell" data-state="closed"></section>
+<section class="sketch-shell foot_shell" data-state="menu-open"></section>
+<section class="sketch-shell foot_shell" data-state="theme-open"></section>
+<section class="sketch-shell foot_shell" data-state="settings-open"></section>
+<section data-state="signed-out">
+  <main class="sketch-narrow">
+    <h1 class="foot_page_part">Signed-out page. Pattern: navigation/user-menu</h1>
+  </main>
+</section>
+
+<!-- The trigger is at the foot of the side list. The menu opens up, and its head says who is signed in. Each row has an icon. -->
+<template id="shell">
+  <header class="sketch-bar foot_head" role="banner"><strong>[Product]</strong></header>
+  <nav class="sketch-nav" aria-label="Main">
+    <a href="#" aria-current="page"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="comment"></i>Feed</a><a href="#"><i data-icon="box"></i>Catalog</a><a href="#"><i data-icon="user"></i>Members</a>
+    <span class="sketch-spacer sketch-from-desktop"></span>
+    <button type="button" class="sketch-menu-item foot_trigger" data-sketch-popover="menu___state__" data-opens="menu-open"><span class="sketch-avatar" aria-hidden="true">ML</span><span class="foot_name">Mara<span class="sketch-from-desktop"> Lindqvist</span></span></button>
+    <div class="sketch-menu foot_menu foot_layer" id="menu___state__" aria-label="Account">
+      <p class="foot_identity"><b>Mara Lindqvist</b><span>mara@portal.example</span></p>
+      <button type="button" class="sketch-menu-item foot_group" data-opens-part><i data-icon="settings"></i>Settings</button>
+      <button type="button" class="sketch-menu-item" data-sketch-toast="Help page (sample)"><i data-icon="info"></i>Help</button>
+      <div class="foot_sub_anchor">
+        <button type="button" class="sketch-menu-item" data-submenu-row aria-haspopup="menu"><i data-icon="eye"></i>Theme<span class="sketch-spacer"></span><i data-icon="chevron-right"></i></button>
+        <!--submenu-->
+      </div>
+      <hr class="foot_rule">
+      <a class="sketch-menu-item" href="#signed-out"><i data-icon="arrow-right"></i>Sign out</a>
+    </div>
+  </nav>
+  <main class="sketch-main"><h1>Home</h1><div class="sketch-placeholder" style="min-height:240px">Portal page</div></main>
+  <dialog class="sketch-dialog foot_part" id="part___state__" aria-label="Settings window"><p>Settings window. Pattern: settings/settings-window</p></dialog>
+</template>
+
+<template id="part_submenu">
+  <div class="sketch-menu foot_submenu" aria-label="Theme">
+    <button type="button" class="sketch-menu-item" data-theme-choice="Light">Light<span class="sketch-spacer"></span><i data-icon="check"></i></button>
+    <button type="button" class="sketch-menu-item" data-theme-choice="Dark">Dark<span class="sketch-spacer"></span><i data-icon="check"></i></button>
+    <button type="button" class="sketch-menu-item" data-theme-choice="System">System<span class="sketch-spacer"></span><i data-icon="check"></i></button>
+  </div>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The values of transitions.json. The sketch plays each with the same duration, delay and easing.
+  const transition_records = [
+    { label: 'menu-open', trigger: 'click the trigger of the menu', element: 'menu', property: 'opacity', animation: null, duration: 35, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'menu-open', trigger: 'click the trigger of the menu', element: 'menu', property: 'transform', animation: null, duration: 160, delay: 0, easing: 'cubic-bezier(0, 0, 0.2, 1)', measurement: 'estimated' },
+    { label: 'closed', trigger: 'press Escape, press outside the menu or click the trigger', element: 'menu', property: 'transform', animation: null, duration: 20, delay: 0, easing: 'linear', measurement: 'estimated' },
+    { label: 'closed', trigger: 'press Escape, press outside the menu or click the trigger', element: 'menu', property: 'opacity', animation: null, duration: 110, delay: 20, easing: 'cubic-bezier(0, 0, 0.2, 1)', measurement: 'estimated' }
+  ];
+  window.__sketchTransitions = transition_records;
+
+  const root = document.documentElement;
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  const open_states = ['menu-open', 'theme-open', 'settings-open'];
+  const reduced_motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const template_html = id => document.getElementById(id).innerHTML;
+  const shown_section = () => state_sections.find(section => !section.hidden);
+  const transition_css = label => transition_records
+    .filter(record => record.label === label)
+    .map(record => `${record.property} ${record.duration}ms ${record.easing} ${record.delay}ms`).join(', ');
+  // The menu stays on the screen until the last step of the close ends.
+  const leave_ms = Math.max(...transition_records.filter(record => record.label === 'closed').map(record => record.delay + record.duration));
+  root.style.setProperty('--foot-enter', transition_css('menu-open'));
+  root.style.setProperty('--foot-leave', `${transition_css('closed')}, display ${leave_ms}ms allow-discrete`);
+
+  // The theme choice is a sample. It moves the mark, and it does not change the theme of the sketch.
+  let chosen_theme = 'System';
+  function mark_theme() {
+    document.querySelectorAll('[data-theme-choice]').forEach(choice => {
+      choice.setAttribute('role', 'menuitemradio');
+      choice.setAttribute('aria-checked', String(choice.dataset.themeChoice === chosen_theme));
+    });
+  }
+
+  // The layer that a state shows: the plain box in settings-open, and the menu in each other state.
+  const state_layer = section => section.querySelector(section.dataset.state === 'settings-open' ? '.foot_part' : '.foot_menu');
+
+  // Copy the template into one state. The layer of an open state opens with the state.
+  function render_state(section) {
+    const state = section.dataset.state;
+    if (!section.matches('.foot_shell')) return;
+    section.innerHTML = template_html('shell')
+      .replace('<!--submenu-->', state === 'theme-open' ? template_html('part_submenu') : '')
+      .replaceAll('__state__', state);
+    if (open_states.includes(state)) state_layer(section).setAttribute('data-open', '');
+    section.querySelector('.foot_part').addEventListener('close', sync_address);
+    section.querySelectorAll('[data-submenu-row]').forEach(row => row.setAttribute('aria-expanded', String(state === 'theme-open')));
+  }
+
+  // The kit hides each menu that it did not open, and it scrolls a menu when the submenu hangs outside it.
+  function show_submenus() {
+    document.querySelectorAll('.foot_submenu').forEach(submenu => { submenu.hidden = false; });
+    document.querySelectorAll('.foot_menu').forEach(menu => { menu.style.overflowY = ''; });
+  }
+
+  // Each state has its own copy of the screen. So a change of state puts the focus on the same control of the new copy.
+  let focus_target = null;
+  const menu_rows = section => [...section.querySelectorAll('.foot_menu > .sketch-menu-item, .foot_sub_anchor > .sketch-menu-item')];
+  const focus_trigger = section => section.querySelector('[data-opens]');
+  const focus_first_row = section => menu_rows(section)[0];
+  const focus_submenu_row = section => section.querySelector('[data-submenu-row]');
+  const focus_theme_choice = section => section.querySelector('[data-theme-choice][aria-checked="true"]');
+
+  // The menu plays its entry only when the state before was closed. The kit shows a state before this script names it.
+  // So the entry starts while data-from still names the state before. Read the menu first, then name the state.
+  function name_state() {
+    const section = shown_section();
+    section.querySelector('.foot_layer')?.getBoundingClientRect();
+    root.dataset.from = section.dataset.state;
+  }
+
+  function go(state, target, replace) {
+    focus_target = target || null;
+    if (replace) location.replace(`#${state}`); else location.hash = state;
+  }
+
+  // The state that the layer of a section shows. The kit closes a layer in place.
+  function wanted_state(section) {
+    const layer = open_states.includes(section.dataset.state) && state_layer(section);
+    if (!layer) return section.dataset.state;
+    return (layer.matches('dialog') ? layer.open : !layer.hidden) ? section.dataset.state : 'closed';
+  }
+
+  // Keep the address the same as the screen. A closed menu plays its close before the state changes. The plain box goes at once.
+  let leave_timer = 0;
+  function sync_address() {
+    const section = shown_section();
+    if (wanted_state(section) === section.dataset.state || leave_timer) return;
+    const wait_ms = reduced_motion.matches || state_layer(section).matches('dialog') ? 0 : leave_ms;
+    leave_timer = setTimeout(() => {
+      leave_timer = 0;
+      // A row that is a link changes the address before the kit shows the new state. Then the address wins.
+      if (shown_section() === section && location.hash === `#${section.dataset.state}`) go('closed', focus_trigger);
+    }, wait_ms);
+  }
+
+  // These listeners run before the listeners of the kit, so the kit does not open or close the layer in place.
+  document.addEventListener('click', event => {
+    const section = event.target.closest('[data-state]');
+    if (!section) return;
+    const opener = section.dataset.state === 'closed' && event.target.closest('[data-opens]');
+    const submenu_row = event.target.closest('[data-submenu-row]');
+    if (opener) go(opener.dataset.opens, focus_first_row);
+    else if (submenu_row) {
+      const open = section.dataset.state === 'theme-open';
+      go(open ? 'menu-open' : 'theme-open', open ? focus_submenu_row : focus_theme_choice);
+    } else if (event.target.closest('[data-opens-part]')) go('settings-open');
+    else return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+  document.addEventListener('keydown', event => {
+    const section = event.target.closest?.('[data-state]');
+    if (!section) return;
+    if (event.key === 'ArrowRight' && event.target.matches('[data-submenu-row]') && section.dataset.state === 'menu-open') go('theme-open', focus_theme_choice);
+    else if (event.key === 'ArrowLeft' && event.target.closest('.foot_submenu')) go('menu-open', focus_submenu_row);
+    else return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+  // The submenu opens when the pointer is over its row, and it closes when the pointer is over a different row.
+  document.addEventListener('mouseover', event => {
+    const section = event.target.closest('[data-state]');
+    const row = event.target.closest('.foot_menu > .sketch-menu-item, .foot_sub_anchor > .sketch-menu-item');
+    if (!row || !['menu-open', 'theme-open'].includes(section.dataset.state) || leave_timer) return;
+    const state = row.matches('[data-submenu-row]') ? 'theme-open' : 'menu-open';
+    const at = menu_rows(section).indexOf(row);
+    if (state !== section.dataset.state) go(state, shown => menu_rows(shown)[at], true);
+  });
+
+  // These listeners are on the document, so they run after the listeners of the kit on the body.
+  document.addEventListener('click', event => {
+    const choice = event.target.closest('[data-theme-choice]');
+    if (choice) {
+      chosen_theme = choice.dataset.themeChoice;
+      mark_theme();
+      sketchToast(`${chosen_theme} theme (sample)`);
+    }
+    sync_address();
+  });
+  document.addEventListener('keydown', sync_address);
+  document.addEventListener('pointerdown', sync_address);
+  addEventListener('resize', show_submenus);
+  addEventListener('hashchange', () => {
+    clearTimeout(leave_timer);
+    leave_timer = 0;
+    show_submenus();
+    focus_target?.(shown_section())?.focus();
+    focus_target = null;
+    name_state();
+  });
+
+  state_sections.forEach(render_state);
+  initSketch();
+  mark_theme();
+  show_submenus();
+  name_state();
+</script>

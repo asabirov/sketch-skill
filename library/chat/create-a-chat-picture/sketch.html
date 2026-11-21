@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create a chat with a picture sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A phone screen. The frame keeps the width of a phone in a wide window, so each part acts as it does on a phone. */
+  html { height: 100%; }
+  body[data-sketch] { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  [data-sketch] > [data-state] { flex: 1; min-height: 0; }
+  [data-sketch] [data-screen] { height: 100%; }
+  [data-sketch] .phone { position: relative; isolation: isolate; width: min(100%, 430px); height: 100%; margin: 0 auto; overflow: hidden; }
+  [data-sketch] .phone_screen { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); }
+  [data-sketch] .phone_bar { grid-row: 1; display: flex; align-items: center; gap: 4px; min-height: 56px; padding: 6px 8px; }
+  [data-sketch] .phone_bar :is(h1, h2) { flex: 1; min-width: 0; margin: 0 8px; font-size: 20px; letter-spacing: -.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .phone_body { grid-row: 2; min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_body > p { margin: 0 0 12px; }
+  [data-sketch] .phone_round { border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
+  @media (min-width: 600px) { [data-sketch] .phone { border-inline: var(--sketch-stroke) solid var(--sketch-muted); } }
+  /* A plain box stands for a part that this pattern does not draw. It names the part, and the pattern that draws it. */
+  [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; text-decoration: none; }
+  /* Each motion value below comes from transitions.json. */
+  [data-sketch] { --phone_spring: linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%); --phone_out: cubic-bezier(0.23, 1, 0.32, 1); }
+  /* A pressed row or button shrinks and takes a soft fill while the finger is down. */
+  [data-sketch] .phone_press:active { background-color: var(--sketch-wash); transform: scale(0.96); }
+  @media (prefers-reduced-motion: no-preference) { [data-sketch] .phone_press { transition: transform 120ms var(--phone_out), background-color 120ms var(--phone_out); } }
+  /* A sheet covers the lower part of the screen. The scrim thins the screen behind it. */
+  [data-sketch] .phone_scrim { position: absolute; inset: 0; z-index: 2; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+  [data-sketch] .phone_sheet { position: absolute; inset: auto 0 0; z-index: 3; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: calc(100% - 48px); background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-bottom: 0; border-radius: 24px 20px 0 0 / 20px 24px 0 0; }
+  [data-sketch] .phone_sheet_head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 8px 4px 16px; touch-action: none; }
+  [data-sketch] .phone_sheet_head h2 { margin: 0; font-size: 20px; }
+  [data-sketch] .phone_grab { grid-column: 1 / -1; justify-self: center; width: 36px; height: 4px; margin: 8px 0 4px; border-radius: 2px; background: var(--sketch-ink); }
+  [data-sketch] .phone_sheet_body { min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_sheet_foot { display: flex; align-items: center; gap: 8px; padding: 8px 16px 16px; }
+  [data-sketch] .exit_scrim { pointer-events: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_scrim.enter_scrim { animation: scrim-enter 120ms var(--phone_out); }
+    [data-sketch] .phone_scrim.exit_scrim { animation: scrim-exit 120ms var(--phone_out) forwards; }
+    [data-sketch] .phone_sheet.enter_sheet { animation: directory-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_sheet.settle { transition: transform 520ms var(--phone_spring); }
+  }
+  @keyframes scrim-enter { from { opacity: 0; } }
+  @keyframes scrim-exit { to { opacity: 0; } }
+  @keyframes directory-enter { from { transform: translateY(100%); } }
+  [data-sketch] .create_bar { justify-content: space-between; }
+  /* The chat list is a plain box. A new chat shows above it. */
+  [data-sketch] .create_list { display: flex; flex-direction: column; gap: 8px; }
+  [data-sketch] .create_list .part_box { flex: 1; }
+  [data-sketch] .create_new { display: flex; align-items: center; gap: 12px; min-height: 56px; }
+  /* The form adds no box. The head, the body and the foot stay parts of the sheet layout. */
+  [data-sketch] .create_form { display: contents; }
+  [data-sketch] .create_sheet .phone_sheet_head { border-bottom: var(--sketch-stroke) solid var(--sketch-muted); }
+  [data-sketch] .create_body { display: grid; justify-items: stretch; gap: 16px; padding-top: 16px; }
+  [data-sketch] .create_body > :is(.create_photo, .sketch-button) { justify-self: center; }
+  [data-sketch] .create_body .sketch-error { margin: -8px 0 0; }
+  [data-sketch] .create_foot { justify-content: space-between; padding-top: 12px; border-top: var(--sketch-stroke) solid var(--sketch-muted); }
+  /* The picture: a round frame. A crossed box stands for the chosen picture. */
+  [data-sketch] .create_photo { display: grid; place-items: center; width: 96px; height: 96px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; }
+  [data-sketch] .sketch-placeholder.create_photo { min-height: 0; padding: 0; overflow: hidden; }
+  /* Create is quiet until the form has a name. */
+  [data-sketch] .phone_sheet .create_submit:disabled { opacity: 1; background-color: var(--sketch-wash); border-color: transparent; color: var(--sketch-muted); }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_sheet .create_submit { transition: transform 120ms var(--phone_out), background-color 120ms var(--phone_out), color 120ms var(--phone_out); }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="closed">
+  <div data-screen="create_form"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="create_form" data-show="sheet"></div>
+</section>
+<section data-state="filled">
+  <div data-screen="create_form" data-show="sheet filled chosen"></div>
+</section>
+<section data-state="name-taken">
+  <div data-screen="create_form" data-show="sheet filled taken chosen"></div>
+</section>
+<section data-state="created">
+  <div data-screen="create_form" data-show="filled created chosen"></div>
+</section>
+
+<!-- The screen with the chat list, and the sheet that makes a new chat. The parts "filled", "taken" and "created" draw the states.
+     The part "chosen" shows a chosen picture. -->
+<template id="create_form">
+<div class="phone">
+  <main class="phone_screen" data-inert-in="sheet">
+    <header class="phone_bar create_bar">
+      <h1>Chats</h1>
+      <button class="sketch-icon-button phone_round phone_press" type="button" aria-label="New chat" data-go="empty" data-move="sheet" data-focus="!sheet"><i data-icon="plus"></i></button>
+    </header>
+    <div class="phone_body create_list">
+      <div class="create_new" data-part="created">
+        <span class="sketch-avatar"><i data-icon="image"></i></span>
+        <span data-new-name>Book club</span>
+      </div>
+      <div class="part_box" data-used-names="Garden club|Weekend market"><strong>Chat list</strong><span class="sketch-muted">chat/chat-list</span></div>
+    </div>
+  </main>
+  <div class="phone_scrim" data-part="sheet" data-go="closed" data-move="close"></div>
+  <div class="phone_sheet create_sheet" role="dialog" aria-modal="true" aria-labelledby="create_title" data-part="sheet" data-closed="closed">
+  <form class="create_form" novalidate>
+    <header class="phone_sheet_head" data-sheet-drag>
+      <span class="phone_grab"></span>
+      <h2 id="create_title">New chat</h2>
+      <button class="sketch-icon-button" type="button" aria-label="Close" data-go="closed" data-move="close" data-escape><i data-icon="close"></i></button>
+    </header>
+    <div class="phone_sheet_body create_body">
+      <span class="create_photo" data-part="!chosen"><i data-icon="image"></i></span>
+      <span class="sketch-placeholder create_photo" data-part="chosen">Picture</span>
+      <button class="sketch-button secondary" type="button" data-part="!chosen" data-sketch-toast="The pictures of the phone open (sample)">Choose a picture</button>
+      <button class="sketch-button secondary" type="button" data-part="chosen" data-sketch-toast="The pictures of the phone open (sample)">Change the picture</button>
+      <label class="sketch-field">Name<input class="sketch-input" type="text" name="chat_name" maxlength="80" autocomplete="off" aria-describedby="create_error" data-chat-name data-focus="sheet" data-value-in="filled=Book club|taken=Garden club"></label>
+      <p class="sketch-error" id="create_error" data-part="taken" data-name-error>A chat has this name. Use a different name.</p>
+    </div>
+    <footer class="phone_sheet_foot create_foot">
+      <button class="sketch-button secondary phone_press" type="button" data-go="closed" data-move="close">Cancel</button>
+      <button class="sketch-button phone_press create_submit" type="submit" disabled>Create</button>
+    </footer>
+  </form>
+  </div>
+</div>
+</template>
+
+<script>
+/* The screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it.
+   data-inert-in locks a region. data-value-in="name=text" fills a field.
+   A link to "#state" and a button with data-go change the state. data-move names the transition that the change plays.
+   After the change, the element whose data-focus names a shown part takes the focus.
+   Escape presses the shown data-escape button. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' ').filter(Boolean), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  const parts_of = block => (block.dataset.show || '').split(' ');
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = parts_of(block);
+    ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    copy.querySelectorAll('[data-inert-in]').forEach(region => { region.inert = has_part(shown, region.dataset.inertIn); });
+    copy.querySelectorAll('[data-value-in]').forEach(field => field.dataset.valueIn.split('|').forEach(pair => {
+      const [name, text] = pair.split('=');
+      if (shown.includes(name)) field.setAttribute('value', text);
+    }));
+    block.append(copy);
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_block = () => document.querySelector('[data-state]:not([hidden]) [data-screen]');
+  /* A move plays one transition of transitions.json. play adds the class that holds the animation, and takes it away at the end. */
+  window.pattern_moves = {};
+  window.pattern_play = (node, name, after) => {
+    if (reduced.matches) { if (after) after(); return; }
+    const done = event => {
+      if (event.target !== node) return;
+      node.removeEventListener('animationend', done);
+      node.classList.remove(name);
+      if (after) after();
+    };
+    node.addEventListener('animationend', done);
+    node.classList.add(name);
+  };
+  let focus_next = false;
+  window.pattern_go = (state, move, from) => {
+    const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
+    if (to && to !== from && move && !reduced.matches) pattern_moves[move](from, to);
+    focus_next = true;
+    location.hash = state;
+  };
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-go], a[href^="#"]');
+    const block = control && control.closest('[data-screen]');
+    if (!block || control.matches(':disabled')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pattern_go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
+  }, true);
+  addEventListener('hashchange', () => requestAnimationFrame(() => {
+    const block = shown_block();
+    const target = focus_next && block && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    focus_next = false;
+    if (target) target.focus({preventScroll: true});
+  }));
+  document.addEventListener('keydown', event => {
+    const block = event.key === 'Escape' && shown_block();
+    const close = block && [...block.querySelectorAll('[data-escape]')].find(button => button.checkVisibility());
+    if (close) close.click();
+  });
+})();
+/* sheet: the sheet rises and the scrim shows. close: the sheet leaves at once, and a copy of the scrim fades out.
+   A drag on the head of a sheet moves the sheet with the pointer. A release after a third of the height, or after a fast flick,
+   closes the sheet. A shorter drag returns it. data-closed on the sheet names the state that a long drag opens. */
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  pattern_moves.sheet = (from, to) => {
+    to.querySelectorAll('.phone_sheet:not([hidden])').forEach(sheet => pattern_play(sheet, 'enter_sheet'));
+    to.querySelectorAll('.phone_scrim:not([hidden])').forEach(scrim => pattern_play(scrim, 'enter_scrim'));
+  };
+  pattern_moves.close = (from, to) => {
+    if (!from.querySelector('.phone_scrim:not([hidden])')) return;
+    const ghost = document.createElement('div');
+    ghost.className = 'phone_scrim';
+    to.querySelector('.phone').append(ghost);
+    pattern_play(ghost, 'exit_scrim', () => ghost.remove());
+  };
+  const offset = sheet => new DOMMatrix(getComputedStyle(sheet).transform).m42;
+  let drag = null;
+  document.addEventListener('pointerdown', event => {
+    const head = event.target.closest('[data-sheet-drag]');
+    if (!head || event.button !== 0 || event.target.closest('button, a, input')) return;
+    const sheet = head.closest('.phone_sheet'), held = offset(sheet);
+    sheet.classList.remove('enter_sheet', 'settle');
+    sheet.style.transform = `translateY(${held}px)`;
+    head.setPointerCapture(event.pointerId);
+    drag = {sheet, start: event.clientY - held, last: event.clientY, time: event.timeStamp, velocity: 0, distance: held};
+  });
+  document.addEventListener('pointermove', event => {
+    if (!drag) return;
+    const elapsed = event.timeStamp - drag.time;
+    if (elapsed > 0) drag.velocity = (event.clientY - drag.last) / elapsed;
+    drag.last = event.clientY;
+    drag.time = event.timeStamp;
+    drag.distance = Math.max(0, event.clientY - drag.start);
+    drag.sheet.style.transform = `translateY(${drag.distance}px)`;
+  });
+  const release = event => {
+    if (!drag) return;
+    const {sheet, distance, velocity, time} = drag, block = sheet.closest('[data-screen]');
+    drag = null;
+    const closes = event.type !== 'pointercancel' && (distance >= sheet.offsetHeight / 3 || distance > 24 && velocity > .5 && event.timeStamp - time < 120);
+    const finish = () => {
+      sheet.classList.remove('settle');
+      if (closes) pattern_go(sheet.dataset.closed, 'close', block);
+      sheet.style.transform = '';
+    };
+    if (reduced.matches || !closes && distance < 1) { finish(); return; }
+    const done = ended => {
+      if (ended.target !== sheet) return;
+      sheet.removeEventListener('transitionend', done);
+      finish();
+    };
+    sheet.addEventListener('transitionend', done);
+    sheet.classList.add('settle');
+    sheet.style.transform = closes ? 'translateY(100%)' : 'translateY(0px)';
+  };
+  document.addEventListener('pointerup', release);
+  document.addEventListener('pointercancel', release);
+})();
+/* Create is in use only when the form has a name. Create with a name that the chat list has shows the error on the field. Create
+   with a new name closes the sheet and puts the new chat above the list. The New chat button opens an empty form. */
+(() => {
+  const read = form => ({
+    name: form.querySelector('[data-chat-name]').value,
+  });
+  const draw = form => {
+    const draft = read(form);
+    form.querySelector('.create_submit').disabled = !draft.name.trim();
+  };
+  const write = (form, draft, error) => {
+    const field = form.querySelector('[data-chat-name]');
+    field.value = draft.name;
+    form.querySelector('[data-name-error]').hidden = !error;
+    if (error) field.setAttribute('aria-invalid', 'true');
+    else field.removeAttribute('aria-invalid');
+    draw(form);
+  };
+  const block_of = state => document.querySelector(`[data-state="${state}"] [data-screen]`);
+  document.querySelectorAll('[data-screen] .create_sheet').forEach(form => write(form, read(form), !form.querySelector('[data-name-error]').hidden));
+  document.addEventListener('input', event => {
+    const form = event.target.closest('.create_sheet');
+    if (form) write(form, read(form), false);
+  });
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-go="empty"]')) write(block_of('empty').querySelector('.create_sheet'), {name: ''}, false);
+  }, true);
+  document.addEventListener('submit', event => {
+    const form = event.target.closest('.create_sheet');
+    if (!form) return;
+    event.preventDefault();
+    const block = form.closest('[data-screen]'), draft = read(form), name = draft.name.trim();
+    const used = block.querySelector('[data-used-names]').dataset.usedNames.split('|').some(other => other.toLowerCase() === name.toLowerCase());
+    if (used) {
+      const next = block_of('name-taken');
+      write(next.querySelector('.create_sheet'), draft, true);
+      if (next === block) form.querySelector('[data-chat-name]').focus();
+      else pattern_go('name-taken', null, block);
+      return;
+    }
+    const list = block_of('created');
+    list.querySelector('[data-new-name]').textContent = name;
+    pattern_go('created', 'close', block);
+  });
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

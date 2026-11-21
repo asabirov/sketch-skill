@@ -1,0 +1,506 @@
+<!doctype html>
+<!--
+Best for: the sign-up of a work tool that signs in with an emailed code, creates a workspace, and
+then runs a short paged onboarding. Use it for a passwordless sign-in, a "building your workspace"
+wait, and a 5-step setup pager with skip on each step.
+Row opens: no rows.
+Transitions, with the values of transitions.json:
+- Auth card and auth links: opacity and transform 200ms ease-out (email).
+- Button hover: background-color and color 150ms ease (check-email).
+- Field error: opacity 200ms ease-in-out (code-expired).
+- Loading bar: progress 2000ms linear (create-workspace).
+- Emblem build: emblem-build 3400ms linear. Four strokes draw with stroke-draw 800ms linear, delays
+  500, 750, 1000 and 1250ms. Four fills follow with stroke-fill 600ms linear, delays 900, 1150,
+  1400 and 1650ms. The mark settles with emblem-settle 500ms linear at 2350ms. The overlay leaves
+  with overlay-out 550ms linear at 3500ms (building).
+- New step content: opacity 750ms with the linear() spring in --spring, delays 0, 80, 160 and 240ms.
+- Pager dot: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1). Side video: opacity 350ms ease.
+  Side layer: opacity 200ms ease-out.
+- Old step content: opacity 200ms cubic-bezier(0.4, 0, 1, 1).
+- Toggle: background-color, left and right 150ms ease-out (newsletter).
+- App: app view fade-in 80ms linear. App panel opacity 200ms ease-in-out.
+Reduced motion: the movement and the scale stop. The state changes stay.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign-up, workspace creation and onboarding</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] { --spring: linear(0 0%, 0.0065 1.3513513513513513%, 0.0245 2.7027027027027026%, 0.0517 4.054054054054054%, 0.0863 5.405405405405405%, 0.1265 6.756756756756756%, 0.1708 8.108108108108107%, 0.218 9.459459459459458%, 0.267 10.810810810810809%, 0.3169 12.16216216216216%, 0.3668 13.51351351351351%, 0.4161 14.864864864864861%, 0.4644 16.216216216216214%, 0.5111 17.567567567567565%, 0.556 18.918918918918916%, 0.5988 20.270270270270267%, 0.6393 21.621621621621617%, 0.6774 22.97297297297297%, 0.7131 24.32432432432432%, 0.7462 25.67567567567567%, 0.7769 27.02702702702702%, 0.8051 28.378378378378372%, 0.8309 29.729729729729723%, 0.8544 31.081081081081074%, 0.8758 32.43243243243243%, 0.895 33.78378378378378%, 0.9123 35.13513513513514%, 0.9277 36.48648648648649%, 0.9413 37.837837837837846%, 0.9534 39.1891891891892%, 0.9639 40.540540540540555%, 0.9732 41.89189189189191%, 0.9811 43.243243243243256%, 0.988 44.59459459459461%, 0.9938 45.945945945945965%, 0.9987 47.29729729729732%, 1.0027 48.648648648648674%, 1.0061 50.00000000000002%, 1.0088 51.35135135135137%, 1.0109 52.70270270270272%, 1.0125 54.05405405405408%, 1.0137 55.405405405405425%, 1.0145 56.75675675675677%, 1.0149 58.10810810810813%, 1.0151 59.459459459459474%, 1.0151 60.81081081081082%, 1.0149 62.162162162162176%, 1.0146 63.51351351351353%, 1.0141 64.86486486486488%, 1.0135 66.21621621621624%, 1.0128 67.5675675675676%, 1.0121 68.91891891891895%, 1.0114 70.2702702702703%, 1.0107 71.62162162162166%, 1.0099 72.97297297297301%, 1.0092 74.32432432432437%, 1.0084 75.67567567567572%, 1.0077 77.02702702702707%, 1.007 78.37837837837843%, 1.0063 79.72972972972978%, 1.0057 81.08108108108114%, 1.0051 82.43243243243248%, 1.0046 83.78378378378383%, 1.004 85.13513513513519%, 1.0036 86.48648648648653%, 1.0031 87.83783783783787%, 1.0027 89.18918918918922%, 1.0023 90.54054054054058%, 1.002 91.89189189189192%, 1.0017 93.24324324324326%, 1.0014 94.59459459459461%, 1.0012 95.94594594594597%, 1.001 97.2972972972973%, 1 98.64864864864865%, 1 100%); }
+  [data-sketch] .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] h1 { margin: 0; }
+  [data-sketch] p { margin: 0; }
+  [data-sketch] [data-show] { overflow-wrap: anywhere; }
+  [data-sketch] [tabindex="-1"]:focus { outline: 0; }
+
+  /* The dark surfaces: the building wait and the five onboarding steps stay dark in the light theme. */
+  [data-sketch] .dark {
+    color-scheme: dark;
+    --sketch-page: #141513; --sketch-ink: #efeee6;
+    --sketch-muted: color-mix(in srgb, var(--sketch-ink) 68%, transparent);
+    --sketch-wash: color-mix(in srgb, var(--sketch-ink) 10%, transparent);
+    background: var(--sketch-page); color: var(--sketch-ink);
+  }
+
+  /* Sign-in: a centred card with the links below it. The card and the links move in together. */
+  [data-sketch] .auth-page { min-height: 100vh; display: grid; align-content: center; justify-items: center; gap: 12px; padding: 32px 16px; }
+  [data-sketch] .auth-card { width: min(420px, 100%); }
+  [data-sketch] .auth-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; width: min(420px, 100%); }
+  [data-sketch] .auth-links .sketch-spacer { flex: 1; }
+  [data-sketch] :is(.auth-card, .auth-links) { transition: opacity 200ms ease-out, transform 200ms ease-out; }
+  @starting-style { [data-sketch] :is(.auth-card, .auth-links) { opacity: 0; transform: translateY(10px); } }
+
+  /* Buttons answer in 150ms ease. The hover moves the background and the text, not the border. */
+  [data-sketch] .sketch-button { transition: background-color 150ms ease, color 150ms ease; }
+  [data-sketch] .sketch-button:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--sketch-ink) 84%, transparent);
+    color: color-mix(in srgb, var(--sketch-page) 92%, transparent);
+  }
+  [data-sketch] .sketch-button.secondary:hover:not(:disabled) {
+    background-color: var(--sketch-wash);
+    color: color-mix(in srgb, var(--sketch-ink) 84%, transparent);
+  }
+
+  /* The line under the code field is its own group, one step further from the button. */
+  [data-sketch] .sketch-stack > .auth-note { margin-top: var(--sketch-space); }
+
+  /* The expired-code error fades in under the field. */
+  [data-sketch] .field-error { display: flex; align-items: flex-start; gap: var(--sketch-space); transition: opacity 200ms ease-in-out; }
+  @starting-style { [data-sketch] .field-error { opacity: 0; } }
+
+  /* Create workspace: a loading bar grows, then the wait opens. */
+  [data-sketch] .loading-bar { height: 6px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px 5px 4px 5px; overflow: hidden; }
+  [data-sketch] .loading-bar i { display: block; height: 100%; background: var(--sketch-ink); animation: progress 2000ms linear; }
+  @keyframes progress { from { width: 0; } to { width: 100%; } }
+
+  /* Building: the mark draws stroke by stroke, settles, then the screen fades. */
+  [data-sketch] .building { position: fixed; inset: 0; z-index: 50; background: var(--sketch-page); }
+  [data-sketch] .building-overlay { position: absolute; inset: 0; display: grid; place-items: center; animation: overlay-out 550ms linear 3500ms both; }
+  [data-sketch] .building-content { display: grid; gap: 24px; justify-items: center; }
+  [data-sketch] .emblem { width: 120px; height: 120px; fill: none; stroke: var(--sketch-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; animation: emblem-build 3400ms linear both, emblem-settle 500ms linear 2350ms both; }
+  [data-sketch] .emblem .stroke { stroke-dasharray: 1; stroke-dashoffset: 1; fill: transparent; animation: stroke-draw 800ms linear both, stroke-fill 600ms linear both; }
+  [data-sketch] .emblem .stroke:nth-child(1) { animation-delay: 500ms, 900ms; }
+  [data-sketch] .emblem .stroke:nth-child(2) { animation-delay: 750ms, 1150ms; }
+  [data-sketch] .emblem .stroke:nth-child(3) { animation-delay: 1000ms, 1400ms; }
+  [data-sketch] .emblem .stroke:nth-child(4) { animation-delay: 1250ms, 1650ms; }
+  @keyframes emblem-build { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+  @keyframes stroke-draw { to { stroke-dashoffset: 0; } }
+  @keyframes stroke-fill { to { fill: var(--sketch-ink); } }
+  @keyframes emblem-settle { from { transform: scale(.98); } to { transform: scale(1); } }
+  @keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Onboarding: a shared dark pager. The step content and the side cross-fade. */
+  [data-sketch] .onboarding { position: relative; min-height: 100vh; padding: 32px 16px 48px; }
+  [data-sketch] .onboarding:not(:has([data-state]:not([hidden]))) { display: none; }
+  [data-sketch] .onboarding-inner { width: min(1040px, 100%); margin: 0 auto; display: grid; gap: 24px; }
+  [data-sketch] .step-dots { display: flex; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .step-dots i { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--sketch-ink); opacity: .4; transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1); }
+  [data-sketch] .step-dots i.on { opacity: 1; }
+  [data-sketch] .ob-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (min-width: 760px) { [data-sketch] .ob-split { grid-template-columns: minmax(0, 1fr) 320px; } }
+  [data-sketch] .ob-main { min-width: 0; display: grid; gap: 12px; align-content: start; }
+  [data-sketch] .ob-side { position: relative; }
+  [data-sketch] .side-video { min-height: 240px; display: grid; place-items: center; padding: 16px; transition: opacity 350ms ease; }
+  [data-sketch] .side-layer { position: absolute; left: 12px; bottom: 12px; padding: 4px 12px; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); transition: opacity 200ms ease-out; }
+  [data-sketch] :is(.side-video, .side-layer).leaving { opacity: 0; }
+  @starting-style { [data-sketch] :is(.step-dots i, .side-video, .side-layer) { opacity: 0; } }
+
+  /* Step content: four blocks. New content enters with the spring; old content leaves fast. */
+  [data-sketch] .step-block { transition: opacity 750ms var(--spring); }
+  [data-sketch] .step-block:nth-child(2) { transition-delay: 80ms; }
+  [data-sketch] .step-block:nth-child(3) { transition-delay: 160ms; }
+  [data-sketch] .step-block:nth-child(4) { transition-delay: 240ms; }
+  [data-sketch] .step-block.leaving { transition: opacity 200ms cubic-bezier(0.4, 0, 1, 1); transition-delay: 0ms; opacity: 0; }
+  @starting-style { [data-sketch] .step-block { opacity: 0; } }
+  [data-sketch] .feature-row { display: flex; align-items: flex-start; gap: 12px; }
+  [data-sketch] .feature-row .sketch-icon { margin-top: 2px; }
+  [data-sketch] .photo { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+  /* Newsletter toggles: the track colour and the knob position move with left and right. */
+  [data-sketch] .toggle { position: relative; display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+  [data-sketch] .toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  [data-sketch] .toggle-track { position: relative; flex: none; width: 40px; height: 24px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 13px 11px 12px 13px / 12px 13px 11px 12px; transition: background-color 150ms ease-out; }
+  [data-sketch] .toggle-knob { position: absolute; top: 3px; left: 3px; right: 22px; width: 15px; height: 15px; border-radius: 50%; background: var(--sketch-ink); transition: left 150ms ease-out, right 150ms ease-out; }
+  [data-sketch] .toggle input:checked ~ .toggle-track { background: var(--sketch-ink); }
+  [data-sketch] .toggle input:checked ~ .toggle-track .toggle-knob { left: 22px; right: 3px; background: var(--sketch-page); }
+  [data-sketch] .toggle input:focus-visible ~ .toggle-track { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+
+  /* App: the view fades in and the issue panel follows. */
+  [data-sketch] .app { min-height: 100vh; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); animation: fade-in 80ms linear; }
+  @media (min-width: 820px) { [data-sketch] .app { grid-template-columns: 240px 1fr; } }
+  [data-sketch] .app-side { display: grid; gap: 20px; align-content: start; padding: 20px 16px; background: var(--sketch-wash); }
+  [data-sketch] .app-side h2 { margin: 0; font-size: 18px; }
+  [data-sketch] .app-side h3 { margin: 0 0 4px; font-size: inherit; font-weight: 600; color: var(--sketch-muted); }
+  [data-sketch] .app-side ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+  [data-sketch] .app-side a:not(.sketch-button) { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px; border-radius: var(--sketch-wobble); text-decoration: none; }
+  [data-sketch] .app-side a:not(.sketch-button):hover { background: var(--sketch-wash); }
+  [data-sketch] .app-main { display: grid; gap: 24px; align-content: start; padding: 32px 16px; width: min(760px, 100%); }
+  [data-sketch] .app-panel { transition: opacity 200ms ease-in-out; }
+  @starting-style { [data-sketch] .app-panel { opacity: 0; } }
+  @keyframes fade-in { from { opacity: 0; } }
+  [data-sketch] .issue { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; min-height: 56px; margin: 0 -8px; padding: 6px 8px; border-radius: var(--sketch-wobble); }
+
+  /* The two email states: a narrow card on the page, with the company name below. */
+  [data-sketch] .email-page { min-height: 100vh; display: grid; align-content: center; justify-items: center; gap: 16px; padding: 32px 16px; }
+  [data-sketch] .email-card { width: min(440px, 100%); padding: 24px; display: grid; gap: 16px; }
+  [data-sketch] .email-head { display: flex; align-items: center; gap: 8px; }
+  [data-sketch] .email-mark { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  [data-sketch] .email-divider { border: 0; border-top: var(--sketch-stroke) solid var(--sketch-wash); margin: 0; }
+  [data-sketch] .email-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
+  [data-sketch] .email-facts dt { color: var(--sketch-muted); font-weight: 600; }
+  [data-sketch] .email-facts dd { margin: 0; }
+  [data-sketch] .code-chip { justify-self: start; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 18px; letter-spacing: 2px; padding: 8px 14px; background: var(--sketch-wash); border-radius: 6px 10px 6px 9px; }
+  [data-sketch] .email-footer { color: var(--sketch-muted); }
+
+  /* Reduced motion: the state changes stay. The movement and the scale stop. */
+  @media (prefers-reduced-motion: reduce) {
+    [data-sketch] :is(.auth-card, .auth-links, .field-error, .step-block, .side-video, .side-layer, .step-dots i, .app-panel, .toggle-track, .toggle-knob, .sketch-button) { transition: none !important; }
+    [data-sketch] :is(.emblem, .emblem .stroke, .building-overlay, .loading-bar i, .app) { animation: none !important; }
+    [data-sketch] .emblem .stroke { stroke-dashoffset: 0; fill: var(--sketch-ink); }
+    [data-sketch] .sketch-button:active { transform: none !important; }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="start" class="auth-page" aria-labelledby="h-start">
+  <div class="auth-card sketch-frame sketch-panel sketch-stack">
+    <h1 id="h-start" tabindex="-1">Create your workspace</h1>
+    <p>Sign up to start a workspace for your team.</p>
+    <div class="sketch-stack" style="gap:8px">
+      <button class="sketch-button secondary" type="button" id="go-email" data-go="email"><i data-icon="user"></i>Continue with email</button>
+      <button class="sketch-button secondary" type="button" data-sketch-toast="Third-party sign-in opens in the built app"><i data-icon="external"></i>Continue with a third-party account</button>
+      <button class="sketch-button secondary" type="button" data-sketch-toast="Single sign-on opens in the built app"><i data-icon="settings"></i>Continue with single sign-on</button>
+    </div>
+    <p class="sketch-muted">By continuing you agree to the terms of service and the privacy policy.</p>
+  </div>
+</section>
+
+<section data-state="email" class="auth-page" aria-labelledby="h-email">
+  <div class="auth-card sketch-frame sketch-panel sketch-stack">
+    <h1 id="h-email" tabindex="-1">What is your email address?</h1>
+    <label class="sketch-field">Email
+      <input id="email-input" class="sketch-input" type="email" autocomplete="email" placeholder="you@example.com">
+    </label>
+    <div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button" type="button" id="go-check-email" data-go="check-email" data-needs="#email-input">Continue</button></div>
+  </div>
+  <div class="auth-links sketch-row"><a href="#start">Back</a></div>
+</section>
+
+<section data-state="check-email" class="auth-page" aria-labelledby="h-check">
+  <div class="auth-card sketch-frame sketch-panel sketch-stack">
+    <h1 id="h-check" tabindex="-1">Check your email</h1>
+    <p>We sent a temporary login link to <span data-show="email">your email</span>.</p>
+    <button class="sketch-button" type="button" id="go-code-email" data-go="code-email">Open the email</button>
+    <button class="sketch-button secondary" type="button" id="go-enter-code" data-go="enter-code">Enter code manually</button>
+  </div>
+  <div class="auth-links sketch-row"><a href="#start">Back to sign-up</a></div>
+</section>
+
+<section data-state="code-email" class="email-page" aria-labelledby="h-code-email">
+  <div class="email-card sketch-frame">
+    <div class="email-head">
+      <svg class="email-mark" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 18 10 10 18 2 10Z"/></svg>
+      <strong>[Product]</strong>
+    </div>
+    <h1 id="h-code-email" tabindex="-1">Your login code for [Product]</h1>
+    <button class="sketch-button" type="button" id="go-code-login" data-go="create-workspace">Log in to [Product]</button>
+    <p>The link and the code are valid for the next 5 minutes. If the link does not work, use the code directly.</p>
+    <span class="code-chip">K7P2MX9Q4R</span>
+    <a href="#check-email" id="go-back-check-email" style="justify-self:start">Back to check email</a>
+  </div>
+  <p class="email-footer">[Company]</p>
+</section>
+
+<section data-state="enter-code" class="auth-page" aria-labelledby="h-enter">
+  <div class="auth-card sketch-frame sketch-panel sketch-stack">
+    <h1 id="h-enter" tabindex="-1">Enter your login code</h1>
+    <p>Type the code from the email to sign in.</p>
+    <label class="sketch-field">Login code
+      <input id="code-input" class="sketch-input" autocomplete="one-time-code" placeholder="A3B7C9D2E5" style="font-family:ui-monospace,Menlo,monospace">
+    </label>
+    <div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button" type="button" id="go-create-workspace" data-go="create-workspace" data-needs="#code-input">Continue with login code</button></div>
+    <p class="sketch-muted auth-note"><a href="#code-expired" id="go-old-code">Continue with an old code</a> to see the expiry message.</p>
+  </div>
+  <div class="auth-links sketch-row"><a href="#check-email">Back</a></div>
+</section>
+
+<section data-state="code-expired" class="auth-page" aria-labelledby="h-expired">
+  <div class="auth-card sketch-frame sketch-panel sketch-stack">
+    <h1 id="h-expired" tabindex="-1">Enter your login code</h1>
+    <label class="sketch-field">Login code
+      <input class="sketch-input" aria-invalid="true" aria-describedby="code-error" style="font-family:ui-monospace,Menlo,monospace">
+      <span class="sketch-error field-error" id="code-error"><i data-icon="warning"></i><span>This login link has expired. Ask for a new one.</span></span>
+    </label>
+    <div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button" type="button" data-sketch-toast="A new link is sent in the built app">Send a new link</button></div>
+  </div>
+  <div class="auth-links sketch-row"><a href="#check-email">Back to check email</a><span class="sketch-spacer"></span><a href="#enter-code" id="go-back-enter-code">Try the code again</a></div>
+</section>
+
+<section data-state="create-workspace" class="auth-page" aria-labelledby="h-workspace">
+  <div class="auth-card sketch-frame sketch-panel sketch-stack">
+    <h1 id="h-workspace" tabindex="-1">Create your workspace</h1>
+    <label class="sketch-field">Workspace name
+      <input id="ws-name" class="sketch-input" autocomplete="organization" placeholder="Larkspur Studio">
+    </label>
+    <label class="sketch-field">Workspace address
+      <span class="sketch-row" style="gap:4px;flex-wrap:nowrap">[product].com/<input id="ws-slug" class="sketch-input" autocomplete="off" spellcheck="false" placeholder="larkspur-studio" style="flex:1;width:auto;min-width:0"></span>
+    </label>
+    <label class="sketch-field">Region
+      <select class="sketch-input"><option>US East</option><option>US West</option><option>Europe</option></select>
+    </label>
+    <button class="sketch-button" type="button" id="go-building" data-build="building" data-needs="#ws-name">Create workspace</button>
+    <div class="loading-bar" id="loading-bar" hidden role="progressbar" aria-label="Creating your workspace"><i></i></div>
+  </div>
+  <div class="auth-links sketch-row"><span class="sketch-muted">Using <span data-show="email">your email</span></span><span class="sketch-spacer"></span><a href="#email">Use a different email</a></div>
+</section>
+
+<section data-state="building" class="building dark" aria-label="Building your workspace">
+  <div class="building-overlay">
+    <div class="building-content">
+      <svg class="emblem" viewBox="0 0 96 96" aria-hidden="true">
+        <path class="stroke" pathLength="1" d="M16 20 30 12 44 20 30 28Z"/>
+        <path class="stroke" pathLength="1" d="M52 20 66 12 80 20 66 28Z"/>
+        <path class="stroke" pathLength="1" d="M16 40 30 32 44 40 30 48Z"/>
+        <path class="stroke" pathLength="1" d="M52 40 66 32 80 40 66 48Z"/>
+      </svg>
+      <p>Building your workspace…</p>
+    </div>
+  </div>
+</section>
+
+<div class="onboarding dark">
+  <div class="onboarding-inner">
+    <div class="step-dots" role="img" aria-label="Step 1 of 5"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+
+    <section data-state="profile" class="ob-step">
+      <div class="ob-split">
+        <div class="ob-main">
+          <div class="step-block"><span class="sketch-muted">Step 1 of 5</span></div>
+          <div class="step-block"><h1 id="h-profile" tabindex="-1">Tell us about yourself</h1><p>This sets up your profile in the workspace.</p></div>
+          <div class="step-block sketch-stack">
+            <label class="sketch-field">Name <input class="sketch-input" autocomplete="name" placeholder="Mira Okafor"></label>
+            <label class="sketch-field">Job title <input class="sketch-input" autocomplete="organization-title" placeholder="Product designer"></label>
+            <div class="photo"><div class="sketch-placeholder" role="img" aria-label="No photo" style="width:56px;height:56px;min-height:0"></div><button class="sketch-button secondary" type="button" data-sketch-toast="Photo picker opens in the built app">Choose a photo</button></div>
+          </div>
+          <div class="step-block"><div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button secondary" type="button" id="go-invite" data-go="invite">Skip</button><button class="sketch-button" type="button" data-go="invite">Continue</button></div></div>
+        </div>
+        <div class="ob-side">
+          <div class="side-video sketch-placeholder" role="img" aria-label="Picture: your profile">Picture: your profile</div>
+          <div class="side-layer">Step 1</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-state="invite" class="ob-step">
+      <div class="ob-split">
+        <div class="ob-main">
+          <div class="step-block"><span class="sketch-muted">Step 2 of 5</span></div>
+          <div class="step-block"><h1 id="h-invite" tabindex="-1">Invite your teammates</h1><p>Add the people you work with most.</p></div>
+          <div class="step-block sketch-stack">
+            <label class="sketch-field">Email addresses <textarea class="sketch-input" inputmode="email" placeholder="sam@example.com, lee@example.com"></textarea></label>
+            <div class="sketch-row"><button class="sketch-button secondary" type="button" data-sketch-toast="Invite link copied in the built app"><i data-icon="link"></i>Copy invite link</button></div>
+          </div>
+          <div class="step-block"><div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button secondary" type="button" id="go-connect-repo" data-go="connect-repo">Skip</button><button class="sketch-button" type="button" id="send-invitations" data-go="connect-repo" data-sketch-toast="Invitations are sent in the built app">Send invitations</button></div></div>
+        </div>
+        <div class="ob-side">
+          <div class="side-video sketch-placeholder" role="img" aria-label="Picture: your team">Picture: your team</div>
+          <div class="side-layer">Step 2</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-state="connect-repo" class="ob-step">
+      <div class="ob-split">
+        <div class="ob-main">
+          <div class="step-block"><span class="sketch-muted">Step 3 of 5</span></div>
+          <div class="step-block"><h1 id="h-repo" tabindex="-1">Connect your code host</h1><p>Link the place where your code lives.</p></div>
+          <div class="step-block sketch-stack">
+            <div class="feature-row"><i data-icon="link"></i><span>Keep issues and pull requests in one view.</span></div>
+            <div class="feature-row"><i data-icon="check"></i><span>Track work from commit to done.</span></div>
+            <div class="feature-row"><i data-icon="filter"></i><span>Filter by team or by project.</span></div>
+          </div>
+          <div class="step-block"><div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button secondary" type="button" id="go-connect-chat" data-go="connect-chat">Skip</button><button class="sketch-button" type="button" id="auth-repo" data-go="connect-chat" data-sketch-toast="Code host sign-in runs in the built app">Authenticate</button></div></div>
+        </div>
+        <div class="ob-side">
+          <div class="side-video sketch-placeholder" role="img" aria-label="Picture: your code host">Picture: your code host</div>
+          <div class="side-layer">Step 3</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-state="connect-chat" class="ob-step">
+      <div class="ob-split">
+        <div class="ob-main">
+          <div class="step-block"><span class="sketch-muted">Step 4 of 5</span></div>
+          <div class="step-block"><h1 id="h-chat" tabindex="-1">Connect your team chat</h1><p>Bring the conversation into the workspace.</p></div>
+          <div class="step-block sketch-stack">
+            <div class="feature-row"><i data-icon="comment"></i><span>See messages next to the work.</span></div>
+            <div class="feature-row"><i data-icon="bell"></i><span>Get a mention when something changes.</span></div>
+            <div class="feature-row"><i data-icon="check"></i><span>Share one link to a decision.</span></div>
+          </div>
+          <div class="step-block"><div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button secondary" type="button" id="go-newsletter" data-go="newsletter">Skip</button><button class="sketch-button" type="button" id="auth-chat" data-go="newsletter" data-sketch-toast="Team chat sign-in runs in the built app">Authenticate</button></div></div>
+        </div>
+        <div class="ob-side">
+          <div class="side-video sketch-placeholder" role="img" aria-label="Picture: your team chat">Picture: your team chat</div>
+          <div class="side-layer">Step 4</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-state="newsletter" class="ob-step">
+      <div class="ob-split">
+        <div class="ob-main">
+          <div class="step-block"><span class="sketch-muted">Step 5 of 5</span></div>
+          <div class="step-block"><h1 id="h-newsletter" tabindex="-1">Choose your updates</h1><p>Pick the emails you want to get.</p></div>
+          <div class="step-block sketch-stack">
+            <label class="toggle"><input type="checkbox" role="switch" id="toggle-1" checked><span class="toggle-track"><span class="toggle-knob"></span></span><span>Product changes</span></label>
+            <label class="toggle"><input type="checkbox" role="switch" id="toggle-2" checked><span class="toggle-track"><span class="toggle-knob"></span></span><span>Onboarding emails</span></label>
+          </div>
+          <div class="step-block"><div class="sketch-row"><span class="sketch-spacer"></span><a href="#newsletter" data-sketch-toast="Follow link opens in the built app">Follow us</a><button class="sketch-button" type="button" id="go-app" data-go="app">Finish</button></div></div>
+        </div>
+        <div class="ob-side">
+          <div class="side-video sketch-placeholder" role="img" aria-label="Picture: your updates">Picture: your updates</div>
+          <div class="side-layer">Step 5</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<section data-state="app" class="app" aria-labelledby="h-app">
+  <nav class="app-side" aria-label="Workspace">
+    <h2>[Product]</h2>
+    <div><h3>Issues</h3><ul><li>All issues</li><li>Assigned to me</li><li>Urgent</li></ul></div>
+    <div><h3>Team</h3><ul><li>Engineering</li><li>Design</li></ul></div>
+  </nav>
+  <main class="app-main">
+    <div class="sketch-row"><h1 id="h-app" tabindex="-1">Issues</h1><span class="sketch-spacer"></span><button class="sketch-button" type="button" data-sketch-toast="New issue opens in the built app">New issue</button></div>
+    <div class="app-panel sketch-frame sketch-panel sketch-stack">
+      <ul class="sketch-list">
+        <li class="issue"><span class="sketch-badge strong">Urgent</span>Welcome to the workspace<span class="sketch-spacer"></span><span class="sketch-muted">#1</span></li>
+        <li class="issue">Invite your teammates<span class="sketch-spacer"></span><span class="sketch-muted">#2</span></li>
+        <li class="issue">Connect your code host<span class="sketch-spacer"></span><span class="sketch-muted">#3</span></li>
+        <li class="issue">Plan the first project<span class="sketch-spacer"></span><span class="sketch-muted">#4</span></li>
+      </ul>
+    </div>
+  </main>
+</section>
+
+<section data-state="new-login-email" class="email-page" aria-labelledby="h-new-login">
+  <div class="email-card sketch-frame">
+    <div class="email-head">
+      <svg class="email-mark" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 18 10 10 18 2 10Z"/></svg>
+      <strong>[Product]</strong>
+    </div>
+    <h1 id="h-new-login" tabindex="-1">New login to [Product]</h1>
+    <p>A login came from a new device or browser.</p>
+    <hr class="email-divider">
+    <dl class="email-facts">
+      <dt>Platform</dt><dd>Browser on a laptop</dd>
+      <dt>Location</dt><dd>[City], [Country]</dd>
+      <dt>Time</dt><dd>Today, 09:41</dd>
+    </dl>
+    <hr class="email-divider">
+    <p><a href="#new-login-email" data-sketch-toast="Security settings opens in the built app">Review security settings</a> to see the list of active sessions and devices.</p>
+    <button class="sketch-button" type="button" data-sketch-toast="Security settings opens in the built app">Review security settings</button>
+    <p class="sketch-muted">If you did not do this, log out your sessions and contact your workspace admin.</p>
+    <a href="#app" id="go-back-app" style="justify-self:start">Back to app</a>
+  </div>
+  <p class="email-footer">[Company]</p>
+</section>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+(() => {
+  const body = document.body;
+  const state_of = id => document.querySelector(`[data-state="${id}"]`);
+  const ob_steps = ['profile', 'invite', 'connect-repo', 'connect-chat', 'newsletter'];
+
+  // Live text: the email follows its field. The address suffix follows the workspace name
+  // until the user edits the suffix.
+  const fallback = { email: 'your email' };
+  const slug = document.querySelector('#ws-slug');
+  let slug_edited = false;
+  const update = event => {
+    const email = document.querySelector('#email-input')?.value.trim() || fallback.email;
+    document.querySelectorAll('[data-show="email"]').forEach(el => { el.textContent = email; });
+    if (event?.target === slug) slug_edited = slug.value !== '';
+    if (!slug_edited) {
+      slug.value = document.querySelector('#ws-name').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+    document.querySelectorAll('[data-needs]').forEach(button => {
+      const need = document.querySelector(button.dataset.needs);
+      button.disabled = !need || !need.value.trim();
+    });
+  };
+
+  const set_dots = index => {
+    document.querySelectorAll('.step-dots i').forEach((dot, i) => dot.classList.toggle('on', i === index));
+    document.querySelector('.step-dots').setAttribute('aria-label', `Step ${index + 1} of ${ob_steps.length}`);
+  };
+
+  // One shared timer that advances the building wait to the first onboarding step. The workspace
+  // timer opens the wait; a move away from the workspace form cancels it.
+  let building_timer = 0, workspace_timer = 0;
+  const sync = moved => {
+    clearTimeout(building_timer);
+    const state = state_of(location.hash.slice(1)) || document.querySelector('[data-state]');
+    body.dataset.at = state.dataset.state;
+    if (state.dataset.state !== 'create-workspace') {
+      clearTimeout(workspace_timer);
+      document.querySelector('#loading-bar').hidden = true;
+    }
+    if (ob_steps.includes(state.dataset.state)) set_dots(ob_steps.indexOf(state.dataset.state));
+    // The capture script marks each transition with a step label. The two automatic steps
+    // here, the building wait and its end, have no manual step, so the page marks them itself.
+    // It writes nothing when the capture script is not present.
+    if (window.__captureStepLabel !== undefined) window.__captureStepLabel = state.dataset.state;
+    if (state.dataset.state === 'building') {
+      building_timer = setTimeout(() => { location.hash = 'profile'; }, 4050);
+    }
+    if (!moved) return;
+    const target = state.querySelector('h1');
+    if (target) requestAnimationFrame(() => target.focus({ preventScroll: true }));
+  };
+
+  // An onboarding step: the old content leaves first, then the new content enters.
+  const go_onboarding = to => {
+    const current = document.querySelector('.ob-step:not([hidden])');
+    set_dots(ob_steps.indexOf(to));
+    if (current && current.dataset.state !== to) {
+      current.querySelectorAll('.step-block, .side-video, .side-layer').forEach(el => el.classList.add('leaving'));
+      setTimeout(() => {
+        current.querySelectorAll('.leaving').forEach(el => el.classList.remove('leaving'));
+        location.hash = to;
+      }, 200);
+    } else {
+      location.hash = to;
+    }
+  };
+
+  document.addEventListener('input', update);
+  document.addEventListener('change', update);
+  document.addEventListener('click', event => {
+    const go = event.target.closest('[data-go]');
+    if (go) {
+      const to = go.dataset.go;
+      if (ob_steps.includes(to)) go_onboarding(to);
+      else location.hash = to;
+      return;
+    }
+    const build = event.target.closest('[data-build]');
+    if (build) {
+      const bar = document.querySelector('#loading-bar');
+      if (bar) bar.hidden = false;
+      clearTimeout(workspace_timer);
+      workspace_timer = setTimeout(() => { location.hash = build.dataset.build; }, 2000);
+    }
+  });
+  addEventListener('hashchange', () => sync(true));
+  update();
+  sync(false);
+})();
+</script>
+</body>
+</html>

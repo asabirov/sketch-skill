@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notification settings by channel sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .sketch-list > .settings_row { flex-wrap: nowrap; gap: 16px; padding: 12px 8px; }
+  [data-sketch] .settings_row > div { flex: 1; min-width: 0; }
+  [data-sketch] .settings_row p { margin: 0; }
+  [data-sketch] .sketch-main :is(a, button).settings_channel { display: flex; flex: 1; align-items: center; gap: 16px; min-height: 44px; padding: 0; background: none; border: 0; text-align: left; text-decoration: none; cursor: pointer; }
+  [data-sketch] .settings_channel > span { display: grid; flex: 1; min-width: 0; }
+  [data-sketch] .sketch-main a.settings_back { justify-self: start; margin-left: 4px; }
+  /* One column with no app shell. The overview has a search field, a card of channels and a card of news switches.
+     The page of a channel has a back link, a card for the channel, a card for its hours and one card for each group of events. */
+  [data-sketch] .sketch-main.settings_column { max-width: 640px; padding-block: 24px 64px; }
+  [data-sketch] .settings_groups { display: grid; gap: 12px; }
+  [data-sketch] .settings_groups h1 { margin: 0 16px 4px; font-size: 26px; }
+  [data-sketch] .settings_group_head { display: grid; gap: 4px; padding: 20px 16px 0; }
+  [data-sketch] .settings_group_head :is(h2, p) { margin: 0; }
+  [data-sketch] .settings_group_head h2 { font-size: 17px; }
+  [data-sketch] .settings_card .settings_row p { font-size: 14px; color: var(--sketch-muted); }
+  [data-sketch] .settings_status, [data-sketch] .settings_saved { font-size: 14px; }
+  [data-sketch] .settings_saved { flex: none; }
+  [data-sketch] .settings_card { padding: 4px 16px; }
+  [data-sketch] .settings_card .sketch-list > .settings_row { margin: 0; padding: 8px 0; border-radius: 0; }
+  [data-sketch] .settings_card .sketch-list > .settings_row:not([hidden]) ~ .settings_row { border-top: var(--sketch-stroke) solid var(--sketch-wash); }
+  [data-sketch] .settings_head { display: grid; gap: 4px; }
+  [data-sketch] .settings_find { margin: 0 0 4px; }
+  [data-sketch] .settings_none { margin: 12px 16px 0; }
+  /* The hours of a channel: a switch frees the days and the 2 times. */
+  [data-sketch] .settings_hours { display: grid; gap: 12px; padding: 12px 0; border-top: var(--sketch-stroke) solid var(--sketch-wash); }
+  [data-sketch] .settings_hours legend { margin-bottom: 6px; font-size: 14px; }
+  [data-sketch] .settings_hours .sketch-row { gap: 6px; }
+  [data-sketch] .settings_hours .sketch-chip { min-width: 52px; min-height: 44px; justify-content: center; }
+  [data-sketch] .settings_hours .sketch-field { font-size: 14px; }
+  [data-sketch] .settings_hours .sketch-input { width: 96px; }
+  [data-sketch] .settings_hours .sketch-row:last-child { gap: 16px; }
+  [data-sketch] .settings_hours :disabled { opacity: .4; cursor: not-allowed; }
+  @media (max-width: 599px) {
+    [data-sketch] .sketch-list > .settings_row:has(> .sketch-button) { flex-wrap: wrap; gap: 8px; }
+    [data-sketch] .settings_row:has(> .sketch-button) > div { flex-basis: 100%; }
+    [data-sketch] .settings_row > .sketch-button { flex: 1; justify-content: space-between; }
+  }
+  /* Each value below comes from transitions.json. */
+  [data-sketch] [data-state="channel"] .settings_head { animation: settings_fade_in 300ms cubic-bezier(0.25, 0.1, 0.35, 1); }
+  [data-sketch] [data-state="event-off"] .settings_event, [data-sketch] [data-state="channel-off"] .settings_master { animation: settings_switch_off 150ms ease-out; }
+  [data-sketch] [data-state="event-off"] .settings_event::before, [data-sketch] [data-state="channel-off"] .settings_master::before { animation: settings_thumb_off 150ms ease-out; }
+  [data-sketch] [data-state="channel-off"] .settings_locked :disabled { animation: settings_dim 150ms ease-out; }
+  [data-sketch] .sketch-menu:not([hidden]) { animation: settings_fade_in 50ms linear, settings_grow 230ms ease-out; }
+  /* A click on a switch plays the values of the state that shows the same change. */
+  [data-sketch] .sketch-switch input[type="checkbox"] { transition: background-color 150ms ease-out, opacity 150ms ease-out; }
+  [data-sketch] .sketch-switch input[type="checkbox"]::before { transition: left 150ms ease-out, background-color 150ms ease-out; }
+  [data-sketch] .sketch-switch input[type="checkbox"]:checked::before { left: 19px; transform: none; }
+  [data-sketch] [data-locked-in] :is(button, .sketch-input) { transition: opacity 150ms ease-out; }
+  @keyframes settings_fade_in { from { opacity: 0; } }
+  @keyframes settings_grow { from { transform: scale(0.98); } }
+  @keyframes settings_switch_off { from { background-color: var(--sketch-ink); } }
+  @keyframes settings_thumb_off { from { left: 19px; } }
+  @keyframes settings_dim { from { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    [data-sketch] :is(.settings_head, .sketch-menu, .sketch-switch input, .settings_locked :disabled), [data-sketch] .sketch-switch input::before { animation: none !important; }
+    [data-sketch] .sketch-switch input, [data-sketch] .sketch-switch input::before, [data-sketch] [data-locked-in] :is(button, .sketch-input) { transition: none !important; }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="overview">
+  <div data-screen="base_settings"></div>
+</section>
+<section data-state="find">
+  <div data-screen="base_settings" data-typed="repl"></div>
+</section>
+<section data-state="find-none">
+  <div data-screen="base_settings" data-typed="replzz"></div>
+</section>
+<section data-state="channel">
+  <div data-screen="base_settings" data-show="page"></div>
+</section>
+<section data-state="event-off">
+  <div data-screen="base_settings" data-show="page eventoff"></div>
+</section>
+<section data-state="channel-off">
+  <div data-screen="base_settings" data-show="page eventoff off"></div>
+</section>
+<section data-state="format-menu">
+  <div data-screen="base_settings" data-show="page menu"></div>
+</section>
+<section data-state="channel-unavailable">
+  <div data-screen="base_settings" data-show="blocked"></div>
+</section>
+<section data-state="save-error">
+  <div data-screen="base_settings" data-show="page error"></div>
+</section>
+
+<!-- A search field, a list of channels and the switches for news. Each channel row says what the channel sends and
+     opens the page of that channel. The page has the channel switch, the format, the hours and each kind of event in its group. -->
+<template id="base_settings">
+<main class="sketch-main settings_column">
+  <div class="settings_groups" data-part="!page !blocked" data-overview>
+    <h1>Notifications</h1>
+    <input class="sketch-input settings_find" type="search" aria-label="Find a setting" placeholder="Find a setting" data-find>
+    <div class="settings_groups" data-find-group>
+      <div class="settings_group_head"><h2>Channels</h2><p>Each event still shows in the app.</p></div>
+      <div class="sketch-frame settings_card"><ul class="sketch-list">
+        <li class="settings_row"><a class="settings_channel" href="#channel-unavailable"><span><b>Desktop push</b><span class="settings_status">Needs the desktop app</span></span><i data-icon="chevron-right"></i></a></li>
+        <li class="settings_row"><button class="settings_channel" type="button" data-sketch-toast="This sample opens the page of Email only"><span><b>Phone push</b><span class="settings_status">On for each event</span></span><i data-icon="chevron-right"></i></button></li>
+        <li class="settings_row"><a class="settings_channel" href="#channel" data-summary-row><span><b>Email</b><span class="settings_status" data-summary>On for each event</span></span><i data-icon="chevron-right"></i></a></li>
+        <li class="settings_row"><button class="settings_channel" type="button" data-sketch-toast="This sample opens the page of Email only"><span><b>Chat app</b><span class="settings_status">Off</span></span><i data-icon="chevron-right"></i></button></li>
+      </ul></div>
+    </div>
+    <div class="settings_groups" data-find-group>
+      <div class="settings_group_head"><h2>News from [Product]</h2></div>
+      <div class="sketch-frame settings_card"><ul class="sketch-list">
+        <li class="settings_row"><div><b>Product news</b><p>An email about new features, 2 times each month.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Product news" checked></label></li>
+        <li class="settings_row"><div><b>Tips</b><p>A short guide to a feature that you did not use yet.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Tips"></label></li>
+        <li class="settings_row"><div><b>Terms and privacy</b><p>An email when the terms or the privacy policy change.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Terms and privacy" checked></label></li>
+      </ul></div>
+    </div>
+    <div class="settings_groups" data-results hidden>
+      <div class="settings_group_head"><h2>Events</h2></div>
+      <div class="sketch-frame settings_card"><ul class="sketch-list"></ul></div>
+    </div>
+    <p class="settings_none" role="status" data-none hidden></p>
+  </div>
+  <div class="settings_groups" data-part="page blocked" data-channel>
+    <div class="settings_head">
+      <a class="settings_back" href="#overview"><i data-icon="chevron-left"></i>Notifications</a>
+      <h1 data-part="page">Email</h1>
+      <h1 data-part="blocked">Desktop push</h1>
+    </div>
+    <div class="sketch-frame settings_card" data-part="blocked"><ul class="sketch-list">
+      <li class="settings_row"><div><p>Desktop push needs the desktop app.</p></div><button class="sketch-button secondary" type="button">Get the app</button></li>
+    </ul></div>
+    <div class="settings_groups" data-locked-in="blocked">
+      <div class="sketch-frame settings_card" data-part="page"><ul class="sketch-list">
+        <li class="settings_row"><div><b>Send email</b><p>To [your address]</p></div><span class="settings_saved" role="status" data-part="off">Saved</span><label class="sketch-switch"><input class="settings_master" type="checkbox" role="switch" aria-label="Send email" checked data-locks data-off-in="off"></label></li>
+        <li class="settings_row"><div><b>Format</b><p>One digest for several events, or one email for each event.</p></div><button class="sketch-button secondary" type="button" data-sketch-popover="format">Digest<i data-icon="chevron-down"></i></button></li>
+      </ul></div>
+      <div class="settings_group_head" data-part="page"><h2>Hours</h2></div>
+      <div class="sketch-frame settings_card" data-part="page">
+        <ul class="sketch-list">
+          <li class="settings_row"><div><b>Send only in set hours</b><p>An email outside these hours waits for the next start time.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Send only in set hours" checked data-frees="hours"></label></li>
+        </ul>
+        <div class="settings_hours" data-needs="hours">
+          <fieldset><legend>Days</legend><div class="sketch-row"><button class="sketch-chip" type="button" aria-pressed="true">Mon</button><button class="sketch-chip" type="button" aria-pressed="true">Tue</button><button class="sketch-chip" type="button" aria-pressed="true">Wed</button><button class="sketch-chip" type="button" aria-pressed="true">Thu</button><button class="sketch-chip" type="button" aria-pressed="true">Fri</button><button class="sketch-chip" type="button" aria-pressed="false">Sat</button><button class="sketch-chip" type="button" aria-pressed="false">Sun</button></div></fieldset>
+          <div class="sketch-row"><label class="sketch-field">From<input class="sketch-input" value="08:00" inputmode="numeric"></label><label class="sketch-field">To<input class="sketch-input" value="18:00" inputmode="numeric"></label></div>
+        </div>
+      </div>
+      <p class="sketch-error" role="alert" data-part="error" style="margin:0">The change to "Mentions" was not saved. The switch shows the saved value. <button class="sketch-button secondary" type="button" data-go="channel">Try again</button></p>
+      <div class="settings_group_head"><h2>Conversations</h2></div>
+      <div class="sketch-frame settings_card"><ul class="sketch-list" data-events>
+        <li class="settings_row"><div><b>Mentions</b><p>A member names you in a post or a comment.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Mentions" checked></label></li>
+        <li class="settings_row"><div><b>Replies</b><p>A member answers your post or your comment.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Replies" checked></label></li>
+        <li class="settings_row"><div><b>Direct messages</b><p>A member writes to you.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Direct messages" checked></label></li>
+        <li class="settings_row"><div><b>Reactions</b><p>A member reacts to your post or your comment.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Reactions" checked></label></li>
+      </ul></div>
+      <div class="settings_group_head"><h2>Groups and events</h2></div>
+      <div class="sketch-frame settings_card"><ul class="sketch-list" data-events>
+        <li class="settings_row"><div><b>New posts in your groups</b><p>A group that you joined gets a post.</p></div><span class="settings_saved" role="status" data-part="eventoff !off">Saved</span><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="New posts in your groups" class="settings_event" checked data-off-in="eventoff"></label></li>
+        <li class="settings_row"><div><b>Invitations</b><p>A member invites you to a group or an event.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Invitations" checked></label></li>
+        <li class="settings_row"><div><b>Event reminders</b><p>An event that you joined starts soon.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Event reminders" checked></label></li>
+        <li class="settings_row"><div><b>New followers</b><p>A member starts to follow you.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="New followers" checked></label></li>
+      </ul></div>
+      <div class="settings_group_head"><h2>Account</h2></div>
+      <div class="sketch-frame settings_card"><ul class="sketch-list" data-events>
+        <li class="settings_row"><div><b>Sign-in alerts</b><p>A new device signs in to your account.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Sign-in alerts" checked></label></li>
+        <li class="settings_row"><div><b>Billing</b><p>A payment succeeds or fails.</p></div><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Billing" checked></label></li>
+      </ul></div>
+    </div>
+  </div>
+<div class="sketch-menu" id="format" data-part="menu">
+  <button class="sketch-menu-item" type="button"><i data-icon="check"></i>Digest</button>
+  <button class="sketch-menu-item" type="button" style="padding-left:42px">At once</button>
+</div>
+</main>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+/* A channel that is off locks its controls, and each control keeps its value. The switches with data-locks lock the group with
+   data-locked-in when each of them is off, and one that is on frees it. The parts that data-locked-in names lock the group too.
+   A box with data-needs="<name>" also locks while the switch with data-frees="<name>" is off. */
+(() => {
+  const shown_locks = page => [...page.querySelectorAll('[data-locks]')].filter(box => !box.closest('[data-part][hidden]'));
+  const parts = block => (block.dataset.show || '').split(' ').filter(Boolean);
+  const refresh = page => {
+    const group = page.querySelector('[data-locked-in]'), locks = shown_locks(page);
+    const off = group.dataset.lockedIn.split(' ').some(name => parts(page.closest('[data-screen]')).includes(name)) || (locks.length > 0 && !locks.some(box => box.checked));
+    group.classList.toggle('settings_locked', off);
+    group.querySelectorAll('input:not([data-locks]), button').forEach(control => {
+      const needs = control.closest('[data-needs]');
+      control.disabled = off || Boolean(needs && !page.querySelector(`[data-frees="${needs.dataset.needs}"]`).checked);
+    });
+  };
+  document.querySelectorAll('[data-screen]').forEach(block => {
+    block.querySelectorAll('[data-channel]').forEach(refresh);
+  });
+  /* Each change saves at once. The word "Saved" shows on the row of the last change of a page. */
+  document.addEventListener('change', event => {
+    const page = event.target.closest('[data-channel], [data-overview]'), row = event.target.closest('.settings_row');
+    if (!page || !row) return;
+    if (page.matches('[data-channel]')) refresh(page);
+    page.querySelectorAll('.settings_saved').forEach(mark => { mark.hidden = true; });
+    let mark = row.querySelector('.settings_saved');
+    if (!mark) {
+      mark = Object.assign(document.createElement('span'), { className: 'settings_saved', textContent: 'Saved' });
+      mark.setAttribute('role', 'status');
+      row.lastElementChild.before(mark);
+    }
+    mark.hidden = false;
+  });
+  /* The status line of the row with data-summary-row says what the page of that row sends. It follows the page that the reader saw
+     last, and the row opens that page again. */
+  const summary = page => {
+    const on = shown_locks(page).filter(box => box.checked).map(box => box.getAttribute('aria-label'));
+    if (!on.length) return 'Off';
+    const boxes = [...page.querySelectorAll('[data-events] input')];
+    const sent = boxes.filter(box => box.checked).map(box => box.getAttribute('aria-label').toLowerCase());
+    if (sent.length === boxes.length) return 'On for each event';
+    if (!sent.length) return 'On for no event';
+    return `On for ${sent.length > 3 ? `${sent.slice(0, 2).join(', ')}, ${sent.length - 2} others` : sent.join(', ')}`;
+  };
+  const write_summary = () => {
+    const state = location.hash.slice(1), page = document.querySelector(`[data-state="${state}"] [data-channel]`);
+    if (!page || page.hidden || !shown_locks(page).length) return;
+    document.querySelectorAll('[data-summary-row]').forEach(row => {
+      row.setAttribute('href', `#${state}`);
+      row.querySelector('[data-summary]').textContent = summary(page);
+    });
+  };
+  document.addEventListener('change', write_summary);
+  addEventListener('hashchange', write_summary);
+  write_summary();
+  /* The search field finds a setting by its name. The rows of the overview that match stay. A kind of event that matches shows
+     one time for each channel, and its row opens the page of that channel. A block with data-typed starts with that text. */
+  const kinds = [...document.getElementById('base_settings').content.querySelectorAll('[data-events] b')].map(name => name.textContent);
+  const find = field => {
+    const page = field.closest('[data-overview]'), results = page.querySelector('[data-results]'), none = page.querySelector('[data-none]');
+    const text = field.value.trim().toLowerCase(), hit = name => name.toLowerCase().includes(text);
+    let found = 0;
+    page.querySelectorAll('[data-find-group]').forEach(group => {
+      const rows = [...group.querySelectorAll('.settings_row')];
+      rows.forEach(row => { row.hidden = !hit(row.querySelector('b').textContent); });
+      group.hidden = rows.every(row => row.hidden);
+      found += rows.filter(row => !row.hidden).length;
+    });
+    const rows = !text ? [] : [...page.querySelectorAll('[data-find-group] .settings_channel')].flatMap(opener => kinds.filter(hit).map(name => {
+      const row = opener.parentElement.cloneNode(true), channel = opener.querySelector('b').textContent;
+      row.hidden = false;
+      row.querySelector('b').textContent = name;
+      row.querySelector('.settings_status').textContent = channel;
+      row.querySelectorAll('[data-summary-row], [data-summary]').forEach(node => ['data-summary-row', 'data-summary'].forEach(key => node.removeAttribute(key)));
+      return row;
+    }));
+    results.querySelector('ul').replaceChildren(...rows);
+    results.hidden = !rows.length;
+    none.hidden = found + rows.length > 0;
+    none.textContent = `No setting matches "${field.value.trim()}".`;
+  };
+  document.querySelectorAll('[data-find]').forEach(field => {
+    field.value = field.closest('[data-screen]').dataset.typed || '';
+    field.addEventListener('input', () => find(field));
+    find(field);
+  });
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

@@ -1,0 +1,68 @@
+[
+  {
+    "label": "general",
+    "trigger": "click the settings button",
+    "element": "window",
+    "property": "opacity",
+    "animation": null,
+    "duration": 35,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "general",
+    "trigger": "click the settings button",
+    "element": "window",
+    "property": "transform",
+    "animation": null,
+    "duration": 160,
+    "delay": 0,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "account",
+    "trigger": "click the account button",
+    "element": "window",
+    "property": "opacity",
+    "animation": null,
+    "duration": 35,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "account",
+    "trigger": "click the account button",
+    "element": "window",
+    "property": "transform",
+    "animation": null,
+    "duration": 160,
+    "delay": 0,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "closed",
+    "trigger": "press Escape, click the close button or press outside the window",
+    "element": "window",
+    "property": "transform",
+    "animation": null,
+    "duration": 20,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "closed",
+    "trigger": "press Escape, click the close button or press outside the window",
+    "element": "window",
+    "property": "opacity",
+    "animation": null,
+    "duration": 110,
+    "delay": 20,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "estimated"
+  }
+]

@@ -65,6 +65,17 @@
     svg.append(path);
     slot.replaceWith(svg);
   };
+  /* A pattern that needs more icons sets window.sketchGlyphs before the kit loads. <i data-glyph="name"></i> becomes the svg. */
+  const drawGlyph = slot => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'sketch-icon');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(svg.namespaceURI, 'path');
+    path.setAttribute('d', window.sketchGlyphs[slot.dataset.glyph]);
+    svg.append(path);
+    slot.replaceWith(svg);
+  };
 
   /* Popover and menu: a trigger with data-sketch-popover="id" opens the element with that id. */
   let open = null;
@@ -281,6 +292,7 @@
 
   window.initSketch = () => {
     page.querySelectorAll('i[data-icon]').forEach(drawIcon);
+    page.querySelectorAll('i[data-glyph]').forEach(drawGlyph);
     page.querySelectorAll(outlined).forEach(outline);
     page.querySelectorAll('.sketch-popover, .sketch-menu').forEach(layer => {
       if (!layer.matches('dialog')) layer.hidden = !open || open.layer !== layer;

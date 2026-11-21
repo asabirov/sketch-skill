@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forum of posts sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* The comment count of the base has 3 forms: words, a number, or the avatars of the members who commented with the words.
+     The review buttons set data-count on the body. A row with no comment shows the comment icon only, in each form. */
+  [data-sketch] .sketch-list > .feed_card { display: grid; margin: 0; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; padding: 16px; }
+  [data-sketch] .feed_card :is(h2, p) { margin: 0; }
+  [data-sketch] .feed_card p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  [data-sketch] .feed_card > :not(.sketch-outline) { grid-column: 1; }
+  [data-sketch] .feed_card > .sketch-placeholder { grid-column: 2; grid-row: 1 / span 4; width: 96px; min-height: 72px; align-self: center; }
+  [data-sketch] .feed_card:has([aria-current]) { background: var(--sketch-wash); }
+  @media (min-width: 1000px) {
+    [data-sketch] .feed_forum:has(> .feed_pane:not([hidden])) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: none; gap: 48px; }
+  }
+  @media (max-width: 999px) {
+    [data-sketch] .feed_forum:has(> .feed_pane:not([hidden])) > .feed_list { display: none; }
+  }
+  /* Base: one column. The title with the new update button, pill tabs, and the full posts. The base draws no side nav and no bar. */
+  [data-sketch] .sketch-main a.sketch-chip { min-width: 0; min-height: 32px; text-decoration: none; }
+  /* A thread: one box holds a comment, its replies in one level and the reply field. A line joins the replies. */
+  /* The page of a post: a back link, the post, one box for each thread, and the comment form. */
+</style>
+<body data-sketch>
+
+<section data-state="feed">
+  <div data-screen="forum_feed"></div>
+</section>
+<section data-state="sorted">
+  <div data-screen="forum_feed" data-show="sorted"></div>
+</section>
+<section data-state="tag-filter">
+  <div data-screen="forum_feed" data-show="tags"></div>
+</section>
+<section data-state="post">
+  <div data-screen="forum_feed" data-show="pane"></div>
+</section>
+<section data-state="reaction-added">
+  <div data-screen="forum_feed" data-show="pane reacted"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="forum_feed" data-show="empty"></div>
+</section>
+
+<!-- Each post is a card with a title. A card opens the post in a pane, and the list stays. -->
+<template id="forum_feed">
+<header class="sketch-bar" role="banner"><strong>[Product]</strong></header>
+<main class="sketch-main feed_forum">
+  <section class="sketch-stack feed_list" aria-label="Posts">
+    <h1>Help and ideas</h1>
+    <div class="sketch-row"><input class="sketch-input" type="search" aria-label="Search or write a post" placeholder="Search or write a post" style="flex:1;min-width:160px"><button class="sketch-button" type="button" data-sketch-popover="compose">New post</button></div>
+    <div class="sketch-row" data-part="!empty">
+      <label class="sketch-row">Sort<select class="sketch-input" style="width:auto"><option data-go="feed">Recent activity</option><option data-go="sorted" data-select-in="sorted">Date posted</option></select></label>
+      <div class="sketch-row" role="group" aria-label="Tags"><button class="sketch-chip" type="button" aria-pressed="false" data-go="tag-filter" data-part="!tags">Question</button><button class="sketch-chip" type="button" aria-pressed="true" data-go="feed" data-part="tags">Question</button><button class="sketch-chip" type="button" aria-pressed="false">Problem</button><button class="sketch-chip" type="button" aria-pressed="false">Idea</button></div>
+    </div>
+
+    <div class="sketch-stack" style="justify-items:center;text-align:center;padding:48px 0" data-part="empty">
+      <h2>No posts yet</h2>
+      <p style="margin:0;max-width:44ch">Ask a question or share an idea. Each post gets its own thread.</p>
+    </div>
+
+    <ul class="sketch-list sketch-stack" data-part="!empty">
+      <li class="feed_card sketch-panel sketch-frame" data-part="sorted">
+        <div class="sketch-row"><span class="sketch-badge">Question</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions"><i data-icon="more"></i></button></div>
+        <h2><a href="#post">Can a rider get alerts for one stop only?</a></h2>
+        <p><b>Sam Kim:</b> A rider asked at the depot. The form has lines, not stops.</p>
+        <div class="sketch-row"><span>0 reactions</span><span>1 comment</span><span class="sketch-muted">10 min</span></div>
+      </li>
+      <li class="feed_card sketch-panel sketch-frame">
+        <div class="sketch-row"><span class="sketch-badge">Question</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions" data-sketch-popover="row_menu"><i data-icon="more"></i></button></div>
+        <div class="sketch-placeholder">Picture</div>
+        <h2><a href="#post" data-current-in="pane">Which stops get the paper notice first?</a></h2>
+        <p><b>Ada Park:</b> The new signs come two weeks late. We have 31 stops on the east line and one person to put the notices up, so we need an order.</p>
+        <div class="sketch-row"><span>5 reactions</span><span>12 comments</span><span class="sketch-badge">3 new</span><span class="sketch-muted">2 min</span></div>
+      </li>
+      <li class="feed_card sketch-panel sketch-frame" data-part="!tags">
+        <div class="sketch-row"><span class="sketch-badge">Problem</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions"><i data-icon="more"></i></button></div>
+        <h2><a href="#post">Text alerts arrive late on two networks</a></h2>
+        <p><b>Lee Ortiz:</b> The test message took ten minutes on my phone.</p>
+        <div class="sketch-row"><span>2 reactions</span><span>7 comments</span><span class="sketch-muted">Sam is writing</span></div>
+      </li>
+      <li class="feed_card sketch-panel sketch-frame" data-part="!sorted">
+        <div class="sketch-row"><span class="sketch-badge">Question</span><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Post actions"><i data-icon="more"></i></button></div>
+        <h2><a href="#post">Can a rider get alerts for one stop only?</a></h2>
+        <p><b>Sam Kim:</b> A rider asked at the depot. The form has lines, not stops.</p>
+        <div class="sketch-row"><span>0 reactions</span><span>1 comment</span><span class="sketch-muted">10 min</span></div>
+      </li>
+    </ul>
+  </section>
+
+  <aside class="sketch-stack feed_pane" aria-label="Post" data-part="pane">
+    <h1 class="pattern_hidden_title sketch-until-desktop">Help and ideas</h1>
+    <div class="sketch-row"><a class="sketch-until-desktop" href="#feed"><i data-icon="arrow-left"></i>Posts</a><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Copy link" data-sketch-toast="Link copied"><i data-icon="link"></i></button><a class="sketch-from-desktop" href="#feed" aria-label="Close the post"><i data-icon="close"></i></a></div>
+    <h2 style="font-size:24px">Which stops get the paper notice first?</h2>
+    <div class="sketch-row"><span class="sketch-badge">Question</span></div>
+    <div class="sketch-row"><span class="sketch-avatar">AP</span><b>Ada Park</b><span class="sketch-badge">Author</span><span class="sketch-muted">2 h</span></div>
+    <p>The new signs come two weeks late. We have 31 stops on the east line and one person to put the notices up, so we need an order.</p>
+    <div class="sketch-placeholder" style="min-height:160px">Picture</div>
+    <div class="sketch-row"><button class="sketch-chip" type="button" aria-pressed="true">+1 4</button><button class="sketch-chip" type="button" aria-pressed="false" data-go="reaction-added" data-part="!reacted">Thanks 1</button><button class="sketch-chip" type="button" aria-pressed="true" data-go="post" data-part="reacted">Thanks 2</button><button class="sketch-icon-button" type="button" aria-label="Add a reaction" data-sketch-popover="picker"><i data-icon="smile"></i></button><span class="sketch-spacer"></span><button class="sketch-chip" type="button" aria-pressed="false"><i data-icon="bell"></i>Follow</button></div>
+    <div class="sketch-popover" id="picker"><div class="sketch-placeholder pattern_part"><b>Reaction picker</b><span>Pattern: feed-feed</span></div></div>
+    <div class="sketch-placeholder pattern_part"><b>Comment thread</b><span>Pattern: comment-comment-thread</span></div>
+  </aside>
+<div class="sketch-menu" id="row_menu"><div class="sketch-placeholder pattern_part"><b>Row menu</b><span>Pattern: feed-feed</span></div></div>
+<div class="sketch-popover" id="compose"><div class="sketch-placeholder pattern_part"><b>Composer</b><span>Pattern: feed-feed</span></div></div>
+</main>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

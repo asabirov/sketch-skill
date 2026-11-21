@@ -1,0 +1,476 @@
+<!doctype html>
+<!--
+  Best for: a team product where a member reads the main numbers of one record, then the course of one number, and then the facts.
+  Row opens: no rows. The cards of other records have their own pattern, content/fact-cards. The page shows only a plain box for them.
+  The sketch holds only the parts that a page of one record needs. It leaves out the parts that belong to the source app.
+  Transition values, from transitions.json:
+  - period-menu: the option list of the period plays the animation enter, 150 ms, ease. measured.
+  - period-changed, product-page and compare-off: the chart goes from clear to solid. opacity 280 ms, cubic-bezier(0.22, 1, 0.36, 1). measured.
+  - compare-off and product-page: the switch changes its fill. background-color 150 ms, cubic-bezier(0.4, 0, 0.2, 1). measured.
+  - chart-point: the box of a point moves to the next point. transform 400 ms, ease. measured.
+  - picture-open: the dialog of the full picture plays the animation enter, 200 ms, ease. measured.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product page</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .page_hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* One column 811 px wide. A path at the top names the list and the product. */
+  [data-sketch] .page_main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; width: 100%; max-width: 843px; margin: 0 auto; padding: 32px 16px; }
+  [data-sketch] .page_crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  [data-sketch] .page_crumbs > a { display: inline-flex; align-items: center; min-height: 44px; }
+  [data-sketch] .page_crumbs > [aria-current] { font-weight: 600; overflow-wrap: anywhere; }
+  [data-sketch] .page_crumbs > .sketch-icon { width: 14px; height: 14px; }
+
+  /* The page of one product: the head, 4 number cards, a chart, facts, a picture, a note, and a box for the cards of other products. */
+  [data-sketch] .page_title { display: grid; grid-template-columns: 64px minmax(0, 1fr); grid-template-areas: "picture name" "about about" "actions actions"; gap: 16px; align-items: center; }
+  [data-sketch] .page_title > .sketch-placeholder { grid-area: picture; width: 64px; height: 64px; min-height: 0; font-size: 0; }
+  [data-sketch] .page_title > * { margin: 0; }
+  [data-sketch] .page_title > h1 { grid-area: name; overflow-wrap: anywhere; }
+  [data-sketch] .page_title > p { grid-area: about; }
+  [data-sketch] .page_actions { grid-area: actions; display: flex; gap: 8px; }
+  [data-sketch] .page_actions > .sketch-button { min-height: 44px; }
+  [data-sketch] .page_stats { display: grid; gap: 16px; margin: 0; }
+  [data-sketch] .page_stat { display: grid; gap: 4px; align-content: start; padding: 24px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .page_stat > dt { margin-bottom: 12px; font-weight: 600; }
+  [data-sketch] .page_stat > dd { display: grid; gap: 4px; margin: 0; font-size: 13px; }
+  [data-sketch] .page_stat strong { font-size: 24px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+  [data-sketch] .page_person { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  [data-sketch] .page_part { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  [data-sketch] .page_part h2 { margin: 0; letter-spacing: 0; }
+
+  /* The chart: the sum of the period, a select of the period, the lines, and a switch for the period before. */
+  [data-sketch] .page_chart { padding: 16px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .page_chart_head { gap: 8px 16px; }
+  [data-sketch] .page_select { display: inline-flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 200px; min-height: 44px; padding: 4px 12px; background: none; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 6px 16px 5px 15px / 15px 5px 17px 6px; cursor: pointer; }
+  [data-sketch] .page_select:hover, [data-sketch] .page_select[aria-expanded="true"] { background: var(--sketch-wash); }
+  [data-sketch] .page_select > .sketch-icon { width: 16px; height: 16px; }
+  [data-sketch] .page_chart_body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  [data-sketch] .page_sum { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0; }
+  [data-sketch] .page_sum > strong { font-size: 24px; line-height: 1.3; }
+  [data-sketch] .page_plot_box { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 8px; font-size: 12px; font-variant-numeric: tabular-nums; }
+  [data-sketch] .page_scale { position: relative; }
+  [data-sketch] .page_scale > span { position: absolute; right: 0; transform: translateY(-50%); }
+  [data-sketch] .page_plot { position: relative; height: 200px; border-radius: 2px; cursor: crosshair; touch-action: pan-y; }
+  [data-sketch] .page_plot > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  [data-sketch] .page_plot :is(line, polyline) { fill: none; vector-effect: non-scaling-stroke; }
+  [data-sketch] .page_plot line { stroke: var(--sketch-wash); stroke-width: 1px; }
+  [data-sketch] .page_plot polyline { stroke: var(--sketch-ink); stroke-width: var(--sketch-stroke); stroke-linejoin: round; }
+  [data-sketch] .page_plot polyline.page_before { stroke: var(--sketch-muted); stroke-dasharray: 5 4; }
+  [data-sketch] .page_days { grid-column: 2; display: flex; justify-content: space-between; }
+  [data-sketch] .page_guide { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--sketch-muted); }
+  [data-sketch] .page_dot { position: absolute; width: 9px; height: 9px; margin: -4.5px; box-sizing: border-box; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; }
+  [data-sketch] .page_dot.page_before { border-color: var(--sketch-muted); }
+  [data-sketch] .page_tip { position: absolute; top: 0; left: 0; z-index: 1; display: grid; gap: 4px; width: max-content; padding: 8px 12px; font-size: 13px; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); pointer-events: none; }
+  [data-sketch] .page_tip > span { display: flex; align-items: center; gap: 8px; }
+  [data-sketch] .page_tip b { margin-left: auto; padding-left: 12px; }
+  [data-sketch] .page_line { width: 16px; border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .page_line.page_before { border-top: var(--sketch-stroke) dashed var(--sketch-muted); }
+  [data-sketch] .page_compare:has(input:disabled) { color: var(--sketch-muted); cursor: not-allowed; }
+
+  /* The facts: 2 text cards, one below the other, and then one cell for each fact. */
+  [data-sketch] .page_texts { display: grid; gap: 16px; }
+  [data-sketch] .page_text { display: grid; gap: 8px; align-content: start; padding: 16px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] .page_text > * { margin: 0; }
+  [data-sketch] .page_facts { display: grid; gap: 16px 24px; margin: 0; }
+  [data-sketch] .page_facts > div { display: grid; gap: 4px; align-content: start; }
+  [data-sketch] .page_facts dt { color: var(--sketch-muted); }
+  [data-sketch] .page_facts dd { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; font-weight: 600; }
+
+  /* The picture: one large button that opens the full picture in a dialog. The dialog scrolls the picture. */
+  [data-sketch] .page_shot { position: relative; display: block; width: 100%; padding: 0; background: none; border: 0; border-radius: var(--sketch-wobble); cursor: pointer; }
+  [data-sketch] .page_shot > .sketch-placeholder { height: 240px; }
+  [data-sketch] .page_shot:hover > .sketch-placeholder { background: var(--sketch-wash); }
+  [data-sketch] .page_shot_label { position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; font-weight: 600; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .page_viewer { width: min(1100px, calc(100vw - 32px)); padding: 16px; }
+  [data-sketch] .page_viewer_head { flex-wrap: nowrap; }
+  [data-sketch] .page_viewer_scroll { max-height: calc(100vh - 140px); overflow-y: auto; }
+  [data-sketch] .page_viewer_scroll > .sketch-placeholder { height: 1400px; align-items: start; padding-top: 48px; }
+  [data-sketch] .page_note { display: grid; gap: 16px; margin: 0; padding: 24px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] .page_note > blockquote { margin: 0; font-size: 18px; line-height: 1.5; }
+  [data-sketch] .page_note > figcaption { display: flex; align-items: center; gap: 10px; }
+  [data-sketch] .page_note > figcaption > span:last-child { display: grid; }
+  [data-sketch] .page_more_head { flex-wrap: nowrap; }
+  [data-sketch] .page_all { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; white-space: nowrap; }
+  [data-sketch] .page_all > .sketch-icon { width: 14px; height: 14px; }
+  /* The cards of other products have their own pattern, so they show as a plain box with the name of that pattern. */
+  [data-sketch] .page_other { min-height: 200px; padding: 16px; text-align: center; color: var(--sketch-ink); }
+  [data-sketch] .page_other > p { margin: 0; }
+
+  @media (min-width: 600px) {
+    [data-sketch] .page_stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* From 600 px, the actions are beside the name, and the text is below the name. */
+    [data-sketch] .page_title { grid-template-columns: 80px minmax(0, 1fr) auto; grid-template-areas: "picture name actions" "picture about about"; gap: 8px 24px; align-items: start; }
+    [data-sketch] .page_title > .sketch-placeholder { width: 80px; height: 80px; }
+    [data-sketch] .page_chart { padding: 24px; }
+    [data-sketch] .page_plot { height: 280px; }
+    [data-sketch] .page_facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    [data-sketch] .page_shot > .sketch-placeholder { height: 400px; }
+  }
+  @media (min-width: 1000px) {
+    [data-sketch] .page_stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  /* The page script writes the values of transitions.json into the 4 variables of the page. */
+  @keyframes enter { from { opacity: 0; transform: translateY(-8px) scale(0.95); } }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .page_layer { transform-origin: top right; animation: var(--page-layer-play, none); }
+    [data-sketch] .page_viewer[open] { animation: var(--page-viewer-play, none); }
+    [data-sketch] .page_compare input[type="checkbox"] { transition: var(--page-switch-play, none); }
+    [data-sketch] .page_tip { transition: var(--page-tip-play, none); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each state, and it sets what differs: the period, the chart, the switch and the open layer. -->
+<section data-state="product-page"></section>
+<section data-state="period-menu"></section>
+<section data-state="period-changed"></section>
+<section data-state="compare-off"></section>
+<section data-state="chart-point"></section>
+<section data-state="picture-open"></section>
+
+<!-- Each state shows the same page. The texts and the numbers are one sample product. -->
+<template id="page">
+  <main class="page_main">
+    <nav class="page_crumbs" aria-label="Path"><a href="#product-page" data-sample data-sketch-toast="The list of products (sample)">Products</a><i data-icon="chevron-right"></i><span aria-current="page">Clinic Queue</span></nav>
+    <header class="page_title">
+      <div class="sketch-placeholder">Picture</div>
+      <h1>Clinic Queue</h1>
+      <p>Waiting lists for small clinics. Tomas Reyes leads the product. It is in the Pilot stage, and its next stage review is on 9 Dec.</p>
+      <div class="page_actions">
+        <button type="button" class="sketch-button secondary" data-sketch-toast="Link copied (sample)"><i data-icon="link"></i>Share</button>
+        <button type="button" class="sketch-button" data-sketch-toast="The site of the product (sample)">Visit<i data-icon="external"></i></button>
+      </div>
+    </header>
+    <dl class="page_stats">
+      <div class="page_stat"><dt>Users in a week</dt><dd><strong>640</strong><span>Rank 8 of 16</span></dd></div>
+      <div class="page_stat"><dt>Growth in a week</dt><dd><strong>+12%</strong><span>77 new users</span></dd></div>
+      <div class="page_stat"><dt>Lead</dt><dd><span class="page_person"><span class="sketch-avatar" aria-hidden="true">TR</span><strong>Tomas Reyes</strong></span></dd></div>
+      <div class="page_stat"><dt>Next stage review</dt><dd><strong>9 Dec</strong><span>Now in Pilot</span></dd></div>
+    </dl>
+    <section class="page_part page_chart" aria-labelledby="chart___state__">
+      <div class="sketch-row page_chart_head">
+        <h2 id="chart___state__">New users</h2><span class="sketch-spacer"></span>
+        <button type="button" class="page_select" aria-label="Period" data-sketch-popover="period___state__" data-menu-trigger><span data-fill-period></span><i data-icon="chevron-down"></i></button>
+      </div>
+      <div class="page_chart_body" data-slot="chart"></div>
+      <label class="sketch-switch page_compare"><input type="checkbox" data-compare>Compare with the period before</label>
+    </section>
+    <section class="page_part" aria-labelledby="about___state__">
+      <h2 id="about___state__">About</h2>
+      <div class="page_texts">
+        <div class="page_text"><h3>Value</h3><p>Waiting lists for small clinics, in one place. A small team needs no spreadsheet for them.</p></div>
+        <div class="page_text"><h3>Problem</h3><p>Teams keep these records in spreadsheets and in chat. They lose time when they look for the latest one.</p></div>
+      </div>
+      <dl class="page_facts">
+        <div><dt>Stage</dt><dd>Pilot</dd></div>
+        <div><dt>Audience</dt><dd>Small firms</dd></div>
+        <div><dt>Team size</dt><dd>4 people</dd></div>
+        <div><dt>Pricing</dt><dd>Free for 3 seats</dd></div>
+        <div><dt>Built as</dt><dd><span class="sketch-badge">Web app</span><span class="sketch-badge">Phone app</span></dd></div>
+        <div><dt>Channels</dt><dd><span class="sketch-badge">Search</span><span class="sketch-badge">Partners</span><span class="sketch-badge">Events</span></dd></div>
+      </dl>
+    </section>
+    <section class="page_part" aria-labelledby="screen___state__">
+      <h2 id="screen___state__">Screen</h2>
+      <button type="button" class="page_shot" aria-label="Open the full picture" data-picture data-sketch-open="viewer___state__">
+        <span class="sketch-placeholder">Screen of the product</span><span class="page_shot_label">Full picture</span>
+      </button>
+    </section>
+    <section class="page_part" aria-labelledby="note___state__">
+      <h2 id="note___state__">Note from the lead</h2>
+      <figure class="page_note">
+        <blockquote>“We talk to 5 users each week before we plan the next step.”</blockquote>
+        <figcaption><span class="sketch-avatar" aria-hidden="true">TR</span><span><strong>Tomas Reyes</strong><span>Lead</span></span></figcaption>
+      </figure>
+    </section>
+    <section class="page_part" aria-labelledby="more___state__">
+      <div class="sketch-row page_more_head">
+        <h2 id="more___state__">More in Pilot</h2><span class="sketch-spacer"></span>
+        <a class="page_all" href="#product-page" data-sample data-sketch-toast="The products in Pilot (sample)">View all<span class="page_hidden"> products in Pilot</span><i data-icon="chevron-right"></i></a>
+      </div>
+      <div class="sketch-placeholder page_other"><p><strong>Cards of other products in Pilot</strong><br>Pattern: content/fact-cards</p></div>
+    </section>
+  </main>
+  <div class="sketch-menu page_layer" id="period___state__" role="listbox" aria-label="Period" data-layer><div data-slot="period-items"></div></div>
+  <dialog class="sketch-dialog page_viewer" id="viewer___state__" aria-labelledby="viewer_title___state__" data-viewer>
+    <div class="sketch-row page_viewer_head"><h2 id="viewer_title___state__">Full picture</h2><span class="sketch-spacer"></span><button type="button" class="sketch-icon-button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button></div>
+    <div class="page_viewer_scroll" tabindex="0" role="region" aria-label="Full picture, which scrolls"><div class="sketch-placeholder">The full screen of the product</div></div>
+  </dialog>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The values of transitions.json. The sketch plays each with the same duration and easing.
+  const transition_records = [
+    { label: 'period-menu', trigger: 'click the select of the period', element: 'layer', property: null, animation: 'enter', duration: 150, delay: 0, easing: 'ease', measurement: 'measured' },
+    { label: 'period-changed', trigger: 'choose a period', element: 'chart', property: 'opacity', animation: null, duration: 280, delay: 0, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', measurement: 'measured' },
+    { label: 'product-page', trigger: 'choose the first period, or turn the switch on', element: 'chart', property: 'opacity', animation: null, duration: 280, delay: 0, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', measurement: 'measured' },
+    { label: 'product-page', trigger: 'turn the switch on', element: 'switch', property: 'background-color', animation: null, duration: 150, delay: 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', measurement: 'measured' },
+    { label: 'compare-off', trigger: 'turn the switch off', element: 'chart', property: 'opacity', animation: null, duration: 280, delay: 0, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', measurement: 'measured' },
+    { label: 'compare-off', trigger: 'turn the switch off', element: 'switch', property: 'background-color', animation: null, duration: 150, delay: 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', measurement: 'measured' },
+    { label: 'chart-point', trigger: 'the pointer goes over the chart', element: 'tooltip', property: 'transform', animation: null, duration: 400, delay: 0, easing: 'ease', measurement: 'measured' },
+    { label: 'picture-open', trigger: 'click the picture', element: 'dialog', property: null, animation: 'enter', duration: 200, delay: 0, easing: 'ease', measurement: 'measured' }
+  ];
+  window.__sketchTransitions = transition_records;
+
+  // The sample product of the page. The seed gives the chart its shape.
+  const product = { seed: 2, users: 640, growth: 12 };
+  // The periods of the chart. A period of days has one point for each day, and a period of months has one for each month.
+  const periods = [
+    { id: '7', label: 'Last 7 days', points: 7, days: 1 },
+    { id: '30', label: 'Last 30 days', points: 30, days: 1 },
+    { id: '12', label: 'Last 12 months', points: 12, days: 30 },
+    { id: 'all', label: 'All time', points: 24, days: 30 }
+  ];
+  const month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  const root = document.documentElement;
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  // These states show a layer over the page that the member has.
+  const layer_states = ['period-menu', 'chart-point', 'picture-open'];
+  const first_page_view = { period: '30', compare: true };
+  const template_html = id => document.getElementById(id).innerHTML;
+  const shown_section = () => state_sections.find(section => !section.hidden);
+  const number_text = number => number.toLocaleString('en-US');
+  const records_of = (label, element) => transition_records.filter(record => record.label === label && record.element === element);
+  const play_of = (label, element) => records_of(label, element).map(record => `${record.property || record.animation} ${record.duration}ms ${record.easing} ${record.delay}ms`).join(', ') || 'none';
+  root.style.setProperty('--page-layer-play', play_of('period-menu', 'layer'));
+  root.style.setProperty('--page-switch-play', play_of('compare-off', 'switch'));
+  root.style.setProperty('--page-tip-play', play_of('chart-point', 'tooltip'));
+  root.style.setProperty('--page-viewer-play', play_of('picture-open', 'dialog'));
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+
+  let pending_focus = null;
+  let page_view = { ...first_page_view };
+  let last_state = null;
+  let last_chart = null;
+  let switch_was = null;
+
+  const page_state_of = wanted => wanted.period !== first_page_view.period ? 'period-changed' : wanted.compare ? 'product-page' : 'compare-off';
+  // Each page state has a view of its own, so an address such as #compare-off shows the chart without the period before.
+  function default_page_view(state) {
+    if (state === 'period-changed') return { ...first_page_view, period: 'all' };
+    if (state === 'compare-off') return { ...first_page_view, compare: false };
+    return { ...first_page_view };
+  }
+  const page_view_of = state => layer_states.includes(state) || state === page_state_of(page_view) ? page_view : default_page_view(state);
+
+  // Sample numbers of new users. Day 0 is the last day, and each earlier day has a negative number.
+  function new_users(day) {
+    const wave = 1 + 0.45 * Math.sin(day * 1.3 + product.seed) + 0.25 * Math.sin(day * 0.37 + product.seed * 2);
+    return Math.max(0, Math.round(product.users * product.growth / 700 * (1 + product.growth / 100) ** (day / 7) * wave));
+  }
+  // The name of a point: a day for a period of days, and a month for a period of months. The last sample day is 30 Nov.
+  function point_text(back, days) {
+    const date = days === 1 ? new Date(Date.UTC(2026, 10, 30 - back)) : new Date(Date.UTC(2026, 10 - back, 1));
+    return days === 1 ? `${date.getUTCDate()} ${month_names[date.getUTCMonth()]}` : `${month_names[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+  }
+  // The points of a period, each with the point of the period before. "All time" has no period before, and it starts at the first month with a user.
+  function chart_of(wanted) {
+    const period = periods.find(part => part.id === wanted.period);
+    const sum = last_day => Array.from({ length: period.days }, (_, at) => new_users(last_day - at)).reduce((total, value) => total + value, 0);
+    const point = back => ({ text: point_text(back, period.days), value: sum(-back * period.days) });
+    let points = Array.from({ length: period.points }, (_, at) => point(period.points - 1 - at));
+    const has_before = period.id !== 'all';
+    if (!has_before) points = points.slice(Math.min(Math.max(points.findIndex(part => part.value > 0), 0), points.length - 2));
+    const before = has_before ? points.map((_, at) => point(2 * period.points - 1 - at)) : [];
+    const total = list => list.reduce((all, part) => all + part.value, 0);
+    const change = total(before) ? Math.round(100 * (total(points) - total(before)) / total(before)) : null;
+    return { period, points, before, compare: has_before && wanted.compare, total: total(points), change };
+  }
+  // The top of the scale is a round number, and the scale has 4 steps.
+  function scale_top(largest) {
+    const step = Math.max(largest, 4) / 4;
+    const size = 10 ** Math.floor(Math.log10(step));
+    return 4 * size * [1, 2, 2.5, 5, 10].find(round => round * size >= step);
+  }
+  function chart_html(chart) {
+    const shown = chart.compare ? [...chart.points, ...chart.before] : chart.points;
+    const top = scale_top(Math.max(...shown.map(part => part.value)));
+    const line = list => list.map((part, at) => `${(100 * at / (list.length - 1)).toFixed(2)},${(100 - 100 * part.value / top).toFixed(2)}`).join(' ');
+    const steps = [0, 1, 2, 3, 4];
+    const change = chart.change === null ? '' : `<span>${chart.change < 0 ? '−' : '+'}${Math.abs(chart.change)}% from the period before</span>`;
+    const marks = [0, 1, 2, 3].map(at => chart.points[Math.round(at * (chart.points.length - 1) / 3)].text);
+    return `<p class="page_sum"><strong>${number_text(chart.total)}</strong>${change}</p>
+      <div class="page_plot_box">
+        <div class="page_scale" aria-hidden="true">${steps.map(at => `<span style="top:${25 * at}%">${number_text(top * (4 - at) / 4)}</span>`).join('')}</div>
+        <div class="page_plot" tabindex="0" role="group" aria-label="New users for each point of the period. The arrow keys move through the points." data-plot data-top="${top}">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${steps.map(at => `<line x1="0" x2="100" y1="${25 * at}" y2="${25 * at}"/>`).join('')}
+            ${chart.compare ? `<polyline class="page_before" points="${line(chart.before)}"/>` : ''}<polyline points="${line(chart.points)}"/></svg>
+          <span class="page_guide" hidden></span><span class="page_dot page_before" hidden></span><span class="page_dot" hidden></span>
+          <div class="page_tip" role="status" hidden></div>
+        </div>
+        <div class="page_days" aria-hidden="true">${marks.map(text => `<span>${text}</span>`).join('')}</div>
+      </div>`;
+  }
+  // Show the guide, the marks and the box of one point. The box stays in the chart: it goes to the left of the point when the right has no room.
+  function show_point(plot, at) {
+    const chart = plot.chart;
+    at = Math.min(Math.max(at, 0), chart.points.length - 1);
+    plot.point = at;
+    const [guide, before_dot, dot, tip] = plot.querySelectorAll('.page_guide, .page_dot, .page_tip');
+    const left = at / (chart.points.length - 1);
+    const height = value => `${100 - 100 * value / Number(plot.dataset.top)}%`;
+    guide.style.left = dot.style.left = before_dot.style.left = `${100 * left}%`;
+    dot.style.top = height(chart.points[at].value);
+    if (chart.compare) before_dot.style.top = height(chart.before[at].value);
+    tip.innerHTML = `<strong>New users</strong><span><i class="page_line"></i>${chart.points[at].text}<b>${number_text(chart.points[at].value)}</b></span>`
+      + (chart.compare ? `<span><i class="page_line page_before"></i>${chart.before[at].text}<b>${number_text(chart.before[at].value)}</b></span>` : '');
+    guide.hidden = dot.hidden = tip.hidden = false;
+    before_dot.hidden = !chart.compare;
+    const x = left * plot.clientWidth;
+    const room = x + 12 + tip.offsetWidth <= plot.clientWidth;
+    tip.style.transform = `translate(${Math.round(Math.max(room ? x + 12 : x - 12 - tip.offsetWidth, 0))}px, 12px)`;
+  }
+  function hide_point(plot) {
+    plot.querySelectorAll('.page_guide, .page_dot, .page_tip').forEach(part => { part.hidden = true; });
+  }
+  // chart-point shows the box of one point until the pointer chooses a different point.
+  const pinned_point = plot => Math.round(0.6 * (plot.chart.points.length - 1));
+
+  function fill_page() {
+    state_sections.forEach(section => {
+      const wanted = page_view_of(section.dataset.state);
+      const chart = chart_of(wanted);
+      section.querySelector('[data-slot="chart"]').innerHTML = chart_html(chart);
+      section.querySelector('[data-plot]').chart = chart;
+      section.querySelector('[data-fill-period]').textContent = chart.period.label;
+      section.querySelector('[data-slot="period-items"]').innerHTML = periods.map(period => `<button type="button" class="sketch-menu-item" role="option" aria-selected="${period.id === wanted.period}" data-period="${period.id}">${period.label}</button>`).join('');
+      // "All time" has no period before, so its switch is off and it does not work.
+      const compare = section.querySelector('[data-compare]');
+      compare.checked = chart.compare;
+      compare.disabled = wanted.period === 'all';
+    });
+    initSketch();
+  }
+  // Show the page state that the view needs. A change of state puts the focus on the same control of the new state.
+  function go_page() {
+    const state = page_state_of(page_view);
+    if (shown_section().dataset.state !== state) location.hash = state;
+    else { fill_page(); show_page(state); focus_pending(); }
+  }
+  // After a state shows: go to the right place of the page, and play the values of transitions.json.
+  function show_page(state) {
+    const section = shown_section();
+    const plot = section.querySelector('[data-plot]');
+    if (last_state === null && !['product-page', 'picture-open'].includes(state)) {
+      // An address of a chart state shows the chart. The kit then puts the option list at its select again.
+      section.querySelector('.page_chart').scrollIntoView({ block: 'center' });
+      dispatchEvent(new Event('resize'));
+    }
+    if (state === 'chart-point') show_point(plot, pinned_point(plot));
+    if (layer_states.includes(state)) return;
+    const compare = section.querySelector('[data-compare]');
+    if (switch_was !== null && !calm.matches) {
+      // The switch of the new state starts from the value that it had, so it plays its change.
+      const now = compare.checked;
+      compare.checked = switch_was;
+      getComputedStyle(compare).backgroundColor;
+      compare.checked = now;
+    }
+    switch_was = null;
+    const shown = `${plot.chart.period.id} ${plot.chart.compare}`;
+    const [record] = records_of(state, 'chart');
+    if (record && last_chart && shown !== last_chart && !calm.matches) {
+      section.querySelector('.page_plot_box').animate({ opacity: [0, 1] }, { duration: record.duration, delay: record.delay, easing: record.easing, fill: 'backwards' });
+    }
+    last_chart = shown;
+  }
+  // When the option list or the full picture closes, the page state shows again.
+  function leave_layer_state() {
+    const section = shown_section();
+    const state = section.dataset.state;
+    const closed = state === 'period-menu' ? section.querySelector('[data-layer]').hidden : state === 'picture-open' && !section.querySelector('[data-viewer]').open;
+    if (!closed) return;
+    pending_focus = pending_focus || (state === 'period-menu' ? '[data-menu-trigger]' : '[data-picture]');
+    go_page();
+  }
+  function focus_pending() {
+    const control = pending_focus && shown_section().querySelector(pending_focus);
+    pending_focus = null;
+    if (!control) return;
+    control.focus();
+    if (control.matches('input:not([type="checkbox"])')) control.setSelectionRange(control.value.length, control.value.length);
+  }
+
+  document.addEventListener('click', event => {
+    const hit = selector => event.target.closest(selector);
+    const state = shown_section().dataset.state;
+    // A link of the page leads to a different screen, so the sketch only names that screen.
+    if (hit('[data-sample]')) event.preventDefault();
+    if (hit('[data-menu-trigger]') && state !== 'period-menu' || hit('[data-picture]') && state !== 'picture-open') {
+      // The option list and the full picture open as states of their own, so the address names what the screen shows.
+      event.preventDefault();
+      event.stopPropagation();
+      pending_focus = hit('[data-menu-trigger]') ? '[data-period][aria-selected="true"]' : null;
+      location.hash = hit('[data-menu-trigger]') ? 'period-menu' : 'picture-open';
+      return;
+    }
+    // The kit closes the option list after this click, and then the page state shows the new period.
+    if (hit('[data-period]')) page_view = { ...page_view, period: hit('[data-period]').dataset.period };
+    setTimeout(leave_layer_state);
+  }, true);
+  document.addEventListener('pointerdown', event => {
+    if (!event.target.closest('[data-menu-trigger]')) setTimeout(leave_layer_state);
+  });
+  document.addEventListener('keydown', event => {
+    setTimeout(leave_layer_state);
+    // The arrow keys move through the points of the chart.
+    const plot = event.target.closest('[data-plot]');
+    const step = { ArrowLeft: -1, ArrowRight: 1, Home: -Infinity, End: Infinity }[event.key];
+    if (!plot || !step) return;
+    event.preventDefault();
+    show_point(plot, (plot.point ?? pinned_point(plot)) + step);
+  });
+  // The pointer or the focus on the chart shows the box of the nearest point.
+  const point_at = (plot, event) => Math.round((event.clientX - plot.getBoundingClientRect().left) / plot.clientWidth * (plot.chart.points.length - 1));
+  ['pointermove', 'pointerdown'].forEach(name => document.addEventListener(name, event => {
+    const plot = event.target.closest?.('[data-plot]');
+    if (plot) show_point(plot, point_at(plot, event));
+  }));
+  document.addEventListener('pointerout', event => {
+    const plot = event.target.closest?.('[data-plot]');
+    if (plot && !plot.contains(event.relatedTarget) && plot !== document.activeElement && shown_section().dataset.state !== 'chart-point') hide_point(plot);
+  });
+  document.addEventListener('focusin', event => {
+    if (event.target.matches('[data-plot]:focus-visible')) show_point(event.target, event.target.point ?? pinned_point(event.target));
+  });
+  document.addEventListener('focusout', event => {
+    if (event.target.matches('[data-plot]') && shown_section().dataset.state !== 'chart-point') hide_point(event.target);
+  });
+  addEventListener('resize', () => {
+    const plot = shown_section().querySelector('[data-plot] > .page_tip:not([hidden])')?.parentElement;
+    if (plot) show_point(plot, plot.point);
+  });
+  document.addEventListener('change', event => {
+    const field = event.target;
+    if (!field.matches('[data-compare]')) return;
+      page_view = { ...page_view_of(shown_section().dataset.state), compare: field.checked };
+      pending_focus = '[data-compare]';
+      switch_was = !field.checked;
+      go_page();
+  });
+  addEventListener('hashchange', () => {
+    const state = shown_section().dataset.state;
+    if (!layer_states.includes(state) && page_state_of(page_view) !== state) page_view = default_page_view(state);
+    fill_page();
+    show_page(state);
+    last_state = state;
+    focus_pending();
+  });
+
+  state_sections.forEach(section => {
+    const state = section.dataset.state;
+    section.innerHTML = template_html('page').replaceAll('__state__', state);
+      // The option list opens with the state period-menu, and the full picture opens with the state picture-open.
+      if (state === 'period-menu') section.querySelector('[data-layer]').setAttribute('data-open', '');
+      if (state === 'picture-open') section.querySelector('[data-viewer]').setAttribute('data-open', '');
+      section.querySelectorAll('[data-viewer]').forEach(viewer => viewer.addEventListener('close', () => setTimeout(leave_layer_state)));
+    });
+  fill_page();
+  dispatchEvent(new HashChangeEvent('hashchange'));
+</script>

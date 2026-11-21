@@ -1,0 +1,46 @@
+[
+  {
+    "label": "card-view",
+    "trigger": "click a card view in the list of views",
+    "element": "placeholder for the view name in the toolbar",
+    "property": null,
+    "animation": "skeleton-pulse",
+    "duration": 1200,
+    "delay": 0,
+    "easing": "ease-in-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "table-view",
+    "trigger": "click a table view in the list of views",
+    "element": "placeholder for the view name in the toolbar",
+    "property": null,
+    "animation": "skeleton-pulse",
+    "duration": 1200,
+    "delay": 0,
+    "easing": "ease-in-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "board-view",
+    "trigger": "click a board view in the list of views",
+    "element": "placeholder for the view name in the toolbar",
+    "property": null,
+    "animation": "skeleton-pulse",
+    "duration": 1200,
+    "delay": 0,
+    "easing": "ease-in-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "filtered",
+    "trigger": "click a view that has a filter in the list of views",
+    "element": "placeholder for the view name in the toolbar",
+    "property": null,
+    "animation": "skeleton-pulse",
+    "duration": 1200,
+    "delay": 0,
+    "easing": "ease-in-out",
+    "measurement": "measured"
+  }
+]

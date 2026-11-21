@@ -1,0 +1,35 @@
+[
+  {
+    "label": "metric-changed",
+    "trigger": "choose a metric",
+    "element": "list",
+    "property": null,
+    "animation": "opacity",
+    "duration": 250,
+    "delay": 0,
+    "easing": "ease-in-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "table",
+    "trigger": "choose the first metric",
+    "element": "list",
+    "property": null,
+    "animation": "opacity",
+    "duration": 250,
+    "delay": 0,
+    "easing": "ease-in-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "table",
+    "trigger": "the pointer goes over a row",
+    "element": "row",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured"
+  }
+]

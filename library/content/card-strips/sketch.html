@@ -1,0 +1,167 @@
+<!--
+  Best for: a team product where a member wants a look at each group of records before a choice.
+  Row opens: on the record's own page. That page has its own pattern, record-product-page. The state product-page shows only a plain box for it.
+  The cards of one group have their own pattern, record-fact-cards. The state group shows only a plain box for it.
+  The sketch holds only the parts that rows of small cards need. It leaves out the parts that belong to the source app.
+  Transition values, from transitions.json:
+  - cards: the pointer goes over a small card, and the border of the card goes from grey to ink. border-color 150 ms, cubic-bezier(0.4, 0, 0.2, 1), estimated. The capture read this value on a card of /acquire.
+  - group and product-page: 0 ms. The source loads a new page.
+  No value in this file is a design-system token.
+-->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rows of product cards</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .cards_hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* One column 811 px wide, with a title at the top. */
+  [data-sketch] .cards_main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; width: 100%; max-width: 843px; margin: 0 auto; padding: 32px 16px; }
+  [data-sketch] .cards_top { display: grid; gap: 16px; justify-items: center; text-align: center; }
+  [data-sketch] .cards_top > h1 { margin: 0; font-size: 24px; letter-spacing: -0.3px; overflow-wrap: anywhere; }
+
+  /* One row of small cards for each group. The row scrolls sideways, and a link opens the group. A small card has the name and 3 numbers. */
+  [data-sketch] .cards_strips { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  [data-sketch] .cards_strip { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  [data-sketch] .cards_strip_head { flex-wrap: nowrap; }
+  [data-sketch] .cards_strip_head > h2 { margin: 0; font-size: 15px; letter-spacing: 0; }
+  [data-sketch] .cards_all { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; white-space: nowrap; }
+  [data-sketch] .cards_all > .sketch-icon { width: 14px; height: 14px; }
+  [data-sketch] .cards_scroller { display: flex; gap: 12px; margin: 0 -16px; padding: 4px 16px 12px; overflow-x: auto; }
+  [data-sketch] .cards_mini { flex: none; display: grid; gap: 12px; width: 220px; padding: 12px; text-decoration: none; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); scroll-snap-align: start; }
+  [data-sketch] .cards_mini_head { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; align-items: center; }
+  [data-sketch] .cards_mini_head > .sketch-placeholder { width: 32px; height: 32px; min-height: 0; font-size: 0; }
+  [data-sketch] .cards_mini_head > strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  [data-sketch] .cards_mini:is(:hover, :focus-visible) { border-color: var(--sketch-ink); }
+  [data-sketch] .cards_mini:active { background: var(--sketch-wash); }
+  [data-sketch] .cards_numbers { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 12px; margin: 0; }
+  [data-sketch] .cards_numbers > div { display: grid; align-content: space-between; }
+  [data-sketch] .cards_numbers dt { font-size: 12px; color: var(--sketch-muted); }
+  [data-sketch] .cards_numbers dd { margin: 0; font-weight: 700; }
+
+  /* A screen that has its own pattern shows as a plain box with the name of that pattern. A link leads back. */
+  [data-sketch] .cards_back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+  [data-sketch] .cards_back > .sketch-icon { width: 14px; height: 14px; }
+  [data-sketch] .cards_other { min-height: 320px; padding: 16px; text-align: center; color: var(--sketch-ink); }
+  [data-sketch] .cards_other :is(h1, p) { margin: 0; font: inherit; letter-spacing: 0; }
+  [data-sketch] .cards_other h1 { font-weight: 600; }
+
+  @media (min-width: 600px) {
+    /* From 600 px, the row stays in the column, and a card stops at the left edge. */
+    [data-sketch] .cards_scroller { margin: 0 -4px; padding: 4px 4px 12px; scroll-padding: 0 4px; scroll-snap-type: x proximity; }
+  }
+  /* The page script writes the value of transitions.json into --cards-hover. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .cards_mini { transition: var(--cards-hover); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script fills the rows from the list of products, and it copies the template of the plain box into the 2 other states. -->
+<section data-state="cards">
+  <main class="cards_main">
+    <header class="cards_top"><h1>Products</h1></header>
+    <div class="cards_strips" data-slot="strips"></div>
+  </main>
+</section>
+<section data-state="group"></section>
+<section data-state="product-page"></section>
+
+<!-- The cards of one group and the page of a product have their own patterns. Each state shows a link back and a plain box with the name of its pattern. -->
+<template id="other">
+  <main class="cards_main">
+    <nav aria-label="Back"><a class="cards_back" href="#cards" data-back><i data-icon="chevron-left"></i>Back to the rows</a></nav>
+    <div class="sketch-placeholder cards_other"><div><h1 data-fill="what"></h1><p>Pattern: <span data-fill="pattern"></span></p></div></div>
+  </main>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The value of transitions.json. The sketch plays it with the same duration and easing.
+  const transition_records = [
+    { label: 'cards', trigger: 'the pointer goes over a small card', element: 'card', property: 'border-color', animation: null, duration: 150, delay: 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', measurement: 'estimated' }
+  ];
+  window.__sketchTransitions = transition_records;
+
+  const stages = ['Idea', 'Prototype', 'Pilot', 'Launch', 'Scale'];
+  // Sample products: name, one line about it, stage, lead, users in a week, growth in a week in percent, next review.
+  const products = [
+    ['Parcel Pilot', 'Route plans for small courier firms', 'Launch', 'Mara Lindqvist', 8420, 4, '2 Dec'],
+    ['Greenhouse Log for growers with many sites', 'Climate notes for growers', 'Launch', 'Ines Okafor', 2310, 9, '4 Dec'],
+    ['Clinic Queue', 'Waiting lists for small clinics', 'Pilot', 'Tomas Reyes', 640, 12, '9 Dec'],
+    ['Fare Split', 'Shared bills for flat mates', 'Prototype', 'Yuki Arai', 85, 30, '11 Dec'],
+    ['Mill Sensor', 'Wear alerts for saw mills', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Harbor Desk', 'Berth booking for marinas', 'Launch', 'Mara Lindqvist', 1975, 6, '2 Dec'],
+    ['Lesson Loop', 'Homework feedback for tutors', 'Pilot', 'Ines Okafor', 410, 15, '9 Dec'],
+    ['Stock Shelf', 'Shelf counts with a phone camera', 'Prototype', 'Tomas Reyes', 52, 21, '11 Dec'],
+    ['Rent Ready', 'Move-in checks for landlords', 'Launch', 'Yuki Arai', 12060, 2, '4 Dec'],
+    ['Field Crew', 'Shift plans for farm teams', 'Pilot', 'Noor Haddad', 730, 8, '9 Dec'],
+    ['Paper Trail', 'Receipts that become ledger rows', 'Launch', 'Tomas Reyes', 3150, 5, '2 Dec'],
+    ['Quiet Hours', 'Noise reports for housing blocks', 'Idea', 'Ines Okafor', 0, null, '16 Dec'],
+    ['Kiln Timer', 'Firing schedules for potters', 'Prototype', 'Mara Lindqvist', 31, 18, '11 Dec'],
+    ['Tool Library', 'Lending records for maker spaces', 'Pilot', 'Yuki Arai', 290, 10, '9 Dec'],
+    ['Depot Board', 'Task board for bus depots', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Well Check', 'Water tests for rural wells', 'Pilot', 'Ines Okafor', 5640, 3, '4 Dec']
+  ].map(([name, about, stage, lead, users, growth, review], at) => ({ at, name, about, stage, lead, users, growth, review }));
+
+  const root = document.documentElement;
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  const shown_section = () => state_sections.find(section => !section.hidden);
+  const escape_html = text => String(text).replace(/[&<>"]/g, sign => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[sign]);
+  const number_text = number => number.toLocaleString('en-US');
+  const growth_text = product => product.growth === null ? 'None' : `+${product.growth}%`;
+  root.style.setProperty('--cards-hover', transition_records.map(record => `${record.property} ${record.duration}ms ${record.easing} ${record.delay}ms`).join(', '));
+
+  let shown_stage = 'Pilot';
+  let shown_product = 2;
+  let pending_focus = null;
+
+  const number_cell = (label, value) => `<div><dt>${label}</dt><dd>${value}</dd></div>`;
+  const numbers = product => `<dl class="cards_numbers">${number_cell('Users', number_text(product.users))}${number_cell('Growth', growth_text(product))}${number_cell('Review', product.review)}</dl>`;
+  const mini_card = product => `<a class="cards_mini" href="#product-page" data-product="${product.at}">
+    <span class="cards_mini_head"><span class="sketch-placeholder">Picture</span><strong>${escape_html(product.name)}</strong></span>
+    ${numbers(product)}</a>`;
+  const strip = (stage, found) => `<section class="cards_strip" aria-label="${stage}">
+    <div class="sketch-row cards_strip_head"><h2>${stage}</h2><span class="sketch-spacer"></span>
+      <a class="cards_all" href="#group" data-stage="${stage}">View all<span class="cards_hidden"> products in ${stage}</span><i data-icon="chevron-right"></i></a></div>
+    <div class="cards_scroller">${found.map(mini_card).join('')}</div></section>`;
+  // A group with no product has no row.
+  const groups = stages.map(stage => [stage, products.filter(product => product.stage === stage)]).filter(([, group]) => group.length);
+  document.querySelector('[data-slot="strips"]').innerHTML = groups.map(([stage, group]) => strip(stage, group)).join('');
+  // Each of the 2 other states is a plain box that names what the member opened, and the pattern that draws it.
+  const boxes = {
+    group: () => [`The cards of ${shown_stage}`, 'record-fact-cards'],
+    'product-page': () => [`The page of ${products[shown_product].name}`, 'record-product-page']
+  };
+  state_sections.filter(section => boxes[section.dataset.state]).forEach(section => { section.innerHTML = document.getElementById('other').innerHTML; });
+  initSketch();
+
+  document.addEventListener('click', event => {
+    const hit = selector => event.target.closest(selector);
+    if (hit('[data-stage]')) {
+      shown_stage = hit('[data-stage]').dataset.stage;
+      pending_focus = '[data-back]';
+    } else if (hit('[data-product]')) {
+      shown_product = Number(hit('[data-product]').dataset.product);
+      pending_focus = '[data-back]';
+    } else if (hit('[data-back]')) {
+      // The focus goes back to the link of the group, or to the small card of the product.
+      pending_focus = shown_section().dataset.state === 'group' ? `[data-stage="${shown_stage}"]` : `[data-product="${shown_product}"]`;
+    }
+  }, true);
+  addEventListener('hashchange', () => {
+    const section = shown_section();
+    const box = boxes[section.dataset.state];
+    if (box) {
+      const [what, pattern] = box();
+      section.querySelector('[data-fill="what"]').textContent = what;
+      section.querySelector('[data-fill="pattern"]').textContent = pattern;
+      scrollTo(0, 0);
+    }
+    const control = pending_focus && section.querySelector(pending_focus);
+    pending_focus = null;
+    if (control) control.focus();
+  });
+  dispatchEvent(new HashChangeEvent('hashchange'));
+</script>

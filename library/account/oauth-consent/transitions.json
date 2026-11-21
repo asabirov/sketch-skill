@@ -1,0 +1,134 @@
+[
+  {
+    "label": "allowed",
+    "trigger": "click Continue",
+    "element": "request content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "denied",
+    "trigger": "click Cancel",
+    "element": "request content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "request-expired",
+    "trigger": "open a request after its time ends",
+    "element": "request content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "request-invalid",
+    "trigger": "open a request that fails the check",
+    "element": "request content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "service-off",
+    "trigger": "open a request while connections are off",
+    "element": "request content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "app-return",
+    "trigger": "click Back to Notes Sync",
+    "element": "page content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "product-home",
+    "trigger": "click Open [Product]",
+    "element": "page content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "clients-list",
+    "trigger": "click Settings or Manage connected clients",
+    "element": "settings content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "revoke-confirm",
+    "trigger": "click Disconnect in the row menu",
+    "element": "confirmation dialog",
+    "property": "opacity",
+    "animation": null,
+    "duration": 160,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "client-revoked",
+    "trigger": "click Disconnect in the confirmation",
+    "element": "settings content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "other-revoked",
+    "trigger": "click Disconnect in the confirmation of the other app",
+    "element": "settings content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "clients-empty",
+    "trigger": "disconnect the last app",
+    "element": "settings content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  }
+]

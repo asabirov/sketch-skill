@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OAuth consent sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] [data-state]:not([hidden]) { animation: consent_enter var(--state-duration) ease-out both; }
+  [data-sketch] .consent_main { padding: 32px 16px; min-height: calc(100vh - 62px); display: grid; align-content: center; }
+  [data-sketch] .consent_card { width: 100%; max-width: 440px; margin: 0 auto; }
+  [data-sketch] .consent_card > :is(h1, p, ul) { margin: 0; }
+  [data-sketch] .consent_card .sketch-button { width: 100%; }
+  [data-sketch] .consent_card a:not(.sketch-button) { display: flex; align-items: center; justify-content: center; min-height: 44px; }
+  [data-sketch] .consent_rights { list-style: none; padding: 0; display: grid; gap: 8px; }
+  [data-sketch] .consent_rights li { display: flex; gap: 10px; }
+  [data-sketch] .consent_rights li::before { content: "\2713"; font-weight: 600; }
+  [data-sketch] .consent_window { width: 100%; max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); }
+  [data-sketch] .consent_window > nav { display: grid; align-content: start; gap: 2px; padding: 16px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .consent_window > nav p { margin: 12px 12px 4px; font-size: 13px; }
+  [data-sketch] .consent_window > nav :is(a, span) { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; text-decoration: none; border-radius: var(--sketch-wobble); }
+  [data-sketch] .consent_window > nav a:hover { background: var(--sketch-wash); }
+  [data-sketch] .consent_window > nav [aria-current] { background: var(--sketch-wash); font-weight: 600; }
+  [data-sketch] .consent_window > div:not(.sketch-menu) { display: grid; gap: 16px; align-content: start; padding: 24px; min-height: 420px; }
+  [data-sketch] .consent_window > div:not(.sketch-menu) > :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .consent_window td:last-child { text-align: right; }
+  /* The settings window is a part of settings/settings-window. It is a plain box with that name, and only the list is drawn in it. */
+  [data-sketch] .consent_part { margin: 0; padding: 16px 24px 0; }
+  @media (min-width: 700px) {
+    [data-sketch] .consent_window:has(> nav) { grid-template-columns: 220px minmax(0, 1fr); }
+    [data-sketch] .consent_window > nav { border-bottom: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  }
+  [data-sketch] .sketch-dialog[open] { animation: consent_enter 160ms ease-out both; }
+  @keyframes consent_enter { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] :is([data-state]:not([hidden]), .sketch-dialog[open]) { animation: none; } }
+</style>
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong><span class="sketch-spacer"></span><span class="sketch-muted">dana@example.com</span></header>
+<main class="consent_main" aria-live="polite">
+  <section class="consent_card sketch-panel sketch-frame sketch-stack" data-state="consent-request" style="--state-duration:180ms" aria-labelledby="request_heading">
+    <p class="sketch-row"><span class="sketch-avatar square" aria-hidden="true">P</span><b>[Product] connect</b></p>
+    <h1 id="request_heading">Connect with [Product]</h1>
+    <p>Give Notes Sync access to [Product].</p>
+    <label class="sketch-field">Workspace
+      <select class="sketch-input" id="workspace_select">
+        <option value="Acme">Acme</option>
+        <option value="Dana's space">Dana's space</option>
+      </select>
+    </label>
+    <p>Through this connection, Notes Sync by Example Labs will be able to:</p>
+    <ul class="consent_rights">
+      <li>Follow your page access and permissions</li>
+      <li>Read the pages that you can open</li>
+      <li>Create and change pages for you</li>
+      <li>View the members of the workspace and their emails</li>
+    </ul>
+    <a class="sketch-button" href="#allowed">Continue</a>
+    <a class="sketch-button secondary" href="#denied">Cancel</a>
+    <p class="sketch-muted">Make sure that you trust Notes Sync. It returns you to notes-sync.example. This request expires in 10 minutes. You can disconnect the app at any time in Settings, Connected clients.</p>
+  </section>
+  <section class="consent_card sketch-panel sketch-frame sketch-stack" data-state="allowed" style="--state-duration:180ms" aria-labelledby="allowed_heading">
+    <h1 id="allowed_heading">Notes Sync is connected</h1>
+    <p>Notes Sync can use <span data-workspace>Acme</span> now. [Product] sends you back to Notes Sync.</p>
+    <a class="sketch-button" href="#app-return">Back to Notes Sync</a>
+    <a href="#clients-list" data-list-link>Manage connected clients</a>
+  </section>
+  <section class="consent_card sketch-panel sketch-frame sketch-stack" data-state="denied" style="--state-duration:180ms" aria-labelledby="denied_heading">
+    <h1 id="denied_heading">Notes Sync is not connected</h1>
+    <p>Notes Sync got no access to <span data-workspace>Acme</span>. You can close this page.</p>
+    <a class="sketch-button" href="#app-return">Back to Notes Sync</a>
+  </section>
+  <section class="consent_card sketch-panel sketch-frame sketch-stack" data-state="request-expired" style="--state-duration:180ms" aria-labelledby="expired_heading">
+    <h1 id="expired_heading">This request has expired</h1>
+    <p>A request stays open for 10 minutes. No access was given. Start again in Notes Sync.</p>
+    <a class="sketch-button" href="#app-return">Back to Notes Sync</a>
+  </section>
+  <section class="consent_card sketch-panel sketch-frame sketch-stack" data-state="request-invalid" style="--state-duration:180ms" aria-labelledby="invalid_heading">
+    <h1 id="invalid_heading">This request is not valid</h1>
+    <p>The app sent a return address that it did not register. No access was given.</p>
+    <p class="sketch-muted">Tell the maker of the app. Reason: the return address does not match.</p>
+  </section>
+  <section class="consent_card sketch-panel sketch-frame sketch-stack" data-state="service-off" style="--state-duration:180ms" aria-labelledby="off_heading">
+    <h1 id="off_heading">Connections are off</h1>
+    <p>[Product] does not let apps connect now. No access was given. Try again later.</p>
+  </section>
+  <section class="consent_card sketch-panel sketch-frame sketch-stack" data-state="app-return" style="--state-duration:180ms" aria-labelledby="return_heading">
+    <p class="sketch-muted">notes-sync.example</p>
+    <h1 id="return_heading">Notes Sync</h1>
+    <p data-return-result>Connected to [Product]. Notes Sync can use <span data-workspace>Acme</span>.</p>
+    <p class="sketch-muted">To change your choice, connect again.</p>
+    <a class="sketch-button" href="#consent-request">Connect [Product]</a>
+    <a href="#product-home">Open [Product]</a>
+  </section>
+  <section class="consent_window sketch-frame" data-state="product-home" style="--state-duration:180ms" aria-labelledby="home_heading">
+    <nav aria-label="Workspace">
+      <p class="sketch-muted" data-workspace>Acme</p>
+      <span aria-current="page"><i data-icon="home"></i>Home</span>
+      <span><i data-icon="search"></i>Search</span>
+      <a href="#clients-list" data-list-link><i data-icon="settings"></i>Settings</a>
+    </nav>
+    <div>
+      <h1 id="home_heading">Home</h1>
+      <div class="sketch-placeholder">Recent pages</div>
+    </div>
+  </section>
+  <section class="consent_window sketch-frame" data-state="clients-list" style="--state-duration:180ms" aria-labelledby="clients_heading">
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <div>
+      <h1 id="clients_heading">Connected clients</h1>
+      <p class="sketch-muted">These clients can use your account in <span data-workspace>Acme</span>.</p>
+      <div class="sketch-table-box"><table class="sketch-table">
+        <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
+        <tbody>
+          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="notes_menu" aria-label="More actions for Notes Sync"><i data-icon="more"></i></button></td></tr>
+          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="bridge_menu" aria-label="More actions for Calendar Bridge"><i data-icon="more"></i></button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="sketch-menu sketch-frame" id="notes_menu" hidden>
+      <a class="sketch-menu-item" href="#revoke-confirm"><i data-icon="trash"></i>Disconnect Notes Sync</a>
+    </div>
+    <div class="sketch-menu sketch-frame" id="bridge_menu" hidden>
+      <button class="sketch-menu-item" type="button" data-sketch-open="revoke_bridge_dialog"><i data-icon="trash"></i>Disconnect Calendar Bridge</button>
+    </div>
+  </section>
+  <section class="consent_window sketch-frame" data-state="revoke-confirm" style="--state-duration:160ms" aria-labelledby="revoke_list_heading">
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <div>
+      <h1 id="revoke_list_heading">Connected clients</h1>
+      <p class="sketch-muted">These clients can use your account in <span data-workspace>Acme</span>.</p>
+      <div class="sketch-table-box"><table class="sketch-table">
+        <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
+        <tbody>
+          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td></td></tr>
+          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <dialog class="sketch-dialog" id="revoke_dialog" aria-labelledby="revoke_heading" data-open>
+      <h2 id="revoke_heading">Disconnect Notes Sync?</h2>
+      <p>Notes Sync can no longer read or change pages in <span data-workspace>Acme</span>. To use it again, connect it again.</p>
+      <div class="sketch-row">
+        <a class="sketch-button" href="#client-revoked">Disconnect</a>
+        <a class="sketch-button secondary" href="#clients-list" autofocus>Keep connected</a>
+      </div>
+    </dialog>
+  </section>
+  <section class="consent_window sketch-frame" data-state="client-revoked" style="--state-duration:180ms" aria-labelledby="revoked_heading">
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <div>
+      <h1 id="revoked_heading">Connected clients</h1>
+      <p role="status">Notes Sync is disconnected. It can no longer use your account.</p>
+      <div class="sketch-table-box"><table class="sketch-table">
+        <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
+        <tbody>
+          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="bridge_last_menu" aria-label="More actions for Calendar Bridge"><i data-icon="more"></i></button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="sketch-menu sketch-frame" id="bridge_last_menu" hidden>
+      <button class="sketch-menu-item" type="button" data-sketch-open="revoke_last_dialog"><i data-icon="trash"></i>Disconnect Calendar Bridge</button>
+    </div>
+  </section>
+  <section class="consent_window sketch-frame" data-state="other-revoked" style="--state-duration:180ms" aria-labelledby="other_revoked_heading">
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <div>
+      <h1 id="other_revoked_heading">Connected clients</h1>
+      <p role="status">Calendar Bridge is disconnected. It can no longer use your account.</p>
+      <div class="sketch-table-box"><table class="sketch-table">
+        <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
+        <tbody>
+          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="notes_last_menu" aria-label="More actions for Notes Sync"><i data-icon="more"></i></button></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="sketch-menu sketch-frame" id="notes_last_menu" hidden>
+      <button class="sketch-menu-item" type="button" data-sketch-open="revoke_notes_last_dialog"><i data-icon="trash"></i>Disconnect Notes Sync</button>
+    </div>
+  </section>
+  <section class="consent_window sketch-frame" data-state="clients-empty" style="--state-duration:180ms" aria-labelledby="empty_heading">
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <div>
+      <h1 id="empty_heading">Connected clients</h1>
+      <p style="padding:96px 0;text-align:center">No client can use your account. When you connect a client, it shows here.</p>
+    </div>
+  </section>
+  <dialog class="sketch-dialog" id="revoke_last_dialog" aria-labelledby="revoke_last_heading">
+    <h2 id="revoke_last_heading">Disconnect Calendar Bridge?</h2>
+    <p>Calendar Bridge can no longer read pages in <span data-workspace>Acme</span>. To use it again, connect it again.</p>
+    <div class="sketch-row">
+      <a class="sketch-button" href="#clients-empty">Disconnect</a>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Keep connected</button>
+    </div>
+  </dialog>
+  <dialog class="sketch-dialog" id="revoke_bridge_dialog" aria-labelledby="revoke_bridge_heading">
+    <h2 id="revoke_bridge_heading">Disconnect Calendar Bridge?</h2>
+    <p>Calendar Bridge can no longer read pages in <span data-workspace>Acme</span>. To use it again, connect it again.</p>
+    <div class="sketch-row">
+      <a class="sketch-button" href="#other-revoked">Disconnect</a>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Keep connected</button>
+    </div>
+  </dialog>
+  <dialog class="sketch-dialog" id="revoke_notes_last_dialog" aria-labelledby="revoke_notes_last_heading">
+    <h2 id="revoke_notes_last_heading">Disconnect Notes Sync?</h2>
+    <p>Notes Sync can no longer read or change pages in <span data-workspace>Acme</span>. To use it again, connect it again.</p>
+    <div class="sketch-row">
+      <a class="sketch-button" href="#clients-empty">Disconnect</a>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Keep connected</button>
+    </div>
+  </dialog>
+</main>
+<script src="../../../assets/sketch.js"></script>
+<script>
+  const transition_records = [
+    { label: 'allowed', trigger: 'click Continue', element: 'request content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'denied', trigger: 'click Cancel', element: 'request content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'request-expired', trigger: 'open a request after its time ends', element: 'request content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'request-invalid', trigger: 'open a request that fails the check', element: 'request content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'service-off', trigger: 'open a request while connections are off', element: 'request content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'app-return', trigger: 'click Back to Notes Sync', element: 'page content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'product-home', trigger: 'click Open [Product]', element: 'page content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'clients-list', trigger: 'click Settings or Manage connected clients', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'revoke-confirm', trigger: 'click Disconnect in the row menu', element: 'confirmation dialog', property: 'opacity', animation: null, duration: 160, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'client-revoked', trigger: 'click Disconnect in the confirmation', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'other-revoked', trigger: 'click Disconnect in the confirmation of the other app', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'clients-empty', trigger: 'disconnect the last app', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' }
+  ];
+  window.__sketchTransitions = transition_records;
+  /* Escape closes the linked confirmation. The list then opens, and focus goes back to the menu button of the row. */
+  document.getElementById('revoke_dialog').addEventListener('cancel', event => {
+    event.preventDefault();
+    addEventListener('hashchange', () => document.querySelector('[data-state="clients-list"] [aria-label="More actions for Notes Sync"]').focus(), {once: true});
+    location.hash = '#clients-list';
+  });
+  /* The chosen workspace names every result and Settings. */
+  document.getElementById('workspace_select').addEventListener('change', event => {
+    document.querySelectorAll('[data-workspace]').forEach(name => { name.textContent = event.target.value; });
+  });
+  /* The app shows the last result, and each link to the list opens the list without the disconnected clients. */
+  const results = {
+    allowed: 'Connected to [Product]. Notes Sync can use <span data-workspace></span>.',
+    denied: 'Not connected. Notes Sync got no access to [Product].',
+    'request-expired': 'The request expired. No access was given.'
+  };
+  const disconnected = new Set();
+  const followState = () => {
+    const id = location.hash.slice(1);
+    if (results[id]) {
+      const result = document.querySelector('[data-return-result]');
+      result.innerHTML = results[id];
+      result.querySelectorAll('[data-workspace]').forEach(name => { name.textContent = document.getElementById('workspace_select').value; });
+    }
+    if (id === 'allowed') disconnected.delete('notes');
+    if (id === 'client-revoked') disconnected.add('notes');
+    if (id === 'other-revoked') disconnected.add('bridge');
+    if (id === 'clients-empty') { disconnected.add('notes'); disconnected.add('bridge'); }
+    const list = disconnected.size === 2 ? '#clients-empty' : disconnected.has('notes') ? '#client-revoked' : disconnected.has('bridge') ? '#other-revoked' : '#clients-list';
+    document.querySelectorAll('[data-list-link]').forEach(link => link.setAttribute('href', list));
+  };
+  addEventListener('hashchange', followState);
+  followState();
+  initSketch();
+</script>

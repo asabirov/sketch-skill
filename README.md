@@ -49,6 +49,7 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 | `references/` | The sketch rules |
 | `assets/` | The kit and the template gallery |
 | `templates/` | The categorized template library |
+| `library/` | Reusable pattern records and sketches |
 
 ## Template categories
 
@@ -80,6 +81,8 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 ## Run and verify
 
 Open `assets/sketch-pages.html` in a browser to see the template gallery. See a picture of each template in [`docs/templates.md`](docs/templates.md).
+
+A pull request gate checks each file under `library/` for a Source note or a web address. A name check runs in a private flow before a pattern reaches this repository. The repository keeps no name or hash list.
 
 ## Licence
 

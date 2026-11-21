@@ -1,0 +1,46 @@
+[
+  {
+    "label": "bad-input",
+    "trigger": "click Continue with a bad value",
+    "element": "contact field and error message",
+    "property": "opacity",
+    "animation": null,
+    "duration": 160,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "code-confirmation",
+    "trigger": "click Continue with an accepted contact value",
+    "element": "form content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "waitlist-confirmed",
+    "trigger": "click Confirm with a correct code",
+    "element": "form content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "already-on-list",
+    "trigger": "click Confirm for a listed person",
+    "element": "form content",
+    "property": "opacity",
+    "animation": null,
+    "duration": 180,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  }
+]

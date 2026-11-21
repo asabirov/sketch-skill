@@ -1,0 +1,44 @@
+name: Library check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout@v4
+      - name: Check out the base branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+
+      # actions/checkout@v4
+      - name: Check out the pull request head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: head
+
+      # actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.x"
+
+      - name: Run the trusted checker on the head library
+        run: |
+          if [ -f base/scripts/check_library.py ]; then
+            python3 base/scripts/check_library.py --root head/library
+          else
+            echo "The base branch has no checker yet, so the head checker runs."
+            python3 head/scripts/check_library.py --root head/library
+          fi
+
+      - name: Run the head unit tests
+        run: python3 -m unittest discover -s tests
+        working-directory: head

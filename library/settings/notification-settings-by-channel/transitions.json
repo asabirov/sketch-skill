@@ -1,0 +1,90 @@
+[
+  {
+    "label": "channel",
+    "trigger": "click a channel row",
+    "element": "page header",
+    "property": "opacity",
+    "animation": null,
+    "duration": 300,
+    "delay": 0,
+    "easing": "cubic-bezier(0.25, 0.1, 0.35, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "event-off",
+    "trigger": "click the switch of an event",
+    "element": "switch",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "event-off",
+    "trigger": "click the switch of an event",
+    "element": "switch thumb",
+    "property": "left",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "channel-off",
+    "trigger": "click the switch of the channel",
+    "element": "switch",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "channel-off",
+    "trigger": "click the switch of the channel",
+    "element": "switch thumb",
+    "property": "left",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "channel-off",
+    "trigger": "click the switch of the channel",
+    "element": "controls of the channel",
+    "property": "opacity",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "format-menu",
+    "trigger": "click the format control",
+    "element": "menu",
+    "property": "opacity",
+    "animation": null,
+    "duration": 50,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "format-menu",
+    "trigger": "click the format control",
+    "element": "menu",
+    "property": "transform",
+    "animation": null,
+    "duration": 230,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  }
+]

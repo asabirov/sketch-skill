@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avatar badges at the end of the row sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A phone screen. The frame keeps the width of a phone in a wide window, so each part acts as it does on a phone. */
+  html { height: 100%; }
+  body[data-sketch] { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  [data-sketch] > [data-state] { flex: 1; min-height: 0; }
+  [data-sketch] [data-screen] { height: 100%; }
+  [data-sketch] .phone { position: relative; isolation: isolate; width: min(100%, 430px); height: 100%; margin: 0 auto; overflow: hidden; }
+  [data-sketch] .phone_screen { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); }
+  [data-sketch] .phone_body { grid-row: 2; min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_body > p { margin: 0 0 12px; }
+  [data-sketch] .phone_foot { grid-row: 3; display: flex; align-items: center; gap: 8px; padding: 8px 16px 16px; }
+  [data-sketch] .phone_round { border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
+  @media (min-width: 600px) { [data-sketch] .phone { border-inline: var(--sketch-stroke) solid var(--sketch-muted); } }
+  /* A plain box stands for a part that this pattern does not draw. It names the part, and the pattern that draws it. */
+  [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; text-decoration: none; }
+  [data-sketch] .part_box.press { width: 100%; background: none; cursor: pointer; }
+  [data-sketch] .part_box.press:hover { background: var(--sketch-wash); }
+  /* Each motion value below comes from transitions.json. */
+  [data-sketch] { --phone_out: cubic-bezier(0.23, 1, 0.32, 1); }
+  /* A pressed row or button shrinks and takes a soft fill while the finger is down. */
+  [data-sketch] .phone_press:active { background-color: var(--sketch-wash); transform: scale(0.96); }
+  @media (prefers-reduced-motion: no-preference) { [data-sketch] .phone_press { transition: transform 120ms var(--phone_out), background-color 120ms var(--phone_out); } }
+  /* A row: the avatar with its marks, and a plain box for the rest of the row. The box is the target of the row. */
+  [data-sketch] .badge_rows > li { flex-wrap: nowrap; }
+  [data-sketch] .badge_open { flex: 1; min-width: 0; min-height: 52px; padding: 4px 12px; }
+  /* The three marks. A star and a dot are at the bottom right of an avatar. A count is at the top right. */
+  [data-sketch] .badge_rows .sketch-avatar, [data-sketch] .badge_holder { position: relative; }
+  [data-sketch] .badge_star, [data-sketch] .badge_dot, [data-sketch] .badge_count { position: absolute; box-shadow: 0 0 0 2px var(--sketch-page); }
+  [data-sketch] .badge_star { right: -5px; bottom: -5px; display: grid; place-items: center; width: 16px; height: 16px; border: 1.5px solid var(--sketch-ink); border-radius: 50%; background: var(--sketch-page); box-shadow: none; }
+  [data-sketch] .badge_star::before { content: ""; width: 10px; height: 10px; background: var(--sketch-ink); clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+  [data-sketch] .badge_dot { right: -2px; bottom: -2px; width: 11px; height: 11px; border-radius: 50%; background: var(--sketch-ink); }
+  [data-sketch] .badge_count { top: -7px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 11px; font-style: normal; font-weight: 600; line-height: 18px; text-align: center; letter-spacing: 0; }
+  /* The marks of new messages are at the end of the row, and the avatar keeps only the star. */
+  [data-sketch] .badge_end { position: static; flex: none; box-shadow: none; }
+  [data-sketch] .badge_holder { display: inline-grid; }
+</style>
+<body data-sketch>
+
+<section data-state="no-new">
+  <div data-screen="badge_list"></div>
+</section>
+<section data-state="new-messages">
+  <div data-screen="badge_list" data-show="new"></div>
+</section>
+<section data-state="over-limit">
+  <div data-screen="badge_list" data-show="many"></div>
+</section>
+
+<!-- One list. The part "new" shows the marks of new messages, and the part "many" shows a count of more than 99. -->
+<template id="badge_list">
+<div class="phone">
+  <main class="phone_screen">
+    <div class="phone_body">
+      <ul class="sketch-list badge_rows">
+        <li class="phone_press">
+          <span class="sketch-avatar">AS<i class="badge_star" role="img" aria-label="Main assistant"></i></span>
+          <button class="part_box press badge_open" type="button"><strong>Row of the main assistant</strong><span class="sketch-muted">chat/chat-list</span></button>
+        </li>
+        <li class="phone_press">
+          <span class="sketch-avatar">ML</span>
+          <button class="part_box press badge_open" type="button"><strong>Row of a person</strong><span class="sketch-muted">chat/chat-list</span></button>
+          <i class="badge_dot badge_end" role="img" aria-label="New messages" data-part="new many"></i>
+        </li>
+        <li class="phone_press">
+          <span class="sketch-avatar">TO</span>
+          <button class="part_box press badge_open" type="button"><strong>Row of a person</strong><span class="sketch-muted">chat/chat-list</span></button>
+        </li>
+        <li class="phone_press">
+          <span class="sketch-avatar square">GC</span>
+          <button class="part_box press badge_open" type="button"><strong>Row of a group</strong><span class="sketch-muted">chat/chat-list</span></button>
+          <i class="badge_count badge_end" role="img" aria-label="4 new messages" data-part="new">4</i><i class="badge_count badge_end" role="img" aria-label="More than 99 new messages" data-part="many">99+</i>
+        </li>
+      </ul>
+    </div>
+    <footer class="phone_foot">
+      <span class="badge_holder">
+        <button class="sketch-icon-button phone_round" type="button" aria-label="Menu" data-sketch-toast="The menu opens (sample)"><i data-icon="menu"></i></button>
+        <i class="badge_count" role="img" aria-label="3 new messages in the menu" data-part="new">3</i><i class="badge_count" role="img" aria-label="More than 99 new messages in the menu" data-part="many">99+</i>
+      </span>
+    </footer>
+  </main>
+</div>
+</template>
+
+<script>
+/* The screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it.
+   A link to "#state" and a button with data-go change the state. data-move names the transition that the change plays.
+   After the change, the element whose data-focus names a shown part takes the focus. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' ').filter(Boolean), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  const parts_of = block => (block.dataset.show || '').split(' ');
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = parts_of(block);
+    ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    block.append(copy);
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_block = () => document.querySelector('[data-state]:not([hidden]) [data-screen]');
+  /* A move plays one transition of transitions.json. play adds the class that holds the animation, and takes it away at the end. */
+  window.pattern_moves = {};
+  window.pattern_play = (node, name, after) => {
+    if (reduced.matches) { if (after) after(); return; }
+    const done = event => {
+      if (event.target !== node) return;
+      node.removeEventListener('animationend', done);
+      node.classList.remove(name);
+      if (after) after();
+    };
+    node.addEventListener('animationend', done);
+    node.classList.add(name);
+  };
+  let focus_next = false;
+  window.pattern_go = (state, move, from) => {
+    const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
+    if (to && to !== from && move && !reduced.matches) pattern_moves[move](from, to);
+    focus_next = true;
+    location.hash = state;
+  };
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-go], a[href^="#"]');
+    const block = control && control.closest('[data-screen]');
+    if (!block || control.matches(':disabled')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pattern_go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
+  }, true);
+  addEventListener('hashchange', () => requestAnimationFrame(() => {
+    const block = shown_block();
+    const target = focus_next && block && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    focus_next = false;
+    if (target) target.focus({preventScroll: true});
+  }));
+})();
+/* A tap on a row opens its chat. The marks of new messages on that row go away. The star stays. */
+document.addEventListener('click', event => {
+  const row = event.target.closest('.badge_open');
+  if (!row) return;
+  row.closest('li').querySelectorAll('.badge_dot, .badge_count').forEach(mark => { mark.hidden = true; });
+  sketchToast('The chat opens (sample)');
+});
+</script>
+<script src="../../../assets/sketch.js"></script>

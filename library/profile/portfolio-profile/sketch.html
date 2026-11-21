@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio profile sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .profile_bar { position: sticky; top: 0; z-index: 3; background: var(--sketch-page); }
+  [data-sketch] .profile_pills [role="tab"] { border-bottom: 0; border-radius: var(--sketch-wobble); }
+  [data-sketch] .profile_pills [role="tab"][aria-selected="true"] { background: var(--sketch-wash); }
+  [data-sketch] .profile_kinds:has(.profile_about_tab[aria-selected="true"]) > .sketch-button { display: none; }
+  [data-sketch] .profile_large { width: 96px; height: 96px; font-size: 24px; }
+  [data-sketch] .profile_box, [data-sketch] .sketch-main a.profile_box { display: grid; justify-content: stretch; padding: 16px; text-decoration: none; }
+  [data-sketch] .profile_box :is(h2, p) { margin: 0; }
+  @media (min-width: 1000px) {
+    [data-sketch] .profile_side { position: sticky; top: 16px; }
+  }
+  @media (max-width: 999px) {
+    [data-sketch] :is([data-state="scrolled"], [data-state="work"]) .profile_side { display: none; }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="profile">
+  <div data-screen="portfolio_profile"></div>
+</section>
+<section data-state="scrolled">
+  <div data-screen="portfolio_profile" data-show="scrolled"></div>
+</section>
+<section data-state="work">
+  <div data-screen="portfolio_profile" data-show="work"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="portfolio_profile" data-show="empty"></div>
+</section>
+
+<!-- The identity stays in a side column. The tabs change the kind of content in a grid, in each state. -->
+<template id="portfolio_profile">
+<header class="sketch-bar" role="banner"><strong>[Product]</strong></header>
+<main class="sketch-main sketch-cols" style="--cols:260px minmax(0,1fr)">
+  <h1 class="pattern_hidden_title sketch-until-desktop" data-part="scrolled work">Mara Lind</h1>
+  <div class="sketch-row sketch-until-desktop profile_bar" style="padding-block:8px" data-scroll="past"><span class="sketch-avatar">ML</span><b>Mara Lind</b><span class="sketch-spacer"></span><button class="sketch-button" type="button" data-sketch-toast="Following (sample)">Follow</button></div>
+  <aside class="sketch-stack profile_side" aria-label="Member">
+    <span class="sketch-avatar profile_large">ML</span>
+    <h1>Mara Lind</h1>
+    <div class="sketch-row sketch-muted" style="gap:0 12px"><span>she/her</span></div>
+    <p data-part="!empty">Bus driver on the night lines. Draws route maps for riders.</p>
+    <button class="sketch-button secondary" type="button" data-part="empty"><i data-icon="plus"></i>Add a short bio</button>
+    <div class="sketch-panel sketch-frame sketch-row" style="padding:4px 16px;gap:0 16px"><a href="#"><b>318</b>followers</a><a href="#"><b>42</b>following</a></div>
+    <button class="sketch-button" type="button" data-sketch-toast="Following (sample)" data-part="!empty" data-scroll-mark>Follow</button>
+    <div class="sketch-row"><a href="#" aria-label="Website"><i data-icon="link"></i></a><a href="#" aria-label="Second website"><i data-icon="link"></i></a><a href="#" aria-label="Mail"><i data-icon="send"></i></a><a href="#" aria-label="Portfolio"><i data-icon="external"></i></a></div>
+  </aside>
+  <section class="sketch-stack" aria-label="Content">
+    <div class="sketch-row profile_kinds" data-part="!scrolled !work">
+      <div class="sketch-tabs profile_pills" aria-label="Kind of content">
+        <button role="tab" type="button" aria-controls="work" aria-selected="true">Work</button>
+        <button role="tab" type="button" class="profile_about_tab" aria-controls="about" data-select-in="empty">About me</button>
+      </div>
+      <span class="sketch-spacer"></span>
+      <button class="sketch-button secondary" type="button" data-sketch-popover="kind_menu">All kinds<i data-icon="chevron-down"></i></button>
+    </div>
+    <!-- The page of one work. A card of the grid opens it. -->
+    <div class="sketch-stack" data-part="work">
+      <a href="#profile" style="justify-self:start"><i data-icon="arrow-left"></i>Work</a>
+      <h2>Night lines map</h2>
+      <div class="sketch-placeholder" style="min-height:320px">Picture</div>
+      <p style="margin:0">A map of each night line, with each stop and the time of the last trip.</p>
+      <div class="sketch-row"><span class="sketch-muted">1.2k uses</span><span class="sketch-spacer"></span><button class="sketch-chip" type="button" aria-pressed="false">Like 214</button><button class="sketch-button" type="button">Use the map</button></div>
+    </div>
+    <div data-part="!work">
+    <div class="sketch-grid" id="work" style="--tablet:2;--wide:3">
+      <a class="sketch-stack profile_box sketch-panel sketch-frame" href="#work" style="gap:8px" data-part="!scrolled"><div class="sketch-placeholder">Picture</div><b>Night lines map</b><span class="sketch-muted">1.2k uses</span></a>
+      <a class="sketch-stack profile_box sketch-panel sketch-frame" href="#work" style="gap:8px" data-part="!scrolled"><div class="sketch-placeholder">Picture</div><b>Stop sign kit</b><span class="sketch-muted">860 uses</span></a>
+      <a class="sketch-stack profile_box sketch-panel sketch-frame" href="#work" style="gap:8px" data-part="!scrolled"><div class="sketch-placeholder">Picture</div><b>Timetable poster</b><span class="sketch-muted">412 uses</span></a>
+      <a class="sketch-stack profile_box sketch-panel sketch-frame" href="#work" style="gap:8px"><div class="sketch-placeholder">Picture</div><b>Paper notice set</b><span class="sketch-muted">96 uses</span></a>
+      <a class="sketch-stack profile_box sketch-panel sketch-frame" href="#work" style="gap:8px"><div class="sketch-placeholder">Picture</div><b>Depot wall chart</b><span class="sketch-muted">54 uses</span></a>
+      <a class="sketch-stack profile_box sketch-panel sketch-frame" href="#work" style="gap:8px"><div class="sketch-placeholder">Picture</div><b>Route icons</b><span class="sketch-muted">31 uses</span></a>
+    </div>
+    <div class="sketch-grid" id="about" style="--tablet:2;--wide:2">
+      <div class="sketch-stack profile_box sketch-panel sketch-frame"><h2>Work</h2><p data-part="!empty">City transit, driver, 2019 to now</p><button class="sketch-button secondary" type="button" data-part="empty"><i data-icon="plus"></i>Add your work</button></div>
+      <div class="sketch-stack profile_box sketch-panel sketch-frame"><h2>Study</h2><p data-part="!empty">Map design course, 2022</p><button class="sketch-button secondary" type="button" data-part="empty"><i data-icon="plus"></i>Add your study</button></div>
+      <div class="sketch-stack profile_box sketch-panel sketch-frame"><h2>Tools</h2><div class="sketch-row" data-part="!empty"><span class="sketch-badge">Pen</span><span class="sketch-badge">Map editor</span><span class="sketch-badge">Camera</span></div><div class="sketch-row" data-part="empty"><span class="sketch-placeholder" style="width:44px;min-height:44px"></span><span class="sketch-placeholder" style="width:44px;min-height:44px"></span><span class="sketch-placeholder" style="width:44px;min-height:44px"></span><button class="sketch-icon-button" type="button" aria-label="Add a tool"><i data-icon="plus"></i></button></div></div>
+      <div class="sketch-stack profile_box sketch-panel sketch-frame"><h2>Portfolio</h2><a href="#" data-part="!empty" style="justify-self:start"><i data-icon="external"></i>nightlines.example</a><button class="sketch-button secondary" type="button" data-part="empty"><i data-icon="plus"></i>Add a link</button></div>
+      <div class="sketch-stack profile_box sketch-panel sketch-frame"><h2>Gallery</h2><div class="sketch-placeholder" data-part="!empty">Picture</div><button class="sketch-button secondary" type="button" data-part="empty"><i data-icon="plus"></i>Add pictures</button></div>
+      <div class="sketch-stack profile_box sketch-panel sketch-frame"><h2>Contact</h2><a href="#" data-part="!empty" style="justify-self:start"><i data-icon="send"></i>Write to Mara</a><button class="sketch-button secondary" type="button" data-part="empty"><i data-icon="plus"></i>Add a contact</button></div>
+    </div>
+    </div>
+  </section>
+<div class="sketch-menu" id="kind_menu">
+  <button class="sketch-menu-item" type="button"><i data-icon="check"></i>All kinds</button>
+  <button class="sketch-menu-item" type="button" style="padding-left:42px">Files</button>
+  <button class="sketch-menu-item" type="button" style="padding-left:42px">Add-ons</button>
+</div>
+</main>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+/* A part with data-scroll="past" shows when the mark of the page (data-scroll-mark) is above the view. The mark is the follow button.
+   The states "scrolled" and "work" show these parts with no scroll. */
+(() => {
+  const set_past = (block, past) => block.querySelectorAll('[data-scroll]').forEach(part => {
+    part.hidden = part.part_off || !past;
+  });
+  const watcher = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.target.getClientRects().length) set_past(entry.target.closest('[data-screen]'), !entry.isIntersecting && entry.boundingClientRect.top < 64);
+  }), { rootMargin: '-64px 0px 0px 0px' });
+  document.querySelectorAll('[data-screen]').forEach(block => {
+    block.querySelectorAll('[data-scroll]').forEach(part => { part.part_off = part.hidden; });
+    set_past(block, /scrolled|work/.test(block.dataset.show || ''));
+    block.querySelectorAll('[data-scroll-mark]').forEach(mark => watcher.observe(mark));
+  });
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

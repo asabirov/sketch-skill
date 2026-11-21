@@ -1,0 +1,50 @@
+[
+  {
+    "label": "menu-open",
+    "trigger": "click the trigger of the menu",
+    "element": "menu",
+    "property": "opacity",
+    "animation": null,
+    "duration": 35,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured",
+    "easing_measurement": "estimated"
+  },
+  {
+    "label": "menu-open",
+    "trigger": "click the trigger of the menu",
+    "element": "menu",
+    "property": "transform",
+    "animation": null,
+    "duration": 160,
+    "delay": 0,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "measured",
+    "easing_measurement": "estimated"
+  },
+  {
+    "label": "closed",
+    "trigger": "press Escape, press outside the menu or click the trigger",
+    "element": "menu",
+    "property": "transform",
+    "animation": null,
+    "duration": 20,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "measured",
+    "easing_measurement": "estimated"
+  },
+  {
+    "label": "closed",
+    "trigger": "press Escape, press outside the menu or click the trigger",
+    "element": "menu",
+    "property": "opacity",
+    "animation": null,
+    "duration": 110,
+    "delay": 20,
+    "easing": "cubic-bezier(0, 0, 0.2, 1)",
+    "measurement": "measured",
+    "easing_measurement": "estimated"
+  }
+]

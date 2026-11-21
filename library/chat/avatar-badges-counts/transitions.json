@@ -1,0 +1,24 @@
+[
+  {
+    "label": "no-new",
+    "trigger": "tap on a row that has a mark",
+    "element": "the pressed row",
+    "property": "transform",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "no-new",
+    "trigger": "tap on a row that has a mark",
+    "element": "the pressed row",
+    "property": "background-color",
+    "animation": null,
+    "duration": 120,
+    "delay": 0,
+    "easing": "cubic-bezier(0.23, 1, 0.32, 1)",
+    "measurement": "measured"
+  }
+]

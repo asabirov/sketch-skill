@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bottom sheet with two heights sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A phone screen. The frame keeps the width of a phone in a wide window, so each part acts as it does on a phone. */
+  html { height: 100%; }
+  body[data-sketch] { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  [data-sketch] > [data-state] { flex: 1; min-height: 0; }
+  [data-sketch] [data-screen] { height: 100%; }
+  [data-sketch] .phone { position: relative; isolation: isolate; width: min(100%, 430px); height: 100%; margin: 0 auto; overflow: hidden; }
+  [data-sketch] .phone_screen { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); }
+  [data-sketch] .phone_body { grid-row: 2; min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_body > p { margin: 0 0 12px; }
+  [data-sketch] .phone_foot { grid-row: 3; display: flex; align-items: center; gap: 8px; padding: 8px 16px 16px; }
+  [data-sketch] .phone_round { border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
+  @media (min-width: 600px) { [data-sketch] .phone { border-inline: var(--sketch-stroke) solid var(--sketch-muted); } }
+  /* A plain box stands for a part that this pattern does not draw. It names the part, and the pattern that draws it. */
+  [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; text-decoration: none; }
+  [data-sketch] .part_box.fill { height: 100%; }
+  [data-sketch] .part_box.long { height: 720px; align-content: start; }
+  /* Each motion value below comes from transitions.json. */
+  [data-sketch] { --phone_spring: linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%); --phone_out: cubic-bezier(0.23, 1, 0.32, 1); }
+  /* A sheet covers the lower part of the screen. The scrim thins the screen behind it. */
+  [data-sketch] .phone_scrim { position: absolute; inset: 0; z-index: 2; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
+  [data-sketch] .phone_sheet { position: absolute; inset: auto 0 0; z-index: 3; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: calc(100% - 48px); background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-bottom: 0; border-radius: 24px 20px 0 0 / 20px 24px 0 0; }
+  [data-sketch] .phone_sheet_head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 8px 4px 16px; touch-action: none; }
+  [data-sketch] .phone_sheet_head h2 { margin: 0; font-size: 20px; }
+  [data-sketch] .phone_grab { grid-column: 1 / -1; justify-self: center; width: 36px; height: 4px; margin: 8px 0 4px; border-radius: 2px; background: var(--sketch-ink); }
+  [data-sketch] .phone_sheet_body { min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .exit_scrim { pointer-events: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_scrim.enter_scrim { animation: scrim-enter 120ms var(--phone_out); }
+    [data-sketch] .phone_scrim.exit_scrim { animation: scrim-exit 120ms var(--phone_out) forwards; }
+    [data-sketch] .phone_sheet.enter_sheet { animation: directory-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_sheet.settle { transition: transform 520ms var(--phone_spring); }
+  }
+  @keyframes scrim-enter { from { opacity: 0; } }
+  @keyframes scrim-exit { to { opacity: 0; } }
+  @keyframes directory-enter { from { transform: translateY(100%); } }
+  /* The state "dragging" draws the sheet under the finger, 96px down. */
+  [data-sketch] [data-show~="held"] .phone_sheet { transform: translateY(96px); }
+  /* The sheet opens at half of the screen height. The height button and a drag up make it tall. */
+  [data-sketch] .phone_sheet.half { height: 50%; }
+  [data-sketch] .phone_sheet.half.tall { height: calc(100% - 48px); }
+  [data-sketch] .phone_sheet.half .phone_sheet_head { grid-template-columns: minmax(0, 1fr) auto auto; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_sheet.half { transition: height 520ms var(--phone_spring); }
+    [data-sketch] .phone_sheet.half.settle { transition: transform 520ms var(--phone_spring), height 520ms var(--phone_spring); }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="closed">
+  <div data-screen="tall_sheet"></div>
+</section>
+<section data-state="open">
+  <div data-screen="tall_sheet" data-show="sheet"></div>
+</section>
+<section data-state="dragging">
+  <div data-screen="tall_sheet" data-show="sheet held"></div>
+</section>
+
+<!-- The sheet holds a long list. It opens at half of the screen height. -->
+<template id="tall_sheet">
+<div class="phone">
+  <main class="phone_screen" data-inert-in="sheet">
+    <div class="phone_body"><div class="part_box fill"><strong>Screen</strong></div></div>
+    <footer class="phone_foot">
+      <button class="sketch-icon-button phone_round" type="button" aria-label="People" data-go="open" data-move="sheet" data-focus="!sheet"><i data-icon="user"></i></button>
+    </footer>
+  </main>
+  <div class="phone_scrim" data-part="sheet" data-go="closed" data-move="close"></div>
+  <section class="phone_sheet half" role="dialog" aria-modal="true" aria-labelledby="sheet_title" data-part="sheet" data-closed="closed" data-rest="open">
+    <header class="phone_sheet_head" data-sheet-drag>
+      <span class="phone_grab"></span>
+      <h2 id="sheet_title">People</h2>
+      <button class="sketch-icon-button" type="button" aria-label="Make the sheet taller" data-sheet-height><i data-icon="chevron-up"></i></button>
+      <button class="sketch-icon-button" type="button" aria-label="Close" data-go="closed" data-move="close" data-escape data-focus="sheet"><i data-icon="close"></i></button>
+    </header>
+    <div class="phone_sheet_body" tabindex="0" role="group" aria-label="Long list"><div class="part_box long"><strong>Long list</strong><span>The list scrolls in the sheet.</span></div></div>
+  </section>
+</div>
+</template>
+
+<script>
+/* The screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it.
+   data-inert-in locks a region.
+   A link to "#state" and a button with data-go change the state. data-move names the transition that the change plays.
+   After the change, the element whose data-focus names a shown part takes the focus.
+   Escape presses the shown data-escape button. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' ').filter(Boolean), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  const parts_of = block => (block.dataset.show || '').split(' ');
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = parts_of(block);
+    ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    copy.querySelectorAll('[data-inert-in]').forEach(region => { region.inert = has_part(shown, region.dataset.inertIn); });
+    block.append(copy);
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_block = () => document.querySelector('[data-state]:not([hidden]) [data-screen]');
+  /* A move plays one transition of transitions.json. play adds the class that holds the animation, and takes it away at the end. */
+  window.pattern_moves = {};
+  window.pattern_play = (node, name, after) => {
+    if (reduced.matches) { if (after) after(); return; }
+    const done = event => {
+      if (event.target !== node) return;
+      node.removeEventListener('animationend', done);
+      node.classList.remove(name);
+      if (after) after();
+    };
+    node.addEventListener('animationend', done);
+    node.classList.add(name);
+  };
+  let focus_next = false;
+  window.pattern_go = (state, move, from) => {
+    const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
+    if (to && to !== from && move && !reduced.matches) pattern_moves[move](from, to);
+    focus_next = true;
+    location.hash = state;
+  };
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-go], a[href^="#"]');
+    const block = control && control.closest('[data-screen]');
+    if (!block || control.matches(':disabled')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pattern_go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
+  }, true);
+  addEventListener('hashchange', () => requestAnimationFrame(() => {
+    const block = shown_block();
+    const target = focus_next && block && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    focus_next = false;
+    if (target) target.focus({preventScroll: true});
+  }));
+  document.addEventListener('keydown', event => {
+    const block = event.key === 'Escape' && shown_block();
+    const close = block && [...block.querySelectorAll('[data-escape]')].find(button => button.checkVisibility());
+    if (close) close.click();
+  });
+})();
+/* sheet: the sheet rises and the scrim shows. close: the sheet leaves at once, and a copy of the scrim fades out.
+   A drag on the head of a sheet moves the sheet with the pointer. A release after a third of the height, or after a fast flick,
+   closes the sheet. A shorter drag returns it. data-closed on the sheet names the state that a long drag opens. data-rest names the state that
+   a short drag opens from a block with the part "held". */
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  pattern_moves.sheet = (from, to) => {
+    to.querySelectorAll('.phone_sheet:not([hidden])').forEach(sheet => pattern_play(sheet, 'enter_sheet'));
+    to.querySelectorAll('.phone_scrim:not([hidden])').forEach(scrim => pattern_play(scrim, 'enter_scrim'));
+  };
+  pattern_moves.close = (from, to) => {
+    if (!from.querySelector('.phone_scrim:not([hidden])')) return;
+    const ghost = document.createElement('div');
+    ghost.className = 'phone_scrim';
+    to.querySelector('.phone').append(ghost);
+    pattern_play(ghost, 'exit_scrim', () => ghost.remove());
+  };
+  const offset = sheet => new DOMMatrix(getComputedStyle(sheet).transform).m42;
+  let drag = null;
+  document.addEventListener('pointerdown', event => {
+    const head = event.target.closest('[data-sheet-drag]');
+    if (!head || event.button !== 0 || event.target.closest('button, a, input')) return;
+    const sheet = head.closest('.phone_sheet'), held = offset(sheet);
+    sheet.classList.remove('enter_sheet', 'settle');
+    sheet.style.transform = `translateY(${held}px)`;
+    head.setPointerCapture(event.pointerId);
+    drag = {sheet, start: event.clientY - held, last: event.clientY, time: event.timeStamp, velocity: 0, distance: held};
+  });
+  document.addEventListener('pointermove', event => {
+    if (!drag) return;
+    const elapsed = event.timeStamp - drag.time;
+    if (elapsed > 0) drag.velocity = (event.clientY - drag.last) / elapsed;
+    drag.last = event.clientY;
+    drag.time = event.timeStamp;
+    drag.distance = Math.max(0, event.clientY - drag.start);
+    drag.sheet.style.transform = `translateY(${drag.distance}px)`;
+  });
+  const release = event => {
+    if (!drag) return;
+    const {sheet, distance, velocity, time} = drag, block = sheet.closest('[data-screen]');
+    drag = null;
+    const closes = event.type !== 'pointercancel' && (distance >= sheet.offsetHeight / 3 || distance > 24 && velocity > .5 && event.timeStamp - time < 120);
+    const finish = () => {
+      sheet.classList.remove('settle');
+      if (closes) pattern_go(sheet.dataset.closed, 'close', block);
+      else if ((block.dataset.show || '').split(' ').includes('held')) pattern_go(sheet.dataset.rest, null, block);
+      sheet.style.transform = '';
+    };
+    if (reduced.matches || !closes && distance < 1) { finish(); return; }
+    const done = ended => {
+      if (ended.target !== sheet) return;
+      sheet.removeEventListener('transitionend', done);
+      finish();
+    };
+    sheet.addEventListener('transitionend', done);
+    sheet.classList.add('settle');
+    sheet.style.transform = closes ? 'translateY(100%)' : 'translateY(0px)';
+  };
+  document.addEventListener('pointerup', release);
+  document.addEventListener('pointercancel', release);
+})();
+/* The height button changes the sheet between half of the screen and the full height. A drag up of more than 24px on the head makes
+   the sheet tall. */
+(() => {
+  const set_tall = (sheet, tall) => {
+    const button = sheet.querySelector('[data-sheet-height]');
+    sheet.classList.toggle('tall', tall);
+    button.setAttribute('aria-label', tall ? 'Make the sheet shorter' : 'Make the sheet taller');
+    button.replaceChildren(document.createElement('i'));
+    button.firstChild.dataset.icon = tall ? 'chevron-down' : 'chevron-up';
+    initSketch();
+  };
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-sheet-height]');
+    if (button) set_tall(button.closest('.phone_sheet'), !button.closest('.phone_sheet').classList.contains('tall'));
+  });
+  let start = null;
+  document.addEventListener('pointerdown', event => { start = event.target.closest('.phone_sheet.half [data-sheet-drag]') ? event.clientY : null; });
+  document.addEventListener('pointerup', event => {
+    const sheet = start !== null && event.target.closest('.phone_sheet.half');
+    if (sheet && start - event.clientY > 24) set_tall(sheet, true);
+    start = null;
+  });
+  addEventListener('hashchange', () => document.querySelectorAll('.phone_sheet.tall').forEach(sheet => set_tall(sheet, false)));
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

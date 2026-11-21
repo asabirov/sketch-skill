@@ -1,0 +1,307 @@
+<!doctype html>
+<!--
+  Best for: a team product where a member chooses one group of records, and then scans all records of that group.
+  Row opens: on the record's own page. That page has its own pattern, content/product-page. The state product-page shows only a plain box for it.
+  A card has its own pattern, content/fact-cards. So each card of this sketch is a plain box with the name of its product and the number of the chosen metric.
+  The sketch holds only the parts that a page of one group needs. It leaves out the parts that belong to the source app.
+  The title is at the left edge of the column, and the search field is at the right edge. The source has them in the middle. The owner asked for a page in balance, so the head and the cards have the same 2 edges.
+  The metric switch of the head chooses the metric: MRR, Revenue or Users in a week. The cards are in the order of that metric. The owner asked for the switch. The source has no such control.
+  Transition values: transitions.json has no value. The capture read no transition for a change of the cards or for the page of a card.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product cards of one group</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* One column 811 px wide. The head and the cards have the same left edge and the same right edge. A group has a path back to all products. */
+  [data-sketch] .cards_main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; width: 100%; max-width: 843px; margin: 0 auto; padding: 32px 16px; }
+  [data-sketch] .cards_crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  [data-sketch] .cards_crumbs > a { display: inline-flex; align-items: center; min-height: 44px; }
+  [data-sketch] .cards_crumbs > [aria-current] { font-weight: 600; overflow-wrap: anywhere; }
+  [data-sketch] .cards_crumbs > .sketch-icon { width: 14px; height: 14px; }
+
+  /* The first row of the head has the title at the left edge of the column, then the metric switch, the search field and one button. A part that does not fit goes to the next row. */
+  [data-sketch] .head { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  [data-sketch] .head_top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  [data-sketch] .head_title { flex: 999 1 160px; min-width: 0; min-height: 44px; margin: 0; display: flex; align-items: center; font-size: 24px; letter-spacing: -0.3px; overflow-wrap: anywhere; }
+  /* The metric switch is 216 px wide beside the title. In a row of its own, it is 360 px wide at most. Its options share the width. The switch is 6 px higher than the row, so its margin keeps the row 44 px high. */
+  [data-sketch] .head_metric { flex: 1 1 216px; min-width: 0; max-width: 360px; margin: -3px 0; }
+  [data-sketch] .head_metric > .sketch-segmented { display: flex; }
+  [data-sketch] .head_metric label { flex: 1 1 0; min-width: 0; padding: 0 8px; white-space: nowrap; }
+  [data-sketch] .head_hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* The search field and one button are at the right edge of the first row. Below 732 px, they are a row of their own. */
+  [data-sketch] .head_find { flex: 1 1 100%; display: flex; gap: 8px; min-width: 0; }
+  [data-sketch] .head_search { flex: 1; min-width: 0; }
+  [data-sketch] .head_add { flex: none; }
+  @media (min-width: 600px) {
+    [data-sketch] .head_find { flex-basis: 300px; }
+  }
+  @media (min-width: 1024px) {
+    [data-sketch] .head_find { flex: 0 1 372px; }
+  }
+
+  /* The cards fill 3 columns from 1000 px. Each card is a plain box, because the card has its own pattern. The box has the name of its product and the number of the chosen metric, and it is a link to the page of its product. */
+  [data-sketch] .cards_grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  [data-sketch] .cards_box { align-content: center; gap: 4px; min-height: 160px; padding: 16px; text-align: center; font-weight: 600; color: var(--sketch-ink); text-decoration: none; overflow-wrap: anywhere; }
+  [data-sketch] .cards_box_number { font-weight: 400; }
+  [data-sketch] .cards_box:is(:hover, :focus-visible) { border-color: var(--sketch-ink); }
+  [data-sketch] .cards_box:active { background: var(--sketch-wash); }
+  [data-sketch] .cards_caption { margin: 0; }
+  [data-sketch] .cards_empty { justify-items: center; padding: 48px 16px; text-align: center; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] .cards_empty > :is(h2, p) { margin: 0; }
+  [data-sketch] .cards_empty > h2 { font-size: 18px; letter-spacing: 0; overflow-wrap: anywhere; }
+  /* A button loads more cards, and links lead to each group. */
+  [data-sketch] .cards_more { display: grid; justify-items: center; }
+  [data-sketch] .cards_more > .sketch-button { width: 100%; max-width: 320px; min-height: 44px; }
+  [data-sketch] .cards_groups { gap: 12px; }
+  [data-sketch] .cards_groups > h2 { font-size: 18px; letter-spacing: 0; }
+  [data-sketch] .cards_groups a.sketch-chip { min-height: 44px; padding: 4px 16px; text-decoration: none; }
+
+  /* The page of a product has its own pattern, so it shows as a plain box with the name of that pattern. A link leads back. */
+  [data-sketch] .cards_back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+  [data-sketch] .cards_back > .sketch-icon { width: 14px; height: 14px; }
+  [data-sketch] .cards_other { min-height: 320px; padding: 16px; text-align: center; color: var(--sketch-ink); }
+  [data-sketch] .cards_other :is(h1, p) { margin: 0; font: inherit; letter-spacing: 0; }
+  [data-sketch] .cards_other h1 { font-weight: 600; }
+
+  @media (min-width: 600px) {
+    [data-sketch] .cards_grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1000px) {
+    [data-sketch] .cards_grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each list state, and it fills the boxes from the list of products. -->
+<section data-state="cards"></section>
+<section data-state="filtered"></section>
+<section data-state="metric-changed"></section>
+<section data-state="no-match"></section>
+<section data-state="product-page"></section>
+
+<!-- The page of all products, and the page of one group. A path leads back from a group, and links lead to the other groups. -->
+<template id="screen">
+  <main class="cards_main">
+    <header class="head">
+      <nav class="cards_crumbs" aria-label="Path" data-crumbs hidden><a href="#cards" data-clear>Products</a><i data-icon="chevron-right"></i><span aria-current="page" data-title></span></nav>
+      <div class="head_top">
+        <h1 class="head_title" data-title>Products</h1>
+        <fieldset class="head_metric"><legend class="head_hidden">Metric</legend>
+          <div class="sketch-segmented" data-metric-switch><!--metric-options--></div></fieldset>
+        <div class="head_find">
+          <input class="sketch-input head_search" type="search" aria-label="Search" placeholder="Search" data-search>
+          <button type="button" class="sketch-button head_add" data-sketch-toast="New product form (sample)"><i data-icon="plus"></i>Add</button>
+        </div>
+      </div>
+    </header>
+    <div class="sketch-stack" data-slot="grid"></div>
+    <section class="sketch-stack cards_groups" aria-labelledby="groups___state__">
+      <h2 id="groups___state__" data-groups-title>Stages</h2>
+      <div class="sketch-row" data-slot="groups"></div>
+    </section>
+  </main>
+</template>
+
+<!-- The page of a product has its own pattern, content/product-page. This state shows a link back and a plain box with the name of that pattern. -->
+<template id="page">
+  <main class="cards_main">
+    <nav aria-label="Back"><a class="cards_back" href="#cards" data-back><i data-icon="chevron-left"></i>Back to the cards</a></nav>
+    <div class="sketch-placeholder cards_other"><div><h1 data-fill="name"></h1><p>Pattern: content/product-page</p></div></div>
+  </main>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The capture read no transition, so transitions.json has no value.
+  window.__sketchTransitions = [];
+
+  const stages = ['Idea', 'Prototype', 'Pilot', 'Launch', 'Scale'];
+  // Sample products: name, one line about it, stage, lead, users in a week, growth in a week in percent, next review.
+  const products = [
+    ['Parcel Pilot', 'Route plans for small courier firms', 'Launch', 'Mara Lindqvist', 8420, 4, '2 Dec'],
+    ['Greenhouse Log for growers with many sites', 'Climate notes for growers', 'Launch', 'Ines Okafor', 2310, 9, '4 Dec'],
+    ['Clinic Queue', 'Waiting lists for small clinics', 'Pilot', 'Tomas Reyes', 640, 12, '9 Dec'],
+    ['Fare Split', 'Shared bills for flat mates', 'Prototype', 'Yuki Arai', 85, 30, '11 Dec'],
+    ['Mill Sensor', 'Wear alerts for saw mills', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Harbor Desk', 'Berth booking for marinas', 'Launch', 'Mara Lindqvist', 1975, 6, '2 Dec'],
+    ['Lesson Loop', 'Homework feedback for tutors', 'Pilot', 'Ines Okafor', 410, 15, '9 Dec'],
+    ['Stock Shelf', 'Shelf counts with a phone camera', 'Prototype', 'Tomas Reyes', 52, 21, '11 Dec'],
+    ['Rent Ready', 'Move-in checks for landlords', 'Launch', 'Yuki Arai', 12060, 2, '4 Dec'],
+    ['Field Crew', 'Shift plans for farm teams', 'Pilot', 'Noor Haddad', 730, 8, '9 Dec'],
+    ['Paper Trail', 'Receipts that become ledger rows', 'Launch', 'Tomas Reyes', 3150, 5, '2 Dec'],
+    ['Quiet Hours', 'Noise reports for housing blocks', 'Idea', 'Ines Okafor', 0, null, '16 Dec'],
+    ['Kiln Timer', 'Firing schedules for potters', 'Prototype', 'Mara Lindqvist', 31, 18, '11 Dec'],
+    ['Tool Library', 'Lending records for maker spaces', 'Pilot', 'Yuki Arai', 290, 10, '9 Dec'],
+    ['Depot Board', 'Task board for bus depots', 'Idea', 'Noor Haddad', 0, null, '16 Dec'],
+    ['Well Check', 'Water tests for rural wells', 'Pilot', 'Ines Okafor', 5640, 3, '4 Dec']
+  ].map(([name, about, stage, lead, users, growth, review], at) => ({ at, name, about, stage, lead, users, growth, review }));
+  // The MRR, its growth in a week in percent, the revenue and its growth in a week in percent, for each product in the same order. An amount is in dollars.
+  const money = [[48200, 3, 386500, 3], [31600, 7, 198700, 4], [4100, 11, 22800, 5], [240, 25, 480, 13], [0, null, 0, null], [12750, 5, 96400, 3], [2200, 14, 9600, 6], [120, 17, 240, 12],
+    [27900, 2, 412000, 2], [3650, 9, 15900, 6], [18400, 4, 240300, 2], [0, null, 0, null], [60, 20, 90, 17], [1480, 8, 5300, 7], [0, null, 0, null], [9300, 6, 61200, 4]];
+  products.forEach(product => { [product.mrr, product.mrr_growth, product.revenue, product.revenue_growth] = money[product.at]; });
+  // The metric switch of the head chooses the number that the list shows, and the order follows that number. MRR is the first metric.
+  const metrics = [
+    { id: 'mrr', label: 'MRR', short: 'MRR', noun: 'MRR', money: true },
+    { id: 'revenue', label: 'Revenue', short: 'Revenue', noun: 'revenue', money: true },
+    { id: 'users', label: 'Users in a week', short: 'Users', noun: 'users', money: false }
+  ];
+  const metric_of = id => metrics.find(metric => metric.id === id);
+  const amount_of = (product, metric) => product[metric.id];
+  const growth_of = (product, metric) => metric.id === 'users' ? product.growth : product[`${metric.id}_growth`];
+  const amount_text = (number, metric) => `${metric.money ? '$' : ''}${number.toLocaleString('en-US')}`;
+  const percent_text = percent => percent === null ? 'None' : `+${percent}%`;
+  const metric_options = metrics.map(metric => `<label><input type="radio" name="metric___state__" value="${metric.id}">${metric.short}<span class="head_hidden">${metric.label.slice(metric.short.length)}</span></label>`).join('');
+  // The page shows this many cards before the member loads more.
+  const first_cards = 9;
+
+  const root = document.documentElement;
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  const list_states = ['cards', 'filtered', 'metric-changed', 'no-match'];
+  const empty_view = { stage: '', term: '', metric: 'mrr' };
+  const template_html = id => document.getElementById(id).innerHTML;
+  const shown_section = () => state_sections.find(section => !section.hidden);
+  const escape_html = text => String(text).replace(/[&<>"]/g, sign => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[sign]);
+
+  let view = { ...empty_view };
+  let all_cards = false;
+  let shown_product = 2;
+  let last_list = 'cards';
+  let pending_focus = null;
+
+  function found_products(wanted) {
+    const term = wanted.term.trim().toLowerCase();
+    return products.filter(product => (!wanted.stage || product.stage === wanted.stage) && (!term || `${product.name} ${product.about}`.toLowerCase().includes(term)));
+  }
+  // The metric is not a filter. It keeps its value when the member opens a group, or goes back to all products.
+  const has_filter = wanted => wanted.stage !== '' || wanted.term !== '';
+  const state_of = wanted => !found_products(wanted).length ? 'no-match' : has_filter(wanted) ? 'filtered' : wanted.metric !== empty_view.metric ? 'metric-changed' : 'cards';
+  // The cards in the order of the chosen metric, with the largest number first. Cards with the same number keep the order of the list.
+  const ranked = (list, metric) => [...list].sort((a, b) => amount_of(b, metric) - amount_of(a, metric) || a.at - b.at);
+  // Each list state has a view of its own, so an address such as #filtered shows a filtered list. No sample product is in the Scale stage.
+  function default_view(state) {
+    if (state === 'filtered') return { ...empty_view, stage: 'Pilot' };
+    if (state === 'metric-changed') return { ...empty_view, metric: 'revenue' };
+    if (state === 'no-match') return { ...empty_view, stage: 'Scale' };
+    return { ...empty_view };
+  }
+  const view_of = state => state === state_of(view) ? view : default_view(state);
+
+  // A card has its own pattern, so each card is a plain box with the name of its product and the number of the chosen metric.
+  const card_box = (product, metric) => `<a class="sketch-placeholder cards_box" href="#product-page" data-product="${product.at}"><span>${escape_html(product.name)}</span><span class="cards_box_number">${metric.short} ${amount_text(amount_of(product, metric), metric)}</span></a>`;
+  function grid_html(found, metric) {
+    const shown = all_cards ? found : found.slice(0, first_cards);
+    const more = shown.length < found.length ? '<div class="cards_more"><button type="button" class="sketch-button secondary" data-more>Load more</button></div>' : '';
+    return `<p class="cards_caption">Each box is a card of the pattern content/fact-cards.</p><div class="cards_grid">${shown.map(product => card_box(product, metric)).join('')}</div>${more}`;
+  }
+  function empty_html(wanted) {
+    const term = wanted.term.trim();
+    const title = term ? `No product matches “${escape_html(term)}”` : `No product is in ${wanted.stage}`;
+    const help = term ? 'Try a different word.' : 'A product shows here when its stage review moves it to this stage.';
+    return `<div class="sketch-stack cards_empty"><h2>${title}</h2><p>${help}</p><button type="button" class="sketch-button secondary" data-clear>Show all products</button></div>`;
+  }
+
+  function fill_lists() {
+    state_sections.filter(section => list_states.includes(section.dataset.state)).forEach(section => {
+      const wanted = view_of(section.dataset.state);
+      const metric = metric_of(wanted.metric);
+      const found = ranked(found_products(wanted), metric);
+      section.querySelector('[data-slot="grid"]').innerHTML = found.length ? grid_html(found, metric) : empty_html(wanted);
+      section.querySelectorAll('[data-metric-switch] input').forEach(input => { input.checked = input.value === wanted.metric; });
+      const field = section.querySelector('[data-search]');
+      if (field !== document.activeElement) field.value = wanted.term;
+      // A group or a search has its own title, a path back, and links to the other groups.
+      const title = wanted.stage || (wanted.term.trim() ? `Results for “${wanted.term.trim()}”` : 'Products');
+      section.querySelectorAll('[data-title]').forEach(part => { part.textContent = title; });
+      section.querySelectorAll('[data-crumbs]').forEach(path => { path.hidden = !has_filter(wanted); });
+      section.querySelectorAll('[data-groups-title]').forEach(part => { part.textContent = wanted.stage ? 'Other stages' : 'Stages'; });
+      section.querySelectorAll('[data-slot="groups"]').forEach(slot => {
+        slot.innerHTML = stages.filter(stage => stage !== wanted.stage).map(stage => `<a class="sketch-chip" href="#filtered" data-stage="${stage}">${stage}</a>`).join('');
+      });
+    });
+    initSketch();
+  }
+  // The state product-page names the product that the member opened.
+  function fill_page() {
+    const section = state_sections.find(part => part.dataset.state === 'product-page');
+    section.querySelector('[data-fill="name"]').textContent = `The page of ${products[shown_product].name}`;
+    section.querySelector('[data-back]').href = `#${last_list}`;
+  }
+
+  // Show the state that the view needs. A change of state puts the focus on the same control of the new state.
+  function apply_view() {
+    const state = state_of(view);
+    all_cards = false;
+    fill_lists();
+    if (shown_section().dataset.state !== state) location.hash = state; else focus_pending();
+  }
+  function focus_pending() {
+    const control = pending_focus && shown_section().querySelector(pending_focus);
+    pending_focus = null;
+    if (!control) return;
+    control.focus();
+    if (control.matches('input:not([type="radio"])')) control.setSelectionRange(control.value.length, control.value.length);
+  }
+  const shown_view = () => ({ ...view_of(shown_section().dataset.state) });
+
+  document.addEventListener('click', event => {
+    const hit = selector => event.target.closest(selector);
+    if (hit('[data-stage]')) {
+      // A link of a group opens the group. The focus goes to the path of the group.
+      event.preventDefault();
+      view = { ...empty_view, metric: shown_view().metric, stage: hit('[data-stage]').dataset.stage };
+      pending_focus = '[data-crumbs] a';
+      apply_view();
+      scrollTo(0, 0);
+    } else if (hit('[data-clear]')) {
+      event.preventDefault();
+      view = { ...empty_view, metric: shown_view().metric };
+      pending_focus = '[data-search]';
+      apply_view();
+    } else if (hit('[data-more]')) {
+      all_cards = true;
+      fill_lists();
+      // The focus goes to the first new card.
+      shown_section().querySelector(`.cards_grid > :nth-child(${first_cards + 1})`)?.focus();
+    } else if (hit('[data-product]')) {
+      shown_product = Number(hit('[data-product]').dataset.product);
+      pending_focus = '[data-back]';
+    } else if (hit('[data-back]')) {
+      // The focus goes back to the box of the product.
+      pending_focus = `[data-product="${shown_product}"]`;
+    }
+  }, true);
+  document.addEventListener('input', event => {
+    if (!event.target.matches('[data-search]')) return;
+    view = { ...shown_view(), term: event.target.value };
+    pending_focus = '[data-search]';
+    apply_view();
+  });
+  document.addEventListener('change', event => {
+    if (!event.target.matches('[data-metric-switch] input')) return;
+    view = { ...shown_view(), metric: event.target.value };
+    pending_focus = '[data-metric-switch] input:checked';
+    apply_view();
+  });
+  addEventListener('hashchange', () => {
+    const state = shown_section().dataset.state;
+    if (list_states.includes(state)) {
+      last_list = state;
+      if (state_of(view) !== state) { view = default_view(state); all_cards = false; }
+      fill_lists();
+    } else {
+      fill_page();
+      scrollTo(0, 0);
+    }
+    focus_pending();
+  });
+
+  state_sections.forEach(section => {
+    const state = section.dataset.state;
+    section.innerHTML = template_html(list_states.includes(state) ? 'screen' : 'page').replace('<!--metric-options-->', metric_options).replaceAll('__state__', state);
+  });
+  fill_lists();
+  if (list_states.includes(shown_section().dataset.state)) last_list = shown_section().dataset.state;
+  dispatchEvent(new HashChangeEvent('hashchange'));
+</script>

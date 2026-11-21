@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waitlist sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] [data-state]:not([hidden]) { animation: waitlist_enter var(--state-duration) ease-out both; }
+  [data-sketch] .waitlist_code { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  [data-sketch] .waitlist_code input { min-width: 0; text-align: center; }
+  @keyframes waitlist_enter { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] [data-state]:not([hidden]) { animation: none; } }
+</style>
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-narrow" style="--width:420px;min-height:calc(100vh - 62px);align-content:center" aria-live="polite">
+  <section class="sketch-panel sketch-frame sketch-stack" data-state="join-form" style="--state-duration:180ms" aria-labelledby="join_heading">
+    <h1 id="join_heading">Request access</h1>
+    <form class="sketch-stack" data-form="join">
+      <label class="sketch-field">Contact address or phone<input class="sketch-input" name="contact" autocomplete="email" required></label>
+      <button class="sketch-button" type="submit">Continue</button>
+    </form>
+  </section>
+  <section class="sketch-panel sketch-frame sketch-stack" data-state="bad-input" style="--state-duration:160ms" aria-labelledby="bad_input_heading">
+    <h1 id="bad_input_heading">Request access</h1>
+    <form class="sketch-stack" data-form="bad-input">
+      <label class="sketch-field">Contact address or phone<input class="sketch-input" name="contact" value="bad value" aria-invalid="true" required></label>
+      <p class="sketch-error">Error: Check the contact value.</p>
+      <button class="sketch-button" type="submit">Continue</button>
+    </form>
+  </section>
+  <section class="sketch-panel sketch-frame sketch-stack" data-state="code-confirmation" style="--state-duration:180ms" aria-labelledby="code_heading">
+    <h1 id="code_heading">Enter the access code</h1>
+    <form class="sketch-stack" data-form="code">
+      <div class="waitlist_code" aria-label="Six-character access code">
+        <input class="sketch-input" inputmode="numeric" aria-label="Code character 1" value="1"><input class="sketch-input" inputmode="numeric" aria-label="Code character 2" value="2"><input class="sketch-input" inputmode="numeric" aria-label="Code character 3" value="3"><input class="sketch-input" inputmode="numeric" aria-label="Code character 4" value="4"><input class="sketch-input" inputmode="numeric" aria-label="Code character 5" value="5"><input class="sketch-input" inputmode="numeric" aria-label="Code character 6" value="6">
+      </div>
+      <label class="sketch-choice"><input type="checkbox" checked>Remember this device</label>
+      <button class="sketch-button" type="submit">Confirm</button>
+      <button class="sketch-button secondary" type="button" data-go="join-form">Change contact</button>
+    </form>
+  </section>
+  <section class="sketch-panel sketch-frame sketch-stack" data-state="waitlist-confirmed" style="--state-duration:180ms" aria-labelledby="confirmed_heading">
+    <h1 id="confirmed_heading">Your place is saved</h1><p>We will contact you when access is ready.</p><button class="sketch-button" type="button" data-go="join-form">Request again</button>
+  </section>
+  <section class="sketch-panel sketch-frame sketch-stack" data-state="already-on-list" style="--state-duration:180ms" aria-labelledby="listed_heading">
+    <h1 id="listed_heading">You already have a place</h1><p>We will use your saved contact method for updates.</p><button class="sketch-button" type="button" data-go="join-form">Change contact</button>
+  </section>
+</main>
+<script src="../../../assets/sketch.js"></script>
+<script>
+  const valid_contact = /[^\s@]+@[^\s@]+\.[^\s@]+|\+?[0-9 ()-]{7,}/;
+  const transition_records = [{ label: 'bad-input', trigger: 'click Continue with a bad value', element: 'contact field and error message', property: 'opacity', animation: null, duration: 160, delay: 0, easing: 'ease-out', measurement: 'estimated' }, { label: 'code-confirmation', trigger: 'click Continue with an accepted contact value', element: 'form content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' }, { label: 'waitlist-confirmed', trigger: 'click Confirm with a correct code', element: 'form content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' }, { label: 'already-on-list', trigger: 'click Confirm for a listed person', element: 'form content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' }];
+  window.__sketchTransitions = transition_records;
+  function submit_join(event) { event.preventDefault(); const contact_value = event.currentTarget.elements.contact.value.trim(); location.hash = valid_contact.test(contact_value) ? 'code-confirmation' : 'bad-input'; }
+  function submit_code(event) { event.preventDefault(); const code_value = [...event.currentTarget.querySelectorAll('.waitlist_code input')].map((input) => input.value).join(''); location.hash = code_value === '000000' ? 'already-on-list' : 'waitlist-confirmed'; }
+  document.querySelectorAll('[data-form="join"], [data-form="bad-input"]').forEach((form) => form.addEventListener('submit', submit_join));
+  document.querySelector('[data-form="code"]').addEventListener('submit', submit_code);
+  document.querySelectorAll('[data-go]').forEach((button) => button.addEventListener('click', () => { location.hash = button.dataset.go; }));
+  initSketch();
+</script>

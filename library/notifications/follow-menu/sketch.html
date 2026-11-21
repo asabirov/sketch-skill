@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Follow menu with alert levels sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* The head of the page of a product: its mark, its name, the count of its followers and the follow button. The button shows the level
+     of the member with an icon and one word. Its menu has one row for each level, with an icon, a name and one short line. */
+  [data-sketch] .follow_head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+  [data-sketch] .follow_head h1 { margin: 0; font-size: 24px; }
+  [data-sketch] .follow_head .sketch-avatar { width: 56px; height: 56px; font-size: 18px; }
+  [data-sketch] .follow_button { gap: 8px; }
+  [data-sketch] .follow_menu { width: min(320px, calc(100vw - 16px)); }
+  [data-sketch] .follow_menu .sketch-menu-item { display: grid; grid-template-columns: 20px minmax(0, 1fr) 20px; gap: 0 12px; align-items: center; padding-block: 8px; text-align: left; }
+  [data-sketch] .follow_menu .sketch-menu-item small { grid-column: 2; font-size: 14px; color: var(--sketch-muted); }
+  [data-sketch] .follow_menu .sketch-menu-item > .sketch-icon { grid-row: 1 / span 2; }
+  [data-sketch] .follow_menu .sketch-menu-item > .sketch-icon:last-of-type { grid-column: 3; }
+  /* The check stands only on the level of the member. */
+  [data-sketch] .follow_menu .sketch-menu-item:not([aria-current]) > .sketch-icon:last-of-type { visibility: hidden; }
+  [data-sketch] .follow_menu .sketch-menu-item[aria-current] b { font-weight: 700; }
+  [data-sketch] .follow_menu .sketch-menu-item:not([aria-current]) b { font-weight: 500; }
+  [data-sketch] .follow_custom { width: min(320px, calc(100vw - 16px)); gap: 0; }
+  [data-sketch] .follow_custom .sketch-choice { margin: 0 -12px; }
+  [data-sketch] .follow_custom > .sketch-row:first-child { margin: -8px 0 4px -12px; gap: 4px; }
+  [data-sketch] .follow_custom > .sketch-row:last-child { margin-top: 12px; }
+</style>
+<body data-sketch>
+
+<section data-state="follow">
+  <div data-screen="follow_page"></div>
+</section>
+<section data-state="menu">
+  <div data-screen="follow_page" data-show="menu"></div>
+</section>
+<section data-state="following">
+  <div data-screen="follow_page" data-show="all" data-toast="You follow Night lines"></div>
+</section>
+<section data-state="custom">
+  <div data-screen="follow_page" data-show="custom"></div>
+</section>
+<section data-state="custom-set">
+  <div data-screen="follow_page" data-show="customset" data-toast="Alerts saved"></div>
+</section>
+<section data-state="muted">
+  <div data-screen="follow_page" data-show="muted" data-toast="Night lines is muted"></div>
+</section>
+
+<!-- The follow button stands in the head of the page of a product. Its menu sets the level of the alerts. -->
+<template id="follow_page">
+<header class="sketch-bar" role="banner"><strong>[Product]</strong></header>
+<main class="sketch-main sketch-stack" style="max-width:760px">
+  <div class="follow_head">
+    <span class="sketch-avatar square">NL</span>
+    <div><h1>Night lines</h1><span class="sketch-muted">1,204 followers</span></div>
+    <span class="sketch-spacer"></span>
+    <button class="sketch-button follow_button" type="button" data-sketch-popover="levels" data-part="!all !customset !muted !custom"><i data-icon="bell"></i>Follow<i data-icon="chevron-down"></i></button>
+    <button class="sketch-button secondary follow_button" type="button" data-sketch-popover="levels" data-part="all"><i data-glyph="bell-ring"></i>Following<i data-icon="chevron-down"></i></button>
+    <button class="sketch-button secondary follow_button" type="button" data-sketch-popover="levels" data-part="customset"><i data-icon="sliders"></i>Custom<i data-icon="chevron-down"></i></button>
+    <button class="sketch-button secondary follow_button" type="button" data-sketch-popover="levels" data-part="muted"><i data-glyph="bell-off"></i>Muted<i data-icon="chevron-down"></i></button>
+    <button class="sketch-button follow_button" type="button" data-sketch-popover="custom" data-part="custom"><i data-icon="bell"></i>Follow<i data-icon="chevron-down"></i></button>
+  </div>
+  <div class="sketch-placeholder pattern_part" style="min-height:480px"><b>Feed of the product</b><span>Pattern: content/feed-full-posts</span></div>
+<div class="sketch-menu follow_menu" id="levels" data-part="menu">
+  <button class="sketch-menu-item" type="button" data-go="following" data-current-in="all"><i data-glyph="bell-ring"></i><b>All updates</b><i data-icon="check"></i><small>Posts, releases and comments</small></button>
+  <button class="sketch-menu-item" type="button" data-go="custom" data-current-in="customset"><i data-icon="sliders"></i><b>Custom</b><i data-icon="check"></i><small>Only the events that you choose</small></button>
+  <button class="sketch-menu-item" type="button" data-go="follow" data-current-in="!all !customset !muted"><i data-icon="user"></i><b>Mentions only</b><i data-icon="check"></i><small>When a member names you</small></button>
+  <button class="sketch-menu-item" type="button" data-go="muted" data-current-in="muted"><i data-glyph="bell-off"></i><b>Mute</b><i data-icon="check"></i><small>No alerts</small></button>
+</div>
+<div class="sketch-popover follow_custom" id="custom" data-part="custom" role="group" aria-label="Custom alerts">
+  <div class="sketch-row"><button class="sketch-icon-button" type="button" aria-label="Back to the levels" data-go="menu"><i data-icon="arrow-left"></i></button><b>Custom</b></div>
+  <label class="sketch-choice"><input type="checkbox" checked>Releases</label>
+  <label class="sketch-choice"><input type="checkbox">Posts</label>
+  <label class="sketch-choice"><input type="checkbox">Comments</label>
+  <label class="sketch-choice"><input type="checkbox" checked>Security alerts</label>
+  <div class="sketch-row"><span class="sketch-spacer"></span><button class="sketch-button secondary" type="button" data-go="menu">Cancel</button><button class="sketch-button" type="button" data-go="custom-set" data-custom-apply>Apply</button></div>
+</div>
+</main>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+/* Line icons that the kit does not have. The kit draws <i data-glyph="name"></i> with the paths in window.sketchGlyphs. */
+window.sketchGlyphs = {
+    pin: 'M9 4h6l-1 6 3 3H7l3-3zM12 13v7', heart: 'M12 20c-4-3-7-6-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 4-3 7-7 10z',
+    repost: 'M7 7h9a2 2 0 0 1 2 2v6M15 12l3 3 3-3M17 17H8a2 2 0 0 1-2-2V9M9 12L6 9l-3 3', views: 'M6 20v-6M12 20V4M18 20v-9',
+    'bell-off': 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4M4 4l16 16', 'bell-ring': 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4M3 8c0-2 1-3.5 2.5-4.5M21 8c0-2-1-3.5-2.5-4.5',
+    mail: 'M4 6h16v12H4zM4 7l8 6 8-6', phone: 'M8 3h8v18H8zM11 18h2', rss: 'M5 19v.5M5 12a7 7 0 0 1 7 7M5 5a14 14 0 0 1 14 14',
+    'arrow-up': 'M12 19V5M6 11l6-6 6 6', 'arrow-down': 'M12 5v14M6 13l6 6 6-6', reply: 'M10 8l-5 4 5 4M5 12h9a5 5 0 0 1 5 5v1',
+    code: 'M9 7l-5 5 5 5M15 7l5 5-5 5', tag: 'M4 4h8l8 8-8 8-8-8zM8.5 8.5v.5', play: 'M8 5l11 7-11 7z', paperclip: 'M19 11l-7 7a4 4 0 0 1-6-6l8-8a3 3 0 0 1 4 4l-8 8a1.5 1.5 0 0 1-2-2l7-7',
+  };
+/* Apply is off when no event has a check, because a custom level with no event sends nothing. */
+document.addEventListener('change', event => {
+  const panel = event.target.closest('.follow_custom');
+  if (panel) panel.querySelector('[data-custom-apply]').disabled = !panel.querySelector('input:checked');
+});
+</script>
+<script src="../../../assets/sketch.js"></script>

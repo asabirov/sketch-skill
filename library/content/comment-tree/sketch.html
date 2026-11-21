@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comment tree with votes sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* A reply field starts as one line and grows with its text. Its buttons stand next to it, at the level of its last line. */
+  [data-sketch] .reply_row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 8px; }
+  [data-sketch] .reply_row textarea.sketch-input { flex: 1 1 120px; width: auto; min-width: 0; min-height: 44px; max-height: 196px; resize: none; }
+  [data-sketch] .reply_row > .sketch-avatar { align-self: flex-start; width: 32px; height: 32px; margin-top: 6px; font-size: 12px; }
+  @media (max-width: 599px) { [data-sketch] .reply_row > .sketch-avatar { display: none; } }
+  [data-sketch] .sketch-main.tree_column { max-width: 784px; padding-block: 24px 64px; }
+  [data-sketch] .tree_page { display: grid; gap: 24px; }
+  [data-sketch] .tree_talk { display: grid; gap: 12px; }
+  [data-sketch] .tree_talk h1 { margin: 0; font-size: 20px; }
+  [data-sketch] .tree_talk > p { margin: 0; }
+  [data-sketch] .tree_top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  [data-sketch] .tree_list, [data-sketch] .tree_replies { display: grid; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .tree_list { gap: 12px; }
+  /* A comment: the avatar and the author line, then the text and one row of actions. A line runs down from the avatar, at the left of
+     the text and of each reply. The replies stand at the right of that line, so each level moves the width of one avatar to the right.
+     The button at the top of the line closes the branch. */
+  [data-sketch] .tree_item { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 0 8px; }
+  [data-sketch] .tree_item > .sketch-avatar { width: 32px; height: 32px; margin-top: 6px; font-size: 12px; }
+  [data-sketch] .tree_by { display: flex; align-items: center; gap: 0 8px; min-height: 44px; margin: 0; font-size: 14px; }
+  [data-sketch] .tree_by > * { white-space: nowrap; }
+  [data-sketch] .tree_line, [data-sketch] .tree_fold { grid-column: 1; position: relative; }
+  [data-sketch] :is(.tree_line, .tree_fold)::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 4px; border-left: var(--sketch-stroke) solid var(--sketch-muted); }
+  [data-sketch] .tree_item:not(:has(.tree_replies)) > .tree_line::before { content: none; } /* A comment with no reply has no line. */
+  [data-sketch] .tree_fold { justify-self: center; width: 44px; min-height: 44px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+  [data-sketch] .tree_fold .sketch-icon { position: absolute; left: 50%; top: 12px; width: 20px; height: 20px; padding: 2px; margin-left: -10px; border: var(--sketch-stroke) solid currentColor; border-radius: 50%; background: var(--sketch-page); }
+  [data-sketch] .tree_fold:hover .sketch-icon { background: var(--sketch-wash); }
+  [data-sketch] .tree_fold[aria-expanded="false"] { grid-row: 1; grid-column: 1; min-height: 44px; }
+  [data-sketch] .tree_fold[aria-expanded="false"]::before { content: none; }
+  /* A closed branch is one line: the open button, the author, the age and the count of the replies. */
+  [data-sketch] .tree_item:has(> .tree_fold[aria-expanded="false"]:not([hidden])) > .sketch-avatar { display: none; }
+  [data-sketch] .tree_body { grid-column: 2; display: grid; min-width: 0; }
+  [data-sketch] .tree_body p { margin: 0; overflow-wrap: anywhere; }
+  [data-sketch] .tree_acts { display: flex; align-items: center; gap: 4px; margin-left: -12px; }
+  [data-sketch] .tree_votes { display: inline-flex; align-items: center; }
+  [data-sketch] .tree_votes b { min-width: 2ch; text-align: center; font-size: 14px; }
+  [data-sketch] .tree_act { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--sketch-wobble); background: none; color: inherit; font: inherit; font-size: 14px; cursor: pointer; }
+  [data-sketch] .tree_act:hover { background: var(--sketch-wash); }
+  [data-sketch] .tree_act:active { background: color-mix(in srgb, var(--sketch-ink) 18%, transparent); }
+  /* A pressed vote has its arrow in a filled circle. */
+  [data-sketch] .tree_act[aria-pressed="true"] .sketch-icon { border-radius: 50%; background: var(--sketch-ink); color: var(--sketch-page); padding: 2px; }
+  [data-sketch] .tree_more { justify-self: start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px 0 6px; border: 0; border-radius: var(--sketch-wobble); background: none; color: inherit; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  [data-sketch] .tree_more:hover { background: var(--sketch-wash); }
+  [data-sketch] .tree_form { padding-bottom: 8px; }
+  /* The comment field and its button are one group. Clear space parts the group from the comments. The sort control stands
+     right above the comments that it sorts. */
+  [data-sketch] .tree_new { margin-bottom: 24px; }
+  [data-sketch] .tree_sorted { display: grid; gap: 4px; }
+  [data-sketch] .tree_sort { justify-self: start; }
+  [data-sketch] .tree_menu .sketch-menu-item { display: flex; align-items: center; gap: 10px; }
+  @media (max-width: 599px) {
+    [data-sketch] .tree_item { grid-template-columns: 24px minmax(0, 1fr); }
+    [data-sketch] .tree_item > .sketch-avatar { width: 24px; height: 24px; margin-top: 10px; font-size: 9px; }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="thread">
+  <div data-screen="tree"></div>
+</section>
+<section data-state="vote">
+  <div data-screen="tree" data-show="voted"></div>
+</section>
+<section data-state="collapsed">
+  <div data-screen="tree" data-show="folded"></div>
+</section>
+<section data-state="more-replies">
+  <div data-screen="tree" data-show="more"></div>
+</section>
+<section data-state="reply-form">
+  <div data-screen="tree" data-show="replyform"></div>
+</section>
+<section data-state="reply-sent">
+  <div data-screen="tree" data-show="replied"></div>
+</section>
+<section data-state="comment-menu">
+  <div data-screen="tree" data-show="menu"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="tree" data-show="nocomments"></div>
+</section>
+
+<!-- A plain box stands for the post. Under it, the field for a new comment with its button. Then, after clear space, the sort control
+     and the tree of the comments. -->
+<template id="tree">
+<main class="sketch-main tree_column">
+  <div class="tree_page">
+    <div class="sketch-placeholder pattern_part"><b>Post</b><span>Pattern: content/feed-full-posts</span></div>
+    <section class="tree_talk" aria-labelledby="talk_title">
+      <h1 class="pattern_hidden_title" id="talk_title">Comments</h1>
+      <div class="reply_row tree_new" data-reply-form>
+        <textarea class="sketch-input" rows="1" aria-label="Comment" placeholder="Add a comment"></textarea>
+        <button class="sketch-button" type="button" disabled data-reply-send data-sketch-toast="Comment sent (sample)">Comment</button>
+      </div>
+      <p data-part="nocomments">No comments yet.</p>
+      <div class="tree_sorted" data-part="!nocomments">
+      <label class="sketch-row tree_sort">Sort<select class="sketch-input" style="width:auto"><option>Best</option><option>New</option><option>Old</option></select></label>
+      <ul class="tree_list">
+        <li class="tree_item">
+          <span class="sketch-avatar">LO</span>
+          <p class="tree_by"><b>Lee Ortiz</b><span class="sketch-muted">2 h</span><span class="sketch-muted" data-part="folded">4 replies</span></p>
+          <button class="tree_fold" type="button" aria-expanded="true" aria-label="Collapse the thread of Lee Ortiz" data-go="collapsed" data-part="!folded"><i data-icon="minus"></i></button><button class="tree_fold" type="button" aria-expanded="false" aria-label="Open the thread of Lee Ortiz" data-go="thread" data-part="folded"><i data-icon="plus"></i></button>
+          <div class="tree_body" data-part="!folded">
+            <p>One network says that a priority route takes two days. The other network did not answer yet.</p>
+            <div class="tree_acts"><span class="tree_votes" data-part="!voted"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of Lee Ortiz" data-go="vote"><i data-glyph="arrow-up"></i></button><b aria-label="16 points">16</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Lee Ortiz"><i data-glyph="arrow-down"></i></button></span><span class="tree_votes" data-part="voted"><button class="tree_act" type="button" aria-pressed="true" aria-label="Vote up the comment of Lee Ortiz" data-go="thread"><i data-glyph="arrow-up"></i></button><b aria-label="17 points">17</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Lee Ortiz"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to Lee Ortiz" data-go="reply-form"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of Lee Ortiz" data-sketch-popover="comment_menu"><i data-icon="more"></i></button></div>
+          <div class="reply_row tree_form" data-part="replyform" data-reply-form data-focus>
+            <textarea class="sketch-input" rows="1" aria-label="Reply to Lee Ortiz" placeholder="Write a reply"></textarea>
+            <button class="sketch-button secondary" type="button" data-go="thread">Cancel</button>
+            <button class="sketch-button" type="button" disabled data-reply-send="reply-sent">Reply</button>
+          </div>
+          <ul class="tree_replies" aria-label="Replies">
+        <li class="tree_item" data-part="replied">
+          <span class="sketch-avatar">YO</span>
+          <p class="tree_by"><b>You</b><span class="sketch-muted">now</span></p>
+          <span class="tree_line" aria-hidden="true"></span>
+          <div class="tree_body">
+            <p data-reply-text>I can ask the second network today.</p>
+            <div class="tree_acts"><span class="tree_votes"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of You"><i data-glyph="arrow-up"></i></button><b aria-label="1 points">1</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of You"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to You" data-sketch-toast="The first comment shows the reply form (sample)"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of You"><i data-icon="more"></i></button></div>
+          </div>
+        </li>
+        <li class="tree_item">
+          <span class="sketch-avatar">AP</span>
+          <p class="tree_by"><b>Ada Park</b><span class="sketch-badge">Author</span><span class="sketch-muted">2 h</span></p>
+          <span class="tree_line" aria-hidden="true"></span>
+          <div class="tree_body">
+            <p>Two days is fine. Then we test again on Wednesday.</p>
+            <div class="tree_acts"><span class="tree_votes"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of Ada Park"><i data-glyph="arrow-up"></i></button><b aria-label="7 points">7</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Ada Park"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to Ada Park" data-sketch-toast="The first comment shows the reply form (sample)"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of Ada Park"><i data-icon="more"></i></button></div>
+          <ul class="tree_replies" aria-label="Replies">
+        <li class="tree_item">
+          <span class="sketch-avatar">SK</span>
+          <p class="tree_by"><b>Sam Kim</b><span class="sketch-muted">1 h</span></p>
+          <span class="tree_line" aria-hidden="true"></span>
+          <div class="tree_body">
+            <p>I book the test phones for Wednesday morning.</p>
+            <div class="tree_acts"><span class="tree_votes"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of Sam Kim"><i data-glyph="arrow-up"></i></button><b aria-label="3 points">3</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Sam Kim"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to Sam Kim" data-sketch-toast="The first comment shows the reply form (sample)"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of Sam Kim"><i data-icon="more"></i></button></div>
+          </div>
+        </li>
+          </ul>
+          </div>
+        </li>
+        <li data-part="!more"><button class="tree_more" type="button" data-go="more-replies"><i data-icon="plus"></i>2 more replies</button></li>
+        <li class="tree_item" data-part="more">
+          <span class="sketch-avatar">ML</span>
+          <p class="tree_by"><b>Mia Lund</b><span class="sketch-muted">50 min</span></p>
+          <span class="tree_line" aria-hidden="true"></span>
+          <div class="tree_body">
+            <p>Which network did not answer?</p>
+            <div class="tree_acts"><span class="tree_votes"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of Mia Lund"><i data-glyph="arrow-up"></i></button><b aria-label="2 points">2</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Mia Lund"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to Mia Lund" data-sketch-toast="The first comment shows the reply form (sample)"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of Mia Lund"><i data-icon="more"></i></button></div>
+          </div>
+        </li>
+        <li class="tree_item" data-part="more">
+          <span class="sketch-avatar">LO</span>
+          <p class="tree_by"><b>Lee Ortiz</b><span class="sketch-muted">45 min</span></p>
+          <span class="tree_line" aria-hidden="true"></span>
+          <div class="tree_body">
+            <p>The one with the old contract. I wrote to them again today.</p>
+            <div class="tree_acts"><span class="tree_votes"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of Lee Ortiz"><i data-glyph="arrow-up"></i></button><b aria-label="2 points">2</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Lee Ortiz"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to Lee Ortiz" data-sketch-toast="The first comment shows the reply form (sample)"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of Lee Ortiz"><i data-icon="more"></i></button></div>
+          </div>
+        </li>
+          </ul>
+          </div>
+        </li>
+        <li class="tree_item">
+          <span class="sketch-avatar">SK</span>
+          <p class="tree_by"><b>Sam Kim</b><span class="sketch-muted">1 h</span></p>
+          <span class="tree_line" aria-hidden="true"></span>
+          <div class="tree_body">
+            <p>Does the app message reach a rider who turned the notifications off?</p>
+            <div class="tree_acts"><span class="tree_votes"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of Sam Kim"><i data-glyph="arrow-up"></i></button><b aria-label="9 points">9</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Sam Kim"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to Sam Kim" data-sketch-toast="The first comment shows the reply form (sample)"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of Sam Kim"><i data-icon="more"></i></button></div>
+          <ul class="tree_replies" aria-label="Replies">
+        <li class="tree_item">
+          <span class="sketch-avatar">AP</span>
+          <p class="tree_by"><b>Ada Park</b><span class="sketch-badge">Author</span><span class="sketch-muted">1 h</span></p>
+          <span class="tree_line" aria-hidden="true"></span>
+          <div class="tree_body">
+            <p>No. That rider gets the text alert only.</p>
+            <div class="tree_acts"><span class="tree_votes"><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote up the comment of Ada Park"><i data-glyph="arrow-up"></i></button><b aria-label="4 points">4</b><button class="tree_act" type="button" aria-pressed="false" aria-label="Vote down the comment of Ada Park"><i data-glyph="arrow-down"></i></button></span><button class="tree_act" type="button" aria-label="Reply to Ada Park" data-sketch-toast="The first comment shows the reply form (sample)"><i data-glyph="reply"></i>Reply</button><button class="tree_act" type="button" aria-label="Actions for the comment of Ada Park"><i data-icon="more"></i></button></div>
+          </div>
+        </li>
+          </ul>
+          </div>
+        </li>
+      </ul>
+      </div>
+      <div class="sketch-menu tree_menu" id="comment_menu" data-part="menu">
+        <button class="sketch-menu-item" type="button" data-sketch-toast="Link copied"><i data-icon="link"></i>Copy link</button>
+        <button class="sketch-menu-item" type="button" data-sketch-toast="You get an alert for each reply (sample)"><i data-icon="bell"></i>Follow replies</button>
+        <button class="sketch-menu-item" type="button" data-sketch-toast="Report sent (sample)"><i data-icon="warning"></i>Report</button>
+      </div>
+    </section>
+  </div>
+</main>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+/* Line icons that the kit does not have. The kit draws <i data-glyph="name"></i> with the paths in window.sketchGlyphs. */
+window.sketchGlyphs = {
+    pin: 'M9 4h6l-1 6 3 3H7l3-3zM12 13v7', heart: 'M12 20c-4-3-7-6-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 4-3 7-7 10z',
+    repost: 'M7 7h9a2 2 0 0 1 2 2v6M15 12l3 3 3-3M17 17H8a2 2 0 0 1-2-2V9M9 12L6 9l-3 3', views: 'M6 20v-6M12 20V4M18 20v-9',
+    'bell-off': 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4M4 4l16 16', 'bell-ring': 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4M3 8c0-2 1-3.5 2.5-4.5M21 8c0-2-1-3.5-2.5-4.5',
+    mail: 'M4 6h16v12H4zM4 7l8 6 8-6', phone: 'M8 3h8v18H8zM11 18h2', rss: 'M5 19v.5M5 12a7 7 0 0 1 7 7M5 5a14 14 0 0 1 14 14',
+    'arrow-up': 'M12 19V5M6 11l6-6 6 6', 'arrow-down': 'M12 5v14M6 13l6 6 6-6', reply: 'M10 8l-5 4 5 4M5 12h9a5 5 0 0 1 5 5v1',
+    code: 'M9 7l-5 5 5 5M15 7l5 5-5 5', tag: 'M4 4h8l8 8-8 8-8-8zM8.5 8.5v.5', play: 'M8 5l11 7-11 7z', paperclip: 'M19 11l-7 7a4 4 0 0 1-6-6l8-8a3 3 0 0 1 4 4l-8 8a1.5 1.5 0 0 1-2-2l7-7',
+  };
+/* A reply field grows with its text. Its send button stays off until the field has text. The send button opens the state in
+   data-reply-send, and an element with data-reply-text in that state takes the typed text. A form with data-focus takes the focus
+   when its state opens. */
+(() => {
+  const fit = field => { field.style.height = 'auto'; field.style.height = `${field.scrollHeight + field.offsetHeight - field.clientHeight}px`; };
+  document.addEventListener('input', event => {
+    const field = event.target.closest('[data-reply-form] textarea');
+    if (!field) return;
+    fit(field);
+    field.closest('[data-reply-form]').querySelector('.sketch-button:not(.secondary)').disabled = !field.value.trim();
+  });
+  document.addEventListener('click', event => {
+    const send = event.target.closest('[data-reply-send]');
+    if (!send) return;
+    const field = send.closest('[data-reply-form]').querySelector('textarea'), to = send.dataset.replySend;
+    const text = to && document.querySelector(`[data-state="${to}"] [data-reply-text]`);
+    if (text) text.textContent = field.value.trim();
+    field.value = '';
+    field.style.height = '';
+    setTimeout(() => { send.disabled = true; });
+    if (to) location.hash = to;
+  });
+  ['load', 'hashchange'].forEach(name => addEventListener(name, () =>
+    document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-reply-form][data-focus]:not([hidden]) textarea`)?.focus({ preventScroll: true })));
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

@@ -1,0 +1,390 @@
+<!--
+  Best for: a product with one set of records that people scan by picture, compare by field and follow by status.
+  Row opens: in a pane. The source opens the record in a dialog over the list, and this sketch draws that dialog.
+  Transition values, from transitions.json:
+  - card-view, table-view, board-view and filtered: the mark of the current view pulses while the view loads.
+    Animation skeleton-pulse, 1200 ms, ease-in-out, measured. The sketch plays one pulse.
+  - view-list, filter-open, sort-open, record-open and no-match: 0 ms. The capture script read no transition.
+  No value in this file is a design-system token.
+-->
+<!doctype html>
+<html lang="en" data-variation="display-panel">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalog views</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .catalog_variations { padding: 8px 16px; }
+  [data-sketch] .catalog_open { justify-self: start; min-height: 44px; padding: 0; background: none; border: 0; text-align: left; text-decoration: underline; text-decoration-color: var(--sketch-muted); overflow-wrap: anywhere; cursor: pointer; }
+  [data-sketch] .catalog_card { gap: 8px; min-width: 0; }
+  [data-sketch] .catalog_board_card { display: grid; gap: 0; padding: 4px 16px 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .catalog_group legend { margin-bottom: 6px; }
+  /* The kit centres each link of the main column. A menu row starts at the left. */
+  [data-sketch] .sketch-main a.sketch-menu-item { display: flex; justify-content: flex-start; }
+  [data-sketch] .sketch-menu-item[aria-current] { font-weight: 600; }
+  [data-sketch] .catalog_tab_row { display: flex; align-items: center; gap: 4px; }
+  [data-sketch] .catalog_tab_row > .sketch-nav { min-width: 0; padding: 0; }
+  [data-sketch] .catalog_side { display: grid; gap: 8px; align-content: start; justify-items: start; }
+  [data-sketch] .catalog_side > .sketch-nav { padding: 0; justify-self: stretch; }
+  [data-sketch] .catalog_side > .sketch-nav a { justify-content: start; }
+  [data-sketch] .catalog_side_layout { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 599px) {
+    /* A phone shows the current tab only. The All views button lists the other views. */
+    [data-sketch] .catalog_tab_row > .sketch-nav a:not([aria-current]) { display: none; }
+  }
+  @media (min-width: 1000px) {
+    [data-sketch] .catalog_side_layout { grid-template-columns: 200px minmax(0, 1fr); gap: 32px; }
+  }
+  /* The name skeleton-pulse is the animation name in transitions.json, so that capture.py compare can match it. */
+  [data-sketch] [data-state][data-loads]:not([hidden]) [data-view-mark] { animation: skeleton-pulse var(--state-duration) ease-in-out both; }
+  @keyframes skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] [data-state][data-loads]:not([hidden]) [data-view-mark] { animation: none; } }
+</style>
+<body data-sketch>
+
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <section class="sketch-stack" data-state="card-view" data-view="cards" data-loads style="--state-duration:1200ms" aria-label="Card view"></section>
+  <section class="sketch-stack" data-state="table-view" data-view="table" data-loads style="--state-duration:1200ms" aria-label="Table view"></section>
+  <section class="sketch-stack" data-state="board-view" data-view="board" data-loads style="--state-duration:1200ms" aria-label="Board view"></section>
+  <section class="sketch-stack" data-state="view-list" data-view="cards" data-opens="views" aria-label="List of views"></section>
+  <section class="sketch-stack" data-state="filter-open" data-view="cards" data-opens="filter" aria-label="Filter"></section>
+  <section class="sketch-stack" data-state="filtered" data-view="cards" data-filter="Live" data-loads style="--state-duration:1200ms" aria-label="Filtered cards"></section>
+  <section class="sketch-stack" data-state="sort-open" data-view="table" data-opens="sort" aria-label="Sort"></section>
+  <section class="sketch-stack" data-state="record-open" data-view="cards" data-opens="record" aria-label="Open product"></section>
+  <section class="sketch-stack" data-state="no-match" data-view="cards" data-filter="Retired" aria-label="No match"></section>
+</main>
+
+<!-- One template for each variation. The page script copies the template of the active variation into each state. -->
+<template id="chrome_base">
+  <h1>Products</h1>
+  <div class="sketch-row">
+    <button type="button" class="sketch-button secondary" data-sketch-popover="views___state__"><i data-own-icon="view"></i><span data-view-name data-view-mark></span><i data-icon="chevron-down"></i></button>
+    <button type="button" class="sketch-button secondary" data-sketch-popover="filter___state__" data-filter-trigger><i data-icon="filter"></i><span class="sketch-from-tablet">Filter</span><span class="sketch-badge" data-filter-count hidden>1</span></button>
+    <button type="button" class="sketch-button secondary" data-sketch-popover="sort___state__" aria-label="Sort"><i data-own-icon="sort"></i><span class="sketch-from-tablet">Sort</span></button>
+  </div>
+  <!--views--><!--filter--><!--sort-->
+  <div class="sketch-stack" data-slot="records"></div>
+  <!--record-->
+</template>
+
+<template id="chrome_view-tabs">
+  <h1>Products</h1>
+  <div class="catalog_tab_row">
+    <nav class="sketch-nav" aria-label="Views">
+      <a href="#card-view" data-view-link="cards"><i data-own-icon="cards"></i>Cards</a>
+      <a href="#table-view" data-view-link="table"><i data-own-icon="table"></i>Table</a>
+      <a href="#board-view" data-view-link="board"><i data-own-icon="board"></i>Board</a>
+    </nav>
+    <button type="button" class="sketch-icon-button" aria-label="All views" data-sketch-popover="views___state__"><i data-icon="more"></i></button>
+    <span class="sketch-spacer"></span>
+    <button type="button" class="sketch-icon-button" data-sketch-popover="filter___state__" data-filter-trigger><i data-icon="filter"></i></button>
+    <button type="button" class="sketch-icon-button" aria-label="Sort" data-sketch-popover="sort___state__"><i data-own-icon="sort"></i></button>
+  </div>
+  <div class="sketch-row" data-filter-chips hidden>
+    <button type="button" class="sketch-chip" data-clear-filter><span>Status: <span data-filter-chip-value></span></span><i data-icon="close"></i></button>
+  </div>
+  <!--views--><!--filter--><!--sort-->
+  <div class="sketch-stack" data-slot="records"></div>
+  <!--record-->
+</template>
+
+<template id="chrome_display-panel">
+  <h1>Products</h1>
+  <div class="sketch-row">
+    <button type="button" class="sketch-button secondary" data-sketch-popover="filter___state__" data-filter-trigger><i data-icon="filter"></i><span class="sketch-from-tablet">Filter</span><span class="sketch-badge" data-filter-count hidden>1</span></button>
+    <span class="sketch-spacer"></span>
+    <button type="button" class="sketch-button secondary" data-sketch-popover="display___state__" aria-label="Display"><i data-icon="sliders"></i><span class="sketch-from-tablet" data-view-mark>Display</span></button>
+  </div>
+  <div class="sketch-popover" id="display___state__" aria-label="Display" data-layer="views sort">
+    <fieldset class="catalog_group">
+      <legend>View</legend>
+      <div class="sketch-segmented">
+        <label><input type="radio" name="kind___state__" value="card-view" data-kind="cards"><i data-own-icon="cards"></i>Cards</label>
+        <label><input type="radio" name="kind___state__" value="table-view" data-kind="table"><i data-own-icon="table"></i>Table</label>
+        <label><input type="radio" name="kind___state__" value="board-view" data-kind="board"><i data-own-icon="board"></i>Board</label>
+      </div>
+    </fieldset>
+    <!--order-->
+  </div>
+  <!--filter-->
+  <div class="sketch-stack" data-slot="records"></div>
+  <!--record-->
+</template>
+
+<template id="chrome_side-list">
+  <h1>Products</h1>
+  <div class="catalog_side_layout">
+    <div class="catalog_side">
+      <button type="button" class="sketch-button secondary sketch-menu-button" aria-expanded="false" data-views-button><i data-icon="menu"></i>Views</button>
+      <nav class="sketch-collapse sketch-nav" aria-label="Views">
+        <a href="#card-view" data-view-link="cards"><i data-own-icon="cards"></i>Cards</a>
+        <a href="#table-view" data-view-link="table"><i data-own-icon="table"></i>Table</a>
+        <a href="#board-view" data-view-link="board"><i data-own-icon="board"></i>Board</a>
+      </nav>
+    </div>
+    <div class="sketch-stack">
+      <div class="sketch-row">
+        <button type="button" class="sketch-button secondary" data-sketch-popover="filter___state__" data-filter-trigger><i data-icon="filter"></i><span class="sketch-from-tablet">Filter</span><span class="sketch-badge" data-filter-count hidden>1</span></button>
+        <button type="button" class="sketch-button secondary" data-sketch-popover="sort___state__" aria-label="Sort"><i data-own-icon="sort"></i><span class="sketch-from-tablet">Sort</span></button>
+      </div>
+      <!--filter--><!--sort-->
+      <div class="sketch-stack" data-slot="records"></div>
+    </div>
+  </div>
+  <!--record-->
+</template>
+
+<!-- The layers that the variations share. -->
+<template id="layer_views">
+  <div class="sketch-menu" id="views___state__" aria-label="Views" data-layer="views">
+    <a class="sketch-menu-item" href="#card-view" data-view-link="cards"><i data-own-icon="cards"></i>Cards</a>
+    <a class="sketch-menu-item" href="#table-view" data-view-link="table"><i data-own-icon="table"></i>Table</a>
+    <a class="sketch-menu-item" href="#board-view" data-view-link="board"><i data-own-icon="board"></i>Board</a>
+  </div>
+</template>
+
+<template id="layer_filter">
+  <div class="sketch-popover" id="filter___state__" aria-label="Filter" data-layer="filter">
+    <fieldset class="catalog_group">
+      <legend>Where Status is</legend>
+      <label class="sketch-choice"><input type="radio" name="filter___state__" value="" data-filter-value>Any</label>
+      <label class="sketch-choice"><input type="radio" name="filter___state__" value="Live" data-filter-value>Live</label>
+      <label class="sketch-choice"><input type="radio" name="filter___state__" value="Beta" data-filter-value>Beta</label>
+      <label class="sketch-choice"><input type="radio" name="filter___state__" value="Planned" data-filter-value>Planned</label>
+      <label class="sketch-choice"><input type="radio" name="filter___state__" value="Retired" data-filter-value>Retired</label>
+    </fieldset>
+  </div>
+</template>
+
+<template id="layer_sort">
+  <div class="sketch-popover" id="sort___state__" aria-label="Sort" data-layer="sort"><!--order--></div>
+</template>
+
+<template id="part_order">
+  <fieldset class="catalog_group">
+    <legend>Sort by</legend>
+    <div class="sketch-segmented">
+      <label><input type="radio" name="sort_field___state__" value="name" data-sort-field>Name</label>
+      <label><input type="radio" name="sort_field___state__" value="category" data-sort-field>Category</label>
+    </div>
+  </fieldset>
+  <fieldset class="catalog_group">
+    <legend>Direction</legend>
+    <div class="sketch-segmented">
+      <label><input type="radio" name="sort_dir___state__" value="up" data-sort-dir>A to Z</label>
+      <label><input type="radio" name="sort_dir___state__" value="down" data-sort-dir>Z to A</label>
+    </div>
+  </fieldset>
+</template>
+
+<template id="layer_record">
+  <dialog class="sketch-dialog" id="record___state__" aria-labelledby="record_name___state__" data-layer="record">
+    <div class="sketch-row">
+      <button type="button" class="sketch-icon-button" aria-label="Previous product" data-step="-1"><i data-icon="chevron-left"></i></button>
+      <button type="button" class="sketch-icon-button" aria-label="Next product" data-step="1"><i data-icon="chevron-right"></i></button>
+      <span class="sketch-spacer"></span>
+      <button type="button" class="sketch-icon-button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button>
+    </div>
+    <h2 id="record_name___state__" data-field="name" style="margin:0"></h2>
+    <div class="sketch-placeholder">Picture</div>
+    <dl class="sketch-facts">
+      <dt>Category</dt><dd data-field="category"></dd>
+      <dt>Status</dt><dd><span class="sketch-badge" data-field="status"></span></dd>
+      <dt>Updated</dt><dd data-field="updated"></dd>
+    </dl>
+  </dialog>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The values of transitions.json. The sketch plays each with the same duration and easing.
+  const transition_records = [
+    { label: 'card-view', trigger: 'click a card view in the list of views', element: 'placeholder for the view name in the toolbar', property: null, animation: 'skeleton-pulse', duration: 1200, delay: 0, easing: 'ease-in-out', measurement: 'measured' },
+    { label: 'table-view', trigger: 'click a table view in the list of views', element: 'placeholder for the view name in the toolbar', property: null, animation: 'skeleton-pulse', duration: 1200, delay: 0, easing: 'ease-in-out', measurement: 'measured' },
+    { label: 'board-view', trigger: 'click a board view in the list of views', element: 'placeholder for the view name in the toolbar', property: null, animation: 'skeleton-pulse', duration: 1200, delay: 0, easing: 'ease-in-out', measurement: 'measured' },
+    { label: 'filtered', trigger: 'click a view that has a filter in the list of views', element: 'placeholder for the view name in the toolbar', property: null, animation: 'skeleton-pulse', duration: 1200, delay: 0, easing: 'ease-in-out', measurement: 'measured' }
+  ];
+  window.__sketchTransitions = transition_records;
+
+  // Sample records. They are not the records of the source.
+  const catalog_records = [
+    { name: 'Invoice maker', category: 'Finance', status: 'Beta', updated: '14 Sep' },
+    { name: 'Parcel tracker', category: 'Logistics', status: 'Beta', updated: '9 Aug' },
+    { name: 'Price watcher for marketplace sellers in three regions', category: 'Sales', status: 'Planned', updated: '21 Aug' },
+    { name: 'Route planner', category: 'Logistics', status: 'Live', updated: '3 Oct' },
+    { name: 'Shift board', category: 'Staff', status: 'Live', updated: '2 Sep' },
+    { name: 'Stock counter', category: 'Warehouse', status: 'Live', updated: '28 Sep' }
+  ];
+  const board_columns = ['Live', 'Beta', 'Planned'];
+  const view_names = { cards: 'Cards', table: 'Table', board: 'Board' };
+  // The states that a filter value opens from a card view. Each other value narrows the view in place.
+  const filter_states = { '': 'card-view', Live: 'filtered', Retired: 'no-match' };
+  const own_icons = {
+    cards: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+    table: 'M4 5h16v14H4zM4 10h16M4 14.5h16M10 5v14',
+    board: 'M4 4h4.5v16H4zM9.75 4h4.5v10h-4.5zM15.5 4H20v13h-4.5z',
+    sort: 'M7 5v14M4 16l3 3 3-3M17 19V5M14 8l3-3 3 3'
+  };
+  const state_sections = [...document.querySelectorAll('[data-state]')];
+  const template_html = id => document.getElementById(id).innerHTML;
+  const own_icon = name => `<svg class="sketch-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${own_icons[name]}"/></svg>`;
+
+  function shown_records(section) {
+    const filter = section.dataset.filter || '';
+    const field = section.dataset.sortField || 'name';
+    const sign = section.dataset.sortDir === 'down' ? -1 : 1;
+    return catalog_records
+      .filter(record => !filter || record.status === filter)
+      .sort((a, b) => sign * a[field].localeCompare(b[field]));
+  }
+
+  function open_button(section, record) {
+    return `<button type="button" class="catalog_open" data-sketch-open="record_${section.dataset.state}" data-record="${catalog_records.indexOf(record)}">${record.name}</button>`;
+  }
+
+  function records_html(section) {
+    const records = shown_records(section);
+    const count = records.length ? `${records.length} ${records.length === 1 ? 'product' : 'products'}` : 'No products';
+    let body = '';
+    if (section.dataset.view === 'cards' && records.length) {
+      body = `<div class="sketch-grid" style="--wide:3">${records.map(record => `
+        <article class="sketch-stack catalog_card">
+          <div class="sketch-placeholder" style="min-height:120px">Picture</div>
+          ${open_button(section, record)}
+          <dl class="sketch-facts"><dt>Category</dt><dd>${record.category}</dd><dt>Status</dt><dd><span class="sketch-badge">${record.status}</span></dd></dl>
+        </article>`).join('')}</div>`;
+    }
+    if (section.dataset.view === 'table') {
+      body = `<div class="sketch-table-box"><table class="sketch-table">
+        <thead><tr><th>Name</th><th>Category</th><th>Status</th><th>Updated</th></tr></thead>
+        <tbody>${records.map(record => `<tr><td>${open_button(section, record)}</td><td>${record.category}</td><td><span class="sketch-badge">${record.status}</span></td><td>${record.updated}</td></tr>`).join('')}</tbody>
+      </table></div>`;
+    }
+    if (section.dataset.view === 'board') {
+      body = `<div class="sketch-board">${board_columns.map(status => {
+        const column = records.filter(record => record.status === status);
+        return `<div class="sketch-stack" role="group" aria-label="${status}">
+          <div class="sketch-row"><h2 style="margin:0">${status}</h2><span>${column.length}</span></div>
+          ${column.map(record => `<article class="catalog_board_card">${open_button(section, record)}<span class="sketch-muted">${record.category}</span></article>`).join('')}
+        </div>`;
+      }).join('')}</div>`;
+    }
+    return `${body}<p style="margin:0" role="status">${count}</p>`;
+  }
+
+  // Draw the records of one state again, and mark the filter in its toolbar.
+  function render_records(section) {
+    const filter = section.dataset.filter || '';
+    section.querySelector('[data-slot="records"]').innerHTML = records_html(section);
+    section.querySelectorAll('[data-filter-trigger]').forEach(trigger => {
+      trigger.setAttribute('aria-label', filter ? 'Filter, 1 set' : 'Filter');
+      if (trigger.matches('.sketch-icon-button')) trigger.setAttribute('aria-pressed', String(Boolean(filter)));
+    });
+    section.querySelectorAll('[data-filter-count], [data-filter-chips]').forEach(mark => { mark.hidden = !filter; });
+    section.querySelectorAll('[data-filter-chip-value]').forEach(value => { value.textContent = filter; });
+    section.querySelectorAll('[data-filter-value]').forEach(input => { input.checked = input.value === filter; });
+  }
+
+  // Copy the template of the active variation into one state.
+  function render_state(section, variation) {
+    const view = section.dataset.view;
+    const opens = section.dataset.opens || '';
+    section.innerHTML = template_html(`chrome_${variation}`)
+      .replace('<!--views-->', template_html('layer_views'))
+      .replace('<!--filter-->', template_html('layer_filter'))
+      .replace('<!--sort-->', template_html('layer_sort'))
+      .replace('<!--record-->', template_html('layer_record'))
+      .replace('<!--order-->', template_html('part_order'))
+      .replaceAll('__state__', section.dataset.state)
+      .replace(/<i data-own-icon="([a-z]+)"><\/i>/g, (match, name) => own_icon(name === 'view' ? view : name));
+    section.querySelectorAll('[data-view-name]').forEach(name => { name.textContent = view_names[view]; });
+    section.querySelectorAll(`[data-view-link="${view}"]`).forEach(link => {
+      link.setAttribute('aria-current', 'page');
+      if (link.matches('.sketch-menu-item')) link.insertAdjacentHTML('beforeend', '<span class="sketch-spacer"></span><i data-icon="check"></i>');
+      else link.setAttribute('data-view-mark', '');
+    });
+    section.querySelectorAll('[data-kind]').forEach(input => { input.checked = input.dataset.kind === view; });
+    section.querySelectorAll('[data-sort-field]').forEach(input => { input.checked = input.value === (section.dataset.sortField || 'name'); });
+    section.querySelectorAll('[data-sort-dir]').forEach(input => { input.checked = input.value === (section.dataset.sortDir || 'up'); });
+    // The overlay of the state opens with the state. In side-list, the list of views has no layer, so the Views button opens.
+    const layer = opens && section.querySelector(`[data-layer~="${opens}"]`);
+    if (layer) layer.setAttribute('data-open', '');
+    else if (opens === 'views') section.querySelector('[data-views-button]')?.setAttribute('aria-expanded', 'true');
+    render_records(section);
+    fill_record(section, shown_records(section)[0]);
+  }
+
+  function fill_record(section, record) {
+    const dialog = section.querySelector('dialog');
+    const records = shown_records(section);
+    if (!record) return;
+    section.dataset.record = catalog_records.indexOf(record);
+    dialog.querySelectorAll('[data-field]').forEach(field => { field.textContent = record[field.dataset.field]; });
+    dialog.querySelector('[data-step="-1"]').disabled = records.indexOf(record) === 0;
+    dialog.querySelector('[data-step="1"]').disabled = records.indexOf(record) === records.length - 1;
+  }
+
+  function set_variation(variation) {
+    document.documentElement.dataset.variation = variation;
+    state_sections.forEach(section => render_state(section, variation));
+    initSketch();
+  }
+
+  // The control that the person used last. The state that opens puts the focus on the same control.
+  let used_control = '';
+  const focus_targets = {
+    filter: '[data-filter-trigger]',
+    view: '[data-sketch-popover^="views_"], [data-view-link][aria-current], [data-sketch-popover^="display_"], [data-views-button]'
+  };
+
+  function set_filter(section, value) {
+    const linked = filter_states[value];
+    if (section.dataset.view === 'cards' && linked && linked !== section.dataset.state) { used_control = 'filter'; location.hash = linked; return; }
+    section.dataset.filter = value;
+    render_records(section);
+  }
+
+  // These listeners are on the document, so they run after the listeners of the kit on the body.
+  document.addEventListener('click', event => {
+    const section = event.target.closest('[data-state]');
+    if (!section) return;
+    if (event.target.closest('[data-view-link]')) used_control = 'view';
+    const open = event.target.closest('.catalog_open');
+    if (open) fill_record(section, catalog_records[Number(open.dataset.record)]);
+    const step = event.target.closest('[data-step]');
+    if (step) {
+      const records = shown_records(section);
+      const at = records.indexOf(catalog_records[Number(section.dataset.record)]) + Number(step.dataset.step);
+      fill_record(section, records[at]);
+      if (step.disabled) section.querySelector('dialog [data-step]:not(:disabled)')?.focus();
+    }
+    if (event.target.closest('[data-clear-filter]')) {
+      set_filter(section, '');
+      section.querySelector('[data-filter-trigger]').focus();
+    }
+  });
+  document.addEventListener('change', event => {
+    const section = event.target.closest('[data-state]');
+    if (!section) return;
+    if (event.target.matches('[data-filter-value]')) set_filter(section, event.target.value);
+    if (event.target.matches('[data-kind]')) { used_control = 'view'; location.hash = event.target.value; }
+    if (event.target.matches('[data-sort-field]')) { section.dataset.sortField = event.target.value; render_records(section); }
+    if (event.target.matches('[data-sort-dir]')) { section.dataset.sortDir = event.target.value; render_records(section); }
+  });
+  // A state that the person left goes back to its own filter.
+  state_sections.forEach(section => { section.dataset.filterDefault = section.dataset.filter || ''; });
+  addEventListener('hashchange', () => {
+    state_sections.forEach(section => {
+      if (!section.hidden || (section.dataset.filter || '') === section.dataset.filterDefault) return;
+      section.dataset.filter = section.dataset.filterDefault;
+      render_records(section);
+    });
+    const shown = state_sections.find(section => !section.hidden);
+    const targets = used_control && shown ? [...shown.querySelectorAll(focus_targets[used_control])] : [];
+    targets.find(target => target.offsetParent)?.focus();
+    used_control = '';
+  });
+
+  set_variation(document.documentElement.dataset.variation);
+</script>

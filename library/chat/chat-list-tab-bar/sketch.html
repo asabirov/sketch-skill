@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phone chat list with a tab bar sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A phone screen. The frame keeps the width of a phone in a wide window, so each part acts as it does on a phone. */
+  html { height: 100%; }
+  body[data-sketch] { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  [data-sketch] > [data-state] { flex: 1; min-height: 0; }
+  [data-sketch] [data-screen] { height: 100%; }
+  [data-sketch] .phone { position: relative; isolation: isolate; width: min(100%, 430px); height: 100%; margin: 0 auto; overflow: hidden; }
+  [data-sketch] .phone_screen { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); }
+  [data-sketch] .phone_bar { grid-row: 1; display: flex; align-items: center; gap: 4px; min-height: 56px; padding: 6px 8px; }
+  [data-sketch] .phone_bar :is(h1, h2) { flex: 1; min-width: 0; margin: 0 8px; font-size: 20px; letter-spacing: -.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .phone_body { grid-row: 2; min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_body > p { margin: 0 0 12px; }
+  [data-sketch] .phone_search { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 44px; padding: 0 14px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 22px 20px 23px 19px / 20px 23px 19px 22px; text-decoration: none; }
+  [data-sketch] .phone_search input { flex: 1; min-width: 0; min-height: 40px; padding: 0; background: none; border: 0; outline: 0; }
+  [data-sketch] .phone_search:has(input:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 2px; }
+  [data-sketch] .phone_round { border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
+  @media (min-width: 600px) { [data-sketch] .phone { border-inline: var(--sketch-stroke) solid var(--sketch-muted); } }
+  /* A plain box stands for a part that this pattern does not draw. It names the part, and the pattern that draws it. */
+  [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; text-decoration: none; }
+  [data-sketch] .part_box.fill { height: 100%; }
+  /* Each motion value below comes from transitions.json. */
+  [data-sketch] { --phone_spring: linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%); --phone_out: cubic-bezier(0.23, 1, 0.32, 1); }
+  /* A pressed row or button shrinks and takes a soft fill while the finger is down. */
+  [data-sketch] .phone_press:active { background-color: var(--sketch-wash); transform: scale(0.96); }
+  @media (prefers-reduced-motion: no-preference) { [data-sketch] .phone_press { transition: transform 120ms var(--phone_out), background-color 120ms var(--phone_out); } }
+  /* A screen that opens comes in from the right, and the screen before it leaves to the left. Back plays the opposite. */
+  [data-sketch] .phone_ghost { pointer-events: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_screen.enter_push { animation: push-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_screen.exit_push { animation: push-exit 520ms var(--phone_spring) forwards; }
+    [data-sketch] .phone_screen.enter_back { animation: back-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_screen.exit_back { animation: back-exit 520ms var(--phone_spring) forwards; }
+  }
+  @keyframes push-enter { from { transform: translateX(100%); } }
+  @keyframes push-exit { to { transform: translateX(-100%); } }
+  @keyframes back-enter { from { transform: translateX(-100%); } }
+  @keyframes back-exit { to { transform: translateX(100%); } }
+  /* A row shows one line of the last message. A longer line ends with an ellipsis. */
+  [data-sketch] .sketch-list > li.sketch-conversation p { -webkit-line-clamp: 1; }
+  [data-sketch] .list_pill { color: var(--sketch-muted); }
+  [data-sketch] .list_search_top { display: flex; margin-bottom: 8px; }
+  [data-sketch] .list_none { margin: 16px 0; }
+  [data-sketch] .list_empty { display: grid; justify-items: start; gap: 12px; align-content: start; padding-top: 24px; }
+  [data-sketch] .list_empty p { margin: 0; }
+  /* The sections of the product are at the bottom, and the search field is at the top of the list. */
+  [data-sketch] .list_tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); padding: 4px; border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .list_tabs :is(a, button) { display: grid; justify-items: center; gap: 2px; min-height: 48px; padding: 4px; background: none; border: 0; border-radius: var(--sketch-wobble); font-size: 12px; text-decoration: none; cursor: pointer; }
+  [data-sketch] .list_tabs :is(a, button):hover { background: var(--sketch-wash); }
+  [data-sketch] .list_tabs [aria-current] { font-weight: 600; background: var(--sketch-wash); }
+</style>
+<body data-sketch>
+
+<section data-state="list">
+  <div data-screen="chat_list"></div>
+</section>
+<section data-state="chat">
+  <div data-screen="chat_list" data-show="chat"></div>
+</section>
+<section data-state="search">
+  <div data-screen="chat_list" data-show="search found"></div>
+</section>
+<section data-state="search-none">
+  <div data-screen="chat_list" data-show="search none"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="chat_list" data-show="empty"></div>
+</section>
+
+<!-- One screen of the phone. The parts name the states. -->
+<template id="chat_list">
+<div class="phone">
+  <main class="phone_screen" data-filter-scope>
+    <!-- The list of chats. -->
+    <header class="phone_bar" data-part="!search !chat">
+      <h1>Chats</h1>
+      <button class="sketch-icon-button phone_round" type="button" aria-label="New chat" data-sketch-toast="A new chat opens (sample)"><i data-icon="plus"></i></button>
+    </header>
+    <div class="phone_body" data-part="!search !chat !empty">
+      <a class="phone_search list_pill list_search_top" href="#search" data-move="push" data-focus><i data-icon="search"></i>Search</a>
+      <ul class="sketch-list">
+        <li class="sketch-conversation phone_press" data-row><span>ML</span><div><a href="#chat" data-move="push">Mara Lind</a><p>The hall is free on Friday</p></div><div>9:12</div></li>
+        <li class="sketch-conversation phone_press" data-row><span>TO</span><div><a href="#chat" data-move="push">Tom Okafor</a><p>I sent the two invoices again, with the new address and the tax number</p></div><div>8:40</div></li>
+        <li class="sketch-conversation phone_press" data-row><span class="square">GC</span><div><a href="#chat" data-move="push">Garden club</a><p>Ines: the seeds arrive next week</p></div><div>Yesterday</div></li>
+        <li class="sketch-conversation phone_press" data-row><span>ID</span><div><a href="#chat" data-move="push">Ines Duarte</a><p>Thanks, see you there</p></div><div>Mon</div></li>
+      </ul>
+      <p class="list_none" data-none hidden>No chat has this text.</p>
+    </div>
+    <div class="phone_body list_empty" data-part="empty">
+      <p>You have no chats. A new chat shows here.</p>
+      <button class="sketch-button" type="button" data-sketch-toast="A new chat opens (sample)">New chat</button>
+    </div>
+    <nav class="list_tabs" aria-label="Sections" data-part="!search !chat">
+      <a href="#list" aria-current="page"><i data-icon="comment"></i>Chats</a>
+      <button type="button" data-sketch-toast="Calls opens (sample)"><i data-icon="bell"></i>Calls</button>
+      <button type="button" data-sketch-toast="Settings opens (sample)"><i data-icon="settings"></i>Settings</button>
+    </nav>
+    <!-- The search screen. -->
+    <header class="phone_bar" data-part="search">
+      <a class="sketch-icon-button" href="#list" data-move="back" aria-label="Back"><i data-icon="chevron-left"></i></a>
+      <h1>Search</h1>
+    </header>
+    <div class="phone_body" data-part="search">
+      <label class="phone_search list_search_top"><i data-icon="search"></i><input type="search" aria-label="Search" placeholder="Search" data-filter data-focus="search" data-value-in="found=garden|none=zq"></label>
+      <ul class="sketch-list">
+        <li class="sketch-conversation phone_press" data-row><span>ML</span><div><a href="#chat" data-move="push">Mara Lind</a><p>The hall is free on Friday</p></div><div>9:12</div></li>
+        <li class="sketch-conversation phone_press" data-row><span>TO</span><div><a href="#chat" data-move="push">Tom Okafor</a><p>I sent the two invoices again, with the new address and the tax number</p></div><div>8:40</div></li>
+        <li class="sketch-conversation phone_press" data-row><span class="square">GC</span><div><a href="#chat" data-move="push">Garden club</a><p>Ines: the seeds arrive next week</p></div><div>Yesterday</div></li>
+        <li class="sketch-conversation phone_press" data-row><span>ID</span><div><a href="#chat" data-move="push">Ines Duarte</a><p>Thanks, see you there</p></div><div>Mon</div></li>
+      </ul>
+      <p class="list_none" data-none hidden>No chat has this text.</p>
+    </div>
+    <!-- The page of one chat. -->
+    <header class="phone_bar" data-part="chat">
+      <a class="sketch-icon-button" href="#list" data-move="back" aria-label="Back" data-focus="chat"><i data-icon="chevron-left"></i></a>
+      <h1 data-chat-title>Mara Lind</h1>
+    </header>
+    <div class="phone_body" data-part="chat"><div class="part_box fill"><strong>Chat page</strong></div></div>
+  </main>
+</div>
+</template>
+
+<script>
+/* The screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it.
+   data-value-in="name=text" fills a field.
+   A link to "#state" and a button with data-go change the state. data-move names the transition that the change plays.
+   After the change, the element whose data-focus names a shown part takes the focus. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' ').filter(Boolean), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  const parts_of = block => (block.dataset.show || '').split(' ');
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = parts_of(block);
+    ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    copy.querySelectorAll('[data-value-in]').forEach(field => field.dataset.valueIn.split('|').forEach(pair => {
+      const [name, text] = pair.split('=');
+      if (shown.includes(name)) field.setAttribute('value', text);
+    }));
+    block.append(copy);
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_block = () => document.querySelector('[data-state]:not([hidden]) [data-screen]');
+  /* A move plays one transition of transitions.json. play adds the class that holds the animation, and takes it away at the end. */
+  window.pattern_moves = {};
+  window.pattern_play = (node, name, after) => {
+    if (reduced.matches) { if (after) after(); return; }
+    const done = event => {
+      if (event.target !== node) return;
+      node.removeEventListener('animationend', done);
+      node.classList.remove(name);
+      if (after) after();
+    };
+    node.addEventListener('animationend', done);
+    node.classList.add(name);
+  };
+  let focus_next = false;
+  window.pattern_go = (state, move, from) => {
+    const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
+    if (to && to !== from && move && !reduced.matches) pattern_moves[move](from, to);
+    focus_next = true;
+    location.hash = state;
+  };
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-go], a[href^="#"]');
+    const block = control && control.closest('[data-screen]');
+    if (!block || control.matches(':disabled')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pattern_go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
+  }, true);
+  addEventListener('hashchange', () => requestAnimationFrame(() => {
+    const block = shown_block();
+    const target = focus_next && block && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    focus_next = false;
+    if (target) target.focus({preventScroll: true});
+  }));
+})();
+/* push and back: a copy of the screen that the reader leaves moves out, while the new screen moves in. */
+(() => {
+  const slide = kind => (from, to) => {
+    const ghost = from.querySelector('.phone_screen:not([hidden])').cloneNode(true);
+    ghost.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    ghost.classList.add('phone_ghost');
+    ghost.inert = true;
+    ghost.setAttribute('aria-hidden', 'true');
+    to.querySelector('.phone').append(ghost);
+    pattern_play(ghost, `exit_${kind}`, () => ghost.remove());
+    pattern_play(to.querySelector('.phone_screen:not([hidden])'), `enter_${kind}`);
+  };
+  pattern_moves.push = slide('push');
+  pattern_moves.back = slide('back');
+})();
+/* In a screen with data-filter-scope, the shown search field with data-filter filters the rows with data-row. data-none shows when
+   no row shows. */
+(() => {
+  const filter = scope => {
+    const field = [...scope.querySelectorAll('[data-filter]')].find(input => !input.closest('[hidden]'));
+    const text = field ? field.value.trim().toLowerCase() : '';
+    const rows = [...scope.querySelectorAll('[data-row]')];
+    rows.forEach(row => { row.hidden = !row.textContent.toLowerCase().includes(text); });
+    scope.querySelectorAll('[data-none]').forEach(none => { none.hidden = rows.some(row => !row.hidden); });
+  };
+  document.querySelectorAll('[data-screen] [data-filter-scope]').forEach(filter);
+  document.addEventListener('input', event => { if (event.target.matches('[data-filter]')) filter(event.target.closest('[data-filter-scope]')); });
+})();
+/* The page of a chat takes the name of the row that opens it. */
+document.addEventListener('click', event => {
+  const row = event.target.closest('.sketch-conversation a[href="#chat"]');
+  if (row) document.querySelectorAll('[data-chat-title]').forEach(title => { title.textContent = row.textContent; });
+}, true);
+</script>
+<script src="../../../assets/sketch.js"></script>

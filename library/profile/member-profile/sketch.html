@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Member profile sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A box with the class pattern_part stands for a part that another pattern draws. It names the part and that pattern. */
+  [data-sketch] .pattern_part { display: grid; gap: 2px; place-content: center; justify-items: center; min-width: 200px; padding: 16px; text-align: center; }
+  [data-sketch] .pattern_part > * { padding: 0 8px; background: var(--sketch-page); }
+  [data-sketch] .pattern_part b { color: var(--sketch-ink); }
+/* A title with the class pattern_plain_title is the main heading of the page for a screen reader. It looks like the text around it. */
+[data-sketch] .pattern_plain_title { margin: 0; font: inherit; letter-spacing: inherit; }
+/* A title with the class pattern_hidden_title names a page whose drawn title is out of view. Only a screen reader reads it. */
+[data-sketch] .pattern_hidden_title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .profile_head { position: relative; margin-bottom: 40px; }
+  [data-sketch] .profile_banner, [data-sketch] .sketch-main a.profile_banner { display: grid; min-height: 160px; text-decoration: none; }
+  [data-sketch] .profile_avatar { position: absolute; left: 16px; bottom: -40px; width: 96px; height: 96px; font-size: 24px; background: var(--sketch-page); text-decoration: none; }
+  [data-sketch] .profile_wall { position: sticky; bottom: 0; justify-items: center; padding: 16px; background: var(--sketch-page); }
+  @media (min-width: 1000px) {
+  }
+  @media (max-width: 999px) {
+  }
+  /* Each value below comes from transitions.json. */
+  [data-sketch] dialog.sketch-dialog[open] { animation: profile_dialog_in 150ms cubic-bezier(0, 0, 0.2, 1); }
+  [data-sketch] dialog.sketch-dialog[open]::backdrop { animation: profile_fade_in 150ms cubic-bezier(0, 0, 0.2, 1); }
+  [data-sketch] .profile_wall { animation: profile_wall_in 420ms cubic-bezier(0.16, 1, 0.3, 1); }
+  /* A dialog that closes plays its close values, then leaves the page. */
+  [data-sketch] dialog.sketch-dialog { transition: opacity 100ms cubic-bezier(0.4, 0, 1, 1), scale 100ms cubic-bezier(0.4, 0, 1, 1), display 100ms allow-discrete, overlay 100ms allow-discrete; }
+  [data-sketch] dialog.sketch-dialog:not([open]) { opacity: 0; scale: 0.98; }
+  [data-sketch] dialog.sketch-dialog::backdrop { transition: opacity 100ms cubic-bezier(0.4, 0, 1, 1), display 100ms allow-discrete, overlay 100ms allow-discrete; }
+  [data-sketch] dialog.sketch-dialog:not([open])::backdrop { opacity: 0; }
+  @keyframes profile_dialog_in { from { opacity: 0; scale: 0.98; } }
+  @keyframes profile_fade_in { from { opacity: 0; } }
+  @keyframes profile_wall_in { from { opacity: 0; transform: translateY(12px); } }
+  @media (prefers-reduced-motion: reduce) {
+    [data-sketch] :is(.sketch-dialog, .profile_wall), [data-sketch] .sketch-dialog::backdrop { animation: none !important; }
+    [data-sketch] .sketch-dialog, [data-sketch] .sketch-dialog::backdrop { transition: none !important; }
+  }
+</style>
+<body data-sketch>
+
+<section data-state="profile">
+  <div data-screen="base_profile"></div>
+</section>
+<section data-state="scrolled">
+  <div data-screen="base_profile" data-show="scrolled"></div>
+</section>
+<section data-state="guest-prompt">
+  <div data-screen="base_profile" data-show="prompt"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="base_profile" data-show="empty"></div>
+</section>
+
+<!-- One column. The banner, the identity and the links to the member's pages on other sites, then the box of the member's posts. -->
+<template id="base_profile">
+<main class="sketch-main" style="max-width:640px">
+  <h1 class="pattern_hidden_title" data-part="scrolled">Mara Lind</h1>
+  <div class="sketch-stack" style="gap:8px" data-part="!scrolled">
+    <div class="profile_head"><a class="sketch-placeholder profile_banner" href="#" aria-label="Open the banner picture">Banner</a><a class="sketch-avatar profile_avatar" href="#" aria-label="Open the profile picture">ML</a></div>
+    <h1>Mara Lind</h1>
+    <p>Bus driver on the night lines. Writes about routes, stops and timetables.</p>
+    <div class="sketch-row" style="gap:0 16px" data-scroll-mark><a href="#"><i data-icon="external"></i>Blog</a><a href="#"><i data-icon="external"></i>Portfolio</a></div>
+  </div>
+  <div class="sketch-stack" style="justify-items:center;text-align:center;padding:48px 0" data-part="empty">
+    <h2>No posts yet</h2>
+    <p style="margin:0">When this member posts, the posts show here.</p>
+  </div>
+  <div class="sketch-placeholder pattern_part" style="min-height:720px" data-part="!empty"><b>Posts of the member</b><span>Pattern: content/feed-short-posts</span></div>
+  <div class="sketch-stack profile_wall" data-scroll="past">
+    <h2>See the full profile of Mara Lind</h2>
+    <a class="sketch-button" href="#guest-prompt" style="width:100%">Sign in</a>
+  </div>
+</main>
+<dialog class="sketch-dialog" id="prompt" data-part="prompt" aria-labelledby="prompt_title">
+  <div class="sketch-row"><h2 id="prompt_title">Sign in to see more</h2><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button></div>
+  <p style="margin:0">Members see each post and each reply.</p>
+  <div class="sketch-row"><button class="sketch-button" type="button" style="flex:1" data-sketch-close>Log in</button><button class="sketch-button secondary" type="button" style="flex:1" data-sketch-close>Sign up</button></div>
+</dialog>
+</template>
+
+<script>
+/* Screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it. On a menu, a popover or a
+   dialog, the part opens it. data-select-in="name" selects a tab or an option, data-current-in="name" marks the open row, and
+   data-off-in="name" clears a checkbox. A tab that is a link, and a button or an option with data-go, change the state.
+   A block with data-toast shows that toast when its state opens. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' '), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = (block.dataset.show || '').split(' ');
+    ['id', 'name', 'aria-controls', 'aria-labelledby', 'data-sketch-popover', 'data-sketch-open'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => {
+      const on = has_part(shown, part.dataset.part);
+      if (part.matches('.sketch-menu, .sketch-popover, dialog')) part.toggleAttribute('data-open', on);
+      else part.hidden = !on;
+    });
+    copy.querySelectorAll('[data-select-in]').forEach(node => {
+      if (!has_part(shown, node.dataset.selectIn)) return;
+      if (node.matches('option')) { node.setAttribute('selected', ''); return; }
+      node.parentElement.querySelectorAll('[aria-selected]').forEach(other => other.setAttribute('aria-selected', 'false'));
+      node.setAttribute('aria-selected', 'true');
+    });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    copy.querySelectorAll('[data-off-in]').forEach(box => { if (has_part(shown, box.dataset.offIn)) box.checked = false; });
+    block.append(copy);
+  });
+  /* The kit selects a clicked tab in the state that the reader leaves. Each state gets its own tab and option back. */
+  const link_tabs = [...document.querySelectorAll('a[role="tab"]')].map(tab => [tab, tab.getAttribute('aria-selected') === 'true']);
+  addEventListener('hashchange', () => {
+    link_tabs.forEach(([tab, chosen]) => tab.setAttribute('aria-selected', String(chosen)));
+    const block = document.querySelector(`[data-state="${location.hash.slice(1)}"] [data-screen][data-toast]`);
+    const toast = document.querySelector('.sketch-toast');
+    if (block) sketchToast(block.dataset.toast); else if (toast) toast.hidden = true;
+  });
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves.
+     A sample link with the address "#" leads nowhere, so it keeps the state. Without this, it opens the first state. */
+  document.addEventListener('click', event => {
+    if (event.target.closest('a[href="#"]')) event.preventDefault();
+    const button = event.target.closest('button[data-go]');
+    if (!button) return;
+    event.stopPropagation();
+    location.hash = button.dataset.go;
+  }, true);
+  document.addEventListener('change', event => {
+    const to = event.target.selectedOptions?.[0].dataset.go;
+    if (!to) return;
+    event.target.selectedIndex = Math.max(0, [...event.target.options].findIndex(option => option.defaultSelected));
+    location.hash = to;
+  });
+})();
+/* A part with data-scroll="past" shows when the mark of the page (data-scroll-mark) is above the view. The mark is the row of links.
+   The state "scrolled" shows these parts with no scroll. */
+(() => {
+  const set_past = (block, past) => block.querySelectorAll('[data-scroll]').forEach(part => {
+    part.hidden = part.part_off || !past;
+  });
+  const watcher = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.target.getClientRects().length) set_past(entry.target.closest('[data-screen]'), !entry.isIntersecting && entry.boundingClientRect.top < 64);
+  }), { rootMargin: '-64px 0px 0px 0px' });
+  document.querySelectorAll('[data-screen]').forEach(block => {
+    block.querySelectorAll('[data-scroll]').forEach(part => { part.part_off = part.hidden; });
+    set_past(block, /scrolled/.test(block.dataset.show || ''));
+    block.querySelectorAll('[data-scroll-mark]').forEach(mark => watcher.observe(mark));
+  });
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>

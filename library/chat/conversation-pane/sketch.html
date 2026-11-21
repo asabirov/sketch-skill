@@ -1,0 +1,181 @@
+<!--
+Pattern record direct-message-direct-messages. Sample words are the designer's own. No brand, text or picture of the source.
+Best for: a chat tool where one-to-one and small group conversations get their own page, with the list beside the open conversation.
+States: list, conversation, unreads, empty.
+Transitions: the source gives no values. The designer chose them from the kit motion tokens.
+- list to conversation: the pane fades in, opacity 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+-->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direct messages pattern</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>/* Inbox parts. A count on a nav link, an inbox head, a row, an avatar, row actions, a group,
+   reactions and a reading pane. Each part takes the one ink and the kit motion tokens. */
+/* The kit shell puts its nav in the first row when no top bar comes first. Keep the phone tab bar at the
+   bottom, and let a side nav take the full height. */
+@media (max-width: 599px) { [data-sketch] .sketch-shell:not(:has(> .sketch-bar)) { grid-template-rows: 1fr auto; } }
+@media (min-width: 600px) { [data-sketch] .sketch-shell:not(:has(> .sketch-bar)) { grid-template-rows: 1fr; } }
+[data-sketch] .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* 1. A count on a nav link: over the icon in a rail or a tab bar, at the end of the link in a side nav. */
+[data-sketch] a:has(> .sketch-count) { position: relative; }
+[data-sketch] .sketch-count { position: absolute; top: 2px; right: 2px; min-width: 20px; padding: 0 5px; font-size: 12px; line-height: 16px; text-align: center; }
+[data-sketch] .sketch-nav a > .sketch-badge:last-child:not(.sketch-count) { margin-left: auto; }
+@media (min-width: 1000px) { [data-sketch] .sketch-shell > .sketch-nav .sketch-count { top: 50%; right: 12px; transform: translateY(-50%); } }
+/* 2. An inbox head: the title, the actions at the end, then the tabs with counts on their own line. */
+[data-sketch] .sketch-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 44px; }
+[data-sketch] .sketch-head > :is(h1, h2) { margin: 0 auto 0 0; font-size: 20px; line-height: 1.3; letter-spacing: -.3px; }
+[data-sketch] .sketch-head > .sketch-tabs { flex-basis: 100%; }
+[data-sketch] .sketch-head .sketch-tabs [role="tab"] { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+/* 3. A row: an avatar, the text lines, the time and a count. The first link covers the whole row. */
+[data-sketch] .sketch-list > li.sketch-item { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; gap: 2px 12px; padding-block: 10px; }
+[data-sketch] .sketch-item p { margin: 0; overflow-wrap: anywhere; }
+[data-sketch] .sketch-item-body { display: grid; gap: 2px; min-width: 0; }
+[data-sketch] .sketch-item-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+[data-sketch] .sketch-item-title > :is(a, b) { font-weight: 600; }
+[data-sketch] .sketch-item-context { color: var(--sketch-muted); font-size: 14px; }
+[data-sketch] .sketch-item-meta { display: grid; justify-items: end; gap: 4px; white-space: nowrap; }
+[data-sketch] .sketch-item-preview { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+[data-sketch] .sketch-item.unread :is(.sketch-item-meta time, .sketch-item-preview) { font-weight: 600; }
+[data-sketch] .sketch-list .sketch-item a.sketch-item-link { display: inline; min-width: 0; min-height: 0; text-decoration: none; }
+[data-sketch] .sketch-item a.sketch-item-link::after { content: ""; position: absolute; inset: 0; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-item a.sketch-item-link:hover::after { background: var(--sketch-wash); }
+[data-sketch] .sketch-item a.sketch-item-link:focus-visible { outline: none; }
+[data-sketch] .sketch-item a.sketch-item-link:focus-visible::after { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: -2px; }
+[data-sketch] .sketch-item :is(.sketch-reactions, .sketch-item-body a:not(.sketch-item-link), input) { position: relative; z-index: 1; }
+/* 4. An avatar: initials in a drawn circle, an optional glyph at its corner. A square one is a place. */
+[data-sketch] .sketch-avatar {
+  position: relative; display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none;
+  border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%;
+  font-size: 12px; font-weight: 600; line-height: 1;
+}
+[data-sketch] .sketch-avatar.square { border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-avatar.small { width: 24px; height: 24px; font-size: 10px; }
+[data-sketch] .sketch-avatar > .sketch-icon { position: absolute; right: -7px; bottom: -7px; width: 20px; height: 20px; padding: 2px; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; }
+/* 5. Row actions: they show on hover and on keyboard focus. A touch screen shows them under the text. */
+[data-sketch] .sketch-item-actions {
+  position: absolute; z-index: 1; top: 2px; right: 2px; display: flex; gap: 2px; padding: 2px;
+  background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble);
+  opacity: 0; pointer-events: none;
+}
+[data-sketch] .sketch-item:is(:hover, :focus-within) > .sketch-item-actions, [data-sketch] .sketch-item-actions.shown { opacity: 1; pointer-events: auto; }
+@media (hover: none) {
+  [data-sketch] .sketch-item-actions { position: static; grid-column: 2 / -1; justify-self: start; opacity: 1; pointer-events: auto; border: 0; padding: 0; }
+}
+/* 6. A group: a heading that folds its rows, a count, and group actions at the end. */
+[data-sketch] .sketch-group { position: relative; display: grid; }
+[data-sketch] .sketch-group > details > summary {
+  display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 104px 0 8px; margin: 0 -8px;
+  list-style: none; cursor: pointer; border-radius: var(--sketch-wobble);
+}
+[data-sketch] .sketch-group > details > summary::-webkit-details-marker { display: none; }
+[data-sketch] .sketch-group > details > summary:hover { background: var(--sketch-wash); }
+[data-sketch] .sketch-group > details:not([open]) > summary > .sketch-icon:first-child { transform: rotate(-90deg); }
+[data-sketch] .sketch-group-actions { position: absolute; top: 0; right: 0; display: flex; }
+/* 7. Reactions: pressed chips with a count, then a chip that adds one. */
+[data-sketch] .sketch-reactions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+[data-sketch] .sketch-reactions .sketch-icon { width: 16px; height: 16px; }
+/* 8. A reading pane: a head, the open item and a composer. On a phone it replaces the list. */
+[data-sketch] .sketch-pane { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 16px; min-width: 0; padding: 16px; }
+[data-sketch] .sketch-pane > .sketch-list { align-content: end; }
+[data-sketch] .sketch-pane > form { display: flex; gap: 8px; align-items: end; }
+[data-sketch] .sketch-pane > form .sketch-input { flex: 1; min-height: 44px; }
+@media (max-width: 599px) { [data-sketch] .sketch-pane { min-height: calc(100vh - 62px); } }
+@media (min-width: 600px) { [data-sketch] .sketch-split:has(> .sketch-pane) { min-height: 100vh; } }
+@media (prefers-reduced-motion: no-preference) {
+  [data-sketch] .sketch-item-actions { transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .sketch-pane { animation: sketch-pane-in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .sketch-group > details > summary > .sketch-icon:first-child { transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+}
+@keyframes sketch-pane-in { from { opacity: 0; } }</style>
+<style>
+/* Glue for this sketch only: the column padding, a two-line preview, the composer row and the empty pane. */
+[data-sketch] .dm { min-width: 0; }
+[data-sketch] .col { display: grid; gap: 16px; align-content: start; min-width: 0; padding: 16px; }
+[data-sketch] .clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+[data-sketch] .composer { display: flex; gap: 8px; align-items: end; }
+[data-sketch] .composer .sketch-input { flex: 1; min-height: 44px; }
+[data-sketch] .quiet { display: grid; place-content: center; justify-items: center; gap: 8px; text-align: center; padding: 48px 16px; }
+</style>
+<body data-sketch>
+<div class="sketch-shell sketch-rail">
+<nav class="sketch-nav" aria-label="App">
+<a href="#list"><i data-icon="home"></i>Home</a>
+<a href="#list" aria-current="page"><i data-icon="comment"></i>DMs<span class="sketch-badge strong sketch-count">3</span></a>
+<a href="#list"><i data-icon="bell"></i>Activity<span class="sketch-badge strong sketch-count">4</span></a>
+<a href="#list"><i data-icon="calendar"></i>Later</a>
+<a href="#list"><i data-icon="more"></i>More</a>
+</nav>
+<main class="dm">
+
+<section data-state="list" class="sketch-split" style="--split: 340px minmax(0, 1fr)">
+<div class="col">
+<div class="sketch-head"><h1>Direct messages</h1>
+<a class="sketch-icon-button" href="#unreads" aria-label="Show unreads only"><i data-icon="filter"></i></a>
+<a class="sketch-icon-button" href="#list" aria-label="New message"><i data-icon="edit"></i></a>
+</div>
+<ul class="sketch-list" aria-label="Conversations">
+<li class="sketch-item unread"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation"><span class="vh">Unread: </span>Mira Kade</a></p><p class="sketch-item-preview clamp">Can we move the launch call to Thursday at 10? I will send the new agenda after lunch.</p></div><div class="sketch-item-meta"><time>10:42</time><span class="sketch-badge strong" aria-label="2 unread">2</span></div></li>
+<li class="sketch-item unread"><span class="sketch-avatar">JA</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation"><span class="vh">Unread: </span>Jon Avery, Tess Ward</a></p><p class="sketch-item-preview clamp">Tess: the refund queue is down to 4.</p></div><div class="sketch-item-meta"><time>09:15</time><span class="sketch-badge strong" aria-label="1 unread">1</span></div></li>
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation">Ola Brandt</a></p><p class="sketch-item-preview clamp">You: Thanks, the invoice is sent.</p></div><div class="sketch-item-meta"><time>Mon</time></div></li>
+<li class="sketch-item"><span class="sketch-avatar square">DB</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation">Deploy bot</a></p><p class="sketch-item-preview clamp">Build 4182 passed on main.</p></div><div class="sketch-item-meta"><time>Mon</time></div></li>
+</ul>
+</div>
+<div class="sketch-from-tablet quiet"><i data-icon="comment"></i><p>Pick a conversation to read it.</p></div>
+</section>
+
+<section data-state="conversation" class="sketch-split" style="--split: 340px minmax(0, 1fr)">
+<div class="col sketch-from-tablet">
+<div class="sketch-head"><h1>Direct messages</h1>
+<a class="sketch-icon-button" href="#unreads" aria-label="Show unreads only"><i data-icon="filter"></i></a>
+<a class="sketch-icon-button" href="#list" aria-label="New message"><i data-icon="edit"></i></a>
+</div>
+<ul class="sketch-list" aria-label="Conversations">
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation" aria-current="true">Mira Kade</a></p><p class="sketch-item-preview clamp">Can we move the launch call to Thursday at 10? I will send the new agenda after lunch.</p></div><div class="sketch-item-meta"><time>10:42</time></div></li>
+<li class="sketch-item unread"><span class="sketch-avatar">JA</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation"><span class="vh">Unread: </span>Jon Avery, Tess Ward</a></p><p class="sketch-item-preview clamp">Tess: the refund queue is down to 4.</p></div><div class="sketch-item-meta"><time>09:15</time><span class="sketch-badge strong" aria-label="1 unread">1</span></div></li>
+<li class="sketch-item"><span class="sketch-avatar">OB</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation">Ola Brandt</a></p><p class="sketch-item-preview clamp">You: Thanks, the invoice is sent.</p></div><div class="sketch-item-meta"><time>Mon</time></div></li>
+<li class="sketch-item"><span class="sketch-avatar square">DB</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation">Deploy bot</a></p><p class="sketch-item-preview clamp">Build 4182 passed on main.</p></div><div class="sketch-item-meta"><time>Mon</time></div></li>
+</ul>
+</div>
+<section class="sketch-pane" aria-label="Conversation with Mira Kade">
+<div class="sketch-head"><a class="sketch-icon-button sketch-phone-only" href="#list" aria-label="Back to messages"><i data-icon="arrow-left"></i></a><span class="sketch-avatar small">MK</span><h2>Mira Kade</h2>
+<a class="sketch-icon-button" href="#conversation" aria-label="Conversation details"><i data-icon="more"></i></a></div>
+<ul class="sketch-list" aria-label="Messages">
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">10:40</time></p><p>The price table is ready for review.</p>
+<div class="sketch-reactions"><button class="sketch-chip" type="button" aria-pressed="true" aria-label="Check, 2 people, you reacted"><i data-icon="check"></i>2</button><button class="sketch-chip" type="button" aria-pressed="false" aria-label="Eyes, 1 person"><i data-icon="eye"></i>1</button><button class="sketch-chip" type="button" aria-label="Add reaction"><i data-icon="plus"></i></button></div>
+<p><a href="#conversation">1 reply</a> <span class="sketch-muted">Last reply today at 10:27</span></p></div></li>
+<li class="sketch-item"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><b>Mira Kade</b><time class="sketch-muted">10:42</time></p><p>Can we move the launch call to Thursday at 10? I will send the new agenda after lunch.</p></div></li>
+</ul>
+<form class="composer" onsubmit="return false"><label class="vh" for="msg">Message Mira Kade</label><textarea id="msg" class="sketch-input" rows="1" placeholder="Message Mira Kade"></textarea><button class="sketch-button" type="submit" data-sketch-toast="Sent">Send</button></form>
+</section>
+</section>
+
+<section data-state="unreads" class="sketch-split" style="--split: 340px minmax(0, 1fr)">
+<div class="col">
+<div class="sketch-head"><h1>Direct messages</h1>
+<a class="sketch-icon-button" href="#list" aria-label="Show all messages" aria-pressed="true"><i data-icon="filter"></i></a>
+<a class="sketch-icon-button" href="#list" aria-label="New message"><i data-icon="edit"></i></a>
+</div>
+<p class="sketch-row"><span class="sketch-badge">Unreads only</span><a href="#list">Show all</a></p>
+<ul class="sketch-list" aria-label="Unread conversations">
+<li class="sketch-item unread"><span class="sketch-avatar">MK</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation"><span class="vh">Unread: </span>Mira Kade</a></p><p class="sketch-item-preview clamp">Can we move the launch call to Thursday at 10? I will send the new agenda after lunch.</p></div><div class="sketch-item-meta"><time>10:42</time><span class="sketch-badge strong" aria-label="2 unread">2</span></div></li>
+<li class="sketch-item unread"><span class="sketch-avatar">JA</span><div class="sketch-item-body"><p class="sketch-item-title"><a class="sketch-item-link" href="#conversation"><span class="vh">Unread: </span>Jon Avery, Tess Ward</a></p><p class="sketch-item-preview clamp">Tess: the refund queue is down to 4.</p></div><div class="sketch-item-meta"><time>09:15</time><span class="sketch-badge strong" aria-label="1 unread">1</span></div></li>
+</ul>
+</div>
+<div class="sketch-from-tablet quiet"><i data-icon="comment"></i><p>Pick a conversation to read it.</p></div>
+</section>
+
+<section data-state="empty" class="sketch-split" style="--split: 340px minmax(0, 1fr)">
+<div class="col">
+<div class="sketch-head"><h1>Direct messages</h1>
+<a class="sketch-icon-button" href="#list" aria-label="New message"><i data-icon="edit"></i></a>
+</div>
+<div class="quiet"><i data-icon="comment"></i><h2>No messages yet</h2><p>Start a conversation with one person or a small group.</p><a class="sketch-button" href="#list">New message</a></div>
+</div>
+<div class="sketch-from-tablet"></div>
+</section>
+
+</main>
+</div>
+<script src="../../../assets/sketch.js"></script>

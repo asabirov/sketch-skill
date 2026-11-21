@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topics tree sketch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* A phone screen. The frame keeps the width of a phone in a wide window, so each part acts as it does on a phone. */
+  html { height: 100%; }
+  body[data-sketch] { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  [data-sketch] > [data-state] { flex: 1; min-height: 0; }
+  [data-sketch] [data-screen] { height: 100%; }
+  [data-sketch] .phone { position: relative; isolation: isolate; width: min(100%, 430px); height: 100%; margin: 0 auto; overflow: hidden; }
+  [data-sketch] .phone_screen { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); }
+  [data-sketch] .phone_bar { grid-row: 1; display: flex; align-items: center; gap: 4px; min-height: 56px; padding: 6px 8px; }
+  [data-sketch] .phone_bar :is(h1, h2) { flex: 1; min-width: 0; margin: 0 8px; font-size: 20px; letter-spacing: -.3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .phone_body { grid-row: 2; min-height: 0; padding: 4px 16px 16px; overflow-y: auto; }
+  [data-sketch] .phone_body > p { margin: 0 0 12px; }
+  @media (min-width: 600px) { [data-sketch] .phone { border-inline: var(--sketch-stroke) solid var(--sketch-muted); } }
+  /* A plain box stands for a part that this pattern does not draw. It names the part, and the pattern that draws it. */
+  [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; text-decoration: none; }
+  [data-sketch] .part_box.fill { height: 100%; }
+  /* Each motion value below comes from transitions.json. */
+  [data-sketch] { --phone_spring: linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%); --phone_out: cubic-bezier(0.23, 1, 0.32, 1); }
+  /* A pressed row or button shrinks and takes a soft fill while the finger is down. */
+  [data-sketch] .phone_press:active { background-color: var(--sketch-wash); transform: scale(0.96); }
+  @media (prefers-reduced-motion: no-preference) { [data-sketch] .phone_press { transition: transform 120ms var(--phone_out), background-color 120ms var(--phone_out); } }
+  /* A screen that opens comes in from the right, and the screen before it leaves to the left. Back plays the opposite. */
+  [data-sketch] .phone_ghost { pointer-events: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .phone_screen.enter_push { animation: push-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_screen.exit_push { animation: push-exit 520ms var(--phone_spring) forwards; }
+    [data-sketch] .phone_screen.enter_back { animation: back-enter 520ms var(--phone_spring); }
+    [data-sketch] .phone_screen.exit_back { animation: back-exit 520ms var(--phone_spring) forwards; }
+  }
+  @keyframes push-enter { from { transform: translateX(100%); } }
+  @keyframes push-exit { to { transform: translateX(-100%); } }
+  @keyframes back-enter { from { transform: translateX(-100%); } }
+  @keyframes back-exit { to { transform: translateX(100%); } }
+  /* The tree: each topic hangs from a line that starts under the mark of its channel. */
+  [data-sketch] :is(.tree_channels, .tree_topics) { margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .tree_channels > li { margin-bottom: 12px; }
+  [data-sketch] .tree_line { display: flex; align-items: center; }
+  [data-sketch] .tree_row { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 44px; padding: 4px 8px; border-radius: var(--sketch-wobble); text-decoration: none; }
+  [data-sketch] .tree_row:hover { background: var(--sketch-wash); }
+  [data-sketch] .tree_row[aria-current] { background: var(--sketch-wash); font-weight: 600; }
+  [data-sketch] .tree_mark { flex: none; width: 20px; text-align: center; font-size: 18px; font-weight: 600; }
+  [data-sketch] .tree_name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .tree_topics { position: relative; margin-left: 17px; padding-left: 16px; border-left: var(--sketch-stroke) solid var(--sketch-muted); }
+  [data-sketch] .tree_topics > li { position: relative; }
+  [data-sketch] .tree_topics > li::before { content: ""; position: absolute; left: -16px; top: 50%; width: 12px; border-top: var(--sketch-stroke) solid var(--sketch-muted); }
+  /* The line stops at the last topic. */
+  [data-sketch] .tree_topics > li:last-child::after { content: ""; position: absolute; left: -19px; top: calc(50% + var(--sketch-stroke)); bottom: 0; width: 5px; background: var(--sketch-page); }
+  [data-sketch] .tree_count { flex: none; min-width: 24px; padding: 1px 7px; border-radius: 12px; text-align: center; }
+</style>
+<body data-sketch>
+
+<section data-state="tree">
+  <div data-screen="topic_tree"></div>
+</section>
+<section data-state="topic">
+  <div data-screen="topic_tree" data-show="topic"></div>
+</section>
+<section data-state="tree-selected">
+  <div data-screen="topic_tree" data-show="selected"></div>
+</section>
+<section data-state="empty">
+  <div data-screen="topic_tree" data-show="empty"></div>
+</section>
+
+<!-- The tree is one screen of the phone, and a row opens the page of its topic. -->
+<template id="topic_tree">
+<div class="phone">
+  <main class="phone_screen" data-part="!topic">
+    <header class="phone_bar"><h1>Channels</h1></header>
+    <div class="phone_body" data-part="empty"><p>You are in no channel. A channel that you join shows here.</p></div>
+    <nav class="phone_body" aria-label="Channels" data-part="!empty">
+      <ul class="tree_channels">
+        <li>
+          <div class="tree_line">
+            <a class="tree_row phone_press" href="#topic" data-move="push" data-focus="!topic"><span class="tree_mark" aria-hidden="true">#</span><span class="tree_name">weekend-market</span><span class="sketch-badge strong tree_count" aria-label="4 new messages">4</span></a>
+          </div>
+          <ul class="tree_topics">
+            <li><a class="tree_row phone_press" href="#topic" data-move="push" data-current-in="selected"><span class="tree_name">Stall plan</span><span class="sketch-badge strong tree_count" aria-label="1 new message">1</span></a></li>
+            <li><a class="tree_row phone_press" href="#topic" data-move="push"><span class="tree_name">Price list</span></a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="tree_line">
+            <a class="tree_row phone_press" href="#topic" data-move="push"><span class="tree_mark" aria-hidden="true">#</span><span class="tree_name">neighbourhood-association-2026</span></a>
+          </div>
+          <ul class="tree_topics">
+            <li><a class="tree_row phone_press" href="#topic" data-move="push"><span class="tree_name">Street repairs</span></a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="tree_line">
+            <a class="tree_row phone_press" href="#topic" data-move="push"><span class="tree_mark" aria-hidden="true">#</span><span class="tree_name">summer-trip</span></a>
+          </div>
+          <ul class="tree_topics">
+            <li><a class="tree_row phone_press" href="#topic" data-move="push"><span class="tree_name">Train tickets</span></a></li>
+          </ul>
+        </li>
+        <li>
+          <div class="tree_line">
+            <a class="tree_row phone_press" href="#topic" data-move="push"><span class="tree_mark" aria-hidden="true">#</span><span class="tree_name">car-share</span></a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </main>
+  <main class="phone_screen" data-part="topic">
+    <header class="phone_bar">
+      <a class="sketch-icon-button" href="#tree-selected" data-move="back" aria-label="Back" data-focus="topic"><i data-icon="chevron-left"></i></a>
+      <h1 data-page-title>Stall plan</h1>
+    </header>
+    <div class="phone_body"><div class="part_box fill"><strong>Chat page</strong></div></div>
+  </main>
+</div>
+</template>
+
+<script>
+/* The screens of a pattern sketch. This script runs before the kit script.
+   A block with data-screen takes a copy of the <template> with that id. Its data-show names the parts that the state shows.
+   In a template, data-part="name" shows an element only with that part, and "!name" only without it.
+   data-current-in marks the open row.
+   A link to "#state" and a button with data-go change the state. data-move names the transition that the change plays.
+   After the change, the element whose data-focus names a shown part takes the focus. */
+(() => {
+  const has_part = (shown, names) => {
+    const list = names.split(' ').filter(Boolean), wanted = list.filter(name => name[0] !== '!');
+    return list.every(name => name[0] !== '!' || !shown.includes(name.slice(1))) && (!wanted.length || wanted.some(name => shown.includes(name)));
+  };
+  const parts_of = block => (block.dataset.show || '').split(' ');
+  document.querySelectorAll('[data-screen]').forEach((block, index) => {
+    const copy = document.getElementById(block.dataset.screen).content.cloneNode(true);
+    const shown = parts_of(block);
+    ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
+      copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
+    copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    copy.querySelectorAll('[data-current-in]').forEach(node => { if (has_part(shown, node.dataset.currentIn)) node.setAttribute('aria-current', 'true'); });
+    block.append(copy);
+  });
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const shown_block = () => document.querySelector('[data-state]:not([hidden]) [data-screen]');
+  /* A move plays one transition of transitions.json. play adds the class that holds the animation, and takes it away at the end. */
+  window.pattern_moves = {};
+  window.pattern_play = (node, name, after) => {
+    if (reduced.matches) { if (after) after(); return; }
+    const done = event => {
+      if (event.target !== node) return;
+      node.removeEventListener('animationend', done);
+      node.classList.remove(name);
+      if (after) after();
+    };
+    node.addEventListener('animationend', done);
+    node.classList.add(name);
+  };
+  let focus_next = false;
+  window.pattern_go = (state, move, from) => {
+    const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
+    if (to && to !== from && move && !reduced.matches) pattern_moves[move](from, to);
+    focus_next = true;
+    location.hash = state;
+  };
+  /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-go], a[href^="#"]');
+    const block = control && control.closest('[data-screen]');
+    if (!block || control.matches(':disabled')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pattern_go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
+  }, true);
+  addEventListener('hashchange', () => requestAnimationFrame(() => {
+    const block = shown_block();
+    const target = focus_next && block && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    focus_next = false;
+    if (target) target.focus({preventScroll: true});
+  }));
+})();
+/* push and back: a copy of the screen that the reader leaves moves out, while the new screen moves in. */
+(() => {
+  const slide = kind => (from, to) => {
+    const ghost = from.querySelector('.phone_screen:not([hidden])').cloneNode(true);
+    ghost.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    ghost.classList.add('phone_ghost');
+    ghost.inert = true;
+    ghost.setAttribute('aria-hidden', 'true');
+    to.querySelector('.phone').append(ghost);
+    pattern_play(ghost, `exit_${kind}`, () => ghost.remove());
+    pattern_play(to.querySelector('.phone_screen:not([hidden])'), `enter_${kind}`);
+  };
+  pattern_moves.push = slide('push');
+  pattern_moves.back = slide('back');
+})();
+/* The page takes the name of the row that opens it, and the tree marks that row. */
+(() => {
+  const marked = [...document.querySelectorAll('[data-screen]')].filter(block => block.querySelector('.tree_row[aria-current]'));
+  document.addEventListener('click', event => {
+    const row = event.target.closest('.tree_row');
+    if (!row) return;
+    const name = row.querySelector('.tree_name').textContent;
+    document.querySelectorAll('[data-page-title]').forEach(title => { title.textContent = name; });
+    marked.forEach(block => block.querySelectorAll('.tree_row').forEach(other => {
+      if (other.querySelector('.tree_name').textContent === name) other.setAttribute('aria-current', 'true');
+      else other.removeAttribute('aria-current');
+    }));
+  }, true);
+})();
+</script>
+<script src="../../../assets/sketch.js"></script>
