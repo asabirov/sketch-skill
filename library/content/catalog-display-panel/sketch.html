@@ -227,7 +227,6 @@
     sort: 'M7 5v14M4 16l3 3 3-3M17 19V5M14 8l3-3 3 3'
   };
   const state_sections = [...document.querySelectorAll('[data-state]')];
-  const variation_buttons = [...document.querySelectorAll('[data-variation-button]')];
   const template_html = id => document.getElementById(id).innerHTML;
   const own_icon = name => `<svg class="sketch-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${own_icons[name]}"/></svg>`;
 
@@ -327,9 +326,7 @@
   }
 
   function set_variation(variation) {
-    if (!variation_buttons.some(button => button.dataset.variationButton === variation)) variation = 'base';
     document.documentElement.dataset.variation = variation;
-    variation_buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.variationButton === variation)));
     state_sections.forEach(section => render_state(section, variation));
     initSketch();
   }
@@ -350,14 +347,6 @@
 
   // These listeners are on the document, so they run after the listeners of the kit on the body.
   document.addEventListener('click', event => {
-    const variation_button = event.target.closest('[data-variation-button]');
-    if (variation_button) {
-      const address = new URL(location.href);
-      address.searchParams.set('variation', variation_button.dataset.variationButton);
-      history.replaceState(null, '', address);
-      set_variation(variation_button.dataset.variationButton);
-      return;
-    }
     const section = event.target.closest('[data-state]');
     if (!section) return;
     if (event.target.closest('[data-view-link]')) used_control = 'view';
@@ -397,5 +386,5 @@
     used_control = '';
   });
 
-  set_variation(new URLSearchParams(location.search).get('variation') || document.documentElement.dataset.variation);
+  set_variation(document.documentElement.dataset.variation);
 </script>
