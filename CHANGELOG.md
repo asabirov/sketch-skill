@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.0 — 2026-11-21
+
+### Added
+
+- The pattern `settings/theme-switch-preview-cards`. A reader chooses how the product looks on a page of its own, and sees a small picture of each choice first. The choice applies at once, with no Save button.
+- The pattern `account/connected-apps`. A reader sees each outside app that uses their account, with its access, the connect date and the last use. The reader disconnects one app after a confirmation. The pattern fits a phone and a desktop.
+
 ## 0.16.0 — 2026-11-21
 
 ### Added
