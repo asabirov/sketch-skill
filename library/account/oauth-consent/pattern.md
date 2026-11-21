@@ -3,7 +3,7 @@
 Captured: 2026-11-16, from public pictures and a public video
 Best for: a person lets an outside app act for their account, and later takes that right back in Settings.
 Row opens: in place. The designer's choice: Disconnect in the row menu opens a confirmation over the list. The source shows no confirmation.
-Related: `settings/settings-window`, the settings window that holds the list of connected clients.
+Related: `settings/settings-window`, the settings window that holds the list of connected clients. `account/connected-apps`, a full page of the apps that use an account, with the access, the connect date and the last use.
 
 ## States
 

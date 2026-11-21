@@ -1,0 +1,194 @@
+<!doctype html>
+<!--
+  Best for: a signed-in reader sees each outside app that uses their account, with its access, the connect date and the last use, and takes the access back from one app or from all apps. The list fits a phone and a desktop.
+  For a list of apps that a workspace allows, inside a settings window, use account/oauth-consent.
+  Row opens: a page of its own. The app name opens a page with the full access of the app.
+  Related: account/oauth-consent is the consent page and a short list of clients in a settings window. settings/settings-window is the window form of settings.
+  Each row has the app picture, the app name, the owner, a short access line, and a line with the connect date and the last use. A More button at the end of the row opens a menu with Revoke access.
+  The head of the list has the count of apps, a Sort menu and a Revoke all button.
+  Transition values, from transitions.json. The file is empty: the capture is still pictures, so it read no transition.
+  - list to menu: the menu opens at once. 0 ms, estimated.
+  - menu to confirm, and list to confirm-all: the dialog opens at once. 0 ms, estimated.
+  - confirm to revoked, and confirm-all to empty: the row goes at once, and a toast names the app. 0 ms, estimated.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connected apps</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* The head of the list: the count on the left, Sort and Revoke all on the right. On a phone the buttons go below the count. */
+  [data-sketch] .apps_head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-bottom: 12px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .apps_head > p { flex: 1 1 240px; margin: 0; }
+  /* Each row: the picture, the facts, and the More button. The facts wrap, and the More button stays at the top right. */
+  [data-sketch] .apps_list > li { display: grid; grid-template-columns: 36px minmax(0, 1fr) 44px; align-items: start; gap: 4px 12px; padding-block: 12px; border-bottom: 1px solid var(--sketch-muted); border-radius: 0; }
+  [data-sketch] .apps_list > li > div { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .apps_list > li > div > a { justify-self: start; justify-content: start; min-height: 0; font-weight: 600; }
+  [data-sketch] .sketch-menu a.sketch-menu-item { justify-content: start; }
+  [data-sketch] .apps_list > li p { margin: 0; }
+  /* The access page: the facts in 2 columns on a desktop, and in one column on a phone. */
+  [data-sketch] .apps_facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
+  [data-sketch] .apps_facts dd { margin: 0; overflow-wrap: anywhere; }
+  [data-sketch] .apps_access { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .apps_access > li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 2px 12px; }
+  [data-sketch] .apps_access > li > span { grid-column: 2; }
+  [data-sketch] .apps_empty { display: grid; gap: 8px; justify-items: center; padding: 48px 16px; text-align: center; }
+  @media (max-width: 479px) {
+    [data-sketch] .apps_facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    [data-sketch] .apps_facts dd { margin-bottom: 8px; }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies a template into each state. data-hide names the rows that the state leaves out. -->
+<section class="sketch-shell" data-state="list" data-page="apps"></section>
+<section class="sketch-shell" data-state="menu" data-page="apps" data-open-part="menu_notes"></section>
+<section class="sketch-shell" data-state="confirm" data-page="apps" data-open-part="confirm_notes"></section>
+<section class="sketch-shell" data-state="revoked" data-page="apps" data-hide="notes" data-toast="Notes Sync can no longer use your account."></section>
+<section class="sketch-shell" data-state="confirm-all" data-page="apps" data-open-part="confirm_all"></section>
+<section class="sketch-shell" data-state="empty" data-page="apps" data-hide="notes calendar deploy" data-toast="No app can use your account now."></section>
+<section class="sketch-shell" data-state="app" data-page="app"></section>
+
+<template id="frame">
+  <header class="sketch-bar" role="banner"><strong>[Product]</strong><span class="sketch-spacer"></span>
+    <button type="button" class="sketch-icon-button" aria-label="Account menu" data-sketch-toast="Account menu. Pattern: navigation/user-menu"><i data-icon="user"></i></button>
+  </header>
+  <nav class="sketch-nav" aria-label="Settings">
+    <a href="#"><i data-icon="user"></i>Profile</a><a href="#"><i data-icon="settings"></i>Preferences</a><a href="#"><i data-icon="bell"></i>Notifications</a><a href="#list" aria-current="page"><i data-icon="link"></i>Connected apps</a>
+  </nav>
+  <main class="sketch-main sketch-stack" style="max-width:760px"></main>
+</template>
+
+<template id="apps">
+  <h1>Connected apps</h1>
+  <div class="apps_head">
+    <p data-count>You let <b>3 apps</b> use your account.</p>
+    <button class="sketch-button secondary" type="button" data-sketch-popover="sort___state__">Sort<i data-icon="chevron-down"></i></button>
+    <button class="sketch-button secondary" type="button" data-sketch-open="confirm_all___state__" data-revoke-all>Revoke all</button>
+  </div>
+  <div class="sketch-menu" id="sort___state__">
+    <button class="sketch-menu-item" type="button">Last used</button>
+    <button class="sketch-menu-item" type="button">Name</button>
+    <button class="sketch-menu-item" type="button">Connect date</button>
+  </div>
+  <ul class="sketch-list apps_list">
+    <li data-row="notes">
+      <span class="sketch-avatar square">NS</span>
+      <div>
+        <a href="#app">Notes Sync</a>
+        <span class="sketch-muted">Owned by Studio North</span>
+        <p>Can read your profile and your email address.</p>
+        <span class="sketch-muted">Connected 3 March 2025. Last used within the last week.</span>
+      </div>
+      <button class="sketch-icon-button" type="button" aria-label="More actions for Notes Sync" data-sketch-popover="menu_notes___state__"><i data-icon="more"></i></button>
+    </li>
+    <li data-row="calendar">
+      <span class="sketch-avatar square">CB</span>
+      <div>
+        <a href="#app">Calendar Bridge</a>
+        <span class="sketch-muted">Owned by Bridge Tools</span>
+        <p>Can read and change your events.</p>
+        <span class="sketch-muted">Connected 18 January 2024. Last used within the last 10 months.</span>
+      </div>
+      <button class="sketch-icon-button" type="button" aria-label="More actions for Calendar Bridge" data-sketch-popover="menu_calendar___state__"><i data-icon="more"></i></button>
+    </li>
+    <li data-row="deploy">
+      <span class="sketch-avatar square">DH</span>
+      <div>
+        <a href="#app">Deploy Helper with a very long name for a narrow screen</a>
+        <span class="sketch-muted">Owned by a person, rosa-k</span>
+        <p>Can read your profile.</p>
+        <span class="sketch-muted">Connected 2 November 2026. Never used.</span>
+      </div>
+      <button class="sketch-icon-button" type="button" aria-label="More actions for Deploy Helper" data-sketch-popover="menu_deploy___state__"><i data-icon="more"></i></button>
+    </li>
+  </ul>
+  <div class="apps_empty" data-empty hidden>
+    <i data-icon="link"></i>
+    <p><b>No app uses your account.</b></p>
+    <p class="sketch-muted">An app shows here after you let it use your account.</p>
+  </div>
+  <div class="sketch-menu" id="menu_notes___state__">
+    <a class="sketch-menu-item" href="#app">See the access</a>
+    <button class="sketch-menu-item" type="button" data-sketch-open="confirm_notes___state__">Revoke access</button>
+  </div>
+  <div class="sketch-menu" id="menu_calendar___state__">
+    <a class="sketch-menu-item" href="#app">See the access</a>
+    <button class="sketch-menu-item" type="button" data-sketch-toast="Calendar Bridge works the same as Notes Sync in this sketch.">Revoke access</button>
+  </div>
+  <div class="sketch-menu" id="menu_deploy___state__">
+    <a class="sketch-menu-item" href="#app">See the access</a>
+    <button class="sketch-menu-item" type="button" data-sketch-toast="Deploy Helper works the same as Notes Sync in this sketch.">Revoke access</button>
+  </div>
+  <dialog class="sketch-dialog" id="confirm_notes___state__" aria-labelledby="confirm_notes_title___state__">
+    <h2 id="confirm_notes_title___state__">Revoke the access of Notes Sync?</h2>
+    <p>Notes Sync can no longer read your profile or your email address. To use it again, connect it again.</p>
+    <div class="sketch-row">
+      <a class="sketch-button" href="#revoked">Revoke access</a>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Cancel</button>
+    </div>
+  </dialog>
+  <dialog class="sketch-dialog" id="confirm_all___state__" aria-labelledby="confirm_all_title___state__">
+    <h2 id="confirm_all_title___state__">Revoke the access of all 3 apps?</h2>
+    <p>No app can use your account after this. Each app asks again before it can use your account.</p>
+    <div class="sketch-row">
+      <a class="sketch-button" href="#empty">Revoke all</a>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Cancel</button>
+    </div>
+  </dialog>
+</template>
+
+<template id="app">
+  <a href="#list"><i data-icon="arrow-left"></i>Connected apps</a>
+  <div class="sketch-row"><span class="sketch-avatar square">NS</span><h1>Notes Sync</h1></div>
+  <dl class="apps_facts">
+    <dt class="sketch-muted">Owner</dt><dd>Studio North</dd>
+    <dt class="sketch-muted">Connected</dt><dd>3 March 2025</dd>
+    <dt class="sketch-muted">Last used</dt><dd>Within the last week</dd>
+    <dt class="sketch-muted">Website</dt><dd><a href="#app" data-sketch-toast="Opens the website of the app in a new tab.">notes-sync.example</a></dd>
+  </dl>
+  <h2>What Notes Sync can do</h2>
+  <ul class="apps_access">
+    <li><i data-icon="user"></i><b>Read your profile</b><span class="sketch-muted">Your name, your picture and your public details.</span></li>
+    <li><i data-icon="eye"></i><b>Read your email address</b><span class="sketch-muted">Only the main address. It cannot send email.</span></li>
+  </ul>
+  <div class="sketch-row"><a class="sketch-button" href="#confirm">Revoke access</a></div>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The values of transitions.json. The file is empty, so each change shows at once.
+  const transition_records = [];
+  window.__sketchTransitions = transition_records;
+
+  document.querySelectorAll('[data-state]').forEach(section => {
+    const state = section.dataset.state;
+    section.innerHTML = document.getElementById('frame').innerHTML;
+    section.querySelector('main').innerHTML = document.getElementById(section.dataset.page).innerHTML.replaceAll('__state__', state);
+    const hidden = (section.dataset.hide || '').split(' ').filter(Boolean);
+    hidden.forEach(row => section.querySelector(`[data-row="${row}"]`)?.remove());
+    if (section.dataset.page === 'apps') {
+      const left = section.querySelectorAll('[data-row]').length;
+      section.querySelector('[data-count]').innerHTML = left ? `You let <b>${left} ${left === 1 ? 'app' : 'apps'}</b> use your account.` : 'No app uses your account.';
+      if (!left) {
+        section.querySelector('.apps_list').remove();
+        section.querySelector('[data-empty]').hidden = false;
+        section.querySelector('[data-revoke-all]').disabled = true;
+        section.querySelector('[data-sketch-popover^="sort"]').disabled = true;
+      }
+      if (left) section.querySelector('[id^="confirm_all_title"]').textContent = `Revoke the access of all ${left} apps?`;
+    }
+    if (section.dataset.openPart) section.querySelector(`#${section.dataset.openPart}_${state}`)?.setAttribute('data-open', '');
+  });
+
+  initSketch();
+
+  // A state with a toast shows it when the state opens. A state without a toast closes the toast of the state before.
+  const show_toast = () => {
+    const section = [...document.querySelectorAll('[data-state]')].find(item => !item.hidden);
+    if (section?.dataset.toast) sketchToast(section.dataset.toast, section.querySelector('h1'));
+    else document.querySelectorAll('.sketch-toast').forEach(toast => { toast.hidden = true; });
+  };
+  addEventListener('hashchange', show_toast);
+  show_toast();
+</script>
