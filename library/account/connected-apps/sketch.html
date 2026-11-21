@@ -1,0 +1,219 @@
+<!doctype html>
+<!--
+  Best for: a signed-in reader sees each outside app that uses their account, with its access, the connect date and the last use, and disconnects one app after a confirmation.
+  For a short list of the clients of a workspace inside a settings window, use account/oauth-consent.
+  Row opens: on the record's own page. The app name opens a page with the access of the app.
+  Related: account/oauth-consent is the consent page and a short list of clients in a settings window. settings/settings-window is the window form of settings.
+  The list page has the title, a bar with a search and Add app, and one row for each connected app. Each row has the app picture at the top left, the name with a verified mark, a line of what the app can do, and a line with the maker, the connect date and the last use. A More button at the right of the row opens a menu with Disconnect.
+  The page of an app has a head with the picture, the name, the maker and a Connected badge. Below a line, the description, the access list and the account box with Disconnect are on the left, and the facts are in a column on the right.
+  Transition values, from transitions.json: none. The menu, the confirmation, the row that goes and the toast show at once. 0 ms, measured for the menu, estimated for the others.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connected apps</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .sketch-menu a.sketch-menu-item { justify-content: start; }
+  /* The bar above the list: the search takes the free width, then Add app. */
+  [data-sketch] .apps_bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  [data-sketch] .apps_bar > .sketch-input { flex: 1 1 220px; min-width: 0; }
+  [data-sketch] .apps_bar > :is(.sketch-input, .sketch-button) { align-self: stretch; }
+  [data-sketch] .sketch-main > a:first-child { margin-bottom: -12px; }
+  /* The kit stack sets the gaps, so the headings and paragraphs inside these parts have no own margin. */
+  [data-sketch] :is(.sketch-dialog, .apps_empty, .apps_head > div, .apps_body > div) > :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .apps_body > div > h2 { margin-top: 16px; }
+  /* Each row: the picture at the top, the facts, and the More button at the top right. */
+  [data-sketch] .apps_list { display: grid; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .apps_list > li { display: grid; grid-template-columns: 36px minmax(0, 1fr) 44px; align-items: start; gap: 2px 12px; padding-block: 10px; }
+  [data-sketch] .apps_list > li > .sketch-icon-button { margin-top: -10px; }
+  [data-sketch] .apps_list > li > div { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+  /* The name is a text link in a line of text, so it does not need the 44 px target of the kit. */
+  [data-sketch] .sketch-main .apps_list a:not(.sketch-button) { justify-self: start; justify-content: start; min-height: 0; padding: 0; font-weight: 600; text-decoration: none; }
+  [data-sketch] .apps_list a:hover { text-decoration: underline; }
+  [data-sketch] .apps_name { display: inline-flex; align-items: center; gap: 6px; }
+  /* Each fact is its own span, and a line breaks only between facts. */
+  [data-sketch] .apps_meta { display: flex; flex-wrap: wrap; gap: 0 12px; color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .apps_meta > span { white-space: nowrap; }
+  /* The head of the app page: the picture and the names on the left, the badge on the right, a line below. */
+  [data-sketch] .apps_head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-bottom: 20px; border-bottom: 1px solid var(--sketch-muted); }
+  [data-sketch] .apps_head > .sketch-avatar { width: 48px; height: 48px; }
+  [data-sketch] .apps_head > div { flex: 1 1 200px; display: grid; gap: 2px; min-width: 0; }
+  [data-sketch] .apps_head h1 { overflow-wrap: anywhere; }
+  [data-sketch] .apps_badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  /* The body of the app page: the main part and a column of facts. On a phone, the facts go below. */
+  [data-sketch] .apps_body { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 32px 48px; align-items: start; }
+  [data-sketch] .apps_body > div { display: grid; gap: 16px; min-width: 0; }
+  [data-sketch] .apps_access { display: grid; gap: 8px; margin: 0; padding-left: 20px; }
+  [data-sketch] .apps_facts { display: grid; gap: 16px; margin: 0; }
+  [data-sketch] .apps_facts > div { display: grid; gap: 2px; }
+  [data-sketch] .apps_facts dt { color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .apps_facts dd { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; overflow-wrap: anywhere; }
+  [data-sketch] .apps_facts .apps_badge { padding: 0 6px; }
+  /* The account box: what is connected, and Disconnect. */
+  [data-sketch] .apps_account { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .apps_account > span { flex: 1 1 160px; }
+  [data-sketch] .apps_empty { display: grid; gap: 8px; justify-items: center; padding: 48px 16px; text-align: center; }
+  @media (max-width: 719px) {
+    [data-sketch] .apps_body { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies a template into each state. data-hide names the rows that the state leaves out. -->
+<section class="sketch-shell" data-state="list" data-page="apps"></section>
+<section class="sketch-shell" data-state="menu" data-page="apps" data-open-part="menu_notes"></section>
+<section class="sketch-shell" data-state="confirm" data-page="apps" data-open-part="confirm_notes"></section>
+<section class="sketch-shell" data-state="disconnected" data-page="apps" data-hide="notes" data-toast="Notes Sync is disconnected. It can no longer use your account."></section>
+<section class="sketch-shell" data-state="empty" data-page="apps" data-hide="notes calendar deploy"></section>
+<section class="sketch-shell" data-state="app" data-page="app"></section>
+
+<template id="frame">
+  <header class="sketch-bar" role="banner"><strong>[Product]</strong><span class="sketch-spacer"></span>
+    <button type="button" class="sketch-icon-button" aria-label="Account menu" data-sketch-toast="Account menu. Pattern: navigation/user-menu"><i data-icon="user"></i></button>
+  </header>
+  <nav class="sketch-nav" aria-label="Main">
+    <a href="#"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="search"></i>Search</a><a href="#"><i data-icon="box"></i>Projects</a><a href="#list" aria-current="page"><i data-icon="link"></i>Connected apps</a>
+  </nav>
+  <main class="sketch-main sketch-stack" style="max-width:960px"></main>
+</template>
+
+<template id="apps">
+  <h1>Connected apps</h1>
+  <div class="apps_bar">
+    <input class="sketch-input" type="search" placeholder="Search" aria-label="Search connected apps" data-search>
+    <button class="sketch-button" type="button" data-sketch-toast="Opens the catalog of apps. Not a part of this pattern."><i data-icon="plus"></i>Add app</button>
+  </div>
+  <ul class="apps_list">
+    <li data-row="notes">
+      <span class="sketch-avatar square">NS</span>
+      <div>
+        <a href="#app"><span class="apps_name">Notes Sync<i data-icon="check" aria-label="Verified"></i></span></a>
+        <span>Reads your profile and your email address</span>
+        <span class="apps_meta"><span>By Studio North</span><span>Connected 3 Mar 2025</span><span>Used today</span></span>
+      </div>
+      <button class="sketch-icon-button" type="button" aria-label="More actions for Notes Sync" data-sketch-popover="menu_notes___state__"><i data-icon="more"></i></button>
+    </li>
+    <li data-row="calendar">
+      <span class="sketch-avatar square">CB</span>
+      <div>
+        <a href="#app"><span class="apps_name">Calendar Bridge<i data-icon="check" aria-label="Verified"></i></span></a>
+        <span>Reads and changes your events</span>
+        <span class="apps_meta"><span>By Bridge Tools</span><span>Connected 18 Jan 2024</span><span>Used 10 months ago</span></span>
+      </div>
+      <button class="sketch-icon-button" type="button" aria-label="More actions for Calendar Bridge" data-sketch-popover="menu_calendar___state__"><i data-icon="more"></i></button>
+    </li>
+    <li data-row="deploy">
+      <span class="sketch-avatar square">DH</span>
+      <div>
+        <a href="#app">Deploy Helper with a very long name for a narrow screen</a>
+        <span>Reads your profile</span>
+        <span class="apps_meta"><span>By sample-user-1</span><span>Connected 2 Nov 2026</span><span>Never used</span></span>
+      </div>
+      <button class="sketch-icon-button" type="button" aria-label="More actions for Deploy Helper" data-sketch-popover="menu_deploy___state__"><i data-icon="more"></i></button>
+    </li>
+  </ul>
+  <p class="sketch-muted" data-no-match hidden>No connected app matches your search.</p>
+  <div class="apps_empty" data-empty hidden>
+    <i data-icon="link"></i>
+    <p><b>No app uses your account.</b></p>
+    <p class="sketch-muted">An app shows here after you connect it.</p>
+  </div>
+  <div class="sketch-menu" id="menu_notes___state__">
+    <button class="sketch-menu-item" type="button" data-sketch-open="confirm_notes___state__">Disconnect</button>
+  </div>
+  <div class="sketch-menu" id="menu_calendar___state__">
+    <button class="sketch-menu-item" type="button" data-sketch-toast="Calendar Bridge works the same as Notes Sync in this sketch.">Disconnect</button>
+  </div>
+  <div class="sketch-menu" id="menu_deploy___state__">
+    <button class="sketch-menu-item" type="button" data-sketch-toast="Deploy Helper works the same as Notes Sync in this sketch.">Disconnect</button>
+  </div>
+  <dialog class="sketch-dialog" id="confirm_notes___state__" aria-labelledby="confirm_notes_title___state__">
+    <h2 id="confirm_notes_title___state__">Disconnect Notes Sync?</h2>
+    <p>Notes Sync can no longer read your profile or your email address. To use it again, connect it again.</p>
+    <div class="sketch-row">
+      <a class="sketch-button" href="#disconnected">Disconnect</a>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Cancel</button>
+    </div>
+  </dialog>
+</template>
+
+<template id="app">
+  <a href="#list"><i data-icon="arrow-left"></i>Connected apps</a>
+  <div class="apps_head">
+    <span class="sketch-avatar square">NS</span>
+    <div><h1>Notes Sync</h1><span class="sketch-muted">By Studio North</span><span class="sketch-muted">Keeps your notes in step with your account</span></div>
+    <span class="apps_badge"><i data-icon="check"></i>Connected</span>
+  </div>
+  <div class="apps_body">
+    <div>
+      <p>Notes Sync keeps your notes in step with your account. It reads your profile to show your name, and it reads your email address to send you a copy of each note.</p>
+      <h2>What Notes Sync can do</h2>
+      <ul class="apps_access">
+        <li>Read your profile</li>
+        <li>Read your email address</li>
+      </ul>
+      <div class="apps_account">
+        <i data-icon="check"></i><span>Your account is connected to Notes Sync.</span>
+        <a class="sketch-button secondary" href="#confirm">Disconnect</a>
+      </div>
+    </div>
+    <dl class="apps_facts">
+      <div><dt>Developer</dt><dd>Studio North <span class="apps_badge"><i data-icon="check"></i>Verified</span></dd></div>
+      <div><dt>Sends data to</dt><dd>api.notes-sync.example</dd></div>
+      <div><dt>Connected</dt><dd>3 March 2025</dd></div>
+      <div><dt>Last used</dt><dd>Today</dd></div>
+    </dl>
+  </div>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // transitions.json is empty: each change in this pattern shows at once.
+  window.__sketchTransitions = [];
+
+  document.querySelectorAll('[data-state]').forEach(section => {
+    const state = section.dataset.state;
+    section.innerHTML = document.getElementById('frame').innerHTML;
+    section.querySelector('main').innerHTML = document.getElementById(section.dataset.page).innerHTML.replaceAll('__state__', state);
+    (section.dataset.hide || '').split(' ').filter(Boolean).forEach(row => section.querySelector(`[data-row="${row}"]`)?.remove());
+    if (section.dataset.page === 'apps' && !section.querySelector('[data-row]')) {
+      section.querySelectorAll('.apps_list, [data-search]').forEach(part => part.remove());
+      section.querySelector('[data-empty]').hidden = false;
+    }
+    if (section.dataset.openPart) section.querySelector(`#${section.dataset.openPart}_${state}`)?.setAttribute('data-open', '');
+  });
+
+  // The search shows only the rows whose text has the typed words, at once.
+  document.addEventListener('input', event => {
+    const search = event.target.closest('[data-search]');
+    if (!search) return;
+    const section = search.closest('[data-state]');
+    const words = search.value.trim().toLowerCase();
+    let shown = 0;
+    section.querySelectorAll('[data-row]').forEach(row => {
+      row.hidden = !row.textContent.toLowerCase().includes(words);
+      if (!row.hidden) shown += 1;
+    });
+    section.querySelector('[data-no-match]').hidden = shown > 0;
+  });
+
+  initSketch();
+
+  // A confirmation that opens with its state has no visible opener, because its menu is closed. On close, it gives the focus to the More button of its row.
+  document.querySelectorAll('dialog[id^="confirm"]').forEach(dialog => {
+    dialog.addEventListener('close', () => {
+      if (dialog.sketchOpener?.checkVisibility()) return;
+      dialog.closest('[data-state]').querySelector('[data-sketch-popover^="menu_notes"]')?.focus();
+    });
+  });
+
+  // A state with a toast shows it when the state opens. A state without a toast closes the toast of the state before.
+  const show_toast = () => {
+    const section = [...document.querySelectorAll('[data-state]')].find(item => !item.hidden);
+    if (section?.dataset.toast) sketchToast(section.dataset.toast, section.querySelector('h1'));
+    else document.querySelectorAll('.sketch-toast').forEach(toast => { toast.hidden = true; });
+  };
+  addEventListener('hashchange', show_toast);
+  show_toast();
+</script>
