@@ -2,12 +2,13 @@
 <!--
   Best for: a signed-in reader sees each outside app that uses their account, with its access, the connect date and the last use, and disconnects one app after a confirmation. The list fits a phone and a desktop.
   For a short list of the clients of a workspace inside a settings window, use account/oauth-consent.
-  Row opens: a page of its own. The app name opens a page with the full access of the app.
+  Row opens: a page of its own. The app name opens a page with the access of the app.
   Related: account/oauth-consent is the consent page and a short list of clients in a settings window. settings/settings-window is the window form of settings.
-  Each row has the app picture, the app name with a verified mark, the kind of app and its maker, a short access line, and a line with the connect date and the last use. A More button at the end of the row opens a menu with Disconnect.
-  The page of an app has a Connected badge with a More button, the facts of its access, a list of what it can do with Show all, and a box of the connected account with Disconnect.
+  The list page has a back link, the title, a bar with a search, a kind filter and Add, and the heading Active. Each row has the app picture, the name with a verified mark, a line of what the app can do, and a line with the kind, the maker, the connect date and the last use. A More button at the right of the row opens a menu with Disconnect. A row with an arrow below the list opens the included parts.
+  The page of an app has a head with the picture, the name, the maker, an Added badge and a More button. Below a line, the description and the connector box are on the left, and the facts are in a column on the right.
   Transition values, from transitions.json:
-  - tools-open: the tool list opens to its full height in 200 ms, cubic-bezier(0.165, 0.84, 0.44, 1). The arrow of Show all turns in 60 ms, cubic-bezier(0.4, 0, 0.2, 1). Measured.
+  - group-open: a group grows to its full height in 200 ms, cubic-bezier(0.165, 0.84, 0.44, 1). Its arrow turns in 60 ms, cubic-bezier(0.4, 0, 0.2, 1). Measured.
+  - kind-filter: the chosen mark of the kind filter slides in 200 ms, cubic-bezier(0.32, 0.72, 0, 1). Measured. The sketch moves the mark at once.
   - The menu, the confirmation, the row that goes and the toast show at once. 0 ms, measured for the menu, estimated for the others.
   No value in this file is a design-system token.
 -->
@@ -17,31 +18,53 @@
 <title>Connected apps</title>
 <link rel="stylesheet" href="../../../assets/sketch.css">
 <style>
-  /* Each row: the picture, the facts, and the More button. The facts wrap, and the More button stays at the top right. */
-  [data-sketch] .apps_list > li { display: grid; grid-template-columns: 36px minmax(0, 1fr) 44px; align-items: start; gap: 4px 12px; padding-block: 12px; border-bottom: 1px solid var(--sketch-muted); border-radius: 0; }
-  [data-sketch] .apps_list > li > div { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
-  [data-sketch] .apps_list > li > div > a { justify-self: start; justify-content: start; min-height: 0; font-weight: 600; }
   [data-sketch] .sketch-menu a.sketch-menu-item { justify-content: start; }
+  /* The bar above the list: the search takes the free width, then the kind filter, the filter button and Add. */
+  [data-sketch] .apps_bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  [data-sketch] .apps_bar > .sketch-input { flex: 1 1 220px; min-width: 0; }
+  /* Each row: the picture, the facts, and the More button in the middle of the row height. */
+  [data-sketch] .apps_list { display: grid; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .apps_list > li { display: grid; grid-template-columns: 36px minmax(0, 1fr) 44px; align-items: center; gap: 2px 12px; padding-block: 10px; }
+  [data-sketch] .apps_list > li > div { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .apps_list a { justify-self: start; justify-content: start; min-height: 0; padding: 0; font-weight: 600; text-decoration: none; }
+  [data-sketch] .apps_list a:hover { text-decoration: underline; }
   [data-sketch] .apps_name { display: inline-flex; align-items: center; gap: 6px; }
-  /* The head of the page of an app: the picture and the name on the left, the badge and the More button on the right. */
-  [data-sketch] .apps_head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  [data-sketch] .apps_meta { color: var(--sketch-muted); font-size: 14px; }
+  /* A group with an arrow: the panel grows and the arrow turns, with the values of transitions.json. */
+  [data-sketch] .apps_toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--sketch-muted); font: inherit; cursor: pointer; text-align: start; }
+  [data-sketch] .apps_arrow { display: inline-flex; transition: rotate 60ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] [aria-expanded="true"] .apps_arrow { rotate: 90deg; }
+  [data-sketch] .apps_panel { overflow: hidden; transition: height 200ms cubic-bezier(0.165, 0.84, 0.44, 1); }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] :is(.apps_panel, .apps_arrow) { transition: none; } }
+  /* The head of the app page: the picture and the names on the left, the badge and the More button on the right, a line below. */
+  [data-sketch] .apps_head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-bottom: 20px; border-bottom: 1px solid var(--sketch-muted); }
+  [data-sketch] .apps_head > .sketch-avatar { width: 48px; height: 48px; }
   [data-sketch] .apps_head > div { flex: 1 1 200px; display: grid; gap: 2px; min-width: 0; }
   [data-sketch] .apps_head h1 { overflow-wrap: anywhere; }
   [data-sketch] .apps_badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
-  /* The facts in 2 columns on a desktop, and in one column on a phone. */
-  [data-sketch] .apps_facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
+  /* The body of the app page: the main part and a column of facts. On a phone, the facts go below. */
+  [data-sketch] .apps_body { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 32px 48px; align-items: start; }
+  [data-sketch] .apps_body > div { display: grid; gap: 16px; min-width: 0; }
+  [data-sketch] .apps_facts { display: grid; gap: 16px; margin: 0; }
+  [data-sketch] .apps_facts > div { display: grid; gap: 2px; }
+  [data-sketch] .apps_facts dt { color: var(--sketch-muted); font-size: 14px; }
   [data-sketch] .apps_facts dd { margin: 0; overflow-wrap: anywhere; }
-  /* The tool list shows 3 tools. Show all opens the rest, with the values of transitions.json. */
-  [data-sketch] .apps_tools { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; overflow: hidden; transition: height 200ms cubic-bezier(0.165, 0.84, 0.44, 1); }
-  [data-sketch] .apps_more_arrow { display: inline-flex; transition: rotate 60ms cubic-bezier(0.4, 0, 0.2, 1); }
-  [data-sketch] [aria-expanded="true"] > .apps_more_arrow { rotate: 180deg; }
-  @media (prefers-reduced-motion: reduce) { [data-sketch] :is(.apps_tools, .apps_more_arrow) { transition: none; } }
-  [data-sketch] .apps_account { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
-  [data-sketch] .apps_account > span { flex: 1 1 180px; }
+  /* The connector box: a head row, the details, and the connected account. */
+  [data-sketch] .apps_box { display: grid; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .apps_box_head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 8px 12px; }
+  [data-sketch] .apps_box_head > b { flex: 1 1 120px; }
+  [data-sketch] .apps_details { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; padding: 0 16px 12px 48px; }
+  [data-sketch] .apps_details dt { color: var(--sketch-muted); }
+  [data-sketch] .apps_details dd { margin: 0; overflow-wrap: anywhere; }
+  [data-sketch] .apps_account { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; border-top: 1px solid var(--sketch-muted); }
+  [data-sketch] .apps_account > span { flex: 1 1 160px; }
   [data-sketch] .apps_empty { display: grid; gap: 8px; justify-items: center; padding: 48px 16px; text-align: center; }
+  @media (max-width: 719px) {
+    [data-sketch] .apps_body { grid-template-columns: minmax(0, 1fr); }
+  }
   @media (max-width: 479px) {
-    [data-sketch] .apps_facts { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-    [data-sketch] .apps_facts dd { margin-bottom: 8px; }
+    [data-sketch] .apps_details { grid-template-columns: minmax(0, 1fr); gap: 2px; padding-left: 16px; }
+    [data-sketch] .apps_details dd { margin-bottom: 8px; }
   }
 </style>
 <body data-sketch>
@@ -58,51 +81,68 @@
     <button type="button" class="sketch-icon-button" aria-label="Account menu" data-sketch-toast="Account menu. Pattern: navigation/user-menu"><i data-icon="user"></i></button>
   </header>
   <nav class="sketch-nav" aria-label="Main">
-    <a href="#"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="search"></i>Search</a><a href="#"><i data-icon="box"></i>Catalog</a><a href="#list" aria-current="page"><i data-icon="link"></i>Connected apps</a>
+    <a href="#"><i data-icon="plus"></i>New</a><a href="#"><i data-icon="search"></i>Search</a><a href="#"><i data-icon="box"></i>Projects</a><a href="#list" aria-current="page"><i data-icon="link"></i>Apps</a>
   </nav>
-  <main class="sketch-main sketch-stack" style="max-width:760px"></main>
+  <main class="sketch-main sketch-stack" style="max-width:960px"></main>
 </template>
 
 <template id="apps">
-  <a href="#" data-sketch-toast="Opens the catalog of apps. Not a part of this pattern."><i data-icon="arrow-left"></i>Catalog</a>
-  <h1>Connected apps</h1>
+  <a href="#" data-sketch-toast="Opens the catalog of apps. Not a part of this pattern."><i data-icon="arrow-left"></i>Apps</a>
+  <h1>Your apps</h1>
+  <div class="apps_bar">
+    <input class="sketch-input" type="search" placeholder="Search" aria-label="Search your apps">
+    <div class="sketch-segmented" role="radiogroup" aria-label="Kind">
+      <label><input type="radio" name="kind___state__" value="all" checked>All</label>
+      <label><input type="radio" name="kind___state__" value="connector">Connectors</label>
+      <label><input type="radio" name="kind___state__" value="skill">Skills</label>
+    </div>
+    <button class="sketch-icon-button" type="button" aria-label="Filter" data-sketch-toast="Filter by maker. Not a part of this pattern."><i data-icon="filter"></i></button>
+    <button class="sketch-button" type="button" data-sketch-toast="Adds an app. Not a part of this pattern.">Add<i data-icon="chevron-down"></i></button>
+  </div>
   <h2 data-count>Active</h2>
-  <ul class="sketch-list apps_list">
-    <li data-row="notes">
+  <ul class="apps_list">
+    <li data-row="notes" data-kind="connector">
       <span class="sketch-avatar square">NS</span>
       <div>
         <a href="#app"><span class="apps_name">Notes Sync<i data-icon="check" aria-label="Verified"></i></span></a>
-        <span class="sketch-muted">Connector. By Studio North</span>
-        <span>Can read your profile and your email address.</span>
-        <span class="sketch-muted">Connected 3 March 2025. Last used today.</span>
+        <span>Reads your profile and your email address</span>
+        <span class="apps_meta">Connector · By Studio North · Connected 3 Mar 2025 · Used today</span>
       </div>
       <button class="sketch-icon-button" type="button" aria-label="More actions for Notes Sync" data-sketch-popover="menu_notes___state__"><i data-icon="more"></i></button>
     </li>
-    <li data-row="calendar">
+    <li data-row="calendar" data-kind="connector">
       <span class="sketch-avatar square">CB</span>
       <div>
         <a href="#app"><span class="apps_name">Calendar Bridge<i data-icon="check" aria-label="Verified"></i></span></a>
-        <span class="sketch-muted">Connector. By Bridge Tools</span>
-        <span>Can read and change your events.</span>
-        <span class="sketch-muted">Connected 18 January 2024. Last used 10 months ago.</span>
+        <span>Reads and changes your events</span>
+        <span class="apps_meta">Connector · By Bridge Tools · Connected 18 Jan 2024 · Used 10 months ago</span>
       </div>
       <button class="sketch-icon-button" type="button" aria-label="More actions for Calendar Bridge" data-sketch-popover="menu_calendar___state__"><i data-icon="more"></i></button>
     </li>
-    <li data-row="deploy">
+    <li data-row="deploy" data-kind="skill">
       <span class="sketch-avatar square">DH</span>
       <div>
         <a href="#app">Deploy Helper with a very long name for a narrow screen</a>
-        <span class="sketch-muted">Built-in integration. By sample-user-1</span>
-        <span>Can read your profile.</span>
-        <span class="sketch-muted">Connected 2 November 2026. Never used.</span>
+        <span>Reads your profile</span>
+        <span class="apps_meta">Skill · By sample-user-1 · Connected 2 Nov 2026 · Never used</span>
       </div>
       <button class="sketch-icon-button" type="button" aria-label="More actions for Deploy Helper" data-sketch-popover="menu_deploy___state__"><i data-icon="more"></i></button>
     </li>
   </ul>
+  <div data-included>
+    <button class="apps_toggle" type="button" aria-expanded="false" aria-controls="included___state__"><span class="apps_arrow"><i data-icon="chevron-right"></i></span>Included: note-search, note-export and 1 more</button>
+    <div class="apps_panel" id="included___state__" hidden>
+      <ul class="apps_list">
+        <li><span class="sketch-avatar square">ns</span><div><span>note-search</span><span class="apps_meta">Skill · By Studio North</span></div></li>
+        <li><span class="sketch-avatar square">ne</span><div><span>note-export</span><span class="apps_meta">Skill · By Studio North</span></div></li>
+        <li><span class="sketch-avatar square">nt</span><div><span>note-tags</span><span class="apps_meta">Skill · By Studio North</span></div></li>
+      </ul>
+    </div>
+  </div>
   <div class="apps_empty" data-empty hidden>
     <i data-icon="link"></i>
     <p><b>No app uses your account.</b></p>
-    <p class="sketch-muted">An app shows here after you connect it from the catalog.</p>
+    <p class="sketch-muted">An app shows here after you add it from the catalog.</p>
   </div>
   <div class="sketch-menu" id="menu_notes___state__">
     <button class="sketch-menu-item" type="button" data-sketch-open="confirm_notes___state__">Disconnect</button>
@@ -111,11 +151,11 @@
     <button class="sketch-menu-item" type="button" data-sketch-toast="Calendar Bridge works the same as Notes Sync in this sketch.">Disconnect</button>
   </div>
   <div class="sketch-menu" id="menu_deploy___state__">
-    <button class="sketch-menu-item" type="button" data-sketch-toast="Deploy Helper works the same as Notes Sync in this sketch.">Disconnect</button>
+    <button class="sketch-menu-item" type="button" data-sketch-toast="Deploy Helper works the same as Notes Sync in this sketch.">Remove</button>
   </div>
   <dialog class="sketch-dialog" id="confirm_notes___state__" aria-labelledby="confirm_notes_title___state__">
     <h2 id="confirm_notes_title___state__">Disconnect Notes Sync?</h2>
-    <p>Notes Sync can no longer read your profile or your email address. To use it again, connect it again from the catalog.</p>
+    <p>Notes Sync can no longer read your profile or your email address. To use it again, add it again from the catalog.</p>
     <div class="sketch-row">
       <a class="sketch-button" href="#disconnected">Disconnect</a>
       <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Cancel</button>
@@ -124,46 +164,60 @@
 </template>
 
 <template id="app">
-  <a href="#list"><i data-icon="arrow-left"></i>Connected apps</a>
+  <a href="#list"><i data-icon="arrow-left"></i>Your apps</a>
   <div class="apps_head">
     <span class="sketch-avatar square">NS</span>
-    <div><h1>Notes Sync</h1><span class="sketch-muted">By Studio North</span></div>
-    <span class="apps_badge"><i data-icon="check"></i>Connected</span>
+    <div><h1>Notes Sync</h1><span class="sketch-muted">By Studio North · Keeps your notes in step with your account</span></div>
+    <span class="apps_badge"><i data-icon="check"></i>Added</span>
     <button class="sketch-icon-button" type="button" aria-label="More options for Notes Sync" data-sketch-popover="app_menu"><i data-icon="more"></i></button>
   </div>
   <div class="sketch-menu" id="app_menu">
     <a class="sketch-menu-item" href="#confirm">Disconnect</a>
   </div>
-  <p>Notes Sync keeps your notes in step with your account. It reads your profile to show your name, and it reads your email address to send you a copy.</p>
-  <h2>Access</h2>
-  <dl class="apps_facts">
-    <dt class="sketch-muted">Can send data to</dt><dd>api.notes-sync.example</dd>
-    <dt class="sketch-muted">Sign-in</dt><dd>Required</dd>
-    <dt class="sketch-muted">Connected</dt><dd>3 March 2025</dd>
-    <dt class="sketch-muted">Last used</dt><dd>Today</dd>
-  </dl>
-  <h2>What Notes Sync can do</h2>
-  <ul class="apps_tools" id="tools">
-    <li>Read your profile</li>
-    <li>Read your email address</li>
-    <li>Read your notes</li>
-    <li data-extra hidden>Change your notes</li>
-    <li data-extra hidden>Make a new note</li>
-    <li data-extra hidden>Delete a note</li>
-  </ul>
-  <button class="sketch-button secondary" type="button" aria-expanded="false" aria-controls="tools" data-tools><span>Show all 6</span><span class="apps_more_arrow"><i data-icon="chevron-down"></i></span></button>
-  <div class="apps_account">
-    <i data-icon="check"></i><span>Your account is connected to Notes Sync.</span>
-    <a class="sketch-button secondary" href="#confirm">Disconnect</a>
+  <div class="apps_body">
+    <div>
+      <p>Notes Sync keeps your notes in step with your account. It reads your profile to show your name, and it reads your email address to send you a copy of each note.</p>
+      <h2>Connectors</h2>
+      <div class="apps_box">
+        <div class="apps_box_head">
+          <span class="sketch-avatar square">NS</span><b>Notes Sync</b>
+          <span class="sketch-muted"><i data-icon="check"></i> Connected</span>
+          <button class="sketch-icon-button" type="button" aria-label="More actions for the Notes Sync connector" data-sketch-popover="box_menu"><i data-icon="more"></i></button>
+          <button class="apps_toggle" type="button" aria-expanded="true" aria-controls="details" aria-label="Details of the Notes Sync connector"><span class="apps_arrow"><i data-icon="chevron-right"></i></span></button>
+        </div>
+        <div class="apps_panel" id="details">
+          <dl class="apps_details">
+            <dt>Connector address</dt><dd>api.notes-sync.example/v1</dd>
+            <dt>Tools</dt><dd>read_profile, read_email, read_notes, change_notes, make_note, delete_note</dd>
+            <dt>Sign-in</dt><dd>Required</dd>
+          </dl>
+        </div>
+        <div class="apps_account">
+          <i data-icon="check"></i><span>Your account is connected.</span>
+          <a class="sketch-button secondary" href="#confirm">Disconnect</a>
+        </div>
+      </div>
+      <div class="sketch-menu" id="box_menu">
+        <a class="sketch-menu-item" href="#confirm">Disconnect</a>
+      </div>
+    </div>
+    <dl class="apps_facts">
+      <div><dt>Developer</dt><dd>Studio North <span class="apps_badge"><i data-icon="check"></i>Verified</span></dd></div>
+      <div><dt>Safety and access</dt><dd>Can send data to api.notes-sync.example</dd></div>
+      <div><dt>Authorization</dt><dd>Sign-in required</dd></div>
+      <div><dt>Connected</dt><dd>3 March 2025</dd></div>
+      <div><dt>Last used</dt><dd>Today</dd></div>
+    </dl>
   </div>
 </template>
 
 <script src="../../../assets/sketch.js"></script>
 <script>
-  // The values of transitions.json. The CSS above uses the same values for the tool list and its arrow.
+  // The values of transitions.json. The CSS above uses the group-open values. The kind filter moves its mark at once.
   const transition_records = [
-    {label: 'tools-open', element: 'tool list', property: 'height', duration: 200, delay: 0, easing: 'cubic-bezier(0.165, 0.84, 0.44, 1)'},
-    {label: 'tools-open', element: 'arrow of Show all', property: 'rotate', duration: 60, delay: 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)'}
+    {label: 'group-open', element: 'group panel', property: 'height', duration: 200, delay: 0, easing: 'cubic-bezier(0.165, 0.84, 0.44, 1)'},
+    {label: 'group-open', element: 'arrow of the row', property: 'rotate', duration: 60, delay: 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)'},
+    {label: 'kind-filter', element: 'chosen mark of the kind filter', property: 'transform', duration: 200, delay: 0, easing: 'cubic-bezier(0.32, 0.72, 0, 1)'}
   ];
   window.__sketchTransitions = transition_records;
 
@@ -173,28 +227,35 @@
     section.querySelector('main').innerHTML = document.getElementById(section.dataset.page).innerHTML.replaceAll('__state__', state);
     (section.dataset.hide || '').split(' ').filter(Boolean).forEach(row => section.querySelector(`[data-row="${row}"]`)?.remove());
     if (section.dataset.page === 'apps' && !section.querySelector('[data-row]')) {
-      section.querySelector('.apps_list').remove();
-      section.querySelector('[data-count]').remove();
+      section.querySelectorAll('.apps_list, [data-count], [data-included]').forEach(part => part.remove());
       section.querySelector('[data-empty]').hidden = false;
     }
     if (section.dataset.openPart) section.querySelector(`#${section.dataset.openPart}_${state}`)?.setAttribute('data-open', '');
   });
 
-  // Show all opens the rest of the tool list. The list grows from its short height to its full height.
+  // A row with an arrow opens or closes its panel. The panel grows from its old height to its new height.
   document.addEventListener('click', event => {
-    const button = event.target.closest('[data-tools]');
-    if (!button) return;
-    const list = document.getElementById(button.getAttribute('aria-controls'));
-    const open = button.getAttribute('aria-expanded') !== 'true';
-    const from = list.offsetHeight;
-    list.querySelectorAll('[data-extra]').forEach(item => { item.hidden = !open; });
-    const to = list.offsetHeight;
-    list.style.height = from + 'px';
-    list.offsetHeight;
-    list.style.height = to + 'px';
-    list.addEventListener('transitionend', () => { list.style.height = ''; }, {once: true});
-    button.setAttribute('aria-expanded', String(open));
-    button.firstElementChild.textContent = open ? 'Show fewer' : 'Show all 6';
+    const toggle = event.target.closest('.apps_toggle');
+    if (!toggle) return;
+    const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    const from = panel.hidden ? 0 : panel.offsetHeight;
+    panel.hidden = false;
+    const to = open ? panel.scrollHeight : 0;
+    panel.style.height = from + 'px';
+    panel.offsetHeight;
+    panel.style.height = to + 'px';
+    const done = () => { panel.style.height = ''; panel.hidden = !open; };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+    else panel.addEventListener('transitionend', done, {once: true});
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  // The kind filter shows only the rows of the chosen kind, at once.
+  document.addEventListener('change', event => {
+    const kind = event.target.closest('.apps_bar input[type="radio"]');
+    if (!kind) return;
+    kind.closest('[data-state]').querySelectorAll('[data-row]').forEach(row => { row.hidden = kind.value !== 'all' && row.dataset.kind !== kind.value; });
   });
 
   initSketch();
