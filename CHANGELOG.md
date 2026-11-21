@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added the reusable pattern library and its pull request gate.
+- Added the reusable pattern library and its pull request gate. The gate fails on a Source note or a web address in a library file. A name check runs in a private flow before a pattern reaches this repository.
 
 ### Changed
 
