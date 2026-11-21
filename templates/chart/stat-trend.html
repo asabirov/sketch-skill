@@ -1,5 +1,5 @@
-<!-- Best for: A first row of a report that shows a few key numbers, each with the trend of its last months, such as revenue, costs and margin. -->
-<!-- Many periods: Each small trend holds 6 complete months, the current month and one projected month. It has no labels between its first and last month, so it fits a card of any width. For a longer trend, open the full chart. -->
+<!-- Best for: A first row of a report that shows 2 to 4 key numbers, each with the trend of its last months, and a daily chart of the chosen number. -->
+<!-- Many periods: Each tile trend holds 6 complete months, the projected current month and the projected next month. It has no labels, so it fits a tile of any width. The daily chart below holds the 30 days of the current month, with labels only at the first day, today and the last day. For a longer trend, open the full chart. -->
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
@@ -10,24 +10,86 @@
 <header class="sketch-bar"><strong>[Product]</strong></header>
 <main class="sketch-main">
   <h1>November to date</h1>
-  <div class="sketch-grid" style="--phone:1;--tablet:2;--wide:4">
-    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Revenue</h2>
-      <div class="sketch-row"><b style="font-size:32px">€39k</b><span>of €57k projected</span></div><span>▲ 6% vs. October at day 21</span>
-      <div class="sketch-chart" style="--n:8" role="img" aria-label="Revenue, May to October: 45k, 50k, 48k, 42k, 52k, 55k. November to date 39k, projected 57k. December projected 60k."><div class="sketch-plot" style="--h:48px"><div><i style="--v:75%"></i></div><div><i style="--v:83.3%"></i></div><div><i style="--v:80%"></i></div><div><i style="--v:70%"></i></div><div><i style="--v:86.7%"></i></div><div><i style="--v:91.7%"></i></div><div class="partial"><i class="rest" style="--v:30%"></i><i style="--v:65%"></i></div><div class="projected"><i style="--v:100%"></i></div></div><div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Dec proj.</span></div></div></section>
-    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Costs</h2>
-      <div class="sketch-row"><b style="font-size:32px">€27k</b><span>of €40k projected</span></div><span>▲ 2% vs. October at day 21</span>
-      <div class="sketch-chart" style="--n:8" role="img" aria-label="Costs, May to October: 36k, 38k, 37k, 36k, 39k, 39k. November to date 27k, projected 40k. December projected 41k."><div class="sketch-plot" style="--h:48px"><div><i style="--v:80%"></i></div><div><i style="--v:84.4%"></i></div><div><i style="--v:82.2%"></i></div><div><i style="--v:80%"></i></div><div><i style="--v:86.7%"></i></div><div><i style="--v:86.7%"></i></div><div class="partial"><i class="rest" style="--v:28.9%"></i><i style="--v:60%"></i></div><div class="projected"><i style="--v:91.1%"></i></div></div><div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Dec proj.</span></div></div></section>
-    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Margin</h2>
-      <div class="sketch-row"><b style="font-size:32px">€12k</b><span>of €17k projected</span></div><span>▲ 15% vs. October at day 21</span>
-      <div class="sketch-chart" style="--n:8" role="img" aria-label="Margin, May to October: 9k, 12k, 11k, 6k, 13k, 16k. November to date 12k, projected 17k. December projected 19k."><div class="sketch-plot" style="--h:48px"><div><i style="--v:45%"></i></div><div><i style="--v:60%"></i></div><div><i style="--v:55%"></i></div><div><i style="--v:30%"></i></div><div><i style="--v:65%"></i></div><div><i style="--v:80%"></i></div><div class="partial"><i class="rest" style="--v:25%"></i><i style="--v:60%"></i></div><div class="projected"><i style="--v:95%"></i></div></div><div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Dec proj.</span></div></div></section>
-    <section class="sketch-panel sketch-frame sketch-stack" style="gap:4px"><h2 class="sketch-muted" style="font-size:inherit;font-weight:400;margin:0">Cash balance</h2>
-      <div class="sketch-row"><b style="font-size:32px">€131k</b><span>today</span></div><span>▼ 4% vs. October end</span>
-      <svg class="sketch-spark" style="height:48px" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Cash balance, May to October month ends: 121k, 130k, 126k, 119k, 128k, 136k. Today 131k. December end projected 142k."><polyline points="0,17.6 14.3,14 28.6,15.6 42.9,18.4 57.1,14.8 71.4,11.6 85.7,13.6"/><polyline class="projected" points="85.7,13.6 100,9.2"/></svg>
-      <div class="sketch-row sketch-muted" style="font-size:12px" aria-hidden="true"><span>May</span><span class="sketch-spacer"></span><span>Dec proj.</span></div></section>
-  </div>
-  <ul class="sketch-key" aria-hidden="true">
-    <li><i></i>Actual</li><li><i class="projected"></i>Projected</li>
-  </ul>
+  <section class="sketch-panel sketch-frame sketch-stack">
+    <div class="sketch-tabs sketch-tiles" aria-label="Key numbers">
+      <button type="button" role="tab" id="tile-revenue" aria-controls="panel-revenue" aria-selected="true"><span class="sketch-muted">Revenue</span><b>€39k</b><span>▲ 6% vs. Oct 1 to 21</span><svg class="sketch-spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="0,17.5 14.3,12.9 28.6,14.7 42.9,20.2 57.1,11.1 71.4,8.4 71.4,24 0,24"/><polyline points="0,17.5 14.3,12.9 28.6,14.7 42.9,20.2 57.1,11.1 71.4,8.4"/><polyline class="projected" points="71.4,8.4 85.7,6.5 100,3.8"/></svg></button>
+      <button type="button" role="tab" id="tile-costs" aria-controls="panel-costs" aria-selected="false"><span class="sketch-muted">Costs</span><b>€27k</b><span>▲ 2% vs. Oct 1 to 21</span><svg class="sketch-spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="0,17 14.3,12 28.6,14.5 42.9,17 57.1,9.5 71.4,9.5 71.4,24 0,24"/><polyline points="0,17 14.3,12 28.6,14.5 42.9,17 57.1,9.5 71.4,9.5"/><polyline class="projected" points="71.4,9.5 85.7,7 100,4.5"/></svg></button>
+      <button type="button" role="tab" id="tile-margin" aria-controls="panel-margin" aria-selected="false"><span class="sketch-muted">Margin</span><b>€12k</b><span>▲ 15% vs. Oct 1 to 21</span><svg class="sketch-spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="0,15.8 14.3,12 28.6,13.2 42.9,19.5 57.1,10.8 71.4,7 71.4,24 0,24"/><polyline points="0,15.8 14.3,12 28.6,13.2 42.9,19.5 57.1,10.8 71.4,7"/><polyline class="projected" points="71.4,7 85.7,5.8 100,3.2"/></svg></button>
+      <button type="button" role="tab" id="tile-cash" aria-controls="panel-cash" aria-selected="false"><span class="sketch-muted">Cash balance</span><b>€131k</b><span>▼ 4% vs. Oct end</span><svg class="sketch-spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="0,16.5 14.3,12 28.6,14 42.9,17.5 57.1,13 71.4,9 71.4,24 0,24"/><polyline points="0,16.5 14.3,12 28.6,14 42.9,17.5 57.1,13 71.4,9"/><polyline class="projected" points="71.4,9 85.7,10 100,6"/></svg></button>
+    </div>
+    <div role="tabpanel" id="panel-revenue" aria-labelledby="tile-revenue" class="sketch-stack">
+      <div class="sketch-goal" role="meter" aria-label="Revenue to date against the projected total" aria-valuemin="0" aria-valuemax="57" aria-valuenow="39" aria-valuetext="€39k of €57k projected">
+        <span class="mark" style="--v:68.4%">To date €39k</span><div class="track"><i style="--v:68.4%"></i></div>
+        <div class="sketch-row sketch-muted"><span>0</span><span class="sketch-spacer"></span><span>Projected €57k</span></div>
+      </div>
+      <div class="sketch-chart" style="--n:30" role="img" aria-label="Revenue in November, in thousand euro: day 1 2.6k, day 2 3.6k, day 3 6.9k, day 4 8.7k, day 5 9.1k, day 6 11.7k, day 7 12.8k, day 8 16k, day 9 17.9k, day 10 18.2k, day 11 20.8k, day 12 21.9k, day 13 25.1k, day 14 27k, day 15 27.3k, day 16 29.9k, day 17 31k, day 18 34.3k, day 19 36.1k, day 20 36.4k, day 21 39k. Projected day 30 57k. October, the same days: day 1 1.8k, day 2 3.5k, day 3 5.3k, day 4 7.1k, day 5 8.9k, day 6 10.6k, day 7 12.4k, day 8 14.2k, day 9 16k, day 10 17.7k, day 11 19.5k, day 12 21.3k, day 13 23.1k, day 14 24.8k, day 15 26.6k, day 16 28.4k, day 17 30.2k, day 18 31.9k, day 19 33.7k, day 20 35.5k, day 21 37.3k. October day 30 53.2k.">
+      <div class="sketch-plot line" style="--h:160px">
+        <span class="sketch-tick" style="--v:0%"><span>0</span></span>
+        <span class="sketch-tick" style="--v:50%"><span>30k</span></span>
+        <span class="sketch-tick" style="--v:100%"><span>60k</span></span>
+        <svg class="sketch-line" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"><polyline class="compare" points="5,97 15,94.2 25,91.2 35,88.2 45,85.2 55,82.3 65,79.3 75,76.3 85,73.3 95,70.5 105,67.5 115,64.5 125,61.5 135,58.7 145,55.7 155,52.7 165,49.7 175,46.8 185,43.8 195,40.8 205,37.8 215,35 225,32 235,29 245,26 255,23.2 265,20.2 275,17.2 285,14.2 295,11.3"/><polygon class="area" points="5,95.7 15,94 25,88.5 35,85.5 45,84.8 55,80.5 65,78.7 75,73.3 85,70.2 95,69.7 105,65.3 115,63.5 125,58.2 135,55 145,54.5 155,50.2 165,48.3 175,42.8 185,39.8 195,39.3 205,35 205,100 5,100"/><polyline points="5,95.7 15,94 25,88.5 35,85.5 45,84.8 55,80.5 65,78.7 75,73.3 85,70.2 95,69.7 105,65.3 115,63.5 125,58.2 135,55 145,54.5 155,50.2 165,48.3 175,42.8 185,39.8 195,39.3 205,35"/><polyline class="projected" points="205,35 295,5"/></svg>
+        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div style="--v:65%"><i></i></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div class="projected" style="--v:95%"><b>~€57k</b><i></i></div>
+      </div>
+      <ol class="sketch-periods ends" aria-hidden="true"><li>1 Nov</li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>21 Nov<small>today</small></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>30 Nov<small>proj.</small></li></ol>
+      </div>
+      <ul class="sketch-key" aria-hidden="true">
+        <li><i class="line"></i>Actual</li><li><i class="line projected"></i>Projected</li><li><i class="line compare"></i>October</li>
+      </ul>
+    </div>
+    <div role="tabpanel" id="panel-costs" aria-labelledby="tile-costs" class="sketch-stack" hidden>
+      <div class="sketch-goal" role="meter" aria-label="Costs to date against the projected total" aria-valuemin="0" aria-valuemax="40" aria-valuenow="27" aria-valuetext="€27k of €40k projected">
+        <span class="mark" style="--v:67.5%">To date €27k</span><div class="track"><i style="--v:67.5%"></i></div>
+        <div class="sketch-row sketch-muted"><span>0</span><span class="sketch-spacer"></span><span>Projected €40k</span></div>
+      </div>
+      <div class="sketch-chart" style="--n:30" role="img" aria-label="Costs in November, in thousand euro: day 1 1.3k, day 2 3.3k, day 3 4.2k, day 4 5.9k, day 5 6.4k, day 6 7.7k, day 7 9.8k, day 8 10.7k, day 9 12.3k, day 10 12.9k, day 11 14.1k, day 12 16.2k, day 13 17.1k, day 14 18.8k, day 15 19.3k, day 16 20.6k, day 17 22.6k, day 18 23.5k, day 19 25.2k, day 20 25.7k, day 21 27k. Projected day 30 40k. October, the same days: day 1 1.3k, day 2 2.5k, day 3 3.8k, day 4 5k, day 5 6.3k, day 6 7.5k, day 7 8.8k, day 8 10.1k, day 9 11.3k, day 10 12.6k, day 11 13.8k, day 12 15.1k, day 13 16.4k, day 14 17.6k, day 15 18.9k, day 16 20.1k, day 17 21.4k, day 18 22.6k, day 19 23.9k, day 20 25.2k, day 21 26.4k. October day 30 37.7k.">
+      <div class="sketch-plot line" style="--h:160px">
+        <span class="sketch-tick" style="--v:0%"><span>0</span></span>
+        <span class="sketch-tick" style="--v:50%"><span>20k</span></span>
+        <span class="sketch-tick" style="--v:100%"><span>40k</span></span>
+        <svg class="sketch-line" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"><polyline class="compare" points="5,96.8 15,93.8 25,90.5 35,87.5 45,84.2 55,81.2 65,78 75,74.8 85,71.8 95,68.5 105,65.5 115,62.2 125,59 135,56 145,52.8 155,49.7 165,46.5 175,43.5 185,40.3 195,37 205,34 215,30.8 225,27.8 235,24.5 245,21.2 255,18.2 265,15 275,12 285,8.8 295,5.7"/><polygon class="area" points="5,96.8 15,91.8 25,89.5 35,85.2 45,84 55,80.8 65,75.5 75,73.2 85,69.2 95,67.8 105,64.8 115,59.5 125,57.2 135,53 145,51.7 155,48.5 165,43.5 175,41.2 185,37 195,35.8 205,32.5 205,100 5,100"/><polyline points="5,96.8 15,91.8 25,89.5 35,85.2 45,84 55,80.8 65,75.5 75,73.2 85,69.2 95,67.8 105,64.8 115,59.5 125,57.2 135,53 145,51.7 155,48.5 165,43.5 175,41.2 185,37 195,35.8 205,32.5"/><polyline class="projected" points="205,32.5 295,0"/></svg>
+        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div style="--v:67.5%"><i></i></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div class="projected" style="--v:100%"><b>~€40k</b><i></i></div>
+      </div>
+      <ol class="sketch-periods ends" aria-hidden="true"><li>1 Nov</li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>21 Nov<small>today</small></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>30 Nov<small>proj.</small></li></ol>
+      </div>
+      <ul class="sketch-key" aria-hidden="true">
+        <li><i class="line"></i>Actual</li><li><i class="line projected"></i>Projected</li><li><i class="line compare"></i>October</li>
+      </ul>
+    </div>
+    <div role="tabpanel" id="panel-margin" aria-labelledby="tile-margin" class="sketch-stack" hidden>
+      <div class="sketch-goal" role="meter" aria-label="Margin to date against the projected total" aria-valuemin="0" aria-valuemax="17" aria-valuenow="12" aria-valuetext="€12k of €17k projected">
+        <span class="mark" style="--v:70.6%">To date €12k</span><div class="track"><i style="--v:70.6%"></i></div>
+        <div class="sketch-row sketch-muted"><span>0</span><span class="sketch-spacer"></span><span>Projected €17k</span></div>
+      </div>
+      <div class="sketch-chart" style="--n:30" role="img" aria-label="Margin in November, in thousand euro: day 1 1.2k, day 2 2.1k, day 3 2.6k, day 4 2.8k, day 5 2.7k, day 6 3.9k, day 7 4.8k, day 8 5.3k, day 9 5.5k, day 10 5.4k, day 11 6.6k, day 12 7.5k, day 13 8k, day 14 8.2k, day 15 8.1k, day 16 9.3k, day 17 10.2k, day 18 10.7k, day 19 10.9k, day 20 10.8k, day 21 12k. Projected day 30 17k. October, the same days: day 1 0.5k, day 2 1k, day 3 1.5k, day 4 2.1k, day 5 2.6k, day 6 3.1k, day 7 3.6k, day 8 4.1k, day 9 4.6k, day 10 5.2k, day 11 5.7k, day 12 6.2k, day 13 6.7k, day 14 7.2k, day 15 7.7k, day 16 8.3k, day 17 8.8k, day 18 9.3k, day 19 9.8k, day 20 10.3k, day 21 10.8k. October day 30 15.5k.">
+      <div class="sketch-plot line" style="--h:160px">
+        <span class="sketch-tick" style="--v:0%"><span>0</span></span>
+        <span class="sketch-tick" style="--v:50%"><span>10k</span></span>
+        <span class="sketch-tick" style="--v:100%"><span>20k</span></span>
+        <svg class="sketch-line" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"><polyline class="compare" points="5,97.5 15,95 25,92.5 35,89.5 45,87 55,84.5 65,82 75,79.5 85,77 95,74 105,71.5 115,69 125,66.5 135,64 145,61.5 155,58.5 165,56 175,53.5 185,51 195,48.5 205,46 215,43 225,40.5 235,38 245,35.5 255,33 265,30.5 275,27.5 285,25 295,22.5"/><polygon class="area" points="5,94 15,89.5 25,87 35,86 45,86.5 55,80.5 65,76 75,73.5 85,72.5 95,73 105,67 115,62.5 125,60 135,59 145,59.5 155,53.5 165,49 175,46.5 185,45.5 195,46 205,40 205,100 5,100"/><polyline points="5,94 15,89.5 25,87 35,86 45,86.5 55,80.5 65,76 75,73.5 85,72.5 95,73 105,67 115,62.5 125,60 135,59 145,59.5 155,53.5 165,49 175,46.5 185,45.5 195,46 205,40"/><polyline class="projected" points="205,40 295,15"/></svg>
+        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div style="--v:60%"><i></i></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div class="projected" style="--v:85%"><b>~€17k</b><i></i></div>
+      </div>
+      <ol class="sketch-periods ends" aria-hidden="true"><li>1 Nov</li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>21 Nov<small>today</small></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>30 Nov<small>proj.</small></li></ol>
+      </div>
+      <ul class="sketch-key" aria-hidden="true">
+        <li><i class="line"></i>Actual</li><li><i class="line projected"></i>Projected</li><li><i class="line compare"></i>October</li>
+      </ul>
+    </div>
+    <div role="tabpanel" id="panel-cash" aria-labelledby="tile-cash" class="sketch-stack" hidden>
+      <div class="sketch-chart" style="--n:30" role="img" aria-label="Cash balance in November, in thousand euro: day 1 136.6k, day 2 134.7k, day 3 136.9k, day 4 135k, day 5 133.2k, day 6 135.4k, day 7 133.5k, day 8 135.7k, day 9 133.9k, day 10 132k, day 11 134.2k, day 12 132.3k, day 13 134.5k, day 14 132.7k, day 15 130.8k, day 16 133k, day 17 131.2k, day 18 133.3k, day 19 131.5k, day 20 129.6k, day 21 131k. Projected day 30 134k.">
+      <div class="sketch-plot line" style="--h:160px">
+        <span class="sketch-tick" style="--v:0%"><span>80k</span></span>
+        <span class="sketch-tick" style="--v:50%"><span>120k</span></span>
+        <span class="sketch-tick" style="--v:100%"><span>160k</span></span>
+        <svg class="sketch-line" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="5,29.3 15,31.6 25,28.9 35,31.2 45,33.5 55,30.7 65,33.1 75,30.4 85,32.6 95,35 105,32.3 115,34.6 125,31.9 135,34.1 145,36.5 155,33.8 165,36 175,33.4 185,35.6 195,38 205,36.3 205,100 5,100"/><polyline points="5,29.3 15,31.6 25,28.9 35,31.2 45,33.5 55,30.7 65,33.1 75,30.4 85,32.6 95,35 105,32.3 115,34.6 125,31.9 135,34.1 145,36.5 155,33.8 165,36 175,33.4 185,35.6 195,38 205,36.3"/><polyline class="projected" points="205,36.3 295,32.5"/></svg>
+        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div style="--v:63.7%"><i></i></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div class="projected" style="--v:67.5%"><b>~€134k</b><i></i></div>
+      </div>
+      <ol class="sketch-periods ends" aria-hidden="true"><li>1 Nov</li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>21 Nov<small>today</small></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li>30 Nov<small>proj.</small></li></ol>
+      </div>
+      <ul class="sketch-key" aria-hidden="true">
+        <li><i class="line"></i>Actual</li><li><i class="line projected"></i>Projected</li>
+      </ul>
+    </div>
+  </section>
   <details>
     <summary>Data</summary>
     <div class="sketch-table-box"><table class="sketch-table sketch-data">
@@ -40,7 +102,7 @@
           <tr><td>Sep</td><td>€52k</td><td>€39k</td><td>€13k</td><td>€128k</td></tr>
           <tr><td>Oct</td><td>€55k</td><td>€39k</td><td>€16k</td><td>€136k</td></tr>
           <tr><td>Nov to date</td><td>€39k</td><td>€27k</td><td>€12k</td><td>€131k</td></tr>
-          <tr><td>Nov projected</td><td>€57k</td><td>€40k</td><td>€17k</td><td>–</td></tr>
+          <tr><td>Nov projected</td><td>€57k</td><td>€40k</td><td>€17k</td><td>€134k</td></tr>
           <tr><td>Dec projected</td><td>€60k</td><td>€41k</td><td>€19k</td><td>€142k</td></tr>
       </tbody>
     </table></div>

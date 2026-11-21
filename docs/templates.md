@@ -226,15 +226,15 @@ Run `python3 docs/render.py` from the repository root to refresh these pictures 
 </tr>
 <tr>
 <td width="460"><a href="templates/chart/line-over-time.png"><img src="templates/chart/line-over-time.png" width="440" alt="Chart: Line over time"></a></td>
-<td><b>Line over time</b><br>A report that follows one level over time, such as a cash balance, active users or a price.<br><a href="../templates/chart/line-over-time.html"><code>templates/chart/line-over-time.html</code></a></td>
+<td><b>Line over time</b><br>A report that follows one level over time, such as a cash balance, active users or a price, against one reference level.<br><a href="../templates/chart/line-over-time.html"><code>templates/chart/line-over-time.html</code></a></td>
 </tr>
 <tr>
 <td width="460"><a href="templates/chart/monthly-bars.png"><img src="templates/chart/monthly-bars.png" width="440" alt="Chart: Monthly bars"></a></td>
-<td><b>Monthly bars</b><br>A report that compares a total for each month, such as revenue, costs or orders.<br><a href="../templates/chart/monthly-bars.html"><code>templates/chart/monthly-bars.html</code></a></td>
+<td><b>Monthly bars</b><br>A report that compares a total for each month, such as revenue, costs or orders, split into at most 2 parts.<br><a href="../templates/chart/monthly-bars.html"><code>templates/chart/monthly-bars.html</code></a></td>
 </tr>
 <tr>
 <td width="460"><a href="templates/chart/stat-trend.png"><img src="templates/chart/stat-trend.png" width="440" alt="Chart: Stat with a small trend"></a></td>
-<td><b>Stat with a small trend</b><br>A first row of a report that shows a few key numbers, each with the trend of its last months, such as revenue, costs and margin.<br><a href="../templates/chart/stat-trend.html"><code>templates/chart/stat-trend.html</code></a></td>
+<td><b>Stat with a small trend</b><br>A first row of a report that shows 2 to 4 key numbers, each with the trend of its last months, and a daily chart of the chosen number.<br><a href="../templates/chart/stat-trend.html"><code>templates/chart/stat-trend.html</code></a></td>
 </tr>
 <tr>
 <td width="460"><a href="templates/chart/table-sparkline.png"><img src="templates/chart/table-sparkline.png" width="440" alt="Chart: Sparkline in a table row"></a></td>

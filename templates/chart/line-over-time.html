@@ -1,5 +1,5 @@
-<!-- Best for: A report that follows one level over time, such as a cash balance, active users or a price. -->
-<!-- Many periods: Up to 24 months fit at 390 px. Below 600 px, only every third month counted back from the current month, and the last projected month, keep a label. For more than 24 months, show quarters. -->
+<!-- Best for: A report that follows one level over time, such as a cash balance, active users or a price, against one reference level. -->
+<!-- Many periods: Up to 24 months fit at 390 px. Below 600 px, only the first month and today keep a label. The dashed line shows the projected months. For more than 24 months, show quarters. -->
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
@@ -10,45 +10,49 @@
 <header class="sketch-bar"><strong>[Product]</strong></header>
 <main class="sketch-main">
   <h1>Cash balance</h1>
-  <p>Today, 21 November: <b>€131k</b>. Projected at the end of January: <b>€150k</b>.</p>
   <section class="sketch-panel sketch-frame sketch-stack">
-    <h2>Cash balance at month end</h2>
-    <div class="sketch-chart" style="--n:14" role="img" aria-label="Cash balance at month end, in thousand euro, on a scale from 80k to 160k: Dec 120k, Jan 112k, Feb 104k, Mar 110k, Apr 118k, May 121k, Jun 130k, Jul 126k, Aug 119k, Sep 128k, Oct 136k. Today, 21 November, 131k. Projected December 142k, January 150k.">
+    <dl class="sketch-summary">
+      <div><dt>Today, 21 November</dt><dd><b>€131k</b></dd></div>
+      <div><dt>In, November so far</dt><dd><b>€48k</b></dd></div>
+      <div><dt>Out, November so far</dt><dd><b>€53k</b></dd></div>
+    </dl>
+    <div class="sketch-chart" style="--n:14" role="img" aria-label="Cash balance at month end, in thousand euro, on a scale from 80k to 160k: Dec 120k, Jan 112k, Feb 104k, Mar 110k, Apr 118k, May 121k, Jun 130k, Jul 126k, Aug 119k, Sep 128k, Oct 136k. Today, 21 November, 131k. Projected December 142k, January 150k. Minimum cash level 100k.">
     <div class="sketch-plot line">
       <span class="sketch-tick" style="--v:0%"><span>80k</span></span>
       <span class="sketch-tick" style="--v:50%"><span>120k</span></span>
       <span class="sketch-tick" style="--v:100%"><span>160k</span></span>
-      <svg class="sketch-line" viewBox="0 0 140 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="5,50 15,60 25,70 35,62.5 45,52.5 55,48.8 65,37.5 75,42.5 85,51.2 95,40 105,30 115,36.3"/><polyline class="projected" points="115,36.3 125,22.5 135,12.5"/></svg>
-      <div class="minor"></div>
-      <div class="minor"></div>
+      <span class="sketch-ref" style="--v:25%"><span>Minimum €100k</span></span>
+      <svg class="sketch-line" viewBox="0 0 140 100" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="5,50 15,60 25,70 35,62.5 45,52.5 55,48.8 65,37.5 75,42.5 85,51.2 95,40 105,30 115,36.3 115,100 5,100"/><polyline points="5,50 15,60 25,70 35,62.5 45,52.5 55,48.8 65,37.5 75,42.5 85,51.2 95,40 105,30 115,36.3"/><polyline class="projected" points="115,36.3 125,22.5 135,12.5"/></svg>
       <div></div>
-      <div class="minor"></div>
-      <div class="minor"></div>
       <div></div>
-      <div class="minor"></div>
-      <div class="minor"></div>
       <div></div>
-      <div class="minor"></div>
-      <div class="minor" style="--v:70%"><b>136k</b><i></i></div>
-      <div class="partial" style="--v:63.7%"><b>131k</b><i></i></div>
-      <div class="minor"></div>
-      <div class="projected" style="--v:87.5%"><b>~150k</b><i></i></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div style="--v:63.7%"><i></i></div>
+      <div></div>
+      <div class="projected" style="--v:87.5%"><b>~€150k</b><i></i></div>
     </div>
-    <ol class="sketch-periods" aria-hidden="true">
-      <li class="minor">Dec</li>
+    <ol class="sketch-periods ends" aria-hidden="true">
+      <li>Dec 2025</li>
       <li class="minor">Jan</li>
-      <li>Feb</li>
+      <li class="minor">Feb</li>
       <li class="minor">Mar</li>
       <li class="minor">Apr</li>
-      <li>May</li>
+      <li class="minor">May</li>
       <li class="minor">Jun</li>
       <li class="minor">Jul</li>
-      <li>Aug</li>
+      <li class="minor">Aug</li>
       <li class="minor">Sep</li>
       <li class="minor">Oct</li>
       <li>Nov<small>today</small></li>
       <li class="minor">Dec<small>proj.</small></li>
-      <li>Jan<small>proj.</small></li>
+      <li class="minor">Jan 2027<small>proj.</small></li>
     </ol>
     </div>
     <ul class="sketch-key" aria-hidden="true">

@@ -1,5 +1,5 @@
-<!-- Best for: A report that compares a total for each month, such as revenue, costs or orders. -->
-<!-- Many periods: Up to 24 months fit at 390 px. The bars get narrower. Below 600 px, only every third month counted back from the current month, and the last projected month, keep a label. For more than 24 months, group the months into quarters. -->
+<!-- Best for: A report that compares a total for each month, such as revenue, costs or orders, split into at most 2 parts. -->
+<!-- Many periods: Up to 24 months fit at 390 px. The bars get narrower. Below 600 px, only the first month and the current month keep a label. The hatch shows the projected months. For more than 24 months, group the months into quarters. -->
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
@@ -10,65 +10,72 @@
 <header class="sketch-bar"><strong>[Product]</strong></header>
 <main class="sketch-main">
   <h1>Revenue</h1>
-  <p>November so far: <b>€39k</b> of <b>€57k</b> projected.</p>
   <section class="sketch-panel sketch-frame sketch-stack">
     <h2>Revenue by month</h2>
-    <div class="sketch-chart" style="--n:14" role="img" aria-label="Revenue by month, in thousand euro: Dec 41k, Jan 38k, Feb 36k, Mar 44k, Apr 47k, May 45k, Jun 50k, Jul 48k, Aug 42k, Sep 52k, Oct 55k. November to date 39k, projected 57k. Projected December 60k, January 54k.">
+    <dl class="sketch-summary">
+      <div><dt>November 1 to 21</dt><dd><b>€39k</b> <span class="sketch-muted">▲ 6% vs. October 1 to 21</span></dd></div>
+      <div><dt>November, projected</dt><dd><b>~€57k</b> <span class="sketch-muted">▲ 4% vs. October, €55k</span></dd></div>
+    </dl>
+    <div class="sketch-chart" style="--n:14" role="img" aria-label="Revenue by month, in thousand euro, as subscriptions plus services: Dec 2025 31 + 10, Jan 2026 29 + 9, Feb 2026 27 + 9, Mar 2026 33 + 11, Apr 2026 35 + 12, May 2026 34 + 11, Jun 2026 37 + 13, Jul 2026 36 + 12, Aug 2026 31 + 11, Sep 2026 39 + 13, Oct 2026 41 + 14. November to date 29 + 10, projected total 57. Projected totals: December 60, January 54.">
     <div class="sketch-plot">
-      <div class="minor"><b>41k</b><i style="--v:68.3%"></i></div>
-      <div class="minor"><b>38k</b><i style="--v:63.3%"></i></div>
-      <div><b>36k</b><i style="--v:60%"></i></div>
-      <div class="minor"><b>44k</b><i style="--v:73.3%"></i></div>
-      <div class="minor"><b>47k</b><i style="--v:78.3%"></i></div>
-      <div><b>45k</b><i style="--v:75%"></i></div>
-      <div class="minor"><b>50k</b><i style="--v:83.3%"></i></div>
-      <div class="minor"><b>48k</b><i style="--v:80%"></i></div>
-      <div><b>42k</b><i style="--v:70%"></i></div>
-      <div class="minor"><b>52k</b><i style="--v:86.7%"></i></div>
-      <div class="minor"><b>55k</b><i style="--v:91.7%"></i></div>
-      <div class="partial minor"><b>39k</b><i class="rest" style="--v:30%"></i><i style="--v:65%"></i></div>
-      <div class="projected minor"><b>~60k</b><i style="--v:100%"></i></div>
-      <div class="projected"><b>~54k</b><i style="--v:90%"></i></div>
+      <span class="sketch-tick" style="--v:0%"><span>0</span></span>
+      <span class="sketch-tick" style="--v:50%"><span>30k</span></span>
+      <span class="sketch-tick" style="--v:100%"><span>60k</span></span>
+      <div><i class="second" style="--v:16.7%"></i><i style="--v:51.7%"></i></div>
+      <div><i class="second" style="--v:15%"></i><i style="--v:48.3%"></i></div>
+      <div><i class="second" style="--v:15%"></i><i style="--v:45%"></i></div>
+      <div><i class="second" style="--v:18.3%"></i><i style="--v:55%"></i></div>
+      <div><i class="second" style="--v:20%"></i><i style="--v:58.3%"></i></div>
+      <div><i class="second" style="--v:18.3%"></i><i style="--v:56.7%"></i></div>
+      <div><i class="second" style="--v:21.7%"></i><i style="--v:61.7%"></i></div>
+      <div><i class="second" style="--v:20%"></i><i style="--v:60%"></i></div>
+      <div><i class="second" style="--v:18.3%"></i><i style="--v:51.7%"></i></div>
+      <div><i class="second" style="--v:21.7%"></i><i style="--v:65%"></i></div>
+      <div><i class="second" style="--v:23.3%"></i><i style="--v:68.3%"></i></div>
+      <div class="partial"><i class="rest" style="--v:30%"></i><i class="second" style="--v:16.7%"></i><i style="--v:48.3%"></i></div>
+      <div class="projected"><i style="--v:100%"></i></div>
+      <div class="projected"><i style="--v:90%"></i></div>
     </div>
-    <ol class="sketch-periods" aria-hidden="true">
-      <li class="minor">Dec</li>
+    <ol class="sketch-periods ends" aria-hidden="true">
+      <li>Dec 2025</li>
       <li class="minor">Jan</li>
-      <li>Feb</li>
+      <li class="minor">Feb</li>
       <li class="minor">Mar</li>
       <li class="minor">Apr</li>
-      <li>May</li>
+      <li class="minor">May</li>
       <li class="minor">Jun</li>
       <li class="minor">Jul</li>
-      <li>Aug</li>
+      <li class="minor">Aug</li>
       <li class="minor">Sep</li>
       <li class="minor">Oct</li>
       <li>Nov<small>to date</small></li>
       <li class="minor">Dec<small>proj.</small></li>
-      <li>Jan<small>proj.</small></li>
+      <li class="minor">Jan 2027<small>proj.</small></li>
     </ol>
     </div>
-    <ul class="sketch-key" aria-hidden="true">
-      <li><i></i>Actual</li><li><i class="projected"></i>Projected</li>
+    <ul class="sketch-key">
+      <li><i></i>Subscriptions, €402k since Dec 2025</li><li><i class="second"></i>Services, €135k since Dec 2025</li><li><i class="projected"></i>Projected</li>
     </ul>
     <details>
     <summary>Data</summary>
     <div class="sketch-table-box"><table class="sketch-table sketch-data">
-      <thead><tr><th>Month</th><th>State</th><th>Revenue</th></tr></thead>
+      <thead><tr><th>Month</th><th>Subscriptions</th><th>Services</th><th>Total</th></tr></thead>
       <tbody>
-          <tr><td>Dec 2025</td><td>Actual</td><td>€41k</td></tr>
-          <tr><td>Jan 2026</td><td>Actual</td><td>€38k</td></tr>
-          <tr><td>Feb 2026</td><td>Actual</td><td>€36k</td></tr>
-          <tr><td>Mar 2026</td><td>Actual</td><td>€44k</td></tr>
-          <tr><td>Apr 2026</td><td>Actual</td><td>€47k</td></tr>
-          <tr><td>May 2026</td><td>Actual</td><td>€45k</td></tr>
-          <tr><td>Jun 2026</td><td>Actual</td><td>€50k</td></tr>
-          <tr><td>Jul 2026</td><td>Actual</td><td>€48k</td></tr>
-          <tr><td>Aug 2026</td><td>Actual</td><td>€42k</td></tr>
-          <tr><td>Sep 2026</td><td>Actual</td><td>€52k</td></tr>
-          <tr><td>Oct 2026</td><td>Actual</td><td>€55k</td></tr>
-          <tr><td>Nov 2026</td><td>Actual to date, projected €57k</td><td>€39k</td></tr>
-          <tr><td>Dec 2026</td><td>Projected</td><td>€60k</td></tr>
-          <tr><td>Jan 2027</td><td>Projected</td><td>€54k</td></tr>
+          <tr><td>Dec 2025</td><td>€31k</td><td>€10k</td><td>€41k</td></tr>
+          <tr><td>Jan 2026</td><td>€29k</td><td>€9k</td><td>€38k</td></tr>
+          <tr><td>Feb 2026</td><td>€27k</td><td>€9k</td><td>€36k</td></tr>
+          <tr><td>Mar 2026</td><td>€33k</td><td>€11k</td><td>€44k</td></tr>
+          <tr><td>Apr 2026</td><td>€35k</td><td>€12k</td><td>€47k</td></tr>
+          <tr><td>May 2026</td><td>€34k</td><td>€11k</td><td>€45k</td></tr>
+          <tr><td>Jun 2026</td><td>€37k</td><td>€13k</td><td>€50k</td></tr>
+          <tr><td>Jul 2026</td><td>€36k</td><td>€12k</td><td>€48k</td></tr>
+          <tr><td>Aug 2026</td><td>€31k</td><td>€11k</td><td>€42k</td></tr>
+          <tr><td>Sep 2026</td><td>€39k</td><td>€13k</td><td>€52k</td></tr>
+          <tr><td>Oct 2026</td><td>€41k</td><td>€14k</td><td>€55k</td></tr>
+          <tr><td>Nov 2026 to date</td><td>€29k</td><td>€10k</td><td>€39k</td></tr>
+          <tr><td>Nov 2026 proj.</td><td>–</td><td>–</td><td>€57k</td></tr>
+          <tr><td>Dec 2026 proj.</td><td>–</td><td>–</td><td>€60k</td></tr>
+          <tr><td>Jan 2027 proj.</td><td>–</td><td>–</td><td>€54k</td></tr>
       </tbody>
     </table></div>
   </details>

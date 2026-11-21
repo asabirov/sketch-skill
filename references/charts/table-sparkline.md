@@ -15,8 +15,8 @@ Template: `templates/chart/table-sparkline.html`. The rules for every chart are 
 
 ## Many periods
 
-Each sparkline holds 11 complete months, the current month and one projected month in a fixed width of 120 px. It never gets an axis or a scroll bar. For a longer history, open the chart of the row. Below 600 px, the table rows wrap, and less important columns hide with `sketch-from-tablet`. The headers hide too, so each value that stays gets its header as a `sketch-phone-only` label.
+Each sparkline holds 11 complete months, the current month and one projected month in a fixed width: 120 px, or 80 px below 600 px. It never gets an axis or a scroll bar. For a longer history, open the chart of the row. The header of the trend column names its period, such as "Trend, Dec 2025 to Dec 2026", or "Dec to Dec" below 600 px. The table has the class `sketch-data`, so it keeps its headers below 600 px. Less important columns, such as "Dec proj.", hide with `sketch-from-tablet`. A long client name wraps.
 
 ## Current and projected periods
 
-The solid line holds the complete months. The dashed line goes to the projected value of the current month, then to the projected next month. The columns next to the sparkline give the value to date and the 2 projected values. The `aria-label` of each sparkline gives every value, because a data table for each row does not fit the row. The change column "vs. Oct, same day" compares the value to date with the earlier month at the same day.
+The value column gives the value to date in bold, such as "€9k", and the projected total of the month below it, such as "of €15k proj.". The trend cell gives the change against the earlier month at the same day, such as "+7%", above the sparkline. The solid line holds the complete months, with a wash below it. The dashed line goes to the projected value of the current month, then to the projected next month. The `aria-label` of each sparkline gives every value, because a data table for each row does not fit the row.

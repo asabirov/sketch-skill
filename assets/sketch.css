@@ -335,6 +335,52 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 [data-sketch] .sketch-key i.projected { background: repeating-linear-gradient(135deg, var(--sketch-ink) 0 2px, transparent 2px 5px); border: 1px solid var(--sketch-ink); }
 [data-sketch] .sketch-key i.line { width: 18px; height: 0; border-radius: 0; background: none; border-top: var(--sketch-stroke) solid var(--sketch-ink); vertical-align: 3px; }
 [data-sketch] .sketch-key i.line.projected { border: 0; border-top: var(--sketch-stroke) dashed var(--sketch-ink); }
+/* A summary above a chart: <dl class="sketch-summary"> with one <div> of <dt> and <dd> for each value. The first value is the largest. A <span> after the value is its change. */
+[data-sketch] .sketch-summary { display: flex; flex-wrap: wrap; gap: 8px 48px; margin: 0; }
+[data-sketch] .sketch-summary dt { font-size: 12px; color: var(--sketch-muted); }
+[data-sketch] .sketch-summary dd { margin: 0; }
+[data-sketch] .sketch-summary dd > b { font-size: 18px; font-variant-numeric: tabular-nums; }
+[data-sketch] .sketch-summary > div:first-child dd > b { font-size: 30px; line-height: 1.2; }
+[data-sketch] .sketch-summary dd > span { display: block; font-size: 12px; }
+/* A bar of two parts: <i class="second"> is the upper part, in a thinned ink, with a gap of page below it. */
+[data-sketch] :is(.sketch-plot > div, .sketch-key) i.second { background: color-mix(in srgb, var(--sketch-ink) 55%, var(--sketch-page)); }
+[data-sketch] .sketch-plot > div > i.second { box-shadow: inset 0 -2px var(--sketch-page); }
+/* An area below a line: a <polygon class="area"> in a sketch-line or a sketch-spark. "compare" is a thin line for an earlier period. */
+[data-sketch] :is(.sketch-line, .sketch-spark) .area { fill: var(--sketch-wash); stroke: none; }
+[data-sketch] .sketch-line .compare { stroke: var(--sketch-muted); stroke-width: 1px; }
+[data-sketch] .sketch-key i.line.compare { border-top: 1px solid var(--sketch-muted); }
+/* A reference level in a plot, such as a minimum: <span class="sketch-ref" style="--v:25%"><span>Minimum €100k</span></span>. Its label is on the right. */
+[data-sketch] .sketch-ref { position: absolute; left: 0; right: 0; bottom: var(--v); border-bottom: var(--sketch-stroke) dotted var(--sketch-ink); pointer-events: none; }
+[data-sketch] .sketch-ref > span { position: absolute; right: 0; bottom: 3px; padding: 0 4px; font-size: 12px; line-height: 1.2; background: var(--sketch-page); }
+/* "ends" on a sketch-periods row keeps its first and last label inside the chart. A label that is wider than its period spills to both sides. */
+[data-sketch] .sketch-periods.ends > li { display: flex; flex-direction: column; align-items: center; }
+[data-sketch] .sketch-periods.ends > li:first-child { align-items: flex-start; }
+[data-sketch] .sketch-periods.ends > li:last-child { align-items: flex-end; }
+/* A trend cell in a table row: <td class="sketch-trend"> with the change in a <span> above a sketch-spark. */
+[data-sketch] .sketch-trend { text-align: right; white-space: nowrap; }
+[data-sketch] .sketch-trend > span { display: block; font-variant-numeric: tabular-nums; }
+[data-sketch] .sketch-trend > svg { width: 120px; height: 28px; }
+/* Stat tiles that choose a chart: <div class="sketch-tabs sketch-tiles"> with a <button role="tab"> for each tile. A tile holds a label, a <b> value, a change and a sketch-spark. The chosen tile has a drawn frame. */
+[data-sketch] .sketch-tabs.sketch-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; overflow: visible; }
+[data-sketch] .sketch-tiles [role="tab"] { display: grid; gap: 2px; align-content: start; justify-items: start; padding: 12px; text-align: left; white-space: normal; border-bottom: 0; border-radius: var(--sketch-wobble); }
+[data-sketch] .sketch-tiles [role="tab"] > b { font-size: 24px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+[data-sketch] .sketch-tiles [role="tab"] > span:not(.sketch-muted) { font-size: 12px; }
+[data-sketch] .sketch-tiles [role="tab"] > svg { justify-self: stretch; margin-top: 8px; }
+[data-sketch] .sketch-tiles [role="tab"][aria-selected="true"] { font-weight: inherit; box-shadow: inset 0 0 0 var(--sketch-stroke) var(--sketch-ink); }
+[data-sketch] .sketch-tiles [role="tab"]:focus-visible { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 2px; }
+/* A value against a total: <div class="sketch-goal" role="meter"> with a <span class="mark" style="--v:68%"> label, a <div class="track"> with an <i style="--v:68%">, and a row of the two ends.
+   The actual part is solid and the projected rest is hatched. */
+[data-sketch] .sketch-goal { display: grid; gap: 4px; font-size: 12px; }
+[data-sketch] .sketch-goal > .mark { position: relative; left: var(--v); justify-self: start; translate: -50%; font-weight: 600; white-space: nowrap; }
+[data-sketch] .sketch-goal > .mark::after { content: ""; display: block; width: 0; margin: 2px auto 0; border: 5px solid transparent; border-bottom: 0; border-top-color: var(--sketch-ink); }
+[data-sketch] .sketch-goal > .track { height: 16px; overflow: hidden; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px; background: repeating-linear-gradient(135deg, var(--sketch-ink) 0 2px, transparent 2px 6px); }
+[data-sketch] .sketch-goal > .track > i { display: block; width: var(--v); height: 100%; background: var(--sketch-ink); }
+@media (min-width: 600px) {
+  [data-sketch] .sketch-tabs.sketch-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 599px) {
+  [data-sketch] .sketch-trend > svg { width: 80px; }
+}
 [data-sketch] details > summary { min-height: 44px; line-height: 44px; cursor: pointer; } [data-sketch] details > summary:hover { text-decoration: underline; }
 /* Step dots: one <i> for each step, the current one with class "on". */
 [data-sketch] .sketch-dots { display: flex; gap: 8px; margin: 0; } [data-sketch] .sketch-dots i { width: 10px; height: 10px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 50%; } [data-sketch] .sketch-dots .on { background: var(--sketch-ink); }
