@@ -183,6 +183,15 @@
 
   initSketch();
 
+  // A confirmation that opens with its state has no visible opener, because its menu is closed. On close, it gives the focus to the button that opens it in the list.
+  document.querySelectorAll('dialog[id^="confirm"]').forEach(dialog => {
+    dialog.addEventListener('close', () => {
+      if (dialog.sketchOpener?.checkVisibility()) return;
+      const opener = dialog.id.startsWith('confirm_all') ? '[data-revoke-all]' : '[data-sketch-popover^="menu_notes"]';
+      dialog.closest('[data-state]').querySelector(opener)?.focus();
+    });
+  });
+
   // A state with a toast shows it when the state opens. A state without a toast closes the toast of the state before.
   const show_toast = () => {
     const section = [...document.querySelectorAll('[data-state]')].find(item => !item.hidden);
