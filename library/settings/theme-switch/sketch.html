@@ -1,0 +1,122 @@
+<!doctype html>
+<!--
+  Best for: a signed-in reader chooses how the product looks, as one short setting among other preferences. The choice applies at once, with no Save button.
+  For a product that gives the look its own section and shows what each choice looks like, use settings/theme-switch-preview-cards.
+  Row opens: no rows. The page holds settings, and it holds no records.
+  Related: settings/theme-switch-preview-cards is the second pattern of the same part. navigation/user-menu is the menu whose Preferences row opens this page.
+  The theme control is 3 icon buttons in one row: Light, Dark and System, in this order. Each button has its name as its label and as its tip.
+  Transition values, from transitions.json. The file is empty: the capture read no transition when the theme changes.
+  - system, light and dark: the page changes its look at once, and the fill moves to the chosen button at once. 0 ms, measured.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theme switch</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* Each setting is a row: its name and one line about it at the left, its control at the right. */
+  [data-sketch] .prefs_group { display: grid; gap: 0; padding: 0; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .prefs_row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; padding: 12px 16px; }
+  [data-sketch] .prefs_row + .prefs_row { border-top: 1px solid var(--sketch-ink); }
+  [data-sketch] .prefs_text { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .prefs_text > span { color: var(--sketch-muted); }
+  /* The 3 buttons have icons and no words. The name of each button is its label and its tip. */
+  [data-sketch] .prefs_theme label { padding: 0 10px; }
+  [data-sketch] .prefs_theme legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  [data-sketch] .prefs_theme { margin: 0; padding: 0; border: 0; min-width: 0; }
+  /* A part of a different pattern is a plain box with the name of that pattern. */
+  [data-sketch] .prefs_part { display: grid; place-items: center; min-height: 96px; margin: 0; padding: 16px; text-align: center; overflow-wrap: anywhere; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  @media (max-width: 359px) {
+    /* On a very narrow screen, the control goes below the name of its setting. */
+    [data-sketch] .prefs_row { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies the template into each state. The states differ only in the chosen theme. -->
+<section class="sketch-shell" data-state="system"></section>
+<section class="sketch-shell" data-state="light"></section>
+<section class="sketch-shell" data-state="dark"></section>
+
+<template id="page">
+  <header class="sketch-bar" role="banner"><strong>[Product]</strong><span class="sketch-spacer"></span>
+    <button type="button" class="sketch-icon-button" aria-label="Account menu" data-sketch-toast="Account menu. Pattern: navigation/user-menu"><i data-icon="user"></i></button>
+  </header>
+  <nav class="sketch-nav" aria-label="Main">
+    <a href="#"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="comment"></i>Feed</a><a href="#"><i data-icon="box"></i>Catalog</a><a href="#"><i data-icon="user"></i>Members</a>
+  </nav>
+  <main class="sketch-main sketch-stack" style="max-width:720px">
+    <h1>Preferences</h1>
+    <h2>Appearance</h2>
+    <div class="prefs_group">
+      <div class="prefs_row">
+        <p class="prefs_text"><b>Theme</b><span>How the product looks on this account.</span></p>
+        <fieldset class="prefs_theme">
+          <legend>Theme</legend>
+          <div class="sketch-segmented">
+            <label title="Light"><input type="radio" name="theme___state__" value="light" aria-label="Light"><i data-glyph="sun"></i></label>
+            <label title="Dark"><input type="radio" name="theme___state__" value="dark" aria-label="Dark"><i data-glyph="moon"></i></label>
+            <label title="System"><input type="radio" name="theme___state__" value="system" aria-label="System"><i data-glyph="half"></i></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="prefs_row">
+        <label class="prefs_text" for="language___state__"><b>Language</b><span>The language of menus and messages.</span></label>
+        <select class="sketch-input" id="language___state__"><option>English</option><option>Deutsch</option><option>Español</option></select>
+      </div>
+    </div>
+    <h2>Notifications</h2>
+    <p class="prefs_part">Notification settings. Pattern: settings/notification-settings-by-event or settings/notification-settings-by-channel</p>
+  </main>
+</template>
+
+<script>
+  /* Line icons that the kit does not have. The kit draws <i data-glyph="name"></i> with the paths in window.sketchGlyphs. */
+  window.sketchGlyphs = {
+    sun: 'M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
+    moon: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
+    half: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 3v18M12 7h4M12 11h6M12 15h5'
+  };
+</script>
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // The values of transitions.json. The file is empty, so each change shows at once.
+  const transition_records = [];
+  window.__sketchTransitions = transition_records;
+
+  const root = document.documentElement;
+  const sections = [...document.querySelectorAll('[data-state]')];
+  const device_dark = matchMedia('(prefers-color-scheme: dark)');
+  const shown_section = () => sections.find(section => !section.hidden);
+
+  sections.forEach(section => {
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__state__', section.dataset.state);
+    section.querySelector(`input[value="${section.dataset.state}"]`).checked = true;
+  });
+
+  // The chosen theme applies at once. System follows the device. A frame that sets the theme keeps its theme for System.
+  const frame_theme = root.dataset.theme;
+  function apply_theme() {
+    const state = shown_section().dataset.state;
+    if (state === 'system') { root.dataset.theme = frame_theme || (device_dark.matches ? 'dark' : 'light'); return; }
+    root.dataset.theme = state;
+  }
+  device_dark.addEventListener('change', apply_theme);
+
+  // A click or an arrow key on a button opens the state of that theme. The focus stays on the same button in the new copy.
+  let focus_value = null;
+  document.addEventListener('change', event => {
+    const choice = event.target.closest('.prefs_theme input');
+    if (!choice) return;
+    focus_value = choice.value;
+    location.hash = choice.value;
+  });
+  addEventListener('hashchange', () => {
+    apply_theme();
+    if (focus_value) shown_section().querySelector(`input[value="${focus_value}"]`)?.focus();
+    focus_value = null;
+  });
+
+  initSketch();
+  apply_theme();
+</script>
