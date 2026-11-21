@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "label": "tools-open",
+    "trigger": "click Show all below the list of what the app can do",
+    "element": "tool list",
+    "property": "height",
+    "animation": null,
+    "duration": 200,
+    "delay": 0,
+    "easing": "cubic-bezier(0.165, 0.84, 0.44, 1)",
+    "measurement": "measured",
+    "easing_measurement": "measured"
+  },
+  {
+    "label": "tools-open",
+    "trigger": "click Show all below the list of what the app can do",
+    "element": "arrow of Show all",
+    "property": "rotate",
+    "animation": null,
+    "duration": 60,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured",
+    "easing_measurement": "measured"
+  }
+]
