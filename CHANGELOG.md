@@ -4,11 +4,12 @@
 
 ### Added
 
-- Added the Chart category with 5 templates: monthly bars, a line over time, bars with a line, a sparkline in a table row and a stat with a small trend. Each template shows the current month to date and the projected months, and fits its periods without a scroll bar at 390 px and 1280 px.
-- Added `references/charts.md` and one rule page for each chart template: when to use it, when not to use it, and how it fits many periods.
-- Added the chart study `docs/studies/2026-11-21-chart-best-practices.md`, with a source for each practice.
-- Added the chart classes to `assets/sketch.css`: `sketch-chart`, `sketch-plot`, `sketch-periods`, `sketch-line`, `sketch-tick`, `sketch-key`, `sketch-summary`, `sketch-today`, `sketch-trend`, `sketch-tiles`, `sketch-goal`, `sketch-data` and `sketch-chart-data`, with the `partial`, `projected` and `minor` states. A projected part of a sparkline is dashed. A chart data table is for screen readers only.
-- The owner chose real product references for each chart template, and the templates follow them.
+- Chart templates for report pages. Before, the kit had no chart, so a designer who sketched a report had nothing to start from. Now there are 5: monthly bars, a line over time, bars against a plan, a trend in each table row, and key numbers with a small trend.
+- Each chart shows the current month to date and the projected months. So a reader does not take an incomplete month for a fall.
+- No chart scrolls inside itself, on a phone or on a desktop. A scroll bar inside a chart hides periods and is hard to use.
+- Each chart has a rule page that says when to use it and when not to, so that a designer picks the right chart.
+- The charts follow real product charts that the owner chose. A dated study gives a source for each chart practice.
+- Each chart gives all its values to screen readers.
 
 ## 0.15.0 — 2026-11-21
 
