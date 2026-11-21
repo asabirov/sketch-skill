@@ -55,7 +55,11 @@ def check_tree(root, hashes):
     for path in sorted(root.rglob("*")):
         if path.is_file():
             relative_parts = path.relative_to(root).parts
-            if any(hash_name(part) in hashes for part in relative_parts):
+            if any(
+                hash_name(phrase) in hashes
+                for part in relative_parts
+                for phrase in phrases(part)
+            ):
                 findings.append(f"{path}: blocked path name")
             findings.extend(check_file(path, hashes))
     return findings

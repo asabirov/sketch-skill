@@ -49,10 +49,10 @@ class LibraryCheckTests(unittest.TestCase):
         module = load_module()
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)
-            path = root / "sample-name" / "pattern.md"
+            path = root / "sample-inbox" / "pattern.md"
             path.parent.mkdir()
             path.write_text("A neutral record.\n", encoding="utf-8")
-            findings = module.check_tree(root, {module.hash_name("sample name")})
+            findings = module.check_tree(root, {module.hash_name("sample")})
         self.assertTrue(findings)
 
     def test_check_tree_allows_neutral_text(self):
