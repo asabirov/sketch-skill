@@ -1,13 +1,14 @@
 # Changelog
 
-## Unreleased
+## 0.16.0 — 2026-11-21
 
 ### Added
 
 - Added the Chart category with 5 templates: monthly bars, a line over time, bars with a line, a sparkline in a table row and a stat with a small trend. Each template shows the current month to date and the projected months, and fits its periods without a scroll bar at 390 px and 1280 px.
 - Added `references/charts.md` and one rule page for each chart template: when to use it, when not to use it, and how it fits many periods.
 - Added the chart study `docs/studies/2026-11-21-chart-best-practices.md`, with a source for each practice.
-- Added the chart classes to `assets/sketch.css`: `sketch-chart`, `sketch-plot`, `sketch-periods`, `sketch-line`, `sketch-tick` and `sketch-key`, with the `partial`, `projected` and `minor` states. A projected part of a sparkline is dashed.
+- Added the chart classes to `assets/sketch.css`: `sketch-chart`, `sketch-plot`, `sketch-periods`, `sketch-line`, `sketch-tick`, `sketch-key`, `sketch-summary`, `sketch-today`, `sketch-trend`, `sketch-tiles`, `sketch-goal`, `sketch-data` and `sketch-chart-data`, with the `partial`, `projected` and `minor` states. A projected part of a sparkline is dashed. A chart data table is for screen readers only.
+- The owner chose real product references for each chart template, and the templates follow them.
 
 ## 0.15.0 — 2026-11-21
 
