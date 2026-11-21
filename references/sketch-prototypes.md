@@ -67,11 +67,11 @@ Draw all of your own elements, such as charts, rules, markers and icons, with th
 
 ## Page templates
 
-Each `templates/<category>/<name>.html` file is one whole page. Its title is "[Screen]: [Variant]". The templates are in 22 categories:
+Each `templates/<category>/<name>.html` file is one whole page. Its title is "[Screen]: [Variant]". The templates are in 23 categories:
 
 - App shell, Home, Conversation and List hold the product structure.
 - Catalog, Projects, Project, Search and Menu hold navigation screens.
-- Settings, Landing, Notes, Detail, Form, Dashboard and Board hold common work screens.
+- Settings, Landing, Notes, Detail, Form, Dashboard, Chart and Board hold common work screens. Before you draw a chart, read [charts.md](charts.md).
 - Checkout, Pricing, Sign in, Onboarding, Empty and Mobile hold focused flows.
 
 Each file starts with a `<!-- Best for: ... -->` comment that says which product it fits.

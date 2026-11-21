@@ -34,7 +34,7 @@ FONT_SHA256 = "28258d0621216948416a859d32487ab6ad1c9effa0d08795698e70be3c917630"
 CATEGORY_ORDER = [
     "app-shell", "home", "conversation", "list", "catalog", "projects",
     "project", "search", "menu", "settings", "landing", "notes", "detail",
-    "form", "dashboard", "board", "checkout", "pricing", "sign-in",
+    "form", "dashboard", "chart", "board", "checkout", "pricing", "sign-in",
     "onboarding", "empty", "mobile",
 ]
 

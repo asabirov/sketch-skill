@@ -37,7 +37,7 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 
 ## How it works
 
-1. The agent chooses a category and starts from one of its 43 templates.
+1. The agent chooses a category and starts from one of its 48 templates.
 2. The kit in `assets/` gives the marks, controls, themes and focus states.
 3. The agent changes the template words and rows for the screen.
 
@@ -70,6 +70,7 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 | Detail | 1 | Viewing one record |
 | Form | 1 | Completing one form |
 | Dashboard | 1 | Viewing key metrics |
+| Chart | 5 | Showing values over time |
 | Board | 1 | Moving items by stage |
 | Checkout | 1 | Completing a purchase |
 | Pricing | 1 | Comparing plans |

@@ -1,0 +1,29 @@
+<!-- Best for: A table where each row needs its own trend next to its numbers, such as revenue by client or usage by plan. -->
+<!-- Many periods: Each sparkline holds 11 complete months, the current month and one projected month in a fixed width of 120 px. It never gets an axis or a scroll bar. For a longer history, open the row's own chart. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chart: Sparkline in a table row</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <h1>Revenue by client</h1>
+  <section class="sketch-panel sketch-frame sketch-stack">
+    <div class="sketch-table-box"><table class="sketch-table">
+      <thead><tr><th>Client</th><th>Trend</th><th style="text-align:right">Nov to date</th><th class="sketch-from-tablet" style="text-align:right">Nov proj.</th><th class="sketch-from-tablet" style="text-align:right">Dec proj.</th><th style="text-align:right">vs. Oct, same day</th></tr></thead>
+      <tbody>
+        <tr><td><a href="#">Northwind Studio</a></td><td><svg class="sketch-spark" style="width:120px" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Northwind Studio, December 2025 to October 2026: 8k, 9k, 9k, 10k, 11k, 10k, 12k, 12k, 11k, 13k, 14k. November to date 9k, projected 15k. December projected 16k."><polyline points="0,12.9 8.3,11.8 16.7,11.8 25,10.6 33.3,9.5 41.7,10.6 50,8.4 58.3,8.4 66.7,9.5 75,7.2 83.3,6.1"/><polyline class="projected" points="83.3,6.1 91.7,5 100,3.8"/></svg></td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">Nov to date </span>€9k</td><td class="sketch-from-tablet" style="text-align:right">€15k</td><td class="sketch-from-tablet" style="text-align:right">€16k</td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">vs. Oct, same day </span>+7%</td></tr>
+        <tr><td><a href="#">Harbor Analytics</a></td><td><svg class="sketch-spark" style="width:120px" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Harbor Analytics, December 2025 to October 2026: 12k, 11k, 10k, 10k, 9k, 9k, 8k, 8k, 7k, 7k, 6k. November to date 4k, projected 6k. December projected 6k."><polyline points="0,3.8 8.3,5.3 16.7,6.8 25,6.8 33.3,8.4 41.7,8.4 50,9.9 58.3,9.9 66.7,11.4 75,11.4 83.3,12.9"/><polyline class="projected" points="83.3,12.9 91.7,12.9 100,12.9"/></svg></td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">Nov to date </span>€4k</td><td class="sketch-from-tablet" style="text-align:right">€6k</td><td class="sketch-from-tablet" style="text-align:right">€6k</td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">vs. Oct, same day </span>−14%</td></tr>
+        <tr><td><a href="#">Lumen Health</a></td><td><svg class="sketch-spark" style="width:120px" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Lumen Health, December 2025 to October 2026: 5k, 5k, 6k, 6k, 6k, 7k, 7k, 7k, 8k, 8k, 8k. November to date 6k, projected 9k. December projected 9k."><polyline points="0,11.9 8.3,11.9 16.7,9.9 25,9.9 33.3,9.9 41.7,7.9 50,7.9 58.3,7.9 66.7,5.8 75,5.8 83.3,5.8"/><polyline class="projected" points="83.3,5.8 91.7,3.8 100,3.8"/></svg></td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">Nov to date </span>€6k</td><td class="sketch-from-tablet" style="text-align:right">€9k</td><td class="sketch-from-tablet" style="text-align:right">€9k</td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">vs. Oct, same day </span>+13%</td></tr>
+        <tr><td><a href="#">Carta Logistics</a></td><td><svg class="sketch-spark" style="width:120px" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Carta Logistics, December 2025 to October 2026: 9k, 9k, 8k, 10k, 9k, 10k, 9k, 9k, 10k, 9k, 10k. November to date 7k, projected 10k. December projected 10k."><polyline points="0,5.6 8.3,5.6 16.7,7.5 25,3.8 33.3,5.6 41.7,3.8 50,5.6 58.3,5.6 66.7,3.8 75,5.6 83.3,3.8"/><polyline class="projected" points="83.3,3.8 91.7,3.8 100,3.8"/></svg></td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">Nov to date </span>€7k</td><td class="sketch-from-tablet" style="text-align:right">€10k</td><td class="sketch-from-tablet" style="text-align:right">€10k</td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">vs. Oct, same day </span>0%</td></tr>
+        <tr><td><a href="#">Brightline Media</a></td><td><svg class="sketch-spark" style="width:120px" viewBox="0 0 100 24" preserveAspectRatio="none" role="img" aria-label="Brightline Media, December 2025 to October 2026: 7k, 4k, 3k, 6k, 8k, 9k, 11k, 10k, 6k, 12k, 13k. November to date 8k, projected 12k. December projected 13k."><polyline points="0,12.2 8.3,16.4 16.7,17.8 25,13.6 33.3,10.8 41.7,9.4 50,6.6 58.3,8 66.7,13.6 75,5.2 83.3,3.8"/><polyline class="projected" points="83.3,3.8 91.7,5.2 100,3.8"/></svg></td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">Nov to date </span>€8k</td><td class="sketch-from-tablet" style="text-align:right">€12k</td><td class="sketch-from-tablet" style="text-align:right">€13k</td><td style="text-align:right"><span class="sketch-phone-only sketch-muted">vs. Oct, same day </span>−8%</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="sketch-key" aria-hidden="true">
+      <li><i class="line"></i>Actual, Dec to Oct</li><li><i class="line projected"></i>Projected, Nov and Dec</li>
+    </ul>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>

@@ -1,0 +1,77 @@
+<!-- Best for: A report that compares a total for each month, such as revenue, costs or orders. -->
+<!-- Many periods: Up to 24 months fit at 390 px. The bars get narrower. Below 600 px, only every third month counted back from the current month, and the last projected month, keep a label. For more than 24 months, group the months into quarters. -->
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chart: Monthly bars</title>
+<link rel="stylesheet" href="../../assets/sketch.css">
+<body data-sketch>
+<header class="sketch-bar"><strong>[Product]</strong></header>
+<main class="sketch-main">
+  <h1>Revenue</h1>
+  <p>November so far: <b>€39k</b> of <b>€57k</b> projected.</p>
+  <section class="sketch-panel sketch-frame sketch-stack">
+    <h2>Revenue by month</h2>
+    <div class="sketch-chart" style="--n:14" role="img" aria-label="Revenue by month, in thousand euro: Dec 41k, Jan 38k, Feb 36k, Mar 44k, Apr 47k, May 45k, Jun 50k, Jul 48k, Aug 42k, Sep 52k, Oct 55k. November to date 39k, projected 57k. Projected December 60k, January 54k.">
+    <div class="sketch-plot">
+      <div class="minor"><b>41k</b><i style="--v:68.3%"></i></div>
+      <div class="minor"><b>38k</b><i style="--v:63.3%"></i></div>
+      <div><b>36k</b><i style="--v:60%"></i></div>
+      <div class="minor"><b>44k</b><i style="--v:73.3%"></i></div>
+      <div class="minor"><b>47k</b><i style="--v:78.3%"></i></div>
+      <div><b>45k</b><i style="--v:75%"></i></div>
+      <div class="minor"><b>50k</b><i style="--v:83.3%"></i></div>
+      <div class="minor"><b>48k</b><i style="--v:80%"></i></div>
+      <div><b>42k</b><i style="--v:70%"></i></div>
+      <div class="minor"><b>52k</b><i style="--v:86.7%"></i></div>
+      <div class="minor"><b>55k</b><i style="--v:91.7%"></i></div>
+      <div class="partial minor"><b>39k</b><i class="rest" style="--v:30%"></i><i style="--v:65%"></i></div>
+      <div class="projected minor"><b>~60k</b><i style="--v:100%"></i></div>
+      <div class="projected"><b>~54k</b><i style="--v:90%"></i></div>
+    </div>
+    <ol class="sketch-periods" aria-hidden="true">
+      <li class="minor">Dec</li>
+      <li class="minor">Jan</li>
+      <li>Feb</li>
+      <li class="minor">Mar</li>
+      <li class="minor">Apr</li>
+      <li>May</li>
+      <li class="minor">Jun</li>
+      <li class="minor">Jul</li>
+      <li>Aug</li>
+      <li class="minor">Sep</li>
+      <li class="minor">Oct</li>
+      <li>Nov<small>to date</small></li>
+      <li class="minor">Dec<small>proj.</small></li>
+      <li>Jan<small>proj.</small></li>
+    </ol>
+    </div>
+    <ul class="sketch-key" aria-hidden="true">
+      <li><i></i>Actual</li><li><i class="projected"></i>Projected</li>
+    </ul>
+    <details>
+    <summary>Data</summary>
+    <div class="sketch-table-box"><table class="sketch-table sketch-data">
+      <thead><tr><th>Month</th><th>State</th><th>Revenue</th></tr></thead>
+      <tbody>
+          <tr><td>Dec 2025</td><td>Actual</td><td>€41k</td></tr>
+          <tr><td>Jan 2026</td><td>Actual</td><td>€38k</td></tr>
+          <tr><td>Feb 2026</td><td>Actual</td><td>€36k</td></tr>
+          <tr><td>Mar 2026</td><td>Actual</td><td>€44k</td></tr>
+          <tr><td>Apr 2026</td><td>Actual</td><td>€47k</td></tr>
+          <tr><td>May 2026</td><td>Actual</td><td>€45k</td></tr>
+          <tr><td>Jun 2026</td><td>Actual</td><td>€50k</td></tr>
+          <tr><td>Jul 2026</td><td>Actual</td><td>€48k</td></tr>
+          <tr><td>Aug 2026</td><td>Actual</td><td>€42k</td></tr>
+          <tr><td>Sep 2026</td><td>Actual</td><td>€52k</td></tr>
+          <tr><td>Oct 2026</td><td>Actual</td><td>€55k</td></tr>
+          <tr><td>Nov 2026</td><td>Actual to date, projected €57k</td><td>€39k</td></tr>
+          <tr><td>Dec 2026</td><td>Projected</td><td>€60k</td></tr>
+          <tr><td>Jan 2027</td><td>Projected</td><td>€54k</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+  </section>
+</main>
+<script src="../../assets/sketch.js"></script>
