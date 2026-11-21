@@ -308,7 +308,8 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 [data-sketch] :is(.sketch-plot, .sketch-periods) { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); margin: 0; }
 [data-sketch] .sketch-plot { position: relative; height: var(--h, 180px); border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
 [data-sketch] .sketch-plot > div { position: relative; display: flex; flex-direction: column; justify-content: end; align-items: center; min-width: 0; padding: 0 clamp(1px, .6vw, 8px); }
-[data-sketch] .sketch-plot > div > i { width: 100%; max-width: 48px; height: var(--v); background: var(--sketch-ink); border-radius: 4px 4px 0 0; }
+[data-sketch] .sketch-plot:has(> div > b) { margin-top: 20px; } /* Room for the value label of a full-height bar. */
+[data-sketch] .sketch-plot > div > i { flex-shrink: 0; width: 100%; max-width: 48px; height: var(--v); background: var(--sketch-ink); border-radius: 4px 4px 0 0; }
 [data-sketch] .sketch-plot > div > i + i { border-radius: 0; }
 [data-sketch] .sketch-plot > div > b { margin-bottom: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 [data-sketch] .sketch-plot > div:last-child > b { align-self: end; } /* The last value stays inside the plot. */
@@ -347,6 +348,10 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   [data-sketch] :is(.sketch-from-tablet, .sketch-from-desktop, .sketch-table thead) { display: none !important; }
   [data-sketch] .sketch-table tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; padding: 12px 0; border-bottom: var(--sketch-stroke) solid var(--sketch-wash); }
   [data-sketch] .sketch-table td { padding: 0; border: 0; }
+  [data-sketch] .sketch-plot:not(.line) > div:last-child > b { position: absolute; top: -20px; right: 0; margin: 0; } /* A narrow last bar puts its value above the plot, clear of a taller bar before it. */
+  [data-sketch] .sketch-data thead { display: table-header-group !important; } /* A data table keeps its headers and rows, so each value keeps its period and its series. */
+  [data-sketch] .sketch-data tr { display: table-row; padding: 0; }
+  [data-sketch] .sketch-data :is(th, td) { padding: 6px 8px; }
   [data-sketch] :is(.sketch-plot > .minor > b, .sketch-periods > .minor, .sketch-periods small) { visibility: hidden; }
   [data-sketch] .sketch-periods small { display: none; }
 }

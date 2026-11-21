@@ -19,4 +19,4 @@ Each small trend holds 6 complete months, the current month and one projected mo
 
 ## Current and projected periods
 
-The big number is the value to date of the current period, with "of €57k projected" beside it. The change compares the value to date with the earlier period at the same day, such as "vs. October at day 21". In the small bars, the current month is solid to date with a hatched rest, and the projected month is hatched.
+The big number is the value to date of the current period, with "of €57k projected" beside it. The change compares the value to date with the earlier period at the same day, such as "vs. October at day 21". In the small bars, the current month is solid to date with a hatched rest, and the projected month is hatched. In the cash sparkline, the line is solid to today and dashed to the projected end of the next month. One `details` table below the cards gives every value of every card.

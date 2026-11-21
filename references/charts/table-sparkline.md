@@ -15,8 +15,8 @@ Template: `templates/chart/table-sparkline.html`. The rules for every chart are 
 
 ## Many periods
 
-Each sparkline holds the last 12 months and one projected month in a fixed width of 120 px. It never gets an axis or a scroll bar. For a longer history, open the chart of the row. Below 600 px, the table rows wrap, and less important columns hide with `sketch-from-tablet`.
+Each sparkline holds 11 complete months, the current month and one projected month in a fixed width of 120 px. It never gets an axis or a scroll bar. For a longer history, open the chart of the row. Below 600 px, the table rows wrap, and less important columns hide with `sketch-from-tablet`. The headers hide too, so each value that stays gets its header as a `sketch-phone-only` label.
 
 ## Current and projected periods
 
-The solid line holds the complete months. The last fifth of the width is a dashed line to the projected value of the current month. The columns next to the sparkline give the value to date and the projected value. The change column "vs. Oct, same day" compares the value to date with the earlier month at the same day.
+The solid line holds the complete months. The dashed line goes to the projected value of the current month, then to the projected next month. The columns next to the sparkline give the value to date and the 2 projected values. The `aria-label` of each sparkline gives every value, because a data table for each row does not fit the row. The change column "vs. Oct, same day" compares the value to date with the earlier month at the same day.

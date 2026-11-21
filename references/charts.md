@@ -23,7 +23,7 @@ Use this page to choose a chart template and to draw a chart in a sketch. The pr
 - Never use a second value axis. If two series have different units, draw two charts.
 - Never scroll inside a chart. Each rule page says how many periods fit and what to do with more.
 - Name each mark in words in a `sketch-key`. Never use a hue.
-- Give the chart `role="img"` and an `aria-label` with a summary and the values. Put the data in a `details` table below the chart.
+- Give the chart `role="img"` and an `aria-label` with a summary and the values. Put the data in a `details` table below the chart, with the class `sketch-data`. A sparkline in a table row gives every value in its `aria-label` in place of a table.
 - Write the main number of the chart in one sentence above it, such as "November so far: €39k of €57k projected."
 
 ## The chart classes
@@ -39,3 +39,4 @@ The classes are in `assets/sketch.css`, after the sparkline.
 - `<span class="sketch-tick" style="--v:50%"><span>30k</span></span>` in the plot draws a grid line with its value on the left.
 - `--h` on a `sketch-plot` sets its height. The default is 180 px.
 - `projected` on a `polyline` in a `sketch-spark` makes that part dashed.
+- `sketch-data` on a `sketch-table` keeps its headers and rows below 600 px. Use it for the data table of a chart.
