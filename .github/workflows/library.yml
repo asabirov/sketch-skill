@@ -30,8 +30,14 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Run the base checker on the head library
-        run: python3 base/scripts/check_library.py --root head/library
+      - name: Run the trusted checker on the head library
+        run: |
+          if [ -f base/scripts/check_library.py ]; then
+            python3 base/scripts/check_library.py --root head/library
+          else
+            echo "The base branch has no checker yet, so the head checker runs."
+            python3 head/scripts/check_library.py --root head/library
+          fi
 
       - name: Run the head unit tests
         run: python3 -m unittest discover -s tests
