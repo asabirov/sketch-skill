@@ -4,7 +4,7 @@
 
 ### Added
 
-- Chart templates for report pages. Before, the kit had no chart, so a designer who sketched a report had nothing to start from. Now there are 5: monthly bars, a line over time, bars against a plan, a trend in each table row, and key numbers with a small trend.
+- A Chart category for report pages. Before, the kit had only the small bars and trends of the dashboard page, with no projection and no rule for when to use them. Now there are 5 chart templates: monthly bars, a line over time, bars against a plan, a trend in each table row, and key numbers with a small trend.
 - Each chart shows the current month to date and the projected months. So a reader does not take an incomplete month for a fall.
 - No chart scrolls inside itself, on a phone or on a desktop. A scroll bar inside a chart hides periods and is hard to use.
 - Each chart has a rule page that says when to use it and when not to, so that a designer picks the right chart.
