@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Phone settings page.
-     Best for: a phone chat app with a short list of settings, where a signed-in person opens Settings from their account in the side menu and goes back with Back. Settings replaces the screen.
+     Best for: a phone app with about 15 settings, where a signed-in person opens Settings from their account in the side menu and goes back with Back. Settings replaces the screen.
      Row opens: on the record's own page. A row with a chevron opens its section as the next page, with Back.
      Transitions (all estimated, from transitions.json): drawer-in 300ms and drawer-out 250ms, cubic-bezier(0.2, 0, 0, 1). scrim-in 300ms and scrim-out 250ms, linear.
      push-enter, push-exit, back-enter and back-exit 350ms, cubic-bezier(0.32, 0.72, 0, 1).
@@ -28,7 +28,7 @@
   [data-sketch] .part_box.fill { height: 100%; box-sizing: border-box; }
   /* The dim layer under the side menu and the card. A tap on it closes them. */
   [data-sketch] .scrim { position: absolute; inset: 0; display: block; background: color-mix(in srgb, var(--sketch-ink) 22%, transparent); }
-  /* The side menu: the chats in a box, and the account row at the foot. */
+  /* The side menu: the main sections in a box, and the account row at the foot. */
   [data-sketch] .drawer { position: absolute; inset: 0 auto 0 0; width: 82%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); border-right: var(--sketch-stroke) solid var(--sketch-ink); }
   [data-sketch] .drawer .phone_body { padding-top: 12px; }
   [data-sketch] .account_row { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 16px; border-top: var(--sketch-stroke) solid var(--sketch-muted); color: inherit; text-decoration: none; }
@@ -63,7 +63,7 @@
   [data-sketch] .popover a { display: block; min-width: 120px; padding: 10px 18px; border-radius: 999px; color: inherit; text-align: center; text-decoration: none; }
   [data-sketch] .popover a:hover { background: var(--sketch-wash); }
   [data-sketch] .signed_out { position: absolute; inset: 0; display: grid; padding: 24px 16px; background: var(--sketch-page); }
-  /* From 700 px wide, the side menu stays open at the left, and the chat fills the rest. The menu button hides. The pictures show
+  /* From 700 px wide, the side menu stays open at the left, and the home screen fills the rest. The menu button hides. The pictures show
      only phones, so this layout is the designer's choice. */
   @media (min-width: 700px) {
     [data-sketch] .phone { width: 100%; border-inline: 0 !important; }
@@ -71,7 +71,7 @@
     [data-sketch] a.scrim[data-part="drawer"] { display: none !important; }
     [data-sketch] .phone_screen { left: 300px; }
     [data-sketch] .phone_screen .phone_bar > a[aria-label="Menu"] { visibility: hidden; }
-    /* Settings fills the place of the chat, beside the side menu. Its list keeps a width that reads well. */
+    /* Settings fills the place of the home screen, beside the side menu. Its list keeps a width that reads well. */
     [data-sketch] .stack { left: 300px; border-left: var(--sketch-stroke) solid var(--sketch-ink); }
     [data-sketch] .stack .phone_body { width: min(100%, 640px); margin: 0 auto; box-sizing: border-box; }
   }
@@ -107,7 +107,7 @@
 </style>
 <body data-sketch>
 
-<section data-state="chat">
+<section data-state="home">
   <div data-screen="settings_stack"></div>
 </section>
 <section data-state="drawer">
@@ -134,16 +134,16 @@
   <main class="phone_screen">
     <header class="phone_bar">
       <a class="sketch-icon-button" href="#drawer" data-move="open-drawer" aria-label="Menu" data-focus="!drawer !page !out"><i data-icon="more"></i></a>
-      <h1>New chat</h1>
+      <h1>Home</h1>
       <span class="bar_end"></span>
     </header>
-    <div class="phone_body"><div class="part_box fill"><strong>Chat</strong><span class="sketch-muted">chat/chat-list draws the chats in the side menu</span></div></div>
+    <div class="phone_body"><div class="part_box fill"><strong>Home screen</strong><span class="sketch-muted">The app's own content</span></div></div>
   </main>
 
-  <a class="scrim" href="#chat" data-part="drawer" data-move="close-drawer" aria-label="Close the menu"></a>
+  <a class="scrim" href="#home" data-part="drawer" data-move="close-drawer" aria-label="Close the menu"></a>
   <nav class="drawer" data-part="drawer" aria-label="Side menu">
-    <header class="phone_bar"><h2>Chats</h2></header>
-    <div class="phone_body"><div class="part_box fill"><strong>Chat list</strong><span class="sketch-muted">chat/chat-list</span></div></div>
+    <header class="phone_bar"><h2>Menu</h2></header>
+    <div class="phone_body"><div class="part_box fill"><strong>Main sections</strong><span class="sketch-muted">navigation/user-menu</span></div></div>
     <a class="account_row" href="#settings" data-move="open-settings" data-focus="drawer">
       <span class="sketch-avatar">ML</span><strong>Mara Lind</strong><i data-icon="settings"></i>
     </a>
@@ -165,21 +165,21 @@
         </div>
 
         <div class="group">
-          <a href="#section" data-move="push" data-section="Tools"><i data-icon="sliders"></i><span class="row_text">Tools<span class="note">What the assistant can do</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Security"><i data-icon="sliders"></i><span class="row_text">Security<span class="note">Password and sign-in</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
           <a href="#section" data-move="push" data-section="Connected apps"><i data-icon="link"></i><span class="row_text">Connected apps<span class="note">2 connected</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
           <a href="#section" data-move="push" data-section="Permissions"><i data-icon="eye"></i>Permissions<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
         <div class="group">
           <button type="button" data-go="appearance-card" data-move="open-card" aria-haspopup="dialog" data-focus="page !section !card !popover"><i data-icon="smile"></i>Appearance<span class="value"><span data-appearance></span><i data-icon="chevron-down"></i></span></button>
-          <button type="button"><i data-icon="comment"></i>Speech language<span class="value">English<i data-icon="chevron-down"></i></span></button>
+          <button type="button"><i data-icon="comment"></i>Language<span class="value">English<i data-icon="chevron-down"></i></span></button>
           <a href="#section" data-move="push" data-section="Notifications"><i data-icon="bell"></i>Notifications<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
         <div class="group">
-          <label><i data-icon="filter"></i>Haptic feedback<span class="sketch-switch"><input type="checkbox" checked aria-label="Haptic feedback"></span></label>
+          <label><i data-icon="filter"></i>Vibration<span class="sketch-switch"><input type="checkbox" checked aria-label="Vibration"></span></label>
           <a href="#section" data-move="push" data-section="Privacy"><i data-icon="info"></i>Privacy<span class="value"><i data-icon="chevron-right"></i></span></a>
-          <a href="#section" data-move="push" data-section="Shared links"><i data-icon="external"></i>Shared links<span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Help"><i data-icon="external"></i>Help<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
         <div class="group">
@@ -201,15 +201,15 @@
         <div class="part_box fill" data-section-body="other"><strong data-section-title>Privacy</strong><span>This sketch draws only the Privacy page.</span></div>
         <div data-section-body="Privacy">
         <div class="group">
-          <label><span class="row_text">Use my voice to improve the model<span class="note">Turn off to keep your voice out of training.</span></span><span class="sketch-switch"><input type="checkbox" aria-label="Use my voice to improve the model"></span></label>
+          <label><span class="row_text">Share usage data<span class="note">Helps to make the app better.</span></span><span class="sketch-switch"><input type="checkbox" aria-label="Share usage data"></span></label>
         </div>
-        <div class="group" role="radiogroup" aria-label="Microphone">
-          <div class="note">Microphone</div>
+        <div class="group" role="radiogroup" aria-label="Location">
+          <div class="note">Location</div>
           <button type="button" class="choice" role="radio" aria-checked="true">Ask each time<span class="value tick">✓</span></button>
           <button type="button" class="choice" role="radio" aria-checked="false">Always allow<span class="value tick">✓</span></button>
         </div>
         <div class="group">
-          <button type="button"><span class="danger">Delete shared recordings</span></button>
+          <button type="button"><span class="danger">Delete my data</span></button>
         </div>
         </div>
       </div>
@@ -226,7 +226,7 @@
 
   <a class="catch" href="#settings" data-part="popover" data-move="close-popover" aria-label="Keep me signed in"></a>
 
-  <div class="signed_out" data-part="out"><a class="part_box fill" href="#chat"><strong>Sign-in page</strong><span class="sketch-muted">account/email-code-signup</span></a></div>
+  <div class="signed_out" data-part="out"><a class="part_box fill" href="#home"><strong>Sign-in page</strong><span class="sketch-muted">account/email-code-signup</span></a></div>
 </div>
 </template>
 
@@ -355,7 +355,7 @@
     go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
   }, true);
   /* Escape closes the card, the pop-up, the section, Settings or the side menu, in this order. */
-  const escapes = {'appearance-card': ['settings', 'close-card'], 'sign-out-confirm': ['settings', 'close-popover'], 'section': ['settings', 'back'], 'settings': ['drawer', 'close-settings'], 'drawer': ['chat', 'close-drawer']};
+  const escapes = {'appearance-card': ['settings', 'close-card'], 'sign-out-confirm': ['settings', 'close-popover'], 'section': ['settings', 'back'], 'settings': ['drawer', 'close-settings'], 'drawer': ['home', 'close-drawer']};
   document.addEventListener('keydown', event => {
     const block = shown_block(), state = block && block.parentElement.dataset.state;
     if (event.key === 'Escape' && escapes[state]) go(...escapes[state], block);
