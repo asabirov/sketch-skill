@@ -75,6 +75,8 @@
     /* Settings fills the place of the home screen, beside the side menu. Its list keeps a width that reads well. */
     [data-sketch] .stack { left: 300px; border-left: var(--sketch-stroke) solid var(--sketch-ink); }
     [data-sketch] .stack .phone_body { width: min(100%, 640px); margin: 0 auto; box-sizing: border-box; }
+    /* The card opens in the center of Settings, not of the window. */
+    [data-sketch] .card { left: calc(50% + 150px); }
   }
   /* Each motion value below comes from transitions.json. */
   [data-sketch] { --ease_drawer: cubic-bezier(0.2, 0, 0, 1); --ease_push: cubic-bezier(0.32, 0.72, 0, 1); }

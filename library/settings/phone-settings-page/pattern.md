@@ -38,7 +38,7 @@ The pictures give no durations and no easings. Each value above is the designer'
 - Another phone system: one version of the source shows the value of a choice under its label, not at the right. It shows the appearance choice in the same card in the center. Its Log out row is marked as dangerous, and it asks in an alert in the center with Cancel and Log out.
 - Appearance on the source's other version: the row shows its value with up and down chevrons. The pictures do not show the open choice there. The sketch uses the card, which the pictures show.
 - Escape on a keyboard: the sketch closes the card, the pop-up, the section, Settings or the side menu, in this order. The source shows no keyboard.
-- Wide screen: the pictures show only phones. From 700 px, the sketch keeps the side menu open at the left and hides the menu button. Settings fills the place of the home screen, beside the side menu, and its list is at most 640 px wide. Back shows the home screen again. This is the designer's choice.
+- Wide screen: the pictures show only phones. From 700 px, the sketch keeps the side menu open at the left and hides the menu button. Settings fills the place of the home screen, beside the side menu, and its list is at most 640 px wide. The appearance card opens in the center of Settings. Back shows the home screen again. This is the designer's choice.
 - Back gesture: a drag from the left edge, or the system Back of the phone, does the same as Back. `navigation/swipe-back` draws the drag. This sketch draws only the Back button.
 - Language: the row opens the same kind of card as Appearance, with the languages. The sketch does not draw it.
 - Delete my data: the pictures show no confirmation. A product asks before it deletes, as Log out does.
