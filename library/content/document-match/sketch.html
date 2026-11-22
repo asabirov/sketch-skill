@@ -447,7 +447,7 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
     <h1>Amount</h1>
     <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1740.00" aria-invalid="true" data-zoom="total"></label>
     <p class="sketch-error">Error: the document says EUR 1,704.00.</p>
-    <div class="sketch-row"><a class="sketch-button secondary" href="#field-review"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#match-finish">Use 1,704.00</a></div>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#field-review"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#match-finish" data-use-total="1,704.00">Use 1,704.00</a></div>
     <button class="doc-bar" type="button" data-sketch-open="drawer-mismatch"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
     <dialog class="sketch-dialog doc-drawer" id="drawer-mismatch" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom="total"></div></dialog>
   </div>
@@ -851,7 +851,7 @@ document.querySelectorAll('.doc-slot').forEach(slot=>{
 });
 function animate_document(){
  const state=document.querySelector('[data-state="'+location.hash.slice(1)+'"]');if(!state)return;
- const slot=state.querySelector('.doc-slot');if(!slot)return;
+ const slot=state.querySelector('.doc-slot.sketch-from-tablet');if(!slot)return;
  const paper=slot.querySelector('.doc');if(!['match-review','field-review','mismatch'].includes(state.dataset.state)){paper.style.transform='scale(1)';return}const review=state.dataset.state==='match-review';
  paper.style.transition='none';paper.style.transform=review?'scale(1.3)':'scale(1)';paper.getBoundingClientRect();
  requestAnimationFrame(()=>{paper.style.transition='';paper.style.transform=review?'scale(1)':'scale(1.3)'});
@@ -876,19 +876,26 @@ addEventListener('hashchange',finish_loading);finish_loading();
 }
 </style>
 <script>
-// Save copies the edit fields into the summary. Cancel puts the saved values back into the fields.
+// The summary and the edit fields show the saved values. Save, Cancel, Use 1,704.00 and the payee menu change them.
 const saved = {payee: 'Cedar Studio', number: 'INV-1042', date: '2026-09-18', total: '1,704.00'};
+function show_saved() {
+  document.querySelectorAll('[data-saved]').forEach(cell => { const key = cell.dataset.saved; cell.textContent = key === 'total' ? 'EUR ' + saved.total : saved[key]; });
+  document.querySelectorAll('[data-edit]').forEach(input => { input.value = saved[input.dataset.edit]; });
+}
 document.querySelector('[data-edit-save]').addEventListener('click', () => {
   document.querySelectorAll('[data-edit]').forEach(input => { saved[input.dataset.edit] = input.value; });
-  document.querySelectorAll('[data-saved]').forEach(cell => { const key = cell.dataset.saved; cell.textContent = key === 'total' ? 'EUR ' + saved.total : saved[key]; });
+  show_saved();
 });
-document.querySelector('[data-edit-cancel]').addEventListener('click', () => {
-  document.querySelectorAll('[data-edit]').forEach(input => { input.value = saved[input.dataset.edit]; });
-});
+document.querySelector('[data-edit-cancel]').addEventListener('click', show_saved);
+document.querySelector('[data-use-total]').addEventListener('click', event => { saved.total = event.currentTarget.dataset.useTotal; show_saved(); });
 // A pick in the payee menu names the chosen payee. The sketch has no form for a new payee.
 document.querySelectorAll('[data-payee]').forEach(item => item.addEventListener('click', () => {
   const name = item.dataset.payee;
-  if (name !== 'new') document.querySelectorAll('[data-state="match-review"] .sketch-panel strong').forEach(label => { label.textContent = name; });
+  if (name !== 'new') {
+    document.querySelectorAll('[data-state="match-review"] .sketch-panel strong').forEach(label => { label.textContent = name; });
+    saved.payee = name;
+    show_saved();
+  }
   sketchToast(name === 'new' ? 'New payee form (sample)' : 'Payee changed (sample)');
   item.closest('.sketch-menu').removeAttribute('data-open');
 }));
