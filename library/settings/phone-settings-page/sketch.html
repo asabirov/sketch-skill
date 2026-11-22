@@ -40,9 +40,10 @@
   [data-sketch] .who { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 4px 0 0; }
   [data-sketch] .who span:first-child { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   [data-sketch] .pill { padding: 2px 10px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 999px; font-size: 13px; }
-  /* A group of rows. Space, not a name, separates two groups. */
-  [data-sketch] .group { position: relative; display: grid; margin-top: 20px; }
-  [data-sketch] .group + .group { padding-top: 20px; margin-top: 0; border-top: var(--sketch-stroke) solid var(--sketch-wash); }
+  /* A group of rows. Space separates two groups. Form settings-labelled adds a short label over each group. */
+  [data-sketch] .group { position: relative; display: grid; margin-top: 28px; }
+  [data-sketch] .group_label { margin: 28px 0 0; font-size: 13px; color: var(--sketch-muted); }
+  [data-sketch] .group_label + .group { margin-top: 4px; }
   [data-sketch] .group > :is(a, button, label, div):not(.popover) { display: flex; align-items: center; gap: 14px; min-height: 48px; margin: 0 -8px; padding: 0 8px; border: 0; border-radius: var(--sketch-wobble); background: none; color: inherit; font: inherit; text-align: start; text-decoration: none; }
   [data-sketch] .group > :is(a, button):hover { background: var(--sketch-wash); }
   [data-sketch] .group .row_text { display: grid; }
@@ -116,6 +117,9 @@
 <section data-state="settings">
   <div data-screen="settings_stack" data-show="page"></div>
 </section>
+<section data-state="settings-labelled">
+  <div data-screen="settings_stack" data-show="page labelled"></div>
+</section>
 <section data-state="section">
   <div data-screen="settings_stack" data-show="page section"></div>
 </section>
@@ -159,23 +163,27 @@
       <div class="phone_body" data-keep-scroll>
         <p class="who"><span>mara@example.com</span><span class="pill">Free</span></p>
 
+        <p class="group_label" data-part="labelled">Account</p>
         <div class="group">
           <a href="#section" data-move="push" data-section="Profile"><i data-icon="user"></i>Profile<span class="value"><i data-icon="chevron-right"></i></span></a>
           <a href="#section" data-move="push" data-section="Billing"><i data-icon="copy"></i>Billing<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
+        <p class="group_label" data-part="labelled">Access</p>
         <div class="group">
           <a href="#section" data-move="push" data-section="Security"><i data-icon="sliders"></i><span class="row_text">Security<span class="note">Password and sign-in</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
           <a href="#section" data-move="push" data-section="Connected apps"><i data-icon="link"></i><span class="row_text">Connected apps<span class="note">2 connected</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
           <a href="#section" data-move="push" data-section="Permissions"><i data-icon="eye"></i>Permissions<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
+        <p class="group_label" data-part="labelled">Preferences</p>
         <div class="group">
           <button type="button" data-go="appearance-card" data-move="open-card" aria-haspopup="dialog" data-focus="page !section !card !popover"><i data-icon="smile"></i>Appearance<span class="value"><span data-appearance></span><i data-icon="chevron-down"></i></span></button>
           <button type="button"><i data-icon="comment"></i>Language<span class="value">English<i data-icon="chevron-down"></i></span></button>
           <a href="#section" data-move="push" data-section="Notifications"><i data-icon="bell"></i>Notifications<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
+        <p class="group_label" data-part="labelled">More</p>
         <div class="group">
           <label><i data-icon="filter"></i>Vibration<span class="sketch-switch"><input type="checkbox" checked aria-label="Vibration"></span></label>
           <a href="#section" data-move="push" data-section="Privacy"><i data-icon="info"></i>Privacy<span class="value"><i data-icon="chevron-right"></i></span></a>
