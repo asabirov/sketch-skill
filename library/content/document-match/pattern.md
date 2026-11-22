@@ -1,15 +1,19 @@
 # Document match
 
 Captured: 2026-11-22, recorded by an agent
-Best for: a finance product where a person checks the data read from a bill or an invoice against the document, one decision at a time, before the payment or the booking.
+Best for: a finance product where a person matches a bank transaction with an invoice, and checks the data read from the invoice against the document, one decision at a time.
 Row opens: on the record's own page. A row of the source's bill list opens a side panel with a Review button, and Review opens this screen as its own page.
 
 ## States
 
-- `match-loading`: the form column shows a title and three pulsing dots while the product matches the bill to a known payee. The document column shows a blank sheet with a spinner. Opens on: Review in the bill panel.
+- `match-start`: one bank transaction with its amount, date and reference, and a list of possible invoices under it. The best invoice has a "Strong match" badge. A search field finds another invoice. Opens on: a transaction that has no invoice. The source shows no such state. The agent drew it for the owner's scenario.
+- `match-loading`: the form column shows a title and three pulsing dots while the product matches the bill to a known payee. The document column shows a blank sheet with a spinner. Opens on: a pick of an invoice in `match-start`.
 - `match-review`: the form column has the title, one line that says why the match is strong, and one box with the matched payee, a "Strong match" badge, the last payment date, the payee address and the payment method. One full-width primary button accepts the match. Below an "OR" line, a search field finds another payee, and a link creates a new one. The document column shows the whole document at the top, at a zoom that fits its width. Opens on: the end of the match.
 - `field-review`: one step of the check, such as the amount. The step has a title, the fields of that step, and Back and Next at the foot of the form column. When a field has focus, the document zooms to the value that the field was read from and marks it. Opens on: Next, or the focus of a field.
-- `mismatch`: the field value differs from the document value. The field shows an error line with the two values, and the document marks its own value. One button copies the document value into the field. Opens on: a step where the read value and the field value differ. The source shows no such state: each demo bill matches its document. The designer drew it for the use case.
+- `mismatch`: the field value differs from the document value. The field shows an error line with the two values, and the document marks its own value. One button copies the document value into the field. Back and Next are beside it. Opens on: a step where the read value and the field value differ. The source shows no such state: each demo bill matches its document. The designer drew it for the use case.
+- `match-finish`: a summary of the payment and the invoice: the supplier, the invoice number, the date and the total, beside the whole document. Back and the primary button "Confirm match" are at the foot. Opens on: Next after the last step. This state is drawn.
+- `match-done`: a title and one sentence that names the payment and the invoice. "Edit the details" opens the edit mode, and "Next transaction" returns to `match-start`. Opens on: Confirm match. This state is drawn.
+- `edit-mode`: all read fields in one form beside the document: supplier, invoice number, date and total. The focus of a field zooms the document to its source value. Save and Cancel return to `match-done`. Opens on: Edit the details. This state is drawn.
 - `document-closed`: the document column folds away, and the form takes the width. A round button with a chevron on the line between the columns folds and opens it. Opens on: the chevron button. The agent did not press it, so the state is drawn. The sketch uses a text button for this control.
 - `document-open`: the whole document with zoom and download tools, and a return link. Opens on: Document on a phone. This state is drawn.
 
@@ -22,6 +26,7 @@ The agent read each value with the capture script on the public demo.
 - `field-review` to `match-review`. Trigger: Back. Moves: the document pans back to the whole page. 400 ms, ease. measured.
 - `field-review`, a field gets focus. Moves: the focus outline of the field. 80 ms, linear, on outline-color. measured.
 - `field-review` to `mismatch`. Trigger: a field value that differs from the document. Moves: the error line shows at once. 0 ms, none. estimated. The source shows no mismatch.
+- `match-start` to `match-loading`, `mismatch` to `match-finish`, `match-finish` to `match-done`, and `match-done` to `edit-mode` and back. Trigger: the pick of an invoice, Next, Confirm match, Edit the details, Save or Cancel. Moves: the page changes at once. 0 ms, none. estimated. The source shows none of these states.
 - any state to `document-closed`, and back. Trigger: the chevron button. Moves: the column folds. 0 ms, none. estimated. Not pressed in the source.
 
 ## Hard cases

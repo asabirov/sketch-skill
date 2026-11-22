@@ -376,11 +376,11 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   @media (prefers-reduced-motion: reduce) { .doc, .dots i, .spinner { transition: none; animation: none; } }
 </style>
 <body data-sketch>
-<header class="sketch-bar"><a href="#match-review"><i data-icon="arrow-left"></i>Back to supplier</a><strong>Workspace</strong></header>
+<header class="sketch-bar"><a href="#match-start"><i data-icon="arrow-left"></i>Back to transactions</a><strong>Workspace</strong></header>
 
 <template id="document">
   <div class="doc-box" aria-label="Invoice document"><div class="doc">
-    <div class="doc-line"><strong>Invoice</strong><span>INV-1042</span></div>
+    <div class="doc-line"><strong>Invoice</strong><span data-src="number">INV-1042</span></div>
     <div class="doc-line"><span data-src="payee">Cedar Studio</span><span data-src="date">Issued 18 Sep 2026</span></div>
     <div class="doc-line"><span>Brand identity refresh</span><span>980.00</span></div>
     <div class="doc-line"><span>Print artwork, 4 sheets</span><span>440.00</span></div>
@@ -389,6 +389,21 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
     <div class="doc-line"><strong>Total due</strong><strong data-src="total">EUR 1,704.00</strong></div>
   </div></div>
 </template>
+
+<section data-state="match-start"><main class="sketch-narrow" style="max-width:640px">
+  <h1>Match a transaction</h1>
+  <p class="sketch-muted">Pick the invoice that this payment pays.</p>
+  <div class="sketch-panel sketch-frame sketch-stack">
+    <div class="sketch-row" style="justify-content:space-between"><strong>Bank transfer out</strong><strong>EUR -1,704.00</strong></div>
+    <dl class="sketch-facts"><dt>Date</dt><dd>19 Sep 2026</dd><dt>Reference</dt><dd>CEDAR STUDIO INV1042</dd></dl>
+  </div>
+  <h2>Possible invoices</h2>
+  <ul class="sketch-list">
+    <li class="sketch-row" style="justify-content:space-between"><span><a href="#match-loading">INV-1042, Cedar Studio</a> <span class="sketch-badge">Strong match</span></span><span>EUR 1,704.00</span></li>
+    <li class="sketch-row" style="justify-content:space-between"><span><a href="#match-loading">INV-0998, Cedar Studio</a></span><span>EUR 980.00</span></li>
+  </ul>
+  <input class="sketch-input" type="search" aria-label="Find another invoice" placeholder="Find another invoice" autocomplete="off">
+</main></section>
 
 <section data-state="match-loading"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px"><h1>Payee match</h1><div class="dots" role="img" aria-label="Matching the payee"><i></i><i></i><i></i></div></div>
@@ -425,10 +440,39 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
     <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Amount</h1>
     <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1740.00" aria-invalid="true" data-zoom="total"></label>
     <p class="sketch-error">Error: the document says EUR 1,704.00.</p>
-    <button class="sketch-button" data-correct>Use 1,704.00</button>
-    <div class="sketch-row"><a class="sketch-button secondary" href="#field-review"><i data-icon="chevron-left"></i>Back</a></div>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#field-review"><i data-icon="chevron-left"></i>Back</a><button class="sketch-button" data-correct>Use 1,704.00</button><a class="sketch-button secondary" href="#match-finish">Next<i data-icon="chevron-right"></i></a></div>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="total" style="padding:24px"></div>
+</main></section>
+
+<section data-state="match-finish"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
+  <div class="sketch-stack" style="padding:24px">
+    <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Check the match</h1>
+    <p class="sketch-muted">The payment and the invoice agree.</p>
+    <div class="sketch-panel sketch-frame sketch-stack">
+      <dl class="sketch-facts"><dt>Payment</dt><dd>EUR -1,704.00, 19 Sep 2026</dd><dt>Supplier</dt><dd>Cedar Studio</dd><dt>Invoice</dt><dd>INV-1042</dd><dt>Date</dt><dd>18 Sep 2026</dd><dt>Total</dt><dd>EUR 1,704.00</dd></dl>
+    </div>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#mismatch"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#match-done">Confirm match</a></div>
+  </div>
+  <div class="sketch-from-tablet doc-slot" data-zoom="" style="padding:24px"></div>
+</main></section>
+
+<section data-state="match-done"><main class="sketch-narrow" style="max-width:640px">
+  <h1>Match confirmed</h1>
+  <p>The payment of EUR 1,704.00 on 19 Sep 2026 pays invoice INV-1042 from Cedar Studio.</p>
+  <div class="sketch-row"><a class="sketch-button secondary" href="#edit-mode">Edit the details</a><a class="sketch-button" href="#match-start">Next transaction</a></div>
+</main></section>
+
+<section data-state="edit-mode"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
+  <div class="sketch-stack" style="padding:24px">
+    <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Edit the details</h1>
+    <label class="sketch-field">Supplier<input class="sketch-input" value="Cedar Studio" data-zoom="payee"></label>
+    <label class="sketch-field">Invoice number<input class="sketch-input" value="INV-1042" data-zoom="number"></label>
+    <label class="sketch-field">Date<input class="sketch-input" value="2026-09-18" data-zoom="date"></label>
+    <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-zoom="total"></label>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#match-done">Cancel</a><a class="sketch-button" href="#match-done" data-sketch-toast="Details saved (sample)">Save</a></div>
+  </div>
+  <div class="sketch-from-tablet doc-slot" data-zoom="" style="padding:24px"></div>
 </main></section>
 
 <section data-state="document-open"><main class="sketch-narrow">
@@ -775,7 +819,7 @@ const zoom_to = (slot, key) => {
   const target = doc.querySelector(`[data-src="${key}"]`);
   target.classList.add('mark');
   // Scale around the corner that holds the value, so the value stays in view and grows. A hidden state has no layout to measure.
-  doc.style.transformOrigin = { total: 'right bottom', date: 'right top', payee: 'left top' }[key];
+  doc.style.transformOrigin = { total: 'right bottom', date: 'right top', payee: 'left top', number: 'right top' }[key];
   doc.style.transform = 'scale(1.3)';
 };
 document.querySelectorAll('.doc-slot').forEach(slot => {
@@ -814,7 +858,7 @@ document.querySelector('[data-correct]').addEventListener('click',event=>{const 
 function animate_document(){
  const state=document.querySelector('[data-state="'+location.hash.slice(1)+'"]');if(!state)return;
  const slot=state.querySelector('.doc-slot');if(!slot)return;
- const paper=slot.querySelector('.doc');if(state.dataset.state==='document-open'){paper.style.transform='scale(1)';return}const review=state.dataset.state==='match-review';
+ const paper=slot.querySelector('.doc');if(!['match-review','field-review','mismatch'].includes(state.dataset.state)){paper.style.transform='scale(1)';return}const review=state.dataset.state==='match-review';
  paper.style.transition='none';paper.style.transform=review?'scale(1.3)':'scale(1)';paper.getBoundingClientRect();
  requestAnimationFrame(()=>{paper.style.transition='';paper.style.transform=review?'scale(1)':'scale(1.3)'});
 }
@@ -822,7 +866,7 @@ addEventListener('hashchange',animate_document);
 initSketch();
 </script>
 <script>
-if(!location.hash) location.hash='match-review';
+if(!location.hash) location.hash='match-start';
 function finish_loading(){if(location.hash==='#match-loading')setTimeout(()=>{if(location.hash==='#match-loading')location.hash='match-review'},1700)}
 addEventListener('hashchange',finish_loading);finish_loading();
 </script>
