@@ -102,6 +102,7 @@
 <section data-state="invite-link" data-page="people" data-open-part="invite" data-tab="link"></section>
 <section data-state="invited" data-page="people" data-show="jo" data-toast="Invite sent to jo.lane@example.com (sample)."></section>
 <section data-state="member" data-page="member"></section>
+<section data-state="edit" data-page="member" data-open-part="edit"></section>
 <section data-state="sign-out" data-page="member" data-open-part="signout"></section>
 <section data-state="signed-out" data-page="member" data-hide="tablet" data-toast="Mia is signed out of the old tablet (sample)."></section>
 <section data-state="remove" data-page="member" data-open-part="remove"></section>
@@ -128,43 +129,43 @@
       <tr data-row="dana">
         <td></td>
         <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">DR</span><div><span class="members_name"><a href="#member">Dana Reyes</a><span class="sketch-muted">You</span></span><span class="sketch-muted">dana@example.com</span></div></div></td>
-        <td>Manager</td><td>Now</td>
+        <td>Admin</td><td>Now</td>
         <td><a class="sketch-icon-button" href="#member" aria-label="Open Dana Reyes"><i data-icon="chevron-right"></i></a></td>
       </tr>
       <tr data-row="sam">
         <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Sam Reyes" data-check-row></label></td>
         <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">SR</span><div><span class="members_name"><a href="#member">Sam Reyes</a></span><span class="sketch-muted">sam@example.com</span></div></div></td>
-        <td>Parent</td><td>2 hours ago</td>
+        <td>Member</td><td>2 hours ago</td>
         <td><a class="sketch-icon-button" href="#member" aria-label="Open Sam Reyes"><i data-icon="chevron-right"></i></a></td>
       </tr>
       <tr data-row="mia">
         <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Mia Reyes" data-check-row></label></td>
         <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">MR</span><div><span class="members_name"><a href="#member">Mia Reyes</a></span><span class="sketch-muted">mia@example.com</span></div></div></td>
-        <td>Child</td><td>Yesterday</td>
+        <td>Viewer</td><td>Yesterday</td>
         <td><a class="sketch-icon-button" href="#member" aria-label="Open Mia Reyes"><i data-icon="chevron-right"></i></a></td>
       </tr>
       <tr data-row="leo">
         <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Leonardo Alexander Reyes-Whitfield" data-check-row></label></td>
         <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">LR</span><div><span class="members_name"><a href="#member">Leonardo Alexander Reyes-Whitfield</a></span><span class="sketch-muted">leonardo.alexander.reyes-whitfield@example.com</span></div></div></td>
-        <td>Child</td><td>3 weeks ago</td>
+        <td>Viewer</td><td>3 weeks ago</td>
         <td><a class="sketch-icon-button" href="#member" aria-label="Open Leonardo Alexander Reyes-Whitfield"><i data-icon="chevron-right"></i></a></td>
       </tr>
       <tr data-row="ana">
         <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Ana Reyes" data-check-row></label></td>
         <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">AR</span><div><span class="members_name"><a href="#request">Ana Reyes</a><span class="sketch-badge strong" data-status>Asks to join</span></span><span class="sketch-muted">ana@example.com</span></div></div></td>
-        <td data-role>Parent</td><td data-active>Asked today</td>
+        <td data-role>Member</td><td data-active>Asked today</td>
         <td><a class="sketch-icon-button" href="#request" aria-label="Open the request of Ana Reyes"><i data-icon="chevron-right"></i></a></td>
       </tr>
       <tr data-row="kim">
         <td><label class="sketch-choice"><input type="checkbox" aria-label="Select kim.ono@example.com" data-check-row></label></td>
         <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">KO</span><div><span class="members_name"><a href="#member">kim.ono@example.com</a><span class="sketch-badge">Invited</span></span><span class="sketch-muted">Invite sent 4 days ago</span></div></div></td>
-        <td>Child</td><td>Not joined</td>
+        <td>Viewer</td><td>Not joined</td>
         <td><a class="sketch-icon-button" href="#member" aria-label="Open the invite of kim.ono@example.com"><i data-icon="chevron-right"></i></a></td>
       </tr>
       <tr data-row="jo" data-extra>
         <td><label class="sketch-choice"><input type="checkbox" aria-label="Select jo.lane@example.com" data-check-row></label></td>
         <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">JL</span><div><span class="members_name"><a href="#member">jo.lane@example.com</a><span class="sketch-badge">Invited</span></span><span class="sketch-muted">Invite sent now</span></div></div></td>
-        <td>Parent</td><td>Not joined</td>
+        <td>Member</td><td>Not joined</td>
         <td><a class="sketch-icon-button" href="#member" aria-label="Open the invite of jo.lane@example.com"><i data-icon="chevron-right"></i></a></td>
       </tr>
     </tbody>
@@ -177,17 +178,17 @@
     <button class="sketch-button secondary members_danger_button" type="button" data-sketch-toast="Opens one confirmation that names each selected member (sample).">Remove</button>
     <button class="sketch-icon-button" type="button" aria-label="Clear the selection" data-clear><i data-icon="close"></i></button>
     <div class="sketch-menu" id="bulkrole___state__" aria-label="Change role">
-      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now managers (sample)."><i data-icon="settings"></i><span><b>Manager</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now parents (sample)."><i data-icon="user"></i><span><b>Parent</b><span class="sketch-muted">Sees each child and approves requests</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now childs (sample)."><i data-icon="smile"></i><span><b>Child</b><span class="sketch-muted">Sees their own account only</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now admins (sample)."><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now members (sample)."><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now viewers (sample)."><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
     </div>
   </div>
   <div class="sketch-popover" id="filter___state__" role="dialog" aria-label="Filter members">
     <div class="members_filter">
       <fieldset><legend>Role</legend>
-        <label class="sketch-choice"><input type="checkbox" data-filter="Manager">Manager</label>
-        <label class="sketch-choice"><input type="checkbox" data-filter="Parent">Parent</label>
-        <label class="sketch-choice"><input type="checkbox" data-filter="Child">Child</label>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Admin">Admin</label>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Member">Member</label>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Viewer">Viewer</label>
       </fieldset>
       <fieldset><legend>Status</legend>
         <label class="sketch-choice"><input type="checkbox" data-filter="Invited">Invited</label>
@@ -207,11 +208,11 @@
     <div class="members_panel" id="invite_email___state__">
       <label class="sketch-field">Email <input class="sketch-input" type="email" placeholder="Emails, comma separated" data-invite-email></label>
       <div class="members_field"><span id="invite_role___state___label">Role</span>
-    <button class="sketch-input members_pick" type="button" aria-labelledby="invite_role___state___label invite_role___state___value" data-sketch-popover="invite_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="smile"></i></span><span id="invite_role___state___value" data-pick-value>Child</span><i data-icon="chevron-down"></i></button>
+    <button class="sketch-input members_pick" type="button" aria-labelledby="invite_role___state___label invite_role___state___value" data-sketch-popover="invite_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="eye"></i></span><span id="invite_role___state___value" data-pick-value>Viewer</span><i data-icon="chevron-down"></i></button>
     <div class="sketch-menu" id="invite_role___state__" aria-label="Role">
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Manager" data-role-icon="settings"><i data-icon="settings"></i><span><b>Manager</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Parent" data-role-icon="user"><i data-icon="user"></i><span><b>Parent</b><span class="sketch-muted">Sees each child and approves requests</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Child" data-role-icon="smile"><i data-icon="smile"></i><span><b>Child</b><span class="sketch-muted">Sees their own account only</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Admin" data-role-icon="settings"><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Member" data-role-icon="user"><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Viewer" data-role-icon="eye"><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
     </div>
   </div>
       <p class="sketch-muted">The person joins with this role after they accept the invite.</p>
@@ -242,15 +243,17 @@
   <div class="members_head">
     <span class="sketch-avatar" aria-hidden="true">MR</span>
     <div><h1>Mia Reyes</h1><span class="sketch-muted">mia@example.com</span></div>
+    <span class="sketch-spacer"></span>
+    <button class="sketch-button secondary" type="button" data-sketch-open="edit___state__"><i data-icon="edit"></i>Edit</button>
   </div>
   <div class="members_body">
     <div>
       <div class="members_field"><span id="member_role___state___label">Role</span>
-    <button class="sketch-input members_pick" type="button" aria-labelledby="member_role___state___label member_role___state___value" data-sketch-popover="member_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="smile"></i></span><span id="member_role___state___value" data-pick-value>Child</span><i data-icon="chevron-down"></i></button>
+    <button class="sketch-input members_pick" type="button" aria-labelledby="member_role___state___label member_role___state___value" data-sketch-popover="member_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="eye"></i></span><span id="member_role___state___value" data-pick-value>Viewer</span><i data-icon="chevron-down"></i></button>
     <div class="sketch-menu" id="member_role___state__" aria-label="Role">
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Manager" data-role-icon="settings"><i data-icon="settings"></i><span><b>Manager</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Parent" data-role-icon="user"><i data-icon="user"></i><span><b>Parent</b><span class="sketch-muted">Sees each child and approves requests</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Child" data-role-icon="smile"><i data-icon="smile"></i><span><b>Child</b><span class="sketch-muted">Sees their own account only</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Admin" data-role-icon="settings"><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Member" data-role-icon="user"><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Viewer" data-role-icon="eye"><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
     </div>
   </div>
       <h2>Devices</h2>
@@ -275,6 +278,16 @@
       <dt>Last active</dt><dd>Yesterday</dd>
     </dl>
   </div>
+  <dialog class="sketch-dialog" id="edit___state__" aria-labelledby="edit_title___state__">
+    <h2 id="edit_title___state__">Edit Mia Reyes</h2>
+    <label class="sketch-field">Name <input class="sketch-input" type="text" value="Mia Reyes" autofocus></label>
+    <label class="sketch-field">Email <input class="sketch-input" type="email" value="mia@example.com"></label>
+    <p class="sketch-muted">A new email takes effect after Mia confirms it from that address.</p>
+    <div class="sketch-row">
+      <button class="sketch-button" type="button" data-sketch-close data-sketch-toast="The changes to Mia Reyes are saved (sample).">Save</button>
+      <button class="sketch-button secondary" type="button" data-sketch-close>Cancel</button>
+    </div>
+  </dialog>
   <dialog class="sketch-dialog" id="signout___state__" aria-labelledby="signout_title___state__">
     <h2 id="signout_title___state__">Sign Mia out of the old tablet?</h2>
     <p>The old tablet asks for a new sign-in. Mia stays signed in on the other devices.</p>
@@ -305,14 +318,14 @@
   <div class="members_body">
     <div>
       <div class="members_request">
-        <p><b>Ana Reyes asks to join as a parent.</b></p>
+        <p><b>Ana Reyes asks to join as a member.</b></p>
         <p>"Hi, it is Grandma Ana. Sam sent me the family link."</p>
         <div class="members_field"><span id="request_role___state___label">Role after approval</span>
-    <button class="sketch-input members_pick" type="button" aria-labelledby="request_role___state___label request_role___state___value" data-sketch-popover="request_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="user"></i></span><span id="request_role___state___value" data-pick-value>Parent</span><i data-icon="chevron-down"></i></button>
+    <button class="sketch-input members_pick" type="button" aria-labelledby="request_role___state___label request_role___state___value" data-sketch-popover="request_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="user"></i></span><span id="request_role___state___value" data-pick-value>Member</span><i data-icon="chevron-down"></i></button>
     <div class="sketch-menu" id="request_role___state__" aria-label="Role after approval">
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Manager" data-role-icon="settings"><i data-icon="settings"></i><span><b>Manager</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Parent" data-role-icon="user"><i data-icon="user"></i><span><b>Parent</b><span class="sketch-muted">Sees each child and approves requests</span></span></button>
-      <button class="sketch-menu-item members_role_item" type="button" data-role="Child" data-role-icon="smile"><i data-icon="smile"></i><span><b>Child</b><span class="sketch-muted">Sees their own account only</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Admin" data-role-icon="settings"><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Member" data-role-icon="user"><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Viewer" data-role-icon="eye"><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
     </div>
   </div>
         <div class="sketch-row">
