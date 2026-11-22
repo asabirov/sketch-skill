@@ -41,6 +41,7 @@ The source gives only still pictures, so no value is measured. `transitions.json
 ## Hard cases
 
 - Empty invite: Send invite stays off until the email field has an email. A line beside the button says why, because the words of an off button are dim.
+- Tabs of different size: the 2 tab panels share one area, so the dialog keeps its size and place when the tab changes. The line under the tabs is the only line of the dialog head.
 - Invite link: a reset stops the old link at once. A request from the link always waits for approval, so a link that leaks adds no member by itself.
 - Own row: the person who looks at the list cannot check or remove their own row. The row has no check box and shows "You".
 - Last manager: not seen. Remove and a change of role stay off for the last manager, with one line that says why.

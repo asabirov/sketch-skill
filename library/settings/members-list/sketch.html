@@ -64,8 +64,14 @@
   [data-sketch] .members_role_item > span { display: grid; gap: 2px; }
   [data-sketch] .members_role_item .sketch-muted { font-size: 14px; }
   /* The invite dialog: the tabs and the close button in one row, a line under them. */
-  [data-sketch] .members_dialog_head { display: flex; align-items: center; gap: 8px; margin: -8px 0 0; padding-bottom: 8px; border-bottom: 1px solid var(--sketch-muted); }
-  [data-sketch] .members_dialog_head > .sketch-tabs { flex: 1 1 auto; }
+  [data-sketch] .members_dialog_head { display: flex; align-items: end; gap: 8px; margin: -8px 0 0; border-bottom: 1px solid var(--sketch-muted); }
+  [data-sketch] .members_dialog_head > .sketch-tabs { flex: 1 1 auto; margin-bottom: -1px; }
+  [data-sketch] .members_dialog_head [role="tab"]:focus-visible { outline-offset: -3px; }
+  [data-sketch] .members_dialog_head > .sketch-icon-button { margin-bottom: 4px; }
+  /* Both tab panels share one area, so the dialog keeps its size when the tab changes. */
+  [data-sketch] .members_panels { display: grid; }
+  [data-sketch] .members_panels > .members_panel { grid-area: 1 / 1; align-content: start; }
+  [data-sketch] .members_panels > .members_panel[hidden] { display: grid !important; visibility: hidden; }
   [data-sketch] .members_panel { display: grid; gap: 16px; }
   [data-sketch] .members_panel > p { margin: 0; }
   [data-sketch] .members_foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px 12px; padding-top: 12px; border-top: 1px solid var(--sketch-muted); }
@@ -197,6 +203,7 @@
       </div>
       <button class="sketch-icon-button" type="button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button>
     </div>
+    <div class="members_panels">
     <div class="members_panel" id="invite_email___state__">
       <label class="sketch-field">Email <input class="sketch-input" type="email" placeholder="Emails, comma separated" data-invite-email></label>
       <div class="members_field"><span id="invite_role___state___label">Role</span>
@@ -225,6 +232,7 @@
         <p class="sketch-muted">A new link stops the old link at once.</p>
         <button class="sketch-button secondary" type="button" data-sketch-toast="A new link is made. The old link no longer works (sample).">Reset link</button>
       </div>
+    </div>
     </div>
   </dialog>
 </template>
@@ -346,7 +354,14 @@
       if (active) active.textContent = 'Joined now';
     });
     if (section.dataset.tab) {
-      section.querySelectorAll('[data-tab-id]').forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.tabId === section.dataset.tab)));
+      section.querySelectorAll('[data-tab-id]').forEach(tab => {
+        const chosen = tab.dataset.tabId === section.dataset.tab;
+        tab.setAttribute('aria-selected', String(chosen));
+        tab.tabIndex = chosen ? 0 : -1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden = !chosen;
+        tab.autofocus = chosen;
+      });
+      section.querySelectorAll('[role="tabpanel"] [autofocus], .members_panel [autofocus]').forEach(el => { if (!el.matches('[role="tab"]')) el.autofocus = false; });
     }
     if (section.dataset.openPart) section.querySelector(`#${section.dataset.openPart}_${state}`)?.setAttribute('data-open', '');
   });
