@@ -52,6 +52,9 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 
 /* A panel is spacing, not a surface: no fill, so the drawn outline is the only edge. */
 [data-sketch] .sketch-panel { background: none; padding: 24px; }
+/* Two quiet fills, each the ink thinned on the page: a ground under one side of a split area, and an accent under the block that needs a decision. */
+[data-sketch] .sketch-ground { background: color-mix(in srgb, var(--sketch-ink) 6%, var(--sketch-page)); }
+[data-sketch] .sketch-accent { background: color-mix(in srgb, var(--sketch-ink) 12%, var(--sketch-page)); }
 [data-sketch] .sketch-frame { position: relative; isolation: isolate; border: 0; }
 [data-sketch] .sketch-outline { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: visible; }
 [data-sketch] .sketch-outline path {
