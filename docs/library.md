@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 68 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 69 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
