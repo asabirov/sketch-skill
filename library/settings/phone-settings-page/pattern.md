@@ -3,15 +3,15 @@
 Captured: 2026-11-22, from public pictures
 Best for: a phone chat app with about 15 settings, where a signed-in person opens Settings from their account and goes back with Back. Each choice applies at once, and a sign-out asks once more.
 Row opens: on the record's own page
-Related: `settings/phone-settings-sheet` opens Settings as a sheet over the chat, with a name on each group and a pull-down menu for the appearance. `navigation/swipe-back` gives the drag back from a page. `settings/settings-window` is the settings of a desktop product.
+Related: `navigation/swipe-back` gives the drag back from a page. `settings/settings-window` is the settings of a desktop product. `settings/theme-switch-preview-cards` shows the appearance as cards with pictures.
 
 ## States
 
 - `chat`: the chat, with the menu button at the top left. A plain box stands for the chat. Opens on: a tap on the dim layer beside the side menu.
 - `drawer`: the side menu covers 82% of the width from the left. A plain box stands for the chats. The account row is at the foot: the avatar, the name and a settings icon. The chat shows dim at the right. Opens on: a tap on the menu button, or Back in Settings.
 - `settings`: Settings fills the screen. Its bar has Back at the left and the title "Settings" in the center. Under the bar, the email of the account, with the plan at the right. Then 4 groups with no names. Space and a thin line separate them: the account (Profile, Billing), what the assistant can use (Tools, Connected apps, Permissions), the look and the voice (Appearance, Speech language, Notifications) and the rest (Haptic feedback, Privacy, Shared links). Log out is alone at the end. Each row has an icon at the left. A row that opens a page has a chevron at the right. A row with a choice shows its value and a down chevron. A row can have a second line, such as "2 connected". Opens on: a tap on the account row.
-- `section`: one section, here Privacy, fills the screen. Its bar has Back at the left and the section name in the center. It has a switch with a second line, a choice of two (Ask each time, Always allow) and a delete action, marked as the dangerous one. The source shows no picture of an opened section. The sketch draws it from the source's help text.
-- `appearance-card`: a card in the center of the screen, with the title "Appearance" and 3 rows: System, Light and Dark. Each row has an icon, and a tick marks the current choice. Everything under the card is dim. Opens on: a tap on the Appearance row.
+- `section`: the section of the row fills the screen. Its bar has Back at the left and the section name in the center. The sketch draws Privacy: a switch with a second line, a choice of two (Ask each time, Always allow) and a delete action, marked as the dangerous one. A plain box with the name stands for each other section. The source shows no picture of an opened section. The sketch draws Privacy from the source's help text. Opens on: a tap on a row with a chevron.
+- `appearance-card`: a card in the center of the screen, with the title "Appearance" and 3 rows: System, Light and Dark. Each row has an icon, and a tick marks the current choice. Everything under the card is dim. A tap on Light or Dark changes the look of the whole app at once. System follows the look of the device. Opens on: a tap on the Appearance row.
 - `sign-out-confirm`: a small round pop-up opens just above the Log out row. It holds one button: Log out. Nothing else goes dim. Opens on: a tap on Log out.
 - `signed-out`: the sign-in page. A plain box stands for it. Opens on: Log out in the pop-up.
 
@@ -38,6 +38,9 @@ The pictures give no durations and no easings. Each value above is the designer'
 - Appearance on the source's other version: the row shows its value with up and down chevrons. The pictures do not show the open choice there. The sketch uses the card, which the pictures show.
 - Escape on a keyboard: the sketch closes the card, the pop-up, the section, Settings or the side menu, in this order. The source shows no keyboard.
 - Wide screen: the pictures show only phones. From 700 px, the sketch keeps the side menu open at the left and hides the menu button. Settings fills the place of the chat, beside the side menu, and its list is at most 640 px wide. Back shows the chat again. This is the designer's choice.
+- Back gesture: a drag from the left edge, or the system Back of the phone, does the same as Back. `navigation/swipe-back` draws the drag. This sketch draws only the Back button.
+- Speech language: the row opens the same kind of card as Appearance, with the languages. The sketch does not draw it.
+- Delete shared recordings: the pictures show no confirmation. A product asks before it deletes, as Log out does.
 - Reduced motion: each change shows its end at once.
 - Empty, error and slow network: the source shows no such state.
 

@@ -160,26 +160,26 @@
         <p class="who"><span>mara@example.com</span><span class="pill">Free</span></p>
 
         <div class="group">
-          <a href="#section" data-move="push"><i data-icon="user"></i>Profile<span class="value"><i data-icon="chevron-right"></i></span></a>
-          <a href="#section" data-move="push"><i data-icon="copy"></i>Billing<span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Profile"><i data-icon="user"></i>Profile<span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Billing"><i data-icon="copy"></i>Billing<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
         <div class="group">
-          <a href="#section" data-move="push"><i data-icon="sliders"></i><span class="row_text">Tools<span class="note">What the assistant can do</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
-          <a href="#section" data-move="push"><i data-icon="link"></i><span class="row_text">Connected apps<span class="note">2 connected</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
-          <a href="#section" data-move="push"><i data-icon="eye"></i>Permissions<span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Tools"><i data-icon="sliders"></i><span class="row_text">Tools<span class="note">What the assistant can do</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Connected apps"><i data-icon="link"></i><span class="row_text">Connected apps<span class="note">2 connected</span></span><span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Permissions"><i data-icon="eye"></i>Permissions<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
         <div class="group">
           <button type="button" data-go="appearance-card" data-move="open-card" aria-haspopup="dialog" data-focus="page !section !card !popover"><i data-icon="smile"></i>Appearance<span class="value"><span data-appearance></span><i data-icon="chevron-down"></i></span></button>
           <button type="button"><i data-icon="comment"></i>Speech language<span class="value">English<i data-icon="chevron-down"></i></span></button>
-          <a href="#section" data-move="push"><i data-icon="bell"></i>Notifications<span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Notifications"><i data-icon="bell"></i>Notifications<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
         <div class="group">
           <label><i data-icon="filter"></i>Haptic feedback<span class="sketch-switch"><input type="checkbox" checked aria-label="Haptic feedback"></span></label>
-          <a href="#section" data-move="push"><i data-icon="info"></i>Privacy<span class="value"><i data-icon="chevron-right"></i></span></a>
-          <a href="#section" data-move="push"><i data-icon="external"></i>Shared links<span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Privacy"><i data-icon="info"></i>Privacy<span class="value"><i data-icon="chevron-right"></i></span></a>
+          <a href="#section" data-move="push" data-section="Shared links"><i data-icon="external"></i>Shared links<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
 
         <div class="group">
@@ -194,10 +194,12 @@
     <div class="stack_page" data-part="section">
       <header class="phone_bar">
         <a class="sketch-icon-button" href="#settings" data-move="back" aria-label="Back" data-focus="section"><i data-icon="chevron-left"></i></a>
-        <h2>Privacy</h2>
+        <h2 data-section-title>Privacy</h2>
         <span class="bar_end"></span>
       </header>
       <div class="phone_body">
+        <div class="part_box fill" data-section-body="other"><strong data-section-title>Privacy</strong><span>This sketch draws only the Privacy page.</span></div>
+        <div data-section-body="Privacy">
         <div class="group">
           <label><span class="row_text">Use my voice to improve the model<span class="note">Turn off to keep your voice out of training.</span></span><span class="sketch-switch"><input type="checkbox" aria-label="Use my voice to improve the model"></span></label>
         </div>
@@ -208,6 +210,7 @@
         </div>
         <div class="group">
           <button type="button"><span class="danger">Delete shared recordings</span></button>
+        </div>
         </div>
       </div>
     </div>
@@ -256,6 +259,29 @@
     document.querySelectorAll('[data-pick] .tick').forEach(node => { node.style.visibility = node.parentElement.dataset.pick === appearance ? '' : 'hidden'; });
   };
   show_appearance();
+  /* A row with a chevron opens its own section. The sketch draws only Privacy, and a plain box with the name for each other section. */
+  let section = 'Privacy';
+  const show_section = () => {
+    document.querySelectorAll('[data-section-title]').forEach(node => { node.textContent = section; });
+    document.querySelectorAll('[data-section-body]').forEach(node => { node.hidden = (node.dataset.sectionBody === 'Privacy') !== (section === 'Privacy'); });
+  };
+  show_section();
+  /* Light and Dark change the look of the whole sketch at once. System gives back the look of the page that shows the sketch. */
+  const root = document.documentElement;
+  let host_theme = root.getAttribute('data-theme'), own_change = false;
+  new MutationObserver(() => { if (!own_change) host_theme = root.getAttribute('data-theme'); }).observe(root, {attributeFilter: ['data-theme']});
+  const apply_look = () => {
+    own_change = true;
+    const theme = appearance === 'System' ? host_theme : appearance.toLowerCase();
+    if (theme) root.setAttribute('data-theme', theme); else root.removeAttribute('data-theme');
+    queueMicrotask(() => { own_change = false; });
+  };
+  /* A tap on a choice of a group moves the tick to it. */
+  document.addEventListener('click', event => {
+    const choice = event.target.closest('.choice[role="radio"]');
+    if (!choice) return;
+    choice.closest('[role="radiogroup"]').querySelectorAll('[role="radio"]').forEach(node => node.setAttribute('aria-checked', String(node === choice)));
+  });
   /* play adds the class that holds one animation of transitions.json, and takes it away at the end. */
   const play = (node, name, after) => {
     if (reduced.matches) { if (after) after(); return; }
@@ -324,7 +350,8 @@
     if (!block || control.matches(':disabled')) return;
     event.preventDefault();
     event.stopPropagation();
-    if (control.dataset.pick) { appearance = control.dataset.pick; show_appearance(); }
+    if (control.dataset.pick) { appearance = control.dataset.pick; show_appearance(); apply_look(); }
+    if (control.dataset.section) { section = control.dataset.section; show_section(); }
     go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
   }, true);
   /* Escape closes the card, the pop-up, the section, Settings or the side menu, in this order. */
