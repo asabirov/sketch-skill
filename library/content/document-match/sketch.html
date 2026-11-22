@@ -371,7 +371,9 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   .dots i:nth-child(2) { animation-delay: 100ms; } .dots i:nth-child(3) { animation-delay: 200ms; }
   @keyframes wave { 0%, 100% { opacity: 0.2; } 40% { opacity: 1; } }
   .sketch-input:focus-visible { transition: outline-color 80ms linear; }
-  @media (prefers-reduced-motion: reduce) { .doc, .dots i { transition: none; animation: none; } }
+  .spinner { width: 28px; height: 28px; border: var(--sketch-stroke) solid var(--sketch-ink); border-top-color: transparent; border-radius: 50%; animation: spin 1000ms linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .doc, .dots i, .spinner { transition: none; animation: none; } }
 </style>
 <body data-sketch>
 <header class="sketch-bar"><a href="#match-review"><i data-icon="arrow-left"></i>Back to supplier</a><strong>Workspace</strong></header>
@@ -390,7 +392,7 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 
 <section data-state="match-loading"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px"><h1>Payee match</h1><div class="dots" role="img" aria-label="Matching the payee"><i></i><i></i><i></i></div></div>
-  <div class="sketch-from-tablet" style="padding:24px"><div class="sketch-panel sketch-frame" style="min-height:360px;display:grid;place-items:center">Loading document</div></div>
+  <div class="sketch-from-tablet" style="padding:24px"><div class="sketch-panel sketch-frame" style="min-height:360px;display:grid;place-items:center"><span class="spinner" role="img" aria-label="Loading document"></span></div></div>
 </main></section>
 
 <section data-state="match-review"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
@@ -411,8 +413,8 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 <section data-state="field-review"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
     <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Amount</h1>
-    <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-zoom="total" autofocus></label>
-    <label class="sketch-field">Issued<input class="sketch-input" value="2026-09-18" data-zoom="date"></label>
+    <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-zoom="total" data-field="total" autofocus></label>
+    <label class="sketch-field">Issued<input class="sketch-input" value="2026-09-18" data-zoom="date" data-field="date"></label>
     <div class="sketch-row"><a class="sketch-button secondary" href="#match-review"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#mismatch">Next<i data-icon="chevron-right"></i></a></div>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="total" style="padding:24px"></div>
@@ -431,13 +433,15 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 
 <section data-state="document-open"><main class="sketch-narrow">
   <a href="#field-review"><i data-icon="chevron-left"></i>Back to the form</a>
-  <div class="doc-slot" data-zoom="total"></div>
+  <div class="doc-slot" data-zoom=""></div>
 </main></section>
 
 <section data-state="document-closed"><main class="sketch-narrow" style="max-width:560px">
   <a href="#field-review"><i data-icon="chevron-left"></i>Show the document</a>
   <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Amount</h1>
-  <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00"></label>
+  <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-field="total"></label>
+  <label class="sketch-field">Issued<input class="sketch-input" value="2026-09-18" data-field="date"></label>
+  <div class="sketch-row"><a class="sketch-button secondary" href="#match-review"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#mismatch">Next<i data-icon="chevron-right"></i></a></div>
 </main></section>
 
 <script data-sketch-kit="0.13.0">
@@ -796,7 +800,8 @@ document.querySelectorAll('.doc-slot').forEach(slot => {
 @media(prefers-reduced-motion:reduce){[data-sketch] .sketch-input {transition:none}}
 </style>
 <script>
-let document_return = 'mismatch';
+let document_return = 'field-review';
+document.querySelectorAll('[data-field]').forEach(input=>input.addEventListener('input',()=>document.querySelectorAll('[data-field="'+input.dataset.field+'"]').forEach(other=>{if(other!==input)other.value=input.value})));
 document.querySelectorAll('a[href="#document-open"]').forEach(link=>link.addEventListener('click',()=>{document_return=link.closest('[data-state]').dataset.state}));
 document.querySelector('[data-state="document-open"] a').addEventListener('click',event=>{event.preventDefault();location.hash=document_return});
 document.querySelectorAll('.doc-slot').forEach(slot=>{
@@ -809,7 +814,7 @@ document.querySelector('[data-correct]').addEventListener('click',event=>{const 
 function animate_document(){
  const state=document.querySelector('[data-state="'+location.hash.slice(1)+'"]');if(!state)return;
  const slot=state.querySelector('.doc-slot');if(!slot)return;
- const paper=slot.querySelector('.doc');const review=state.dataset.state==='match-review';
+ const paper=slot.querySelector('.doc');if(state.dataset.state==='document-open'){paper.style.transform='scale(1)';return}const review=state.dataset.state==='match-review';
  paper.style.transition='none';paper.style.transform=review?'scale(1.3)':'scale(1)';paper.getBoundingClientRect();
  requestAnimationFrame(()=>{paper.style.transition='';paper.style.transform=review?'scale(1)':'scale(1.3)'});
 }
