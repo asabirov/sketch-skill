@@ -1,0 +1,8 @@
+[
+  {"label": "match-loading", "element": "circle", "animation": "wave", "duration": 1500, "delay": 0, "easing": "cubic-bezier(0.05, 0.2, 0.35, 1)", "measurement": "measured"},
+  {"label": "match-loading", "element": "circle", "animation": "wave", "duration": 1500, "delay": 100, "easing": "cubic-bezier(0.05, 0.2, 0.35, 1)", "measurement": "measured"},
+  {"label": "match-loading", "element": "circle", "animation": "wave", "duration": 1500, "delay": 200, "easing": "cubic-bezier(0.05, 0.2, 0.35, 1)", "measurement": "measured"},
+  {"label": "field-review", "element": "div", "property": "transform", "duration": 400, "delay": 0, "easing": "ease", "measurement": "measured"},
+  {"label": "field-review", "element": "input", "property": "outline-color", "duration": 80, "delay": 0, "easing": "linear", "measurement": "measured"},
+  {"label": "match-review", "element": "div", "property": "transform", "duration": 400, "delay": 0, "easing": "ease", "measurement": "measured"}
+]
