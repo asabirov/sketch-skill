@@ -81,7 +81,7 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 
 ## Pattern library
 
-The library has 67 patterns in 8 categories. Each pattern holds a record, its transitions and a sketch. See each pattern and its "Best for" line in [`docs/library.md`](docs/library.md).
+The library has 68 patterns in 8 categories. Each pattern holds a record, its transitions and a sketch. See each pattern and its "Best for" line in [`docs/library.md`](docs/library.md).
 
 | Category | Patterns | Holds |
 | --- | ---: | --- |
@@ -91,7 +91,7 @@ The library has 67 patterns in 8 categories. Each pattern holds a record, its tr
 | Navigation | 8 | User menu, foot menu, topics tree, swipe back |
 | Notifications | 5 | Notification inbox, inbox popover, activity feed, follow menu, subscribe popover |
 | Profile | 4 | Member profile, portfolio profile, profile card, character builder |
-| Settings | 5 | Settings window, settings modal, notification settings by event and by channel, theme switch |
+| Settings | 6 | Settings window, settings modal, notification settings by event and by channel, theme switch, phone settings page |
 | Sheets | 6 | Bottom sheets, catalogue sheets |
 
 ## Run and verify

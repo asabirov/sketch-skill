@@ -1,0 +1,233 @@
+[
+  {
+    "label": "drawer",
+    "trigger": "tap on the menu button",
+    "element": "the side menu",
+    "property": null,
+    "animation": "drawer-in",
+    "duration": 300,
+    "delay": 0,
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "drawer",
+    "trigger": "tap on the menu button",
+    "element": "the dim layer",
+    "property": null,
+    "animation": "scrim-in",
+    "duration": 300,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "chat",
+    "trigger": "tap on the dim layer",
+    "element": "the side menu",
+    "property": null,
+    "animation": "drawer-out",
+    "duration": 250,
+    "delay": 0,
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "chat",
+    "trigger": "tap on the dim layer",
+    "element": "the dim layer",
+    "property": null,
+    "animation": "scrim-out",
+    "duration": 250,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap on the account row",
+    "element": "the Settings page",
+    "property": null,
+    "animation": "push-enter",
+    "duration": 350,
+    "delay": 0,
+    "easing": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap on the account row",
+    "element": "the side menu",
+    "property": null,
+    "animation": "drawer-out",
+    "duration": 250,
+    "delay": 0,
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap on the account row",
+    "element": "the dim layer",
+    "property": null,
+    "animation": "scrim-out",
+    "duration": 250,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "drawer",
+    "trigger": "tap on Back in Settings",
+    "element": "the Settings page",
+    "property": null,
+    "animation": "back-exit",
+    "duration": 350,
+    "delay": 0,
+    "easing": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "drawer",
+    "trigger": "tap on Back in Settings",
+    "element": "the side menu",
+    "property": null,
+    "animation": "drawer-in",
+    "duration": 300,
+    "delay": 0,
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "drawer",
+    "trigger": "tap on Back in Settings",
+    "element": "the dim layer",
+    "property": null,
+    "animation": "scrim-in",
+    "duration": 300,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "section",
+    "trigger": "tap on a row with a chevron",
+    "element": "the page that opens",
+    "property": null,
+    "animation": "push-enter",
+    "duration": 350,
+    "delay": 0,
+    "easing": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "section",
+    "trigger": "tap on a row with a chevron",
+    "element": "the list that leaves",
+    "property": null,
+    "animation": "push-exit",
+    "duration": 350,
+    "delay": 0,
+    "easing": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap on Back",
+    "element": "the list that comes back",
+    "property": null,
+    "animation": "back-enter",
+    "duration": 350,
+    "delay": 0,
+    "easing": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap on Back",
+    "element": "the page that leaves",
+    "property": null,
+    "animation": "back-exit",
+    "duration": 350,
+    "delay": 0,
+    "easing": "cubic-bezier(0.32, 0.72, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "appearance-card",
+    "trigger": "tap on the Appearance row",
+    "element": "the card",
+    "property": null,
+    "animation": "card-in",
+    "duration": 200,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "appearance-card",
+    "trigger": "tap on the Appearance row",
+    "element": "the dim layer",
+    "property": null,
+    "animation": "scrim-in",
+    "duration": 300,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap on a choice of the card, or on the dim layer",
+    "element": "the card",
+    "property": null,
+    "animation": "card-out",
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-in",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap on a choice of the card, or on the dim layer",
+    "element": "the dim layer",
+    "property": null,
+    "animation": "scrim-out",
+    "duration": 250,
+    "delay": 0,
+    "easing": "linear",
+    "measurement": "estimated"
+  },
+  {
+    "label": "sign-out-confirm",
+    "trigger": "tap on Log out",
+    "element": "the pop-up",
+    "property": null,
+    "animation": "popover-in",
+    "duration": 250,
+    "delay": 0,
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "settings",
+    "trigger": "tap outside the pop-up",
+    "element": "the pop-up",
+    "property": null,
+    "animation": "popover-out",
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-in",
+    "measurement": "estimated"
+  },
+  {
+    "label": "signed-out",
+    "trigger": "tap on Log out in the pop-up",
+    "element": "the pop-up",
+    "property": null,
+    "animation": "popover-out",
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease-in",
+    "measurement": "estimated"
+  }
+]
