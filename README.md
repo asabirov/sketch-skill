@@ -87,7 +87,7 @@ The library has 68 patterns in 8 categories. Each pattern holds a record, its tr
 | --- | ---: | --- |
 | Account | 5 | Sign-up, waitlist, OAuth consent, connected apps |
 | Chat | 14 | Chat list, conversation pane, create a chat, voice message, avatar badges, app in a chat |
-| Content | 20 | Feeds, catalog views, comment threads, fact cards, forum list, kanban, timeline, product page, leaderboard |
+| Content | 21 | Feeds, catalog views, comment threads, document match, fact cards, forum list, kanban, timeline, product page, leaderboard |
 | Navigation | 8 | User menu, foot menu, topics tree, swipe back |
 | Notifications | 5 | Notification inbox, inbox popover, activity feed, follow menu, subscribe popover |
 | Profile | 4 | Member profile, portfolio profile, profile card, character builder |

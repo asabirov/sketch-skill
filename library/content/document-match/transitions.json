@@ -1,0 +1,5 @@
+[
+  {"label": "field-review", "element": "div", "property": "transform", "duration": 400, "delay": 0, "easing": "ease", "measurement": "measured"},
+  {"label": "field-review", "element": "input", "property": "outline-color", "duration": 80, "delay": 0, "easing": "linear", "measurement": "measured"},
+  {"label": "match-review", "element": "div", "property": "transform", "duration": 400, "delay": 0, "easing": "ease", "measurement": "measured"}
+]
