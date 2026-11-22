@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.19.0 — 2026-11-23
+
+### Added
+
+- The pattern `content/document-match`. A person matches a bank transaction with an invoice, then checks each value that the product read from the invoice against the document. The document zooms to the value of each step and marks it. A value that differs from the document shows both values, with one button to use the document value. A summary and an edit screen come before the confirmation. On a phone, a bar at the foot opens the document in a drawer, and a down arrow closes it.
+
+### Fixed
+
+- `README.md` and `docs/library.md` say 69 patterns. Two pattern pull requests each raised the count from 67 to 68, so the count was one too low.
+
 ## 0.18.0 — 2026-11-22
 
 ### Added

@@ -81,7 +81,7 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 
 ## Pattern library
 
-The library has 68 patterns in 8 categories. Each pattern holds a record, its transitions and a sketch. See each pattern and its "Best for" line in [`docs/library.md`](docs/library.md).
+The library has 69 patterns in 8 categories. Each pattern holds a record, its transitions and a sketch. See each pattern and its "Best for" line in [`docs/library.md`](docs/library.md).
 
 | Category | Patterns | Holds |
 | --- | ---: | --- |
