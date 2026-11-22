@@ -400,16 +400,12 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   </div>
   <h2>Possible invoices</h2>
   <ul class="sketch-list">
-    <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap;align-items:start"><span><a href="#match-loading">INV-1042, Cedar Studio</a><br><span class="sketch-badge" style="margin-top:6px">Strong match</span></span><span>EUR 1,704.00</span></li>
+    <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap;align-items:start"><span><a href="#match-review">INV-1042, Cedar Studio</a><br><span class="sketch-badge" style="margin-top:6px">Strong match</span></span><span>EUR 1,704.00</span></li>
     <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap"><button class="sketch-link" type="button" data-sketch-toast="The sketch has a document for INV-1042 only (sample)">INV-0998, Cedar Studio</button><span>EUR 980.00</span></li>
   </ul>
   <a href="#match-start">Find another invoice</a>
 </main></section>
 
-<section data-state="match-loading"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
-  <div class="sketch-stack" style="padding:24px"><h1>Payee match</h1><div class="dots" role="img" aria-label="Matching the payee"><i></i><i></i><i></i></div></div>
-  <div class="sketch-from-tablet" style="padding:24px"><div class="sketch-panel sketch-frame" style="min-height:360px;display:grid;place-items:center"><span class="spinner" role="img" aria-label="Loading document"></span></div></div>
-</main></section>
 
 <section data-state="match-review"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
@@ -861,8 +857,6 @@ initSketch();
 </script>
 <script>
 if(!location.hash) location.hash='match-start';
-function finish_loading(){if(location.hash==='#match-loading')setTimeout(()=>{if(location.hash==='#match-loading')location.hash='match-review'},1700)}
-addEventListener('hashchange',finish_loading);finish_loading();
 </script>
 
 <style>
