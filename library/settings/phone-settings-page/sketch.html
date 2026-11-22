@@ -63,6 +63,18 @@
   [data-sketch] .popover a { display: block; min-width: 120px; padding: 10px 18px; border-radius: 999px; color: inherit; text-align: center; text-decoration: none; }
   [data-sketch] .popover a:hover { background: var(--sketch-wash); }
   [data-sketch] .signed_out { position: absolute; inset: 0; display: grid; padding: 24px 16px; background: var(--sketch-page); }
+  /* From 700 px wide, the side menu stays open at the left, and the chat fills the rest. The menu button hides. The pictures show
+     only phones, so this layout is the designer's choice. */
+  @media (min-width: 700px) {
+    [data-sketch] .phone { width: 100%; border-inline: 0 !important; }
+    [data-sketch] .drawer, [data-sketch] .drawer[hidden] { display: grid !important; width: 300px; }
+    [data-sketch] a.scrim[data-part="drawer"] { display: none !important; }
+    [data-sketch] .phone_screen { left: 300px; }
+    [data-sketch] .phone_screen .phone_bar > a[aria-label="Menu"] { visibility: hidden; }
+    /* Settings fills the place of the chat, beside the side menu. Its list keeps a width that reads well. */
+    [data-sketch] .stack { left: 300px; border-left: var(--sketch-stroke) solid var(--sketch-ink); }
+    [data-sketch] .stack .phone_body { width: min(100%, 640px); margin: 0 auto; box-sizing: border-box; }
+  }
   /* Each motion value below comes from transitions.json. */
   [data-sketch] { --ease_drawer: cubic-bezier(0.2, 0, 0, 1); --ease_push: cubic-bezier(0.32, 0.72, 0, 1); }
   [data-sketch] .move_ghost { pointer-events: none; }
@@ -271,9 +283,12 @@
     'close-popover': {exit: [['.popover', 'popover-out', '.group:has(> .popover)']]}
   };
   const visible = (block, selector) => [...block.querySelectorAll(selector)].find(node => !node.closest('[hidden]'));
+  /* On a wide screen the side menu stays open, so its moves do not play. */
+  const wide = matchMedia('(min-width: 700px)');
+  const moves_here = list => (list || []).filter(([selector]) => !(wide.matches && selector.includes('drawer')));
   const run_move = (name, from, to) => {
     const move = moves[name];
-    (move.exit || []).forEach(([selector, animation, parent]) => {
+    moves_here(move.exit).forEach(([selector, animation, parent]) => {
       const part = visible(from, selector), place = visible(to, parent);
       if (!part || !place) return;
       const ghost = part.cloneNode(true);
@@ -286,7 +301,7 @@
       if (body) ghost.querySelector('[data-keep-scroll]').scrollTop = body.scrollTop;
       play(ghost, animation, () => ghost.remove());
     });
-    (move.enter || []).forEach(([selector, animation]) => {
+    moves_here(move.enter).forEach(([selector, animation]) => {
       const part = visible(to, selector);
       if (part) play(part, animation);
     });
