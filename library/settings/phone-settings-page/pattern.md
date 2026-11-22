@@ -37,6 +37,7 @@ The pictures give no durations and no easings. Each value above is the designer'
 - Another phone system: one version of the source shows the value of a choice under its label, not at the right. It shows the appearance choice in the same card in the center. Its Log out row is marked as dangerous, and it asks in an alert in the center with Cancel and Log out.
 - Appearance on the source's other version: the row shows its value with up and down chevrons. The pictures do not show the open choice there. The sketch uses the card, which the pictures show.
 - Escape on a keyboard: the sketch closes the card, the pop-up, the section, Settings or the side menu, in this order. The source shows no keyboard.
+- Wide screen: the pictures show only phones. From 700 px, the sketch keeps the side menu open at the left and hides the menu button. Settings fills the place of the chat, beside the side menu, and its list is at most 640 px wide. Back shows the chat again. This is the designer's choice.
 - Reduced motion: each change shows its end at once.
 - Empty, error and slow network: the source shows no such state.
 
