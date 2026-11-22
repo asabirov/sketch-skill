@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 68 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 69 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -94,6 +94,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 
 | Pattern | Best for |
 | --- | --- |
+| [`settings/members-list`](../library/settings/members-list/) | A person who manages a shared account, such as a family or a small team, sees each member with a role and the last activity, invites a member with a role, decides on a request to join, and signs a member out of one device or of all devices. For the profile that other members see, use `profile/member-profile`. |
 | [`settings/notification-settings-by-channel`](../library/settings/notification-settings-by-channel/) | A product that sends events on more than one channel and has more than 15 kinds of event. A member chooses which events notify them on each channel, and turns a channel off without losing the choices for its events. |
 | [`settings/notification-settings-by-event`](../library/settings/notification-settings-by-event/) | A product that sends fewer than 13 kinds of event on 2 or 3 channels. A member chooses how each kind of event reaches them, and from whom. |
 | [`settings/phone-settings-page`](../library/settings/phone-settings-page/) | A phone app with about 15 settings, where a signed-in person opens Settings from their account and goes back with Back. Each choice applies at once, and a sign-out asks once more. |
