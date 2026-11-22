@@ -34,6 +34,7 @@ The agent read each value with the capture script on the public demo.
 - Narrow screen: at 390 px the source shows the form only. The document column and its chevron are gone, so a person on a phone cannot see the source value. The sketch keeps a "Document" button above the form. It opens a separate document view with a return link.
 - Value not found: not seen. The sketch shows the whole document with no marker, and the field shows no error.
 - Long document: the source scrolls the document inside its column and keeps the zoom bar at its foot.
+- Where the document came from: the source does not say where the document came from. The sketch shows one line above the document that names it, such as a photo from a phone with its date. The owner asked for it. This line is drawn.
 - Two currencies: the source shows a memo that says the services were converted. Not seen as a state.
 - Keyboard: Tab moves through the fields. The focus on a field zooms the document. The zoom bar has Zoom in, Zoom out and Reset zoom buttons, each with a name.
 - Slow network: the document shows a spinner on a blank sheet while it loads.
