@@ -1,0 +1,458 @@
+<!doctype html>
+<!--
+  Best for: a person who manages a shared account sees each member with a role and the last activity, invites a member with a role, decides on a request to join, and signs a member out of one device or of all devices. For the profile that other members see, use profile/member-profile.
+  Row opens: on the record's own page. A row opens the page of the member, with the role, the join facts, the devices and Remove.
+  Related: profile/member-profile is the public page of a member. settings/settings-modal is the window that can hold this list for a shared workspace. account/connected-apps is the list of outside apps with a disconnect after a confirmation.
+  The list page has the title with Invite, a bar with a search and a Filter button, and a table. Each row has a check box, the picture, the name with the email below it and a status word after the name, the role, the last activity and a chevron. A check on one or more rows shows a filled bar of actions that floats at the foot of the screen: the count, Copy emails, Change role with a menu, Remove and a close button.
+  The invite dialog has 2 tabs: Invite by email, with the emails and a role field, and Invite link, with the link, Copy link, Reset link and a switch. Send invite stays off until an email is typed, with a line that says why. Each role field shows the icon of the role, and its menu gives each role with its icon and one line.
+  The pattern has no side list and no top bar. The product puts the page in its own frame.
+  The page of a member has a back link, a head with the picture, the name and the email, a role field, the join facts, the list of devices with Sign out on each device, Sign out of all devices, and Remove.
+  Transition values, from transitions.json: none. Each change shows at once. 0 ms, estimated from the pictures of the source.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Members list</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .sketch-main > a:first-child { margin-bottom: -12px; }
+  [data-sketch] :is(.sketch-dialog, .members_head > div, .members_devices > li > div) > :is(h1, h2, p) { margin: 0; }
+  /* The title row: the title on the left, Invite on the right. */
+  [data-sketch] .members_title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  [data-sketch] .members_title > h1 { flex: 1 1 auto; margin: 0; }
+  [data-sketch] .members_bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  [data-sketch] .members_bar > .sketch-input { flex: 0 1 280px; min-width: 0; }
+  /* A person cell: the picture, then the name with its status word and the email below. */
+  [data-sketch] .members_person { display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 0 12px; }
+  [data-sketch] .members_person > div { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .members_person a { justify-self: start; justify-content: start; min-height: 0; padding: 0; font-weight: 600; text-decoration: none; }
+  [data-sketch] .members_person a:hover { text-decoration: underline; }
+  [data-sketch] .members_name { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  [data-sketch] .sketch-table td:first-child { width: 44px; }
+  [data-sketch] .sketch-table td:last-child { width: 44px; text-align: right; }
+  [data-sketch] .sketch-table tr[data-checked] { background: var(--sketch-wash); }
+  /* The bar of actions for the checked rows floats at the foot of the screen. It is the one filled shape of the page. */
+  [data-sketch] .members_bulk { position: sticky; bottom: 16px; justify-self: center; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: 100%; padding: 8px 8px 8px 16px; border-radius: var(--sketch-wobble); background: var(--sketch-ink); color: var(--sketch-page); }
+  [data-sketch] .members_bulk > b { margin-right: 4px; }
+  [data-sketch] .members_bulk :is(.sketch-button, .sketch-icon-button) { min-height: 36px; border-color: var(--sketch-page); background: transparent; color: var(--sketch-page); }
+  [data-sketch] .members_bulk :is(.sketch-button, .sketch-icon-button):hover { background: color-mix(in srgb, var(--sketch-page) 18%, transparent); color: var(--sketch-page); }
+  [data-sketch] .members_bulk .members_danger_button { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  [data-sketch] .members_bulk .sketch-menu { color: var(--sketch-ink); }
+  /* The page of a member. */
+  [data-sketch] .members_head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-bottom: 20px; border-bottom: 1px solid var(--sketch-muted); }
+  [data-sketch] .members_head > .sketch-avatar { width: 56px; height: 56px; }
+  [data-sketch] .members_head > div { flex: 1 1 200px; display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .members_body { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 32px 48px; align-items: start; }
+  [data-sketch] .members_body > div { display: grid; gap: 16px; min-width: 0; }
+  [data-sketch] .members_body h2 { margin: 8px 0 0; }
+  [data-sketch] .members_devices { display: grid; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .members_devices > li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-block: 12px; border-bottom: 1px solid var(--sketch-wash); }
+  [data-sketch] .members_devices > li > div { flex: 1 1 200px; display: grid; gap: 2px; min-width: 0; }
+  [data-sketch] .members_request { display: grid; gap: 12px; padding: 16px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .members_request > p { margin: 0; }
+  [data-sketch] .members_danger { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 16px; border-top: 1px solid var(--sketch-muted); }
+  [data-sketch] .members_danger > span { flex: 1 1 200px; }
+  [data-sketch] .members_filter { display: grid; gap: 12px; min-width: 240px; }
+  [data-sketch] .members_filter legend { font-weight: 600; margin-bottom: 4px; }
+  /* A role field: a button that shows the icon and the name of the role, with a menu of the roles. */
+  [data-sketch] .members_field { display: grid; gap: 6px; }
+  [data-sketch] .members_pick { display: flex; align-items: center; gap: 10px; min-height: 48px; text-align: left; cursor: pointer; }
+  [data-sketch] .members_pick > [data-pick-value] { flex: 1 1 auto; }
+  [data-sketch] .members_pick_icon { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] .members_role_item { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; gap: 10px; text-align: left; }
+  [data-sketch] .members_role_item > span { display: grid; gap: 2px; }
+  [data-sketch] .members_role_item .sketch-muted { font-size: 14px; }
+  /* Each dialog is a column, not a grid: each part takes its height at the width of the dialog. The owner saw the check box row of the Remove dialog grow far too tall in Chrome when the dialog was a grid. */
+  [data-sketch] .sketch-dialog[open] { display: flex; flex-direction: column; }
+  /* The invite dialog: the tabs and the close button in one row, a line under them. */
+  [data-sketch] .members_dialog_head { display: flex; align-items: end; gap: 8px; margin: -8px 0 0; border-bottom: 1px solid var(--sketch-muted); }
+  [data-sketch] .members_dialog_head > .sketch-tabs { flex: 1 1 auto; margin-bottom: -1px; }
+  [data-sketch] .members_dialog_head [role="tab"]:focus-visible { outline-offset: -3px; }
+  [data-sketch] .members_dialog_head > .sketch-icon-button { margin-bottom: 4px; }
+  /* Both tab panels share one area, so the dialog keeps its size when the tab changes. */
+  [data-sketch] .members_panels { display: grid; }
+  [data-sketch] .members_panels > .members_panel { grid-area: 1 / 1; align-content: start; }
+  [data-sketch] .members_panels > .members_panel[hidden] { display: grid !important; visibility: hidden; }
+  [data-sketch] .members_panel { display: grid; gap: 16px; }
+  [data-sketch] .members_panel > p { margin: 0; }
+  [data-sketch] .members_foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px 12px; padding-top: 12px; border-top: 1px solid var(--sketch-muted); }
+  [data-sketch] .members_foot > .sketch-muted { flex: 1 1 200px; margin: 0; }
+  [data-sketch] .members_link { display: flex; flex-wrap: wrap; gap: 8px; }
+  [data-sketch] .members_link > .sketch-input { flex: 1 1 220px; min-width: 0; }
+  @media (max-width: 719px) {
+    [data-sketch] .members_body { grid-template-columns: minmax(0, 1fr); }
+  }
+  /* On a phone each row is a grid: the check box, the person and the chevron, then the role and the last activity under the name. */
+  @media (max-width: 599px) {
+    [data-sketch] .sketch-table tr { display: grid; grid-template-columns: 44px auto minmax(0, 1fr) 44px; grid-template-areas: "check person person open" ". role active open"; align-items: center; gap: 4px 8px; }
+    [data-sketch] .sketch-table td { width: auto !important; }
+    [data-sketch] .sketch-table td:nth-child(1) { grid-area: check; }
+    [data-sketch] .sketch-table td:nth-child(2) { grid-area: person; }
+    [data-sketch] .sketch-table td:nth-child(3) { grid-area: role; padding-left: 48px; }
+    [data-sketch] .sketch-table td:nth-child(4) { grid-area: active; color: var(--sketch-muted); }
+    [data-sketch] .sketch-table td:nth-child(5) { grid-area: open; }
+  }
+</style>
+<body data-sketch>
+<!-- The page script copies a template into each state. data-hide names the rows that the state leaves out, data-show the rows that it adds, and data-check the rows that it checks. -->
+<section data-state="list" data-page="people"></section>
+<section data-state="filter" data-page="people" data-open-part="filter"></section>
+<section data-state="selected" data-page="people" data-check="sam mia"></section>
+<section data-state="bulk-role" data-page="people" data-check="sam mia" data-open-part="bulkrole"></section>
+<section data-state="invite" data-page="people" data-open-part="invite"></section>
+<section data-state="invite-link" data-page="people" data-open-part="invite" data-tab="link"></section>
+<section data-state="invited" data-page="people" data-show="jo" data-toast="Invite sent to jo.lane@example.com (sample)."></section>
+<section data-state="member" data-page="member"></section>
+<section data-state="edit" data-page="member" data-open-part="edit"></section>
+<section data-state="sign-out" data-page="member" data-open-part="signout"></section>
+<section data-state="signed-out" data-page="member" data-hide="tablet" data-toast="Mia is signed out of the old tablet (sample)."></section>
+<section data-state="remove" data-page="member" data-open-part="remove"></section>
+<section data-state="request" data-page="request"></section>
+<section data-state="approved" data-page="people" data-approved="ana" data-toast="Ana Reyes is now a member (sample)."></section>
+
+<template id="frame">
+  <main class="sketch-main sketch-stack" style="max-width:1040px"></main>
+</template>
+
+<template id="people">
+  <div class="members_title">
+    <h1>Members</h1>
+    <button class="sketch-button" type="button" data-sketch-open="invite___state__"><i data-icon="plus"></i>Invite</button>
+  </div>
+  <div class="members_bar">
+    <input class="sketch-input" type="search" placeholder="Search members" aria-label="Search members" data-search>
+    <span class="sketch-spacer"></span>
+    <button class="sketch-button secondary" type="button" data-sketch-popover="filter___state__"><i data-icon="filter"></i>Filter</button>
+  </div>
+  <div class="sketch-table-box"><table class="sketch-table">
+    <thead><tr><th aria-label="Select"></th><th>Name</th><th>Role</th><th>Last active</th><th aria-label="Open"></th></tr></thead>
+    <tbody>
+      <tr data-row="dana">
+        <td></td>
+        <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">DR</span><div><span class="members_name"><a href="#member">Dana Reyes</a><span class="sketch-muted">You</span></span><span class="sketch-muted">dana@example.com</span></div></div></td>
+        <td>Admin</td><td>Now</td>
+        <td><a class="sketch-icon-button" href="#member" aria-label="Open Dana Reyes"><i data-icon="chevron-right"></i></a></td>
+      </tr>
+      <tr data-row="sam">
+        <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Sam Reyes" data-check-row></label></td>
+        <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">SR</span><div><span class="members_name"><a href="#member">Sam Reyes</a></span><span class="sketch-muted">sam@example.com</span></div></div></td>
+        <td>Member</td><td>2 hours ago</td>
+        <td><a class="sketch-icon-button" href="#member" aria-label="Open Sam Reyes"><i data-icon="chevron-right"></i></a></td>
+      </tr>
+      <tr data-row="mia">
+        <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Mia Reyes" data-check-row></label></td>
+        <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">MR</span><div><span class="members_name"><a href="#member">Mia Reyes</a></span><span class="sketch-muted">mia@example.com</span></div></div></td>
+        <td>Viewer</td><td>Yesterday</td>
+        <td><a class="sketch-icon-button" href="#member" aria-label="Open Mia Reyes"><i data-icon="chevron-right"></i></a></td>
+      </tr>
+      <tr data-row="leo">
+        <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Leonardo Alexander Reyes-Whitfield" data-check-row></label></td>
+        <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">LR</span><div><span class="members_name"><a href="#member">Leonardo Alexander Reyes-Whitfield</a></span><span class="sketch-muted">leonardo.alexander.reyes-whitfield@example.com</span></div></div></td>
+        <td>Viewer</td><td>3 weeks ago</td>
+        <td><a class="sketch-icon-button" href="#member" aria-label="Open Leonardo Alexander Reyes-Whitfield"><i data-icon="chevron-right"></i></a></td>
+      </tr>
+      <tr data-row="ana">
+        <td><label class="sketch-choice"><input type="checkbox" aria-label="Select Ana Reyes" data-check-row></label></td>
+        <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">AR</span><div><span class="members_name"><a href="#request">Ana Reyes</a><span class="sketch-badge strong" data-status>Asks to join</span></span><span class="sketch-muted">ana@example.com</span></div></div></td>
+        <td data-role>Member</td><td data-active>Asked today</td>
+        <td><a class="sketch-icon-button" href="#request" aria-label="Open the request of Ana Reyes"><i data-icon="chevron-right"></i></a></td>
+      </tr>
+      <tr data-row="kim">
+        <td><label class="sketch-choice"><input type="checkbox" aria-label="Select kim.ono@example.com" data-check-row></label></td>
+        <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">KO</span><div><span class="members_name"><a href="#member">kim.ono@example.com</a><span class="sketch-badge">Invited</span></span><span class="sketch-muted">Invite sent 4 days ago</span></div></div></td>
+        <td>Viewer</td><td>Not joined</td>
+        <td><a class="sketch-icon-button" href="#member" aria-label="Open the invite of kim.ono@example.com"><i data-icon="chevron-right"></i></a></td>
+      </tr>
+      <tr data-row="jo" data-extra>
+        <td><label class="sketch-choice"><input type="checkbox" aria-label="Select jo.lane@example.com" data-check-row></label></td>
+        <td><div class="members_person"><span class="sketch-avatar" aria-hidden="true">JL</span><div><span class="members_name"><a href="#member">jo.lane@example.com</a><span class="sketch-badge">Invited</span></span><span class="sketch-muted">Invite sent now</span></div></div></td>
+        <td>Member</td><td>Not joined</td>
+        <td><a class="sketch-icon-button" href="#member" aria-label="Open the invite of jo.lane@example.com"><i data-icon="chevron-right"></i></a></td>
+      </tr>
+    </tbody>
+  </table></div>
+  <p class="sketch-muted" data-no-match hidden>No member matches your search.</p>
+  <div class="members_bulk" data-bulk hidden>
+    <b data-bulk-count>2 members selected</b>
+    <button class="sketch-button secondary" type="button" data-sketch-toast="The 2 emails are copied (sample).">Copy emails</button>
+    <button class="sketch-button secondary" type="button" data-sketch-popover="bulkrole___state__">Change role<i data-icon="chevron-down"></i></button>
+    <button class="sketch-button secondary members_danger_button" type="button" data-sketch-toast="Opens one confirmation that names each selected member (sample).">Remove</button>
+    <button class="sketch-icon-button" type="button" aria-label="Clear the selection" data-clear><i data-icon="close"></i></button>
+    <div class="sketch-menu" id="bulkrole___state__" aria-label="Change role">
+      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now admins (sample)."><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now members (sample)."><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-sketch-toast="The 2 members are now viewers (sample)."><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
+    </div>
+  </div>
+  <div class="sketch-popover" id="filter___state__" role="dialog" aria-label="Filter members">
+    <div class="members_filter">
+      <fieldset><legend>Role</legend>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Admin">Admin</label>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Member">Member</label>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Viewer">Viewer</label>
+      </fieldset>
+      <fieldset><legend>Status</legend>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Invited">Invited</label>
+        <label class="sketch-choice"><input type="checkbox" data-filter="Asks to join">Asks to join</label>
+      </fieldset>
+    </div>
+  </div>
+  <dialog class="sketch-dialog" id="invite___state__" aria-label="Invite a member">
+    <div class="members_dialog_head">
+      <div class="sketch-tabs" aria-label="Invite">
+        <button type="button" role="tab" aria-controls="invite_email___state__" aria-selected="true" data-tab-id="email">Invite by email</button>
+        <button type="button" role="tab" aria-controls="invite_link___state__" data-tab-id="link">Invite link</button>
+      </div>
+      <button class="sketch-icon-button" type="button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button>
+    </div>
+    <div class="members_panels">
+    <div class="members_panel" id="invite_email___state__">
+      <label class="sketch-field">Email <input class="sketch-input" type="email" placeholder="Emails, comma separated" data-invite-email></label>
+      <div class="members_field"><span id="invite_role___state___label">Role</span>
+    <button class="sketch-input members_pick" type="button" aria-labelledby="invite_role___state___label invite_role___state___value" data-sketch-popover="invite_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="eye"></i></span><span id="invite_role___state___value" data-pick-value>Viewer</span><i data-icon="chevron-down"></i></button>
+    <div class="sketch-menu" id="invite_role___state__" aria-label="Role">
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Admin" data-role-icon="settings"><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Member" data-role-icon="user"><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Viewer" data-role-icon="eye"><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
+    </div>
+  </div>
+      <p class="sketch-muted">The person joins with this role after they accept the invite.</p>
+      <div class="members_foot">
+        <p class="sketch-muted" data-invite-why>Type an email to send the invite.</p>
+        <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Cancel</button>
+        <button class="sketch-button" type="button" data-invite-send disabled>Send invite</button>
+      </div>
+    </div>
+    <div class="members_panel" id="invite_link___state__">
+      <p>Anyone with this link can ask to join. Each request waits for your approval.</p>
+      <label class="sketch-switch"><input type="checkbox" role="switch" checked>Invite link is on</label>
+      <div class="members_link">
+        <input class="sketch-input" type="text" value="join/7Q4-XK2" readonly aria-label="Invite link">
+        <button class="sketch-button" type="button" data-sketch-toast="The link is copied (sample)."><i data-icon="copy"></i>Copy link</button>
+      </div>
+      <div class="members_foot">
+        <p class="sketch-muted">A new link stops the old link at once.</p>
+        <button class="sketch-button secondary" type="button" data-sketch-toast="A new link is made. The old link no longer works (sample).">Reset link</button>
+      </div>
+    </div>
+    </div>
+  </dialog>
+</template>
+
+<template id="member">
+  <a href="#list"><i data-icon="arrow-left"></i>Members</a>
+  <div class="members_head">
+    <span class="sketch-avatar" aria-hidden="true">MR</span>
+    <div><h1>Mia Reyes</h1><span class="sketch-muted">mia@example.com</span></div>
+    <span class="sketch-spacer"></span>
+    <button class="sketch-button secondary" type="button" data-sketch-open="edit___state__"><i data-icon="edit"></i>Edit</button>
+  </div>
+  <div class="members_body">
+    <div>
+      <div class="members_field"><span id="member_role___state___label">Role</span>
+    <button class="sketch-input members_pick" type="button" aria-labelledby="member_role___state___label member_role___state___value" data-sketch-popover="member_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="eye"></i></span><span id="member_role___state___value" data-pick-value>Viewer</span><i data-icon="chevron-down"></i></button>
+    <div class="sketch-menu" id="member_role___state__" aria-label="Role">
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Admin" data-role-icon="settings"><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Member" data-role-icon="user"><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Viewer" data-role-icon="eye"><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
+    </div>
+  </div>
+      <h2>Devices</h2>
+      <p class="sketch-muted">Each device where Mia is signed in. Sign out a device that is lost or that Mia no longer uses.</p>
+      <ul class="members_devices">
+        <li data-row="phone"><div><b>Phone</b><span class="sketch-muted">Signed in 12 Jan 2026. Active now</span></div>
+          <button class="sketch-button secondary" type="button" data-sketch-toast="Works the same as the old tablet in this sketch.">Sign out</button></li>
+        <li data-row="laptop"><div><b>Family laptop, browser</b><span class="sketch-muted">Signed in 3 Mar 2025. Active yesterday</span></div>
+          <button class="sketch-button secondary" type="button" data-sketch-toast="Works the same as the old tablet in this sketch.">Sign out</button></li>
+        <li data-row="tablet"><div><b>Old tablet</b><span class="sketch-muted">Signed in 9 Sep 2024. Active 5 months ago</span></div>
+          <button class="sketch-button secondary" type="button" data-sketch-open="signout___state__">Sign out</button></li>
+      </ul>
+      <div class="sketch-row"><button class="sketch-button secondary" type="button" data-sketch-toast="Opens a confirmation that ends each session of Mia (sample).">Sign out of all devices</button></div>
+      <div class="members_danger">
+        <span>Remove Mia from the family. Mia can no longer sign in to this account.</span>
+        <button class="sketch-button secondary" type="button" data-sketch-open="remove___state__"><i data-icon="trash"></i>Remove</button>
+      </div>
+    </div>
+    <dl class="sketch-facts">
+      <dt>Joined</dt><dd>3 March 2025</dd>
+      <dt>Joined by</dt><dd>Invite from Dana Reyes</dd>
+      <dt>Last active</dt><dd>Yesterday</dd>
+    </dl>
+  </div>
+  <dialog class="sketch-dialog" id="edit___state__" aria-labelledby="edit_title___state__">
+    <h2 id="edit_title___state__">Edit Mia Reyes</h2>
+    <label class="sketch-field">Name <input class="sketch-input" type="text" value="Mia Reyes" autofocus></label>
+    <label class="sketch-field">Email <input class="sketch-input" type="email" value="mia@example.com"></label>
+    <p class="sketch-muted">A new email takes effect after Mia confirms it from that address.</p>
+    <div class="sketch-row">
+      <button class="sketch-button" type="button" data-sketch-close data-sketch-toast="The changes to Mia Reyes are saved (sample).">Save</button>
+      <button class="sketch-button secondary" type="button" data-sketch-close>Cancel</button>
+    </div>
+  </dialog>
+  <dialog class="sketch-dialog" id="signout___state__" aria-labelledby="signout_title___state__">
+    <h2 id="signout_title___state__">Sign Mia out of the old tablet?</h2>
+    <p>The old tablet asks for a new sign-in. Mia stays signed in on the other devices.</p>
+    <div class="sketch-row">
+      <a class="sketch-button" href="#signed-out">Sign out</a>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Cancel</button>
+    </div>
+  </dialog>
+  <dialog class="sketch-dialog" id="remove___state__" aria-labelledby="remove_title___state__">
+    <h2 id="remove_title___state__">Remove Mia Reyes?</h2>
+    <p>Mia is signed out of each device and can no longer sign in to this account.</p>
+    <label class="sketch-choice"><input type="checkbox" data-remove-ok>I understand that this cannot be undone</label>
+    <div class="sketch-row">
+      <button class="sketch-button" type="button" data-remove disabled data-sketch-toast="Mia Reyes is removed (sample).">Remove member</button>
+      <button class="sketch-button secondary" type="button" data-sketch-close autofocus>Cancel</button>
+    </div>
+    <p class="sketch-muted" data-remove-why>Check the box to remove the member.</p>
+  </dialog>
+</template>
+
+<template id="request">
+  <a href="#list"><i data-icon="arrow-left"></i>Members</a>
+  <div class="members_head">
+    <span class="sketch-avatar" aria-hidden="true">AR</span>
+    <div><h1>Ana Reyes</h1><span class="sketch-muted">ana@example.com</span></div>
+    <span class="sketch-badge strong">Asks to join</span>
+  </div>
+  <div class="members_body">
+    <div>
+      <div class="members_request">
+        <p><b>Ana Reyes asks to join as a member.</b></p>
+        <p>"Hi, it is Grandma Ana. Sam sent me the family link."</p>
+        <div class="members_field"><span id="request_role___state___label">Role after approval</span>
+    <button class="sketch-input members_pick" type="button" aria-labelledby="request_role___state___label request_role___state___value" data-sketch-popover="request_role___state__"><span class="members_pick_icon" data-pick-icon><i data-icon="user"></i></span><span id="request_role___state___value" data-pick-value>Member</span><i data-icon="chevron-down"></i></button>
+    <div class="sketch-menu" id="request_role___state__" aria-label="Role after approval">
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Admin" data-role-icon="settings"><i data-icon="settings"></i><span><b>Admin</b><span class="sketch-muted">Manages the members and the settings</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Member" data-role-icon="user"><i data-icon="user"></i><span><b>Member</b><span class="sketch-muted">Uses the account and its shared items</span></span></button>
+      <button class="sketch-menu-item members_role_item" type="button" data-role="Viewer" data-role-icon="eye"><i data-icon="eye"></i><span><b>Viewer</b><span class="sketch-muted">Sees the shared items and changes nothing</span></span></button>
+    </div>
+  </div>
+        <div class="sketch-row">
+          <a class="sketch-button" href="#approved">Approve</a>
+          <button class="sketch-button secondary" type="button" data-sketch-toast="The request is declined. Ana Reyes gets a message (sample).">Decline</button>
+        </div>
+      </div>
+    </div>
+    <dl class="sketch-facts">
+      <dt>Asked</dt><dd>Today, 9:40</dd>
+      <dt>Came from</dt><dd>Family link shared by Sam Reyes</dd>
+    </dl>
+  </div>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  // transitions.json is empty: each change in this pattern shows at once.
+  window.__sketchTransitions = [];
+
+  const words = list => (list || '').split(' ').filter(Boolean);
+
+  document.querySelectorAll('[data-state]').forEach(section => {
+    const state = section.dataset.state;
+    section.innerHTML = document.getElementById('frame').innerHTML;
+    section.querySelector('main').innerHTML = document.getElementById(section.dataset.page).innerHTML.replaceAll('__state__', state);
+    const shown = words(section.dataset.show);
+    section.querySelectorAll('[data-extra]').forEach(row => { if (!shown.includes(row.dataset.row)) row.remove(); });
+    words(section.dataset.hide).forEach(row => section.querySelector(`[data-row="${row}"]`)?.remove());
+    words(section.dataset.check).forEach(row => {
+      const box = section.querySelector(`[data-row="${row}"] [data-check-row]`);
+      if (box) box.checked = true;
+    });
+    words(section.dataset.approved).forEach(row => {
+      const item = section.querySelector(`[data-row="${row}"]`);
+      item?.querySelector('[data-status]')?.remove();
+      item?.querySelectorAll('a[href="#request"]').forEach(link => { link.href = '#member'; });
+      const active = item?.querySelector('[data-active]');
+      if (active) active.textContent = 'Joined now';
+    });
+    if (section.dataset.tab) {
+      section.querySelectorAll('[data-tab-id]').forEach(tab => {
+        const chosen = tab.dataset.tabId === section.dataset.tab;
+        tab.setAttribute('aria-selected', String(chosen));
+        tab.tabIndex = chosen ? 0 : -1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden = !chosen;
+        tab.autofocus = chosen;
+      });
+      section.querySelectorAll('[role="tabpanel"] [autofocus], .members_panel [autofocus]').forEach(el => { if (!el.matches('[role="tab"]')) el.autofocus = false; });
+    }
+    if (section.dataset.openPart) section.querySelector(`#${section.dataset.openPart}_${state}`)?.setAttribute('data-open', '');
+  });
+
+  // A check on a row marks the row and shows the bar of actions with the count.
+  const update_bulk = section => {
+    const checked = [...section.querySelectorAll('[data-check-row]')].filter(box => box.checked);
+    section.querySelectorAll('[data-check-row]').forEach(box => box.closest('tr').toggleAttribute('data-checked', box.checked));
+    const bar = section.querySelector('[data-bulk]');
+    if (!bar) return;
+    bar.hidden = checked.length === 0;
+    bar.querySelector('[data-bulk-count]').textContent = `${checked.length} ${checked.length === 1 ? 'member' : 'members'} selected`;
+  };
+  document.querySelectorAll('[data-state]').forEach(update_bulk);
+
+  // The search and the filter show only the rows that match, at once.
+  const apply_filter = section => {
+    const typed = (section.querySelector('[data-search]')?.value || '').trim().toLowerCase();
+    const picked = [...section.querySelectorAll('[data-filter]:checked')].map(box => box.dataset.filter.toLowerCase());
+    let shown = 0;
+    section.querySelectorAll('tbody tr').forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.hidden = !text.includes(typed) || (picked.length > 0 && !picked.some(word => text.includes(word)));
+      if (!row.hidden) shown += 1;
+    });
+    const none = section.querySelector('[data-no-match]');
+    if (none) none.hidden = shown > 0;
+  };
+
+  document.addEventListener('input', event => {
+    const section = event.target.closest('[data-state]');
+    if (!section) return;
+    if (event.target.matches('[data-search], [data-filter]')) apply_filter(section);
+    if (event.target.matches('[data-check-row]')) update_bulk(section);
+    if (event.target.matches('[data-invite-email]')) {
+      const ready = event.target.value.includes('@');
+      section.querySelector('[data-invite-send]').disabled = !ready;
+      section.querySelector('[data-invite-why]').hidden = ready;
+    }
+    if (event.target.matches('[data-remove-ok]')) {
+      section.querySelector('[data-remove]').disabled = !event.target.checked;
+      section.querySelector('[data-remove-why]').hidden = event.target.checked;
+    }
+  });
+
+  // A role in the menu of a role field becomes the value of the field, with its icon.
+  document.addEventListener('click', event => {
+    const item = event.target.closest('[data-role]');
+    if (!item) return;
+    const field = item.closest('.members_field');
+    field.querySelector('[data-pick-value]').textContent = item.dataset.role;
+    field.querySelector('[data-pick-icon]').replaceChildren(item.querySelector('svg, i').cloneNode(true));
+  });
+
+  // Send invite stays off until an email is typed. Then it sends, and the list shows the invite.
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-invite-send]')) location.hash = '#invited';
+  });
+
+  document.addEventListener('click', event => {
+    const clear = event.target.closest('[data-clear]');
+    if (!clear) return;
+    const section = clear.closest('[data-state]');
+    section.querySelectorAll('[data-check-row]').forEach(box => { box.checked = false; });
+    update_bulk(section);
+    section.querySelector('[data-search]')?.focus();
+  });
+
+  initSketch();
+
+  // A state with a toast shows it when the state opens. A state without a toast closes the toast of the state before.
+  const show_toast = () => {
+    const section = [...document.querySelectorAll('[data-state]')].find(item => !item.hidden);
+    if (section?.dataset.toast) sketchToast(section.dataset.toast, section.querySelector('h1'));
+    else document.querySelectorAll('.sketch-toast').forEach(toast => { toast.hidden = true; });
+  };
+  addEventListener('hashchange', show_toast);
+  show_toast();
+</script>
