@@ -400,10 +400,10 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   </div>
   <h2>Possible invoices</h2>
   <ul class="sketch-list">
-    <li class="sketch-row" style="justify-content:space-between"><span><a href="#match-loading">INV-1042, Cedar Studio</a> <span class="sketch-badge">Strong match</span></span><span>EUR 1,704.00</span></li>
-    <li class="sketch-row" style="justify-content:space-between"><span><a href="#match-loading">INV-0998, Cedar Studio</a></span><span>EUR 980.00</span></li>
+    <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap;align-items:start"><span><a href="#match-loading">INV-1042, Cedar Studio</a><br><span class="sketch-badge" style="margin-top:6px">Strong match</span></span><span>EUR 1,704.00</span></li>
+    <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap"><a href="#match-loading">INV-0998, Cedar Studio</a><span>EUR 980.00</span></li>
   </ul>
-  <input class="sketch-input" type="search" aria-label="Find another invoice" placeholder="Find another invoice" autocomplete="off">
+  <a href="#match-start">Find another invoice</a>
 </main></section>
 
 <section data-state="match-loading"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
@@ -413,81 +413,73 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 
 <section data-state="match-review"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
-    <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Payee match</h1><p class="sketch-muted">The supplier name matches a previous invoice.</p>
+    <h1>Payee match</h1><p class="sketch-muted">The supplier name matches a previous invoice.</p>
     <div class="sketch-panel sketch-frame sketch-stack">
       <div class="sketch-row"><span class="sketch-avatar square" aria-hidden="true">CS</span><strong>Cedar Studio</strong><span class="sketch-badge">Strong match</span></div>
-      <dl class="sketch-facts"><dt>Last paid</dt><dd>2 Aug 2026</dd><dt>Address</dt><dd>12 Example Road</dd><dt>Method</dt><dd>Bank transfer</dd></dl>
     </div>
     <a class="sketch-button" href="#field-review">Use this payee</a>
-    <p class="sketch-muted" style="text-align:center">OR</p>
-    <input class="sketch-input" type="search" aria-label="Find another payee" placeholder="Find another payee" autocomplete="off">
-    <a href="#match-review">Create a new payee</a>
+    <a href="#match-review">Choose another payee</a>
+    <button class="doc-bar" type="button" data-sketch-open="drawer-match-review"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
+    <dialog class="sketch-dialog doc-drawer" id="drawer-match-review" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom=""></div></dialog>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="" style="padding:24px"></div>
 </main></section>
 
 <section data-state="field-review"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
-    <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Amount</h1>
+    <h1>Amount</h1>
     <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-zoom="total" data-field="total" autofocus></label>
     <label class="sketch-field">Issued<input class="sketch-input" value="2026-09-18" data-zoom="date" data-field="date"></label>
     <div class="sketch-row"><a class="sketch-button secondary" href="#match-review"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#mismatch">Next<i data-icon="chevron-right"></i></a></div>
+    <button class="doc-bar" type="button" data-sketch-open="drawer-field-review"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
+    <dialog class="sketch-dialog doc-drawer" id="drawer-field-review" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom="total"></div></dialog>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="total" style="padding:24px"></div>
 </main></section>
 
 <section data-state="mismatch"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
-    <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Amount</h1>
+    <h1>Amount</h1>
     <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1740.00" aria-invalid="true" data-zoom="total"></label>
     <p class="sketch-error">Error: the document says EUR 1,704.00.</p>
-    <div class="sketch-row"><a class="sketch-button secondary" href="#field-review"><i data-icon="chevron-left"></i>Back</a><button class="sketch-button" data-correct>Use 1,704.00</button><a class="sketch-button secondary" href="#match-finish">Next<i data-icon="chevron-right"></i></a></div>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#field-review"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#match-finish">Use 1,704.00</a></div>
+    <button class="doc-bar" type="button" data-sketch-open="drawer-mismatch"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
+    <dialog class="sketch-dialog doc-drawer" id="drawer-mismatch" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom="total"></div></dialog>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="total" style="padding:24px"></div>
 </main></section>
 
 <section data-state="match-finish"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
-    <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Check the match</h1>
+    <h1>Check the match</h1>
     <p class="sketch-muted">The payment and the invoice agree.</p>
     <div class="sketch-panel sketch-frame sketch-stack">
       <dl class="sketch-facts"><dt>Payment</dt><dd>EUR -1,704.00, 19 Sep 2026</dd><dt>Supplier</dt><dd>Cedar Studio</dd><dt>Invoice</dt><dd>INV-1042</dd><dt>Date</dt><dd>18 Sep 2026</dd><dt>Total</dt><dd>EUR 1,704.00</dd></dl>
     </div>
-    <div class="sketch-row"><a class="sketch-button secondary" href="#mismatch"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#match-done">Confirm match</a></div>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#mismatch"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#match-start" data-sketch-toast="Match confirmed (sample)">Confirm match</a></div>
+    <a href="#edit-mode">Edit the details</a>
+    <button class="doc-bar" type="button" data-sketch-open="drawer-match-finish"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
+    <dialog class="sketch-dialog doc-drawer" id="drawer-match-finish" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom=""></div></dialog>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="" style="padding:24px"></div>
 </main></section>
 
-<section data-state="match-done"><main class="sketch-narrow" style="max-width:640px">
-  <h1>Match confirmed</h1>
-  <p>The payment of EUR 1,704.00 on 19 Sep 2026 pays invoice INV-1042 from Cedar Studio.</p>
-  <div class="sketch-row"><a class="sketch-button secondary" href="#edit-mode">Edit the details</a><a class="sketch-button" href="#match-start">Next transaction</a></div>
-</main></section>
 
 <section data-state="edit-mode"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
-    <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Edit the details</h1>
+    <h1>Edit the details</h1>
     <label class="sketch-field">Supplier<input class="sketch-input" value="Cedar Studio" data-zoom="payee"></label>
     <label class="sketch-field">Invoice number<input class="sketch-input" value="INV-1042" data-zoom="number"></label>
     <label class="sketch-field">Date<input class="sketch-input" value="2026-09-18" data-zoom="date"></label>
     <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-zoom="total"></label>
-    <div class="sketch-row"><a class="sketch-button secondary" href="#match-done">Cancel</a><a class="sketch-button" href="#match-done" data-sketch-toast="Details saved (sample)">Save</a></div>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#match-finish">Cancel</a><a class="sketch-button" href="#match-finish" data-sketch-toast="Details saved (sample)">Save</a></div>
+    <button class="doc-bar" type="button" data-sketch-open="drawer-edit-mode"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
+    <dialog class="sketch-dialog doc-drawer" id="drawer-edit-mode" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom=""></div></dialog>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="" style="padding:24px"></div>
 </main></section>
 
-<section data-state="document-open"><main class="sketch-narrow">
-  <a href="#field-review"><i data-icon="chevron-left"></i>Back to the form</a>
-  <div class="doc-slot" data-zoom=""></div>
-</main></section>
 
-<section data-state="document-closed"><main class="sketch-narrow" style="max-width:560px">
-  <a href="#field-review"><i data-icon="chevron-left"></i>Show the document</a>
-  <a class="sketch-phone-only sketch-button secondary" href="#document-open">Document</a><h1>Amount</h1>
-  <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-field="total"></label>
-  <label class="sketch-field">Issued<input class="sketch-input" value="2026-09-18" data-field="date"></label>
-  <div class="sketch-row"><a class="sketch-button secondary" href="#match-review"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#mismatch">Next<i data-icon="chevron-right"></i></a></div>
-</main></section>
 
 <script data-sketch-kit="0.13.0">
 /* Local-only presentation helper. Load after markup; no network requests. */
@@ -845,17 +837,12 @@ document.querySelectorAll('.doc-slot').forEach(slot => {
 @media(prefers-reduced-motion:reduce){[data-sketch] .sketch-input {transition:none}}
 </style>
 <script>
-let document_return = 'field-review';
 document.querySelectorAll('[data-field]').forEach(input=>input.addEventListener('input',()=>document.querySelectorAll('[data-field="'+input.dataset.field+'"]').forEach(other=>{if(other!==input)other.value=input.value})));
-document.querySelectorAll('a[href="#document-open"]').forEach(link=>link.addEventListener('click',()=>{document_return=link.closest('[data-state]').dataset.state}));
-document.querySelector('[data-state="document-open"] a').addEventListener('click',event=>{event.preventDefault();location.hash=document_return});
 document.querySelectorAll('.doc-slot').forEach(slot=>{
  const bar=document.createElement('div');bar.className='doc-tools';
  bar.innerHTML='<button class="sketch-icon-button" aria-label="Zoom out" data-size="0.85"><i data-icon="minus"></i></button><button class="sketch-button secondary" data-size="1">Fit</button><button class="sketch-icon-button" aria-label="Zoom in" data-size="1.2"><i data-icon="plus"></i></button><button class="sketch-icon-button" aria-label="Download document" data-sketch-toast="Document download (sample)"><i data-icon="download"></i></button>';
  slot.append(bar);bar.querySelectorAll('[data-size]').forEach(button=>button.addEventListener('click',()=>{slot.querySelector('.doc').style.transform='scale('+button.dataset.size+')'}));
- if(slot.closest('[data-state]').dataset.state==='field-review') {const close=document.createElement('a');close.className='sketch-button secondary';close.href='#document-closed';close.textContent='Hide document';slot.append(close)}
 });
-document.querySelector('[data-correct]').addEventListener('click',event=>{const state=event.target.closest('[data-state]');state.querySelector('input').value='1704.00';state.querySelector('input').removeAttribute('aria-invalid');state.querySelector('.sketch-error').textContent='The total matches the document.';sketchToast('Total corrected (sample)')});
 function animate_document(){
  const state=document.querySelector('[data-state="'+location.hash.slice(1)+'"]');if(!state)return;
  const slot=state.querySelector('.doc-slot');if(!slot)return;
@@ -871,3 +858,14 @@ if(!location.hash) location.hash='match-start';
 function finish_loading(){if(location.hash==='#match-loading')setTimeout(()=>{if(location.hash==='#match-loading')location.hash='match-review'},1700)}
 addEventListener('hashchange',finish_loading);finish_loading();
 </script>
+
+<style>
+.doc-bar {display:none}
+@media (max-width:599px){
+  [data-sketch] .doc-bar {position:fixed;left:12px;right:12px;bottom:12px;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 14px;font:inherit;color:inherit;text-align:left;background:var(--sketch-page);border:var(--sketch-stroke) solid var(--sketch-ink);border-radius:var(--sketch-wobble);cursor:pointer}
+  [data-sketch] .doc-thumb {width:28px;height:36px;flex:none;border:var(--sketch-stroke) solid var(--sketch-ink);border-radius:3px;background:repeating-linear-gradient(to bottom,transparent 0 6px,var(--sketch-muted) 6px 7px) content-box;padding:6px 5px}
+  [data-sketch] main {padding-bottom:96px}
+  [data-sketch] .doc-bar svg {transform:rotate(180deg)}
+  [data-sketch] .sketch-dialog.doc-drawer {inset:auto 0 0 0;width:100vw;max-width:none;margin:0;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0}
+}
+</style>
