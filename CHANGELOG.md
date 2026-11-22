@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.18.0 — 2026-11-22
+
+### Added
+
+- The pattern `settings/members-list`. A person who manages a shared account sees each member with a role and the last activity. The person invites a member by email or by link, decides on a request to join, edits a member, and signs a member out of one device or of all devices. Remove needs a check box. The sketch uses 3 general roles: Admin, Member and Viewer.
+- 2 fills in the sketch kit. `.sketch-ground` sets one side of a split area apart. `.sketch-accent` makes the block that needs a decision stand out without a frame.
+- `docs/library.md` lists each library pattern with its "Best for" line. A test fails when this list or the counts in `README.md` do not match `library/`.
+
 ## 0.17.0 — 2026-11-21
 
 ### Added
