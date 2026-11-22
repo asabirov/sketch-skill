@@ -401,7 +401,7 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   <h2>Possible invoices</h2>
   <ul class="sketch-list">
     <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap;align-items:start"><span><a href="#match-loading">INV-1042, Cedar Studio</a><br><span class="sketch-badge" style="margin-top:6px">Strong match</span></span><span>EUR 1,704.00</span></li>
-    <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap"><a href="#match-loading">INV-0998, Cedar Studio</a><span>EUR 980.00</span></li>
+    <li class="sketch-row" style="justify-content:space-between;flex-wrap:nowrap"><button class="sketch-link" type="button" data-sketch-toast="The sketch has a document for INV-1042 only (sample)">INV-0998, Cedar Studio</button><span>EUR 980.00</span></li>
   </ul>
   <a href="#match-start">Find another invoice</a>
 </main></section>
@@ -418,9 +418,14 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
       <div class="sketch-row"><span class="sketch-avatar square" aria-hidden="true">CS</span><strong>Cedar Studio</strong><span class="sketch-badge">Strong match</span></div>
     </div>
     <a class="sketch-button" href="#field-review">Use this payee</a>
-    <a href="#match-review">Choose another payee</a>
+    <button class="sketch-link" type="button" data-sketch-popover="payee-menu">Choose another payee</button>
+    <div class="sketch-menu" id="payee-menu" aria-label="Choose another payee">
+      <button class="sketch-menu-item" type="button" data-payee="Cedar Studio Ltd">Cedar Studio Ltd</button>
+      <button class="sketch-menu-item" type="button" data-payee="Cedar and Pine">Cedar and Pine</button>
+      <button class="sketch-menu-item" type="button" data-payee="new"><i data-icon="plus"></i>Create a new payee</button>
+    </div>
     <button class="doc-bar" type="button" data-sketch-open="drawer-match-review"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
-    <dialog class="sketch-dialog doc-drawer" id="drawer-match-review" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom=""></div></dialog>
+    <dialog class="sketch-dialog doc-drawer" id="drawer-match-review" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom="payee"></div></dialog>
   </div>
   <div class="sketch-from-tablet doc-slot" data-zoom="" style="padding:24px"></div>
 </main></section>
@@ -454,7 +459,7 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
     <h1>Check the match</h1>
     <p class="sketch-muted">The payment and the invoice agree.</p>
     <div class="sketch-panel sketch-frame sketch-stack">
-      <dl class="sketch-facts"><dt>Payment</dt><dd>EUR -1,704.00, 19 Sep 2026</dd><dt>Supplier</dt><dd>Cedar Studio</dd><dt>Invoice</dt><dd>INV-1042</dd><dt>Date</dt><dd>18 Sep 2026</dd><dt>Total</dt><dd>EUR 1,704.00</dd></dl>
+      <dl class="sketch-facts"><dt>Payment</dt><dd>EUR -1,704.00, 19 Sep 2026</dd><dt>Supplier</dt><dd data-saved="payee">Cedar Studio</dd><dt>Invoice</dt><dd data-saved="number">INV-1042</dd><dt>Date</dt><dd data-saved="date">18 Sep 2026</dd><dt>Total</dt><dd data-saved="total">EUR 1,704.00</dd></dl>
     </div>
     <div class="sketch-row"><a class="sketch-button secondary" href="#mismatch"><i data-icon="chevron-left"></i>Back</a><a class="sketch-button" href="#match-start" data-sketch-toast="Match confirmed (sample)">Confirm match</a></div>
     <a href="#edit-mode">Edit the details</a>
@@ -468,11 +473,11 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 <section data-state="edit-mode"><main class="sketch-split" style="--split:minmax(0,1fr) minmax(0,1fr)">
   <div class="sketch-stack" style="padding:24px">
     <h1>Edit the details</h1>
-    <label class="sketch-field">Supplier<input class="sketch-input" value="Cedar Studio" data-zoom="payee"></label>
-    <label class="sketch-field">Invoice number<input class="sketch-input" value="INV-1042" data-zoom="number"></label>
-    <label class="sketch-field">Date<input class="sketch-input" value="2026-09-18" data-zoom="date"></label>
-    <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-zoom="total"></label>
-    <div class="sketch-row"><a class="sketch-button secondary" href="#match-finish">Cancel</a><a class="sketch-button" href="#match-finish" data-sketch-toast="Details saved (sample)">Save</a></div>
+    <label class="sketch-field">Supplier<input class="sketch-input" value="Cedar Studio" data-zoom="payee" data-edit="payee"></label>
+    <label class="sketch-field">Invoice number<input class="sketch-input" value="INV-1042" data-zoom="number" data-edit="number"></label>
+    <label class="sketch-field">Date<input class="sketch-input" value="2026-09-18" data-zoom="date" data-edit="date"></label>
+    <label class="sketch-field">Total (EUR)<input class="sketch-input" value="1,704.00" data-zoom="total" data-edit="total"></label>
+    <div class="sketch-row"><a class="sketch-button secondary" href="#match-finish" data-edit-cancel>Cancel</a><a class="sketch-button" href="#match-finish" data-edit-save data-sketch-toast="Details saved (sample)">Save</a></div>
     <button class="doc-bar" type="button" data-sketch-open="drawer-edit-mode"><span class="doc-thumb" aria-hidden="true"></span><span style="flex:1"><strong style="display:block">Invoice INV-1042</strong><span class="sketch-muted">Photo from phone, 18 Sep 2026</span></span><i data-icon="chevron-down"></i></button>
     <dialog class="sketch-dialog doc-drawer" id="drawer-edit-mode" aria-label="Invoice document"><div class="sketch-row"><strong>Invoice INV-1042</strong><span class="sketch-spacer"></span><button class="sketch-icon-button" type="button" data-sketch-close aria-label="Close"><i data-icon="chevron-down"></i></button></div><div class="doc-slot" data-zoom=""></div></dialog>
   </div>
@@ -833,6 +838,7 @@ document.querySelectorAll('.doc-slot').forEach(slot => {
 [data-sketch] .sketch-split {--split:1fr 1fr}
 [data-sketch] .sketch-input {outline:2px solid transparent;outline-offset:2px;transition:outline-color 80ms linear}
 [data-sketch] .sketch-input:focus-visible {outline-color:var(--sketch-ink)}
+[data-sketch] .sketch-link {background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;text-decoration:underline;text-decoration-color:var(--sketch-muted);cursor:pointer}
 .doc-tools {display:flex;align-items:center;justify-content:center;gap:12px;margin-top:24px}
 @media(prefers-reduced-motion:reduce){[data-sketch] .sketch-input {transition:none}}
 </style>
@@ -869,3 +875,21 @@ addEventListener('hashchange',finish_loading);finish_loading();
   [data-sketch] .sketch-dialog.doc-drawer {inset:auto 0 0 0;width:100vw;max-width:none;margin:0;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0}
 }
 </style>
+<script>
+// Save copies the edit fields into the summary. Cancel puts the saved values back into the fields.
+const saved = {payee: 'Cedar Studio', number: 'INV-1042', date: '2026-09-18', total: '1,704.00'};
+document.querySelector('[data-edit-save]').addEventListener('click', () => {
+  document.querySelectorAll('[data-edit]').forEach(input => { saved[input.dataset.edit] = input.value; });
+  document.querySelectorAll('[data-saved]').forEach(cell => { const key = cell.dataset.saved; cell.textContent = key === 'total' ? 'EUR ' + saved.total : saved[key]; });
+});
+document.querySelector('[data-edit-cancel]').addEventListener('click', () => {
+  document.querySelectorAll('[data-edit]').forEach(input => { input.value = saved[input.dataset.edit]; });
+});
+// A pick in the payee menu names the chosen payee. The sketch has no form for a new payee.
+document.querySelectorAll('[data-payee]').forEach(item => item.addEventListener('click', () => {
+  const name = item.dataset.payee;
+  if (name !== 'new') document.querySelectorAll('[data-state="match-review"] .sketch-panel strong').forEach(label => { label.textContent = name; });
+  sketchToast(name === 'new' ? 'New payee form (sample)' : 'Payee changed (sample)');
+  item.closest('.sketch-menu').removeAttribute('data-open');
+}));
+</script>
