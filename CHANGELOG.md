@@ -7,6 +7,11 @@
 - The pattern `settings/phone-settings-page`. The owner did not like it (#30).
 - The pattern `settings/settings-window`. `settings/settings-modal` covers the same part, and the patterns that named the settings window now name the settings modal.
 
+### Changed
+
+- The kit draws a `select` or a `button` with the class `sketch-input` at most 320px wide. Before, a dropdown filled the full line, such as the role dropdown of `settings/members-list`. A text field still fills the line.
+- The kit puts an icon in a line of words on the middle of the words. Before, the icon sat too high, such as the check before "Included".
+
 ## 0.20.0 — 2026-11-23
 
 ### Added
