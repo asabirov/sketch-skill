@@ -1,0 +1,514 @@
+<!doctype html>
+<!--
+  Best for: a desktop work app with many groups of settings, where a person leaves the work for a time to find, change and check settings, then goes back to the work.
+  Row opens: no rows. The page holds settings, and it holds no records.
+  Related: settings/settings-modal shows a similar list of sections in a modal over the page. settings/settings-window is a small window for at most 4 groups.
+  settings/phone-settings-page is the settings of a phone app. settings/theme-switch-preview-cards is a theme choice with a picture for each theme.
+  Transition values, from transitions.json. The agent read each value from the source code, not from the screen, so each value is estimated.
+  - The settings page replaces the work page at once, and the work page replaces it at once. 0 ms.
+  - A change of section: the fill of the section row, background-color 150 ms, cubic-bezier(0.4, 0, 0.2, 1). The right side changes at once.
+  - general-more: the arrow of the "More options" row turns 90 degrees, transform 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+  - appearance: the fill of the chosen theme word, background-color 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+  - sign-out-confirm: the confirmation enters, animation enter 200 ms, ease. The pale layer enters, animation enter 150 ms, ease.
+  - account and signed-out after the confirmation: the confirmation leaves, animation exit 200 ms, ease. The pale layer leaves, animation exit 150 ms, ease.
+  - search-results: the fill of a result, background-color 150 ms, cubic-bezier(0.4, 0, 0.2, 1).
+  The source window is at least 600 px wide. Below 600 px, the open section fills the screen, and the sections state shows the list of sections. This is the designer's choice.
+  It starts from the layout of the page template settings/form of the sketch skill.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full window settings</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] { margin: 0; }
+  /* The kit shows one state section at a time. Each state section is empty, and the page script draws the one page below for the state in the address. */
+  [data-sketch] .fw_app { display: grid; grid-template-columns: 64px minmax(0, 1fr); height: 100dvh; }
+  [data-sketch] .fw_rail { display: grid; grid-template-rows: 1fr auto; justify-items: center; padding: 12px 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .fw_rail_places { display: grid; gap: 4px; align-content: start; }
+  [data-sketch] .fw_work { display: grid; align-content: start; gap: 16px; padding: 24px 32px; min-width: 0; }
+  [data-sketch] .fw_work .sketch-placeholder { min-height: 280px; }
+
+  /* The settings page fills the window. The left column is 280 px wide. */
+  [data-sketch] .fw_page { display: grid; grid-template-columns: 280px minmax(0, 1fr); height: 100dvh; }
+  [data-sketch] .fw_side { display: grid; grid-template-rows: 48px auto minmax(0, 1fr); min-height: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  /* The top of the left column and the bar of the right side have the same height, so their bottom lines meet. */
+  [data-sketch] .fw_back_row, [data-sketch] .fw_bar { display: flex; align-items: center; gap: 8px; height: 48px; box-sizing: border-box; padding: 0 12px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .fw_back { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 0 10px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; border-radius: var(--sketch-wobble); }
+  [data-sketch] .fw_back:hover { background: var(--sketch-wash); }
+  [data-sketch] .fw_search { padding: 12px; }
+  [data-sketch] .fw_search .sketch-input { width: 100%; box-sizing: border-box; }
+  /* The list scrolls on its own. Its padding keeps the focus ring of a row inside it. */
+  [data-sketch] .fw_list { display: grid; gap: 20px; align-content: start; min-height: 0; padding: 4px 12px 16px; overflow-y: auto; }
+  [data-sketch] .fw_group { display: grid; gap: 4px; }
+  [data-sketch] .fw_group_name { padding: 0 12px 4px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  [data-sketch] .fw_link, [data-sketch] .fw_result { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 12px; color: inherit; text-decoration: none; border-radius: var(--sketch-wobble); transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .fw_link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .fw_link:hover, [data-sketch] .fw_result:hover { background: var(--sketch-wash); }
+  [data-sketch] .fw_link[aria-current], [data-sketch] .fw_link[aria-current]:hover { background: var(--sketch-wash); font-weight: 600; }
+  [data-sketch] .fw_result { display: grid; gap: 0; align-content: center; }
+  [data-sketch] .fw_result[aria-selected="true"], [data-sketch] .fw_result[aria-selected="true"]:hover { background: var(--sketch-wash); font-weight: 600; }
+  [data-sketch] .fw_result .sketch-muted { font-weight: 400; font-size: 13px; }
+  [data-sketch] .fw_none { margin: 0; padding: 4px 12px; overflow-wrap: anywhere; }
+
+  /* The right side: the bar, then the open section, which scrolls below the bar. */
+  [data-sketch] .fw_main { display: grid; grid-template-rows: 48px minmax(0, 1fr); min-width: 0; min-height: 0; }
+  [data-sketch] .fw_bar { padding: 0 8px 0 24px; }
+  [data-sketch] .fw_crumb { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+  [data-sketch] .fw_scroll { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+  [data-sketch] .fw_content { display: grid; gap: 32px; max-width: 784px; margin: 0 auto; padding: 24px 32px 96px; box-sizing: border-box; }
+  [data-sketch] .fw_head { display: grid; gap: 8px; padding-bottom: 20px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .fw_head h1 { margin: 0; font-size: 24px; line-height: 1.25; }
+  [data-sketch] .fw_head p { margin: 0; }
+  /* The title of a group is above its outline, so the start and the end of each group show at a glance. */
+  [data-sketch] .fw_set { display: grid; gap: 8px; }
+  [data-sketch] .fw_set h2 { margin: 0; font-size: 15px; }
+  [data-sketch] .fw_card { padding: 0 20px; }
+  /* A setting is a row: its name and one line about it at the left, and its control at the right. A line divides 2 rows. */
+  [data-sketch] .fw_row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; min-height: 64px; padding: 10px 0; box-sizing: border-box; }
+  [data-sketch] .fw_row + .fw_row, [data-sketch] .fw_row + .fw_more, [data-sketch] .fw_more + .fw_row { border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .fw_fact { display: grid; flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .fw_control { flex: 0 1 auto; }
+  [data-sketch] .fw_control select { width: min(220px, 100%); }
+  [data-sketch] .fw_person { display: flex; align-items: center; gap: 12px; flex: 1 1 240px; min-width: 0; }
+  [data-sketch] .fw_person .fw_fact { flex: 1; }
+  /* The "More options" row opens in place. Its settings show with an indent. */
+  [data-sketch] .fw_more { border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .fw_more_button { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 48px; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+  [data-sketch] .fw_more_button:hover { text-decoration: underline; }
+  [data-sketch] .fw_more_button .sketch-icon { transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .fw_more_button[aria-expanded="true"] .sketch-icon { transform: rotate(90deg); }
+  [data-sketch] .fw_more_body { padding-left: 20px; }
+  [data-sketch] .fw_more_body .fw_row { border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .fw_theme label { transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .fw_empty { display: grid; place-items: center; min-height: 320px; margin: 0; padding: 16px; text-align: center; overflow-wrap: anywhere; border: var(--sketch-stroke) dashed var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .fw_sections_button { display: none; }
+
+  /* The confirmation is centred with top, left and translate, and it has no bottom inset. So its height is the height of its
+     content in each browser, also where height: fit-content does not apply. With inset: 0 there, it grew to the full height. */
+  [data-sketch] .fw_confirm { inset: auto; top: 50%; left: 50%; translate: -50% -50%; height: auto; max-height: calc(100dvh - 32px); margin: 0; overflow: auto; }
+  [data-sketch] .fw_confirm[open] { align-content: start; }
+  /* The confirmation and its pale layer enter and leave with the values of transitions.json. */
+  @keyframes enter { from { opacity: 0; transform: scale(.95); } }
+  @keyframes exit { to { opacity: 0; transform: scale(.95); } }
+  @keyframes enter_layer { from { opacity: 0; } }
+  @keyframes exit_layer { to { opacity: 0; } }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .fw_confirm[open] { animation: enter 200ms ease; }
+    [data-sketch] .fw_confirm[open]::backdrop { animation: enter_layer 150ms ease; }
+    [data-sketch] .fw_confirm[open].fw_leaving { animation: exit 200ms ease forwards; }
+    [data-sketch] .fw_confirm[open].fw_leaving::backdrop { animation: exit_layer 150ms ease forwards; }
+  }
+
+  /* 600 to 999 px: the left column keeps its width, and the title of a section gets smaller. */
+  @media (max-width: 999px) {
+    [data-sketch] .fw_head h1 { font-size: 20px; }
+    [data-sketch] .fw_content { padding: 20px 24px 96px; }
+  }
+  /* Below 600 px: the open section fills the screen. A Sections button in the bar opens the list of sections. */
+  @media (max-width: 599px) {
+    [data-sketch] .fw_page { grid-template-columns: minmax(0, 1fr); }
+    [data-sketch] .fw_page:not(.fw_show_sections) .fw_side { display: none; }
+    [data-sketch] .fw_page.fw_show_sections .fw_main { display: none; }
+    [data-sketch] .fw_page.fw_show_sections .fw_side { border-right: 0; }
+    [data-sketch] .fw_bar { padding: 0 4px; }
+    [data-sketch] .fw_sections_button { display: flex; }
+    [data-sketch] .fw_content { padding: 16px 16px 96px; }
+    /* A control that is wider than a switch goes under the name of its setting. */
+    [data-sketch] .fw_control:not(.fw_switch_control) { flex-basis: 100%; }
+    [data-sketch] .fw_control select { width: 100%; }
+    [data-sketch] .fw_app { grid-template-columns: 56px minmax(0, 1fr); }
+    [data-sketch] .fw_work { padding: 16px; }
+  }
+</style>
+<body data-sketch>
+<!-- One empty section for each state. The page script reads the address and draws the page below. -->
+<section data-state="closed"></section>
+<section data-state="general"></section>
+<section data-state="general-more"></section>
+<section data-state="appearance"></section>
+<section data-state="account"></section>
+<section data-state="sign-out-confirm"></section>
+<section data-state="signed-out"></section>
+<section data-state="search-results"></section>
+<section data-state="search-empty"></section>
+<section data-state="sections"></section>
+
+<!-- The work page of the app. The settings button at the foot of the rail opens the settings. -->
+<div class="fw_app" id="fw_app">
+  <nav class="fw_rail" aria-label="Main">
+    <div class="fw_rail_places">
+      <a class="sketch-icon-button" href="#closed" aria-label="Home" aria-current="page"><i data-icon="home"></i></a>
+      <a class="sketch-icon-button" href="#closed" aria-label="Messages"><i data-icon="comment"></i></a>
+      <a class="sketch-icon-button" href="#closed" aria-label="Files"><i data-icon="box"></i></a>
+    </div>
+    <a class="sketch-icon-button" href="#general" id="fw_open" aria-label="Settings (Cmd+,)"><i data-icon="settings"></i></a>
+  </nav>
+  <main class="fw_work">
+    <h1 style="margin:0">Launch plan</h1>
+    <p class="sketch-muted" style="margin:0">The work of the person. Settings open from the button at the foot of the rail, or with Cmd+,.</p>
+    <div class="sketch-placeholder">Work area</div>
+  </main>
+</div>
+
+<!-- The settings page. It replaces the work page and fills the window. -->
+<div class="fw_page" id="fw_page" hidden>
+  <nav class="fw_side" aria-label="Settings sections">
+    <div class="fw_back_row"><button type="button" class="fw_back" data-close><i data-icon="arrow-left"></i>Back to app</button></div>
+    <div class="fw_search"><input class="sketch-input" id="fw_search" type="search" placeholder="Search settings" aria-label="Search settings" autocomplete="off" role="combobox" aria-controls="fw_results" aria-expanded="false"></div>
+    <div class="fw_list" id="fw_groups">
+      <div class="fw_group" role="group" aria-labelledby="g_account">
+        <span class="sketch-muted fw_group_name" id="g_account">Account</span>
+        <a class="fw_link" href="#account" data-section="account"><i data-icon="user"></i><span>Account</span></a>
+        <a class="fw_link" href="#notifications" data-section="notifications"><i data-icon="bell"></i><span>Notifications</span></a>
+      </div>
+      <div class="fw_group" role="group" aria-labelledby="g_interface">
+        <span class="sketch-muted fw_group_name" id="g_interface">Interface</span>
+        <a class="fw_link" href="#general" data-section="general"><i data-icon="settings"></i><span>General</span></a>
+        <a class="fw_link" href="#appearance" data-section="appearance"><i data-icon="eye"></i><span>Appearance</span></a>
+      </div>
+      <div class="fw_group" role="group" aria-labelledby="g_advanced">
+        <span class="sketch-muted fw_group_name" id="g_advanced">Privacy and advanced</span>
+        <a class="fw_link" href="#privacy" data-section="privacy"><svg class="sketch-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg><span>Privacy</span></a>
+        <a class="fw_link" href="#advanced" data-section="advanced"><i data-icon="sliders"></i><span>Advanced</span></a>
+      </div>
+    </div>
+    <div class="fw_list" id="fw_results" role="listbox" aria-label="Search results" hidden></div>
+  </nav>
+
+  <div class="fw_main">
+    <header class="fw_bar">
+      <a class="sketch-icon-button fw_sections_button" href="#sections" aria-label="Sections"><i data-icon="chevron-left"></i></a>
+      <span class="fw_crumb" id="fw_crumb">General</span>
+      <button type="button" class="sketch-icon-button" aria-label="Close settings" data-close><i data-icon="close"></i></button>
+    </header>
+    <div class="fw_scroll">
+      <div class="fw_content" id="fw_content"></div>
+    </div>
+  </div>
+</div>
+
+<dialog class="sketch-dialog fw_confirm" id="fw_confirm" aria-labelledby="fw_confirm_title">
+  <h2 id="fw_confirm_title" style="margin:0;font-size:20px">Sign out?</h2>
+  <p style="margin:0">You stay signed out on this computer until you sign in again. Your local work stays here.</p>
+  <div class="sketch-row"><span class="sketch-spacer"></span>
+    <button type="button" class="sketch-button secondary" data-confirm="account" autofocus>Cancel</button>
+    <button type="button" class="sketch-button" data-confirm="signed-out">Sign out</button>
+  </div>
+</dialog>
+
+<!-- The sections of the settings page. Each is drawn into the right side when it opens. -->
+<template id="t_general">
+  <div class="fw_head"><h1>General</h1><p class="sketch-muted">Language, links and updates of the app.</p></div>
+  <div class="fw_set"><h2>App</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row" data-setting="language"><div class="fw_fact"><span>Language</span><span class="sketch-muted">The words of the app.</span></div><div class="fw_control"><select class="sketch-input" aria-label="Language"><option>System</option><option>English</option><option>Español</option></select></div></div>
+      <div class="fw_row" data-setting="links"><div class="fw_fact"><span>Open links in</span><span class="sketch-muted">Where a link from your work opens.</span></div><div class="fw_control"><select class="sketch-input" aria-label="Open links in"><option>The app</option><option>The system browser</option></select></div></div>
+      <div class="fw_row" data-setting="updates"><div class="fw_fact"><span>Updates</span><span class="sketch-muted">Version 2.4.1. Checked today.</span></div><div class="fw_control"><button type="button" class="sketch-button secondary" data-sketch-toast="No update found (sample)">Check now</button></div></div>
+    </div>
+  </div>
+  <div class="fw_set"><h2>Editor</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row" data-setting="wrap"><div class="fw_fact"><span>Word wrap</span><span class="sketch-muted">Long lines go on to the next line.</span></div><div class="fw_control fw_switch_control"><label class="sketch-switch"><input type="checkbox" role="switch" checked aria-label="Word wrap"></label></div></div>
+      <div class="fw_more">
+        <button type="button" class="fw_more_button" aria-expanded="false" aria-controls="fw_more_body"><i data-icon="chevron-right"></i>More options</button>
+        <div class="fw_more_body" id="fw_more_body" hidden>
+          <div class="fw_row" data-setting="newline"><div class="fw_fact"><span>Final new line</span><span class="sketch-muted">Add a line break at the end of a file when you save it.</span></div><div class="fw_control fw_switch_control"><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Final new line"></label></div></div>
+          <div class="fw_row" data-setting="eol"><div class="fw_fact"><span>End of line</span><span class="sketch-muted">For new files.</span></div><div class="fw_control"><select class="sketch-input" aria-label="End of line"><option>Auto</option><option>LF</option><option>CRLF</option></select></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="t_appearance">
+  <div class="fw_head"><h1>Appearance</h1><p class="sketch-muted">How the app looks on this computer. Each change takes effect at once.</p></div>
+  <div class="fw_set"><h2>Theme</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row" data-setting="theme"><div class="fw_fact"><span id="theme_name">Theme</span><span class="sketch-muted">System follows the setting of your computer.</span></div>
+        <div class="fw_control"><div class="sketch-segmented fw_theme" role="radiogroup" aria-labelledby="theme_name">
+          <label><input type="radio" name="theme" value="system" checked>System</label>
+          <label><input type="radio" name="theme" value="light">Light</label>
+          <label><input type="radio" name="theme" value="dark">Dark</label>
+        </div></div>
+      </div>
+      <div class="fw_row" data-setting="zoom"><div class="fw_fact"><span>UI zoom</span><span class="sketch-muted">The size of all words and controls.</span></div><div class="fw_control"><select class="sketch-input" aria-label="UI zoom"><option>90%</option><option selected>100%</option><option>110%</option><option>125%</option></select></div></div>
+    </div>
+  </div>
+  <div class="fw_set"><h2>Text</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row" data-setting="font"><div class="fw_fact"><span>Font size</span><span class="sketch-muted">For the words of your work.</span></div><div class="fw_control"><select class="sketch-input" aria-label="Font size"><option>13</option><option selected>14</option><option>16</option></select></div></div>
+    </div>
+  </div>
+</template>
+
+<template id="t_account">
+  <div class="fw_head"><h1>Account</h1><p class="sketch-muted">The account that this app uses on this computer.</p></div>
+  <div class="fw_set"><h2>Signed in as</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row">
+        <div class="fw_person"><span class="sketch-avatar" aria-hidden="true">MR</span><div class="fw_fact"><span>Maya Rossi <span class="sketch-badge">Signed in</span></span><span class="sketch-muted">maya@northfield.studio</span></div></div>
+        <div class="fw_control"><button type="button" class="sketch-button secondary" data-sign-out>Sign out</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="fw_set"><h2>Your account includes</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row"><div class="fw_fact"><span>Shared links</span><span class="sketch-muted">Send a link to a file or a result.</span></div><div class="fw_control"><i data-icon="check"></i><span class="sketch-muted"> Included</span></div></div>
+      <div class="fw_row"><div class="fw_fact"><span>Sync between computers</span><span class="sketch-muted">Your settings on each computer where you sign in.</span></div><div class="fw_control"><i data-icon="check"></i><span class="sketch-muted"> Included</span></div></div>
+    </div>
+  </div>
+</template>
+
+<template id="t_signed-out">
+  <div class="fw_head"><h1>Account</h1><p class="sketch-muted">The account that this app uses on this computer.</p></div>
+  <div class="fw_set"><h2>Account</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row">
+        <div class="fw_person"><span class="sketch-avatar" aria-hidden="true"><i data-icon="user"></i></span><div class="fw_fact"><span>Not signed in</span><span class="sketch-muted">Sign in to share links and to sync your settings.</span></div></div>
+        <div class="fw_control"><button type="button" class="sketch-button" data-sign-in>Sign in</button></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="t_notifications">
+  <div class="fw_head"><h1>Notifications</h1><p class="sketch-muted">When the app tells you about your work.</p></div>
+  <div class="fw_set"><h2>Alerts</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row"><div class="fw_fact"><span>Desktop notifications</span><span class="sketch-muted">When a task finishes or needs you.</span></div><div class="fw_control fw_switch_control"><label class="sketch-switch"><input type="checkbox" role="switch" checked aria-label="Desktop notifications"></label></div></div>
+      <div class="fw_row"><div class="fw_fact"><span>Sound</span><span class="sketch-muted">Play a sound with each notification.</span></div><div class="fw_control fw_switch_control"><label class="sketch-switch"><input type="checkbox" role="switch" aria-label="Sound"></label></div></div>
+    </div>
+  </div>
+</template>
+
+<template id="t_privacy">
+  <div class="fw_head"><h1>Privacy</h1><p class="sketch-muted">What the app sends from this computer.</p></div>
+  <div class="fw_set"><h2>Reports</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row"><div class="fw_fact"><span>Send crash reports</span><span class="sketch-muted">A report holds no file content.</span></div><div class="fw_control fw_switch_control"><label class="sketch-switch"><input type="checkbox" role="switch" checked aria-label="Send crash reports"></label></div></div>
+    </div>
+  </div>
+</template>
+
+<template id="t_advanced">
+  <div class="fw_head"><h1>Advanced</h1><p class="sketch-muted">Settings for problems and tests.</p></div>
+  <div class="fw_set"><h2>Storage</h2>
+    <div class="fw_card sketch-panel sketch-frame">
+      <div class="fw_row"><div class="fw_fact"><span>Cache</span><span class="sketch-muted">412 MB on this computer.</span></div><div class="fw_control"><button type="button" class="sketch-button secondary" data-sketch-toast="Cache cleared (sample)">Clear cache</button></div></div>
+    </div>
+  </div>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  const reduced_motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const leave_ms = 200;
+  const titles = { general: 'General', appearance: 'Appearance', account: 'Account', notifications: 'Notifications', privacy: 'Privacy', advanced: 'Advanced' };
+  // The search reads the name of a setting and the name of its section.
+  const catalog = [
+    { name: 'Language', place: 'Interface / General', section: 'general' },
+    { name: 'Open links in', place: 'Interface / General', section: 'general' },
+    { name: 'Updates', place: 'Interface / General', section: 'general' },
+    { name: 'Word wrap', place: 'Interface / General', section: 'general' },
+    { name: 'Theme', place: 'Interface / Appearance', section: 'appearance' },
+    { name: 'UI zoom', place: 'Interface / Appearance', section: 'appearance' },
+    { name: 'Font size', place: 'Interface / Appearance', section: 'appearance' },
+    { name: 'Sign out', place: 'Account / Account', section: 'account' },
+    { name: 'Desktop notifications', place: 'Account / Notifications', section: 'notifications' },
+    { name: 'Sound', place: 'Account / Notifications', section: 'notifications' },
+    { name: 'Send crash reports', place: 'Privacy and advanced / Privacy', section: 'privacy' },
+    { name: 'Cache', place: 'Privacy and advanced / Advanced', section: 'advanced' }
+  ];
+  const sample_words = { 'search-results': 'appear', 'search-empty': 'calendar' };
+  const app = document.getElementById('fw_app');
+  const page = document.getElementById('fw_page');
+  const search = document.getElementById('fw_search');
+  const groups = document.getElementById('fw_groups');
+  const results = document.getElementById('fw_results');
+  const content = document.getElementById('fw_content');
+  const crumb = document.getElementById('fw_crumb');
+  const confirm_box = document.getElementById('fw_confirm');
+
+  let signed_in = true;
+  let theme = 'system';
+  let open_section = 'general';
+  let more_open = false;
+  let selected = 0;
+  let drawn_section = null;
+  let keep_words = false;
+
+  // A section that is not a state of the record, such as Privacy, opens from its own address too.
+  const state_of = () => location.hash.slice(1) || 'closed';
+  const find_settings = words => {
+    const w = words.trim().toLowerCase();
+    return w ? catalog.filter(item => `${item.name} ${item.place}`.toLowerCase().includes(w)) : [];
+  };
+
+  function draw_section(id) {
+    const key = id === 'account' && !signed_in ? 'signed-out' : id;
+    if (drawn_section === key) return;
+    drawn_section = key;
+    content.replaceChildren(document.getElementById(`t_${key}`).content.cloneNode(true));
+    const more = content.querySelector('.fw_more_button');
+    if (more) {
+      more.setAttribute('aria-expanded', String(more_open));
+      content.querySelector('.fw_more_body').hidden = !more_open;
+    }
+    content.querySelectorAll('input[name="theme"]').forEach(input => { input.checked = input.value === theme; });
+    initSketch();
+  }
+
+  function draw_results(words) {
+    const searching = words.trim() !== '';
+    groups.hidden = searching;
+    results.hidden = !searching;
+    search.setAttribute('aria-expanded', String(searching));
+    if (!searching) { results.replaceChildren(); search.removeAttribute('aria-activedescendant'); return; }
+    const found = find_settings(words);
+    selected = Math.min(selected, Math.max(found.length - 1, 0));
+    if (!found.length) {
+      results.innerHTML = '<p class="fw_none sketch-muted" role="status"></p>';
+      results.firstChild.textContent = `No settings found for "${words.trim()}".`;
+      search.removeAttribute('aria-activedescendant');
+      return;
+    }
+    // Keep the old rows when the results stay the same, so the fill moves with a transition.
+    if (results.children.length !== found.length || [...results.children].some((row, i) => row.dataset.name !== found[i].name)) {
+      results.replaceChildren(...found.map((item, i) => {
+        const row = document.createElement('a');
+        row.className = 'fw_result';
+        row.id = `fw_result_${i}`;
+        row.href = `#${item.section}`;
+        row.setAttribute('role', 'option');
+        row.dataset.name = item.name;
+        row.dataset.section = item.section;
+        row.innerHTML = '<span></span><span class="sketch-muted"></span>';
+        row.children[0].textContent = item.name;
+        row.children[1].textContent = item.place;
+        return row;
+      }));
+    }
+    [...results.children].forEach((row, i) => row.setAttribute('aria-selected', String(i === selected)));
+    search.setAttribute('aria-activedescendant', `fw_result_${selected}`);
+  }
+
+  function show() {
+    const state = state_of();
+    const closed = state === 'closed';
+    app.hidden = !closed;
+    page.hidden = closed;
+    document.title = closed ? 'Full window settings' : `Settings: ${titles[open_section]}`;
+    if (closed) { search.value = ''; draw_results(''); return; }
+    if (state in sample_words && search.value.trim() === '') search.value = sample_words[state];
+    // A result keeps the words of the search field. Each other change of section clears them.
+    if (!(state in sample_words) && state !== 'sections' && state !== 'sign-out-confirm' && !keep_words) search.value = '';
+    keep_words = false;
+    if (state === 'general-more') { more_open = true; open_section = 'general'; }
+    else if (state === 'general') { more_open = false; open_section = 'general'; }
+    else if (state === 'signed-out') { signed_in = false; open_section = 'account'; }
+    else if (state === 'account') { signed_in = true; open_section = 'account'; }
+    else if (state === 'sign-out-confirm') { signed_in = true; open_section = 'account'; }
+    else if (titles[state]) open_section = state;
+    // On a phone, the left column holds the search field. So the list of sections and each search state show the left column.
+    page.classList.toggle('fw_show_sections', state === 'sections' || state in sample_words);
+    groups.querySelectorAll('[data-section]').forEach(link => {
+      if (link.dataset.section === open_section) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+    });
+    crumb.textContent = titles[open_section];
+    drawn_section = drawn_section === 'signed-out' && signed_in ? null : drawn_section;
+    draw_section(open_section);
+    const more = content.querySelector('.fw_more_button');
+    if (more) { more.setAttribute('aria-expanded', String(more_open)); content.querySelector('.fw_more_body').hidden = !more_open; }
+    draw_results(search.value);
+    const empty = search.value.trim() !== '' && !find_settings(search.value).length;
+    content.querySelectorAll(':scope > :not(.fw_empty)').forEach(part => { part.hidden = empty; });
+    content.querySelector('.fw_empty')?.remove();
+    if (empty) {
+      const box = document.createElement('p');
+      box.className = 'fw_empty sketch-muted';
+      box.textContent = `No settings found for "${search.value.trim()}"`;
+      content.append(box);
+    }
+    confirm_box.classList.remove('fw_leaving');
+    if (state === 'sign-out-confirm' && !confirm_box.open) confirm_box.showModal();
+  }
+
+  // The confirmation plays its exit, then the state changes.
+  function leave_confirm(next) {
+    if (!confirm_box.open || confirm_box.classList.contains('fw_leaving')) return;
+    confirm_box.classList.add('fw_leaving');
+    setTimeout(() => {
+      confirm_box.close();
+      confirm_box.classList.remove('fw_leaving');
+      location.hash = next;
+      if (next === 'account') content.querySelector('[data-sign-out]')?.focus();
+    }, reduced_motion.matches ? 0 : leave_ms);
+  }
+
+  function close_settings() {
+    location.hash = 'closed';
+    document.getElementById('fw_open').focus();
+  }
+
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-close]')) { close_settings(); return; }
+    if (event.target.closest('.fw_result')) { keep_words = true; return; }
+    if (event.target.closest('[data-sign-out]')) { location.hash = 'sign-out-confirm'; return; }
+    if (event.target.closest('[data-sign-in]')) { signed_in = true; location.hash = 'account'; return; }
+    const choice = event.target.closest('[data-confirm]');
+    if (choice) { event.stopPropagation(); leave_confirm(choice.dataset.confirm); return; }
+    const more = event.target.closest('.fw_more_button');
+    if (more) { location.hash = more.getAttribute('aria-expanded') === 'true' ? 'general' : 'general-more'; return; }
+  }, true);
+
+  confirm_box.addEventListener('cancel', event => { event.preventDefault(); leave_confirm('account'); });
+
+  document.addEventListener('change', event => {
+    if (event.target.name !== 'theme') return;
+    theme = event.target.value;
+    // The theme word changes the theme of the sketch at once, as it does in the source.
+    if (theme === 'system') document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    else document.documentElement.dataset.theme = theme;
+  });
+
+  search.addEventListener('input', () => {
+    selected = 0;
+    const found = find_settings(search.value);
+    const next = search.value.trim() === '' ? open_section : found.length ? 'search-results' : 'search-empty';
+    if (next !== state_of()) location.replace(`#${next}`); else show();
+  });
+
+  document.addEventListener('keydown', event => {
+    const state = state_of();
+    if (state === 'closed') {
+      if (event.key === ',' && (event.metaKey || event.ctrlKey)) { event.preventDefault(); location.hash = 'general'; }
+      return;
+    }
+    if (event.target === search && search.value && results.children.length && results.firstElementChild.matches('.fw_result')) {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const count = results.children.length;
+        selected = (selected + (event.key === 'ArrowDown' ? 1 : -1) + count) % count;
+        draw_results(search.value);
+        return;
+      }
+      if (event.key === 'Enter') { event.preventDefault(); keep_words = true; location.hash = results.children[selected].dataset.section; return; }
+    }
+    if (event.key !== 'Escape' || confirm_box.open) return;
+    // Escape first clears the words of the search field. Without words, Escape closes the settings.
+    if (search.value) { event.preventDefault(); search.value = ''; location.replace(`#${open_section}`); return; }
+    close_settings();
+  });
+
+  addEventListener('hashchange', () => {
+    const before = state_of();
+    show();
+    if (before === 'general' && document.activeElement === document.body) search.focus();
+  });
+
+  initSketch();
+  show();
+  if (state_of() === 'general') search.focus();
+</script>

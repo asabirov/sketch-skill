@@ -1,0 +1,90 @@
+[
+  {
+    "label": "appearance",
+    "trigger": "click the Appearance row",
+    "element": "the row of the section that opens and the row that closes",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "general-more",
+    "trigger": "click the More options row",
+    "element": "the arrow of the More options row",
+    "property": "transform",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "appearance",
+    "trigger": "click a theme word",
+    "element": "the chosen theme word and the word before",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "sign-out-confirm",
+    "trigger": "click Sign out",
+    "element": "the confirmation",
+    "property": null,
+    "animation": "enter",
+    "duration": 200,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "estimated"
+  },
+  {
+    "label": "sign-out-confirm",
+    "trigger": "click Sign out",
+    "element": "the pale layer below the confirmation",
+    "property": null,
+    "animation": "enter_layer",
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "estimated"
+  },
+  {
+    "label": "account",
+    "trigger": "click Cancel in the confirmation, or press Escape",
+    "element": "the confirmation",
+    "property": null,
+    "animation": "exit",
+    "duration": 200,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "estimated"
+  },
+  {
+    "label": "account",
+    "trigger": "click Cancel in the confirmation, or press Escape",
+    "element": "the pale layer below the confirmation",
+    "property": null,
+    "animation": "exit_layer",
+    "duration": 150,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "estimated"
+  },
+  {
+    "label": "search-results",
+    "trigger": "press the down arrow in the search field",
+    "element": "the result with the fill and the result before",
+    "property": "background-color",
+    "animation": null,
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  }
+]
