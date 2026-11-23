@@ -5,6 +5,7 @@
 ### Removed
 
 - The pattern `settings/phone-settings-page`. The owner did not like it (#30).
+- The pattern `settings/settings-window`. `settings/settings-modal` covers the same part, and the patterns that named the settings window now name the settings modal.
 
 ## 0.20.0 — 2026-11-23
 

@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 69 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 68 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -98,8 +98,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 | [`settings/members-list`](../library/settings/members-list/) | A person who manages a shared account, such as a family or a small team, sees each member with a role and the last activity, invites a member with a role, decides on a request to join, and signs a member out of one device or of all devices. For the profile that other members see, use `profile/member-profile`. |
 | [`settings/notification-settings-by-channel`](../library/settings/notification-settings-by-channel/) | A product that sends events on more than one channel and has more than 15 kinds of event. A member chooses which events notify them on each channel, and turns a channel off without losing the choices for its events. |
 | [`settings/notification-settings-by-event`](../library/settings/notification-settings-by-event/) | A product that sends fewer than 13 kinds of event on 2 or 3 channels. A member chooses how each kind of event reaches them, and from whom. |
-| [`settings/settings-modal`](../library/settings/settings-modal/) | A product with more than 4 groups of settings, where a person finds one setting of their account or of a shared workspace. For at most 4 groups of settings, use `settings/settings-window`. |
-| [`settings/settings-window`](../library/settings/settings-window/) | A product with at most 4 groups of settings, where one person changes a setting and goes back to their work. For more than 4 groups, or for settings of a shared workspace, use `settings/settings-modal`. |
+| [`settings/settings-modal`](../library/settings/settings-modal/) | A product with more than 4 groups of settings, where a person finds one setting of their account or of a shared workspace. |
 | [`settings/theme-switch-preview-cards`](../library/settings/theme-switch-preview-cards/) | A signed-in reader chooses how the product looks in a section of its own, and sees a small picture of each choice before choosing. The choice applies at once, with no Save button. For a product that has the look only as a short choice in its account menu, use the theme submenu of `navigation/user-menu`. |
 
 ## sheets
