@@ -1,10 +1,10 @@
 <!doctype html>
 <!-- Phone settings page.
-     Best for: a phone app with about 15 settings, where a signed-in person opens Settings from their account in the side menu and goes back with Back. Settings replaces the screen.
+     Best for: a phone app with about 15 settings, where a signed-in person opens Settings from the account button in the home bar and goes back with Back. Settings replaces the screen.
      Row opens: on the record's own page. A row with a chevron opens its section as the next page, with Back.
-     Transitions (all estimated, from transitions.json): drawer-in 300ms and drawer-out 250ms, cubic-bezier(0.2, 0, 0, 1). scrim-in 300ms and scrim-out 250ms, linear.
+     Transitions (all estimated, from transitions.json): scrim-in 300ms and scrim-out 250ms, linear.
      push-enter, push-exit, back-enter and back-exit 350ms, cubic-bezier(0.32, 0.72, 0, 1).
-     card-in 200ms, ease-out. card-out 150ms, ease-in. popover-in 250ms, cubic-bezier(0.2, 0, 0, 1). popover-out 150ms, ease-in. -->
+     card-in 200ms, ease-out. card-out 150ms, ease-in. -->
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,14 +26,10 @@
   /* A plain box stands for a part that this pattern does not draw. */
   [data-sketch] .part_box { display: grid; place-content: center; justify-items: center; gap: 2px; min-height: 88px; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; }
   [data-sketch] .part_box.fill { height: 100%; box-sizing: border-box; }
-  /* The dim layer under the side menu and the card. A tap on it closes them. */
+  /* The dim layer under the card and the alert. A tap on it closes them. */
   [data-sketch] .scrim { position: absolute; inset: 0; display: block; background: color-mix(in srgb, var(--sketch-ink) 22%, transparent); }
-  /* The side menu: the main sections in a box, and the account row at the foot. */
-  [data-sketch] .drawer { position: absolute; inset: 0 auto 0 0; width: 82%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--sketch-page); border-right: var(--sketch-stroke) solid var(--sketch-ink); }
-  [data-sketch] .drawer .phone_body { padding-top: 12px; }
-  [data-sketch] .account_row { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 16px; border-top: var(--sketch-stroke) solid var(--sketch-muted); color: inherit; text-decoration: none; }
-  [data-sketch] .account_row:hover { background: var(--sketch-wash); }
-  [data-sketch] .account_row .sketch-icon { margin-left: auto; }
+  /* The account button at the right of the home bar opens Settings. */
+  [data-sketch] .account_button { text-decoration: none; }
   /* Settings fills the screen. Its pages change inside it. */
   [data-sketch] .stack { position: absolute; inset: 0; overflow: hidden; background: var(--sketch-page); }
   [data-sketch] .stack_page { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); background: var(--sketch-page); }
@@ -44,7 +40,7 @@
   [data-sketch] .group { position: relative; display: grid; margin-top: 28px; }
   [data-sketch] .group_label { margin: 28px 0 0; font-size: 13px; color: var(--sketch-muted); }
   [data-sketch] .group_label + .group { margin-top: 4px; }
-  [data-sketch] .group > :is(a, button, label, div):not(.popover) { display: flex; align-items: center; gap: 14px; min-height: 48px; margin: 0 -8px; padding: 0 8px; border: 0; border-radius: var(--sketch-wobble); background: none; color: inherit; font: inherit; text-align: start; text-decoration: none; }
+  [data-sketch] .group > :is(a, button, label, div) { display: flex; align-items: center; gap: 14px; min-height: 48px; margin: 0 -8px; padding: 0 8px; border: 0; border-radius: var(--sketch-wobble); background: none; color: inherit; font: inherit; text-align: start; text-decoration: none; }
   [data-sketch] .group > :is(a, button):hover { background: var(--sketch-wash); }
   [data-sketch] .group .row_text { display: grid; }
   [data-sketch] .group .note { font-size: 13px; color: var(--sketch-muted); }
@@ -58,32 +54,23 @@
   [data-sketch] .card button { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 8px; border: 0; border-radius: var(--sketch-wobble); background: none; color: inherit; font: inherit; text-align: start; }
   [data-sketch] .card button:hover { background: var(--sketch-wash); }
   [data-sketch] .card .tick { margin-left: auto; }
-  /* The small pop-up over Log out asks once more. A tap outside it closes it. */
-  [data-sketch] .catch { position: absolute; inset: 0; z-index: 3; display: block; }
-  [data-sketch] .popover { position: absolute; z-index: 4; bottom: calc(100% - 14px); left: 50%; translate: -50% 0; display: block; padding: 6px; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 999px; transform-origin: bottom center; }
-  [data-sketch] .popover a { display: block; min-width: 120px; padding: 10px 18px; border-radius: 999px; color: inherit; text-align: center; text-decoration: none; }
-  [data-sketch] .popover a:hover { background: var(--sketch-wash); }
+  /* The alert asks once more in the center of the screen, with Cancel and Log out. Cancel or a tap on the dim layer keeps the person signed in. */
+  [data-sketch] .alert { margin-top: -60px; padding: 18px 16px 10px; }
+  [data-sketch] .alert h2 { margin: 0 0 14px; font-size: 18px; }
+  [data-sketch] .alert_actions { display: flex; justify-content: flex-end; gap: 4px; }
+  [data-sketch] .alert_actions a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--sketch-wobble); color: inherit; text-decoration: none; }
+  [data-sketch] .alert_actions a:hover { background: var(--sketch-wash); }
   [data-sketch] .signed_out { position: absolute; inset: 0; display: grid; padding: 24px 16px; background: var(--sketch-page); }
-  /* From 700 px wide, the side menu stays open at the left, and the home screen fills the rest. The menu button hides. The pictures show
-     only phones, so this layout is the designer's choice. */
+  /* From 700 px wide, the screens fill the window. The list of Settings keeps a width that reads well. The pictures show only phones,
+     so this layout is the designer's choice. */
   @media (min-width: 700px) {
     [data-sketch] .phone { width: 100%; border-inline: 0 !important; }
-    [data-sketch] .drawer, [data-sketch] .drawer[hidden] { display: grid !important; width: 300px; }
-    [data-sketch] a.scrim[data-part="drawer"] { display: none !important; }
-    [data-sketch] .phone_screen { left: 300px; }
-    [data-sketch] .phone_screen .phone_bar > a[aria-label="Menu"] { visibility: hidden; }
-    /* Settings fills the place of the home screen, beside the side menu. Its list keeps a width that reads well. */
-    [data-sketch] .stack { left: 300px; border-left: var(--sketch-stroke) solid var(--sketch-ink); }
     [data-sketch] .stack .phone_body { width: min(100%, 640px); margin: 0 auto; box-sizing: border-box; }
-    /* The card opens in the center of Settings, not of the window. */
-    [data-sketch] .card { left: calc(50% + 150px); }
   }
   /* Each motion value below comes from transitions.json. */
-  [data-sketch] { --ease_drawer: cubic-bezier(0.2, 0, 0, 1); --ease_push: cubic-bezier(0.32, 0.72, 0, 1); }
+  [data-sketch] { --ease_push: cubic-bezier(0.32, 0.72, 0, 1); }
   [data-sketch] .move_ghost { pointer-events: none; }
   @media (prefers-reduced-motion: no-preference) {
-    [data-sketch] .drawer-in { animation: drawer-in 300ms var(--ease_drawer); }
-    [data-sketch] .drawer-out { animation: drawer-out 250ms var(--ease_drawer) forwards; }
     [data-sketch] .scrim-in { animation: scrim-in 300ms linear; }
     [data-sketch] .scrim-out { animation: scrim-out 250ms linear forwards; }
     [data-sketch] .push-enter { animation: push-enter 350ms var(--ease_push); }
@@ -92,11 +79,7 @@
     [data-sketch] .back-exit { animation: back-exit 350ms var(--ease_push) forwards; }
     [data-sketch] .card-in { animation: card-in 200ms ease-out; }
     [data-sketch] .card-out { animation: card-out 150ms ease-in forwards; }
-    [data-sketch] .popover-in { animation: popover-in 250ms var(--ease_drawer); }
-    [data-sketch] .popover-out { animation: popover-out 150ms ease-in forwards; }
   }
-  @keyframes drawer-in { from { transform: translateX(-100%); } }
-  @keyframes drawer-out { to { transform: translateX(-100%); } }
   @keyframes scrim-in { from { opacity: 0; } }
   @keyframes scrim-out { to { opacity: 0; } }
   @keyframes push-enter { from { transform: translateX(100%); } }
@@ -105,16 +88,11 @@
   @keyframes back-exit { to { transform: translateX(100%); } }
   @keyframes card-in { from { opacity: 0; transform: scale(.9); } }
   @keyframes card-out { to { opacity: 0; } }
-  @keyframes popover-in { from { opacity: 0; transform: scale(.6); } }
-  @keyframes popover-out { to { opacity: 0; transform: scale(.9); } }
 </style>
 <body data-sketch>
 
 <section data-state="home">
   <div data-screen="settings_stack"></div>
-</section>
-<section data-state="drawer">
-  <div data-screen="settings_stack" data-show="drawer"></div>
 </section>
 <section data-state="settings">
   <div data-screen="settings_stack" data-show="page"></div>
@@ -129,7 +107,7 @@
   <div data-screen="settings_stack" data-show="page card"></div>
 </section>
 <section data-state="sign-out-confirm">
-  <div data-screen="settings_stack" data-show="page popover"></div>
+  <div data-screen="settings_stack" data-show="page alert"></div>
 </section>
 <section data-state="signed-out">
   <div data-screen="settings_stack" data-show="out"></div>
@@ -139,26 +117,17 @@
 <div class="phone">
   <main class="phone_screen">
     <header class="phone_bar">
-      <a class="sketch-icon-button" href="#drawer" data-move="open-drawer" aria-label="Menu" data-focus="!drawer !page !out"><i data-icon="more"></i></a>
-      <h1>Home</h1>
       <span class="bar_end"></span>
+      <h1>Home</h1>
+      <a class="sketch-icon-button account_button" href="#settings" data-move="open-settings" aria-label="Account and settings" data-focus="!page !out"><span class="sketch-avatar">ML</span></a>
     </header>
     <div class="phone_body"><div class="part_box fill"><strong>Home screen</strong><span class="sketch-muted">The app's own content</span></div></div>
   </main>
 
-  <a class="scrim" href="#home" data-part="drawer" data-move="close-drawer" aria-label="Close the menu"></a>
-  <nav class="drawer" data-part="drawer" aria-label="Side menu">
-    <header class="phone_bar"><h2>Menu</h2></header>
-    <div class="phone_body"><div class="part_box fill"><strong>Main sections</strong><span class="sketch-muted">navigation/user-menu</span></div></div>
-    <a class="account_row" href="#settings" data-move="open-settings" data-focus="drawer">
-      <span class="sketch-avatar">ML</span><strong>Mara Lind</strong><i data-icon="settings"></i>
-    </a>
-  </nav>
-
   <div class="stack" data-part="page">
     <div class="stack_page" data-part="!section">
       <header class="phone_bar">
-        <a class="sketch-icon-button" href="#drawer" data-move="close-settings" aria-label="Back" data-focus="page !section !card !popover"><i data-icon="chevron-left"></i></a>
+        <a class="sketch-icon-button" href="#home" data-move="close-settings" aria-label="Back" data-focus="page !section !card !alert"><i data-icon="chevron-left"></i></a>
         <h2>Settings</h2>
         <span class="bar_end"></span>
       </header>
@@ -180,7 +149,7 @@
 
         <p class="group_label" data-part="labelled">Preferences</p>
         <div class="group">
-          <button type="button" data-go="appearance-card" data-move="open-card" aria-haspopup="dialog" data-focus="page !section !card !popover"><i data-icon="smile"></i>Appearance<span class="value"><span data-appearance></span><i data-icon="chevron-down"></i></span></button>
+          <button type="button" data-go="appearance-card" data-move="open-card" aria-haspopup="dialog" data-focus="page !section !card !alert"><i data-icon="smile"></i>Appearance<span class="value"><span data-appearance></span><i data-icon="chevron-down"></i></span></button>
           <button type="button"><i data-icon="comment"></i>Language<span class="value">English<i data-icon="chevron-down"></i></span></button>
           <a href="#section" data-move="push" data-section="Notifications"><i data-icon="bell"></i>Notifications<span class="value"><i data-icon="chevron-right"></i></span></a>
         </div>
@@ -193,10 +162,7 @@
         </div>
 
         <div class="group">
-          <button type="button" data-go="sign-out-confirm" data-move="open-popover"><i data-icon="arrow-right"></i>Log out</button>
-          <div class="popover" data-part="popover" role="dialog" aria-label="Log out?">
-            <a href="#signed-out" data-move="close-popover" data-focus="popover"><span class="danger">Log out</span></a>
-          </div>
+          <button type="button" data-go="sign-out-confirm" data-move="open-alert" aria-haspopup="dialog" data-focus="page !section !card !alert"><i data-icon="arrow-right"></i><span class="danger">Log out</span></button>
         </div>
       </div>
     </div>
@@ -234,7 +200,14 @@
     <button type="button" data-pick="Dark" data-go="settings" data-move="close-card"><i data-icon="eye"></i>Dark<span class="tick">✓</span></button>
   </div>
 
-  <a class="catch" href="#settings" data-part="popover" data-move="close-popover" aria-label="Keep me signed in"></a>
+  <a class="scrim" href="#settings" data-part="alert" data-move="close-alert" aria-label="Keep me signed in"></a>
+  <div class="card alert" data-part="alert" role="alertdialog" aria-modal="true" aria-labelledby="alert_title">
+    <h2 id="alert_title">Log out?</h2>
+    <div class="alert_actions">
+      <a href="#settings" data-move="close-alert" data-focus="alert">Cancel</a>
+      <a href="#signed-out" data-move="close-alert"><span class="danger">Log out</span></a>
+    </div>
+  </div>
 
   <div class="signed_out" data-part="out"><a class="part_box fill" href="#home"><strong>Sign-in page</strong><span class="sketch-muted">account/email-code-signup</span></a></div>
 </div>
@@ -307,24 +280,19 @@
   /* Each move lists the parts that come in, and the parts that leave. A part that leaves is a copy of the part of the state
      before, put into the same place of the new state. */
   const moves = {
-    'open-drawer': {enter: [['.drawer', 'drawer-in'], ['a.scrim[data-part="drawer"]', 'scrim-in']]},
-    'close-drawer': {exit: [['.drawer', 'drawer-out', '.phone'], ['a.scrim[data-part="drawer"]', 'scrim-out', '.phone']]},
-    'open-settings': {enter: [['.stack', 'push-enter']], exit: [['.drawer', 'drawer-out', '.phone'], ['a.scrim[data-part="drawer"]', 'scrim-out', '.phone']]},
-    'close-settings': {enter: [['.drawer', 'drawer-in'], ['a.scrim[data-part="drawer"]', 'scrim-in']], exit: [['.stack', 'back-exit', '.phone']]},
+    'open-settings': {enter: [['.stack', 'push-enter']]},
+    'close-settings': {exit: [['.stack', 'back-exit', '.phone']]},
     'push': {enter: [['.stack_page', 'push-enter']], exit: [['.stack_page', 'push-exit', '.stack']]},
     'back': {enter: [['.stack_page', 'back-enter']], exit: [['.stack_page', 'back-exit', '.stack']]},
     'open-card': {enter: [['.card', 'card-in'], ['a.scrim[data-part="card"]', 'scrim-in']]},
     'close-card': {exit: [['.card', 'card-out', '.phone'], ['a.scrim[data-part="card"]', 'scrim-out', '.phone']]},
-    'open-popover': {enter: [['.popover', 'popover-in']]},
-    'close-popover': {exit: [['.popover', 'popover-out', '.group:has(> .popover)']]}
+    'open-alert': {enter: [['.alert', 'card-in'], ['a.scrim[data-part="alert"]', 'scrim-in']]},
+    'close-alert': {exit: [['.alert', 'card-out', '.phone'], ['a.scrim[data-part="alert"]', 'scrim-out', '.phone']]}
   };
   const visible = (block, selector) => [...block.querySelectorAll(selector)].find(node => !node.closest('[hidden]'));
-  /* On a wide screen the side menu stays open, so its moves do not play. */
-  const wide = matchMedia('(min-width: 700px)');
-  const moves_here = list => (list || []).filter(([selector]) => !(wide.matches && selector.includes('drawer')));
   const run_move = (name, from, to) => {
     const move = moves[name];
-    moves_here(move.exit).forEach(([selector, animation, parent]) => {
+    (move.exit || []).forEach(([selector, animation, parent]) => {
       const part = visible(from, selector), place = visible(to, parent);
       if (!part || !place) return;
       const ghost = part.cloneNode(true);
@@ -337,7 +305,7 @@
       if (body) ghost.querySelector('[data-keep-scroll]').scrollTop = body.scrollTop;
       play(ghost, animation, () => ghost.remove());
     });
-    moves_here(move.enter).forEach(([selector, animation]) => {
+    (move.enter || []).forEach(([selector, animation]) => {
       const part = visible(to, selector);
       if (part) play(part, animation);
     });
@@ -346,7 +314,7 @@
   const go = (state, move, from) => {
     const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
     if (!to || to === from) return;
-    /* The list keeps its scroll from one state to the next, so the card or the pop-up opens over the same rows. */
+    /* The list keeps its scroll from one state to the next, so the card or the alert opens over the same rows. */
     const kept = visible(from, '[data-keep-scroll]'), keep = visible(to, '[data-keep-scroll]');
     if (kept && keep) keep.scrollTop = kept.scrollTop;
     if (move && !reduced.matches) run_move(move, from, to);
@@ -364,8 +332,8 @@
     if (control.dataset.section) { section = control.dataset.section; show_section(); }
     go(control.dataset.go || control.getAttribute('href').slice(1), control.dataset.move, block);
   }, true);
-  /* Escape closes the card, the pop-up, the section, Settings or the side menu, in this order. */
-  const escapes = {'appearance-card': ['settings', 'close-card'], 'sign-out-confirm': ['settings', 'close-popover'], 'section': ['settings', 'back'], 'settings': ['drawer', 'close-settings'], 'drawer': ['home', 'close-drawer']};
+  /* Escape closes the card, the alert, the section or Settings, in this order. */
+  const escapes = {'appearance-card': ['settings', 'close-card'], 'sign-out-confirm': ['settings', 'close-alert'], 'section': ['settings', 'back'], 'settings': ['home', 'close-settings']};
   document.addEventListener('keydown', event => {
     const block = shown_block(), state = block && block.parentElement.dataset.state;
     if (event.key === 'Escape' && escapes[state]) go(...escapes[state], block);
@@ -373,8 +341,6 @@
   const after_change = () => requestAnimationFrame(() => {
     const block = shown_block();
     if (!block) return;
-    const popover = visible(block, '.popover');
-    if (popover) popover.parentElement.scrollIntoView({block: 'nearest'});
     const target = focus_next && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
     focus_next = false;
     if (target) target.focus({preventScroll: true});

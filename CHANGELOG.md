@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The pattern `settings/phone-settings-page` has no side menu now. The account button in the home bar opens Settings, and Back shows the home screen. The sign-out asks in an alert in the center with Cancel and Log out, as one version of the source does, in place of the small pop-up. The record says why the source uses a side menu.
+
 ## 0.20.0 — 2026-11-23
 
 ### Added
