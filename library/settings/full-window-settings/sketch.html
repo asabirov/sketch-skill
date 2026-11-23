@@ -51,6 +51,8 @@
   [data-sketch] .fw_result[aria-selected="true"], [data-sketch] .fw_result[aria-selected="true"]:hover { background: var(--sketch-wash); font-weight: 600; }
   [data-sketch] .fw_result .sketch-muted { font-weight: 400; font-size: 13px; }
   [data-sketch] .fw_none { margin: 0; padding: 4px 12px; overflow-wrap: anywhere; }
+  /* With no search result, the heading of the section stays for a screen reader, but it does not show. */
+  [data-sketch] .fw_quiet { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
   /* The right side: the bar, then the open section, which scrolls below the bar. */
   [data-sketch] .fw_main { display: grid; grid-template-rows: 48px minmax(0, 1fr); min-width: 0; min-height: 0; }
@@ -175,9 +177,10 @@
       </div>
     </div>
     <div class="fw_list" id="fw_results" role="listbox" aria-label="Search results" hidden></div>
+    <p class="fw_none sketch-muted" id="fw_none" role="status" hidden></p>
   </nav>
 
-  <div class="fw_main">
+  <main class="fw_main">
     <header class="fw_bar">
       <a class="sketch-icon-button fw_sections_button" href="#sections" aria-label="Sections"><i data-icon="chevron-left"></i></a>
       <span class="fw_crumb" id="fw_crumb">General</span>
@@ -186,7 +189,7 @@
     <div class="fw_scroll">
       <div class="fw_content" id="fw_content"></div>
     </div>
-  </div>
+  </main>
 </div>
 
 <dialog class="sketch-dialog fw_confirm" id="fw_confirm" aria-labelledby="fw_confirm_title">
@@ -337,9 +340,15 @@
   let more_open = false;
   let selected = 0;
   let drawn_section = null;
+  // A link in the page keeps the account as it is. Only an address from outside, such as a review frame, starts the account state signed in.
+  let from_page = false;
+  // The values that the person changed stay for the session, also when the section changes.
+  const kept_values = {};
+  let shown_state = null;
   let keep_words = false;
 
   // A section that is not a state of the record, such as Privacy, opens from its own address too.
+  const none = document.getElementById('fw_none');
   const state_of = () => location.hash.slice(1) || 'closed';
   const find_settings = words => {
     const w = words.trim().toLowerCase();
@@ -349,8 +358,15 @@
   function draw_section(id) {
     const key = id === 'account' && !signed_in ? 'signed-out' : id;
     if (drawn_section === key) return;
+    const controls = () => [...content.querySelectorAll('input:not([name="theme"]), select, textarea')];
+    if (drawn_section) kept_values[drawn_section] = controls().map(c => c.type === 'checkbox' || c.type === 'radio' ? c.checked : c.value);
     drawn_section = key;
     content.replaceChildren(document.getElementById(`t_${key}`).content.cloneNode(true));
+    (kept_values[key] || []).forEach((value, i) => {
+      const c = controls()[i];
+      if (!c) return;
+      if (c.type === 'checkbox' || c.type === 'radio') c.checked = value; else c.value = value;
+    });
     const more = content.querySelector('.fw_more_button');
     if (more) {
       more.setAttribute('aria-expanded', String(more_open));
@@ -364,13 +380,16 @@
     const searching = words.trim() !== '';
     groups.hidden = searching;
     results.hidden = !searching;
+    none.hidden = true;
     search.setAttribute('aria-expanded', String(searching));
     if (!searching) { results.replaceChildren(); search.removeAttribute('aria-activedescendant'); return; }
     const found = find_settings(words);
     selected = Math.min(selected, Math.max(found.length - 1, 0));
     if (!found.length) {
-      results.innerHTML = '<p class="fw_none sketch-muted" role="status"></p>';
-      results.firstChild.textContent = `No settings found for "${words.trim()}".`;
+      results.replaceChildren();
+      results.hidden = true;
+      none.hidden = false;
+      none.textContent = `No settings found for "${words.trim()}".`;
       search.removeAttribute('aria-activedescendant');
       return;
     }
@@ -408,9 +427,10 @@
     if (state === 'general-more') { more_open = true; open_section = 'general'; }
     else if (state === 'general') { more_open = false; open_section = 'general'; }
     else if (state === 'signed-out') { signed_in = false; open_section = 'account'; }
-    else if (state === 'account') { signed_in = true; open_section = 'account'; }
+    else if (state === 'account') { if (!from_page) signed_in = true; open_section = 'account'; }
     else if (state === 'sign-out-confirm') { signed_in = true; open_section = 'account'; }
     else if (titles[state]) open_section = state;
+    from_page = false;
     // On a phone, the left column holds the search field. So the list of sections and each search state show the left column.
     page.classList.toggle('fw_show_sections', state === 'sections' || state in sample_words);
     groups.querySelectorAll('[data-section]').forEach(link => {
@@ -423,7 +443,8 @@
     if (more) { more.setAttribute('aria-expanded', String(more_open)); content.querySelector('.fw_more_body').hidden = !more_open; }
     draw_results(search.value);
     const empty = search.value.trim() !== '' && !find_settings(search.value).length;
-    content.querySelectorAll(':scope > :not(.fw_empty)').forEach(part => { part.hidden = empty; });
+    content.querySelectorAll(':scope > :not(.fw_empty)').forEach(part => { part.hidden = empty && !part.matches('.fw_head'); });
+    content.querySelector('.fw_head')?.classList.toggle('fw_quiet', empty);
     content.querySelector('.fw_empty')?.remove();
     if (empty) {
       const box = document.createElement('p');
@@ -442,6 +463,7 @@
     setTimeout(() => {
       confirm_box.close();
       confirm_box.classList.remove('fw_leaving');
+      from_page = true;
       location.hash = next;
       if (next === 'account') content.querySelector('[data-sign-out]')?.focus();
     }, reduced_motion.matches ? 0 : leave_ms);
@@ -449,12 +471,12 @@
 
   function close_settings() {
     location.hash = 'closed';
-    document.getElementById('fw_open').focus();
   }
 
   document.addEventListener('click', event => {
     if (event.target.closest('[data-close]')) { close_settings(); return; }
-    if (event.target.closest('.fw_result')) { keep_words = true; return; }
+    if (event.target.closest('[data-section]')) from_page = true;
+    if (event.target.closest('.fw_result')) { keep_words = true; from_page = true; return; }
     if (event.target.closest('[data-sign-out]')) { location.hash = 'sign-out-confirm'; return; }
     if (event.target.closest('[data-sign-in]')) { signed_in = true; location.hash = 'account'; return; }
     const choice = event.target.closest('[data-confirm]');
@@ -486,7 +508,7 @@
       if (event.key === ',' && (event.metaKey || event.ctrlKey)) { event.preventDefault(); location.hash = 'general'; }
       return;
     }
-    if (event.target === search && search.value && results.children.length && results.firstElementChild.matches('.fw_result')) {
+    if (event.target === search && search.value && results.children.length) {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault();
         const count = results.children.length;
@@ -494,7 +516,7 @@
         draw_results(search.value);
         return;
       }
-      if (event.key === 'Enter') { event.preventDefault(); keep_words = true; location.hash = results.children[selected].dataset.section; return; }
+      if (event.key === 'Enter') { event.preventDefault(); keep_words = true; from_page = true; location.hash = results.children[selected].dataset.section; return; }
     }
     if (event.key !== 'Escape' || confirm_box.open) return;
     // Escape first clears the words of the search field. Without words, Escape closes the settings.
@@ -502,13 +524,17 @@
     close_settings();
   });
 
-  addEventListener('hashchange', () => {
-    const before = state_of();
-    show();
-    if (before === 'general' && document.activeElement === document.body) search.focus();
-  });
+  // Focus moves after show(), so the new view is visible. Open settings focus the search field on a wide screen. Closed settings focus the Settings link.
+  function move_focus() {
+    const state = state_of();
+    if (state === 'closed' && shown_state && shown_state !== 'closed') document.getElementById('fw_open').focus();
+    else if (state !== 'closed' && (shown_state === 'closed' || shown_state === null) && matchMedia('(min-width: 600px)').matches && !confirm_box.open) search.focus();
+    shown_state = state;
+  }
+
+  addEventListener('hashchange', () => { show(); move_focus(); });
 
   initSketch();
   show();
-  if (state_of() === 'general') search.focus();
+  move_focus();
 </script>
