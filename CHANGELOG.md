@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.20.0 — 2026-11-23
+
+### Added
+
+- The pattern `settings/phone-settings-page`. A signed-in person opens Settings from their account on a phone and goes back with Back. Each row with a chevron opens its own section, each choice applies at once, and a sign-out asks once more. The sketch has an optional labelled form and a wide layout from 700 px.
+
+### Fixed
+
+- `README.md` and `docs/library.md` say 70 patterns. Pull requests #22 and #27 each raised the count from 68 to 69, so the count was one too low.
+
 ## 0.19.0 — 2026-11-23
 
 ### Added
