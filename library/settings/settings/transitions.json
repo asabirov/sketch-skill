@@ -22,17 +22,6 @@
     "measurement": "estimated"
   },
   {
-    "label": "appearance",
-    "trigger": "click a theme word",
-    "element": "the chosen theme word and the word before",
-    "property": "background-color",
-    "animation": null,
-    "duration": 150,
-    "delay": 0,
-    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-    "measurement": "estimated"
-  },
-  {
     "label": "sign-out-confirm",
     "trigger": "click Sign out",
     "element": "the confirmation",

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- The pattern `settings/settings`. The settings page fills the window in place of the work, with a column of sections at the left and one open section at the right, a search, and an account with sign out. The theme choice and the notification choices are dashed boxes that name the patterns that draw them.
+
 ## 0.20.0 — 2026-11-23
 
 ### Added
