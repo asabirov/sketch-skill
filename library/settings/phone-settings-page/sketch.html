@@ -231,6 +231,8 @@
     ['id', 'for', 'name', 'aria-controls', 'aria-labelledby', 'aria-describedby'].forEach(name =>
       copy.querySelectorAll(`[${name}]`).forEach(node => node.setAttribute(name, `s${index}_${node.getAttribute(name)}`)));
     copy.querySelectorAll('[data-part]').forEach(part => { part.hidden = !has_part(shown, part.dataset.part); });
+    /* While the card or the alert is open, the screens under it take no focus and no tap. */
+    if (shown.includes('card') || shown.includes('alert')) copy.querySelectorAll('.phone_screen, .stack').forEach(node => { node.inert = true; });
     block.append(copy);
   });
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -310,7 +312,9 @@
       if (part) play(part, animation);
     });
   };
-  let focus_next = false;
+  let focus_next = false, focus_back = null;
+  /* After the card or the alert closes, the row that opened it takes the focus again. */
+  const openers = {'close-card': '[data-go="appearance-card"]', 'close-alert': '[data-go="sign-out-confirm"]'};
   const go = (state, move, from) => {
     const to = document.querySelector(`[data-state="${state}"] [data-screen]`);
     if (!to || to === from) return;
@@ -319,6 +323,7 @@
     if (kept && keep) keep.scrollTop = kept.scrollTop;
     if (move && !reduced.matches) run_move(move, from, to);
     focus_next = true;
+    focus_back = openers[move] || null;
     location.hash = state;
   };
   /* The capture phase keeps the kit from pressing a chip in the state that the reader leaves. */
@@ -341,8 +346,10 @@
   const after_change = () => requestAnimationFrame(() => {
     const block = shown_block();
     if (!block) return;
-    const target = focus_next && [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus));
+    const target = focus_next && ((focus_back && visible(block, focus_back)) ||
+      [...block.querySelectorAll('[data-focus]')].find(node => !node.closest('[hidden]') && has_part(parts_of(block), node.dataset.focus)));
     focus_next = false;
+    focus_back = null;
     if (target) target.focus({preventScroll: true});
   });
   addEventListener('hashchange', after_change);
