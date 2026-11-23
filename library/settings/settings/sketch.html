@@ -49,6 +49,8 @@
   [data-sketch] .fw_quiet { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
   /* The right side: the bar, then the open section, which scrolls below the bar. */
+  /* The page title is for a screen reader. It shows only when the list of sections fills a phone screen, because the open section and its title are hidden then. */
+  [data-sketch] .fw_side_title { display: none; position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   [data-sketch] .fw_main { display: grid; grid-template-rows: 48px minmax(0, 1fr); min-width: 0; min-height: 0; }
   [data-sketch] .fw_bar { padding: 0 8px 0 24px; }
   [data-sketch] .fw_crumb { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
@@ -107,6 +109,7 @@
     [data-sketch] .fw_page:not(.fw_show_sections) .fw_side { display: none; }
     [data-sketch] .fw_page.fw_show_sections .fw_main { display: none; }
     [data-sketch] .fw_page.fw_show_sections .fw_side { border-right: 0; }
+    [data-sketch] .fw_page.fw_show_sections .fw_side_title { display: block; }
     [data-sketch] .fw_bar { padding: 0 4px; }
     [data-sketch] .fw_sections_button { display: flex; }
     [data-sketch] .fw_content { padding: 16px 16px 96px; }
@@ -130,8 +133,9 @@
 <section data-state="sections"></section>
 
 <!-- The settings page. It replaces the work page of the app and fills the window. -->
-<div class="fw_page" id="fw_page">
+<main class="fw_page" id="fw_page">
   <nav class="fw_side" aria-label="Settings sections">
+    <h1 class="fw_side_title">Settings</h1>
     <div class="fw_back_row"><button type="button" class="fw_back" data-sketch-toast="Back to the work of the app (sample)."><i data-icon="arrow-left"></i>Back to app</button></div>
     <div class="fw_search"><input class="sketch-input" id="fw_search" type="search" placeholder="Search settings" aria-label="Search settings" autocomplete="off" role="combobox" aria-controls="fw_results" aria-expanded="false"></div>
     <div class="fw_list" id="fw_groups">
@@ -155,7 +159,7 @@
     <p class="fw_none sketch-muted" id="fw_none" role="status" hidden></p>
   </nav>
 
-  <main class="fw_main">
+  <div class="fw_main">
     <header class="fw_bar">
       <a class="sketch-icon-button fw_sections_button" href="#sections" aria-label="Sections"><i data-icon="chevron-left"></i></a>
       <span class="fw_crumb" id="fw_crumb">General</span>
@@ -164,8 +168,8 @@
     <div class="fw_scroll">
       <div class="fw_content" id="fw_content"></div>
     </div>
-  </main>
-</div>
+  </div>
+</main>
 
 <dialog class="sketch-dialog fw_confirm" id="fw_confirm" aria-labelledby="fw_confirm_title">
   <h2 id="fw_confirm_title" style="margin:0;font-size:20px">Sign out?</h2>
@@ -412,6 +416,13 @@
     if (state === 'sign-out-confirm' && !confirm_box.open) confirm_box.showModal();
   }
 
+  // An address that does not change fires no hashchange, so the page draws itself again.
+  function go(next, replace = false) {
+    if (state_of() === next) show();
+    else if (replace) location.replace(`#${next}`);
+    else location.hash = next;
+  }
+
   // The confirmation plays its exit, then the state changes.
   function leave_confirm(next) {
     if (!confirm_box.open || confirm_box.classList.contains('fw_leaving')) return;
@@ -434,7 +445,7 @@
     if (event.target.closest('[data-section]')) from_page = true;
     if (event.target.closest('.fw_result')) { keep_words = true; from_page = true; return; }
     if (event.target.closest('[data-sign-out]')) { location.hash = 'sign-out-confirm'; return; }
-    if (event.target.closest('[data-sign-in]')) { signed_in = true; location.hash = 'account'; return; }
+    if (event.target.closest('[data-sign-in]')) { signed_in = true; from_page = true; go('account'); return; }
     const choice = event.target.closest('[data-confirm]');
     if (choice) { event.stopPropagation(); leave_confirm(choice.dataset.confirm); return; }
     const more = event.target.closest('.fw_more_button');
@@ -463,7 +474,7 @@
     }
     if (event.key !== 'Escape' || confirm_box.open) return;
     // Escape first clears the words of the search field. Without words, Escape closes the settings.
-    if (search.value) { event.preventDefault(); search.value = ''; location.replace(`#${open_section}`); return; }
+    if (search.value) { event.preventDefault(); search.value = ''; go(open_section, true); return; }
     close_settings(document.activeElement);
   });
 
