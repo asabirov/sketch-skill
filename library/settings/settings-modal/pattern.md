@@ -1,9 +1,9 @@
 # Settings modal
 
 Captured: 2026-11-20, from public pictures
-Best for: a product with more than 4 groups of settings, where a person finds one setting of their account or of a shared workspace. For at most 4 groups of settings, use `settings/settings-window`.
+Best for: a product with more than 4 groups of settings, where a person finds one setting of their account or of a shared workspace.
 Row opens: no rows. The modal holds settings, and it holds no records.
-Related: `settings/settings-window`, the second pattern of the same part, for a product with at most 4 groups of settings. `navigation/user-menu` and `navigation/foot-menu`, the menus whose settings row can open this modal. `settings/notification-settings-by-event` and `settings/notification-settings-by-channel`, the notification settings that the notifications section holds.
+Related: `navigation/user-menu` and `navigation/foot-menu`, the menus whose settings row can open this modal. `settings/notification-settings-by-event` and `settings/notification-settings-by-channel`, the notification settings that the notifications section holds.
 
 ## States
 
@@ -20,7 +20,7 @@ The pictures show the modal on 3 sections: the notifications section, the accoun
 
 ## Transitions
 
-The capture is public pictures, so the agent read no transition from the source. Each value is the designer's choice: the sketch plays the values of the menu of `navigation/user-menu`, as `settings/settings-window` does.
+The capture is public pictures, so the agent read no transition from the source. Each value is the designer's choice: the sketch plays the values of the menu of `navigation/user-menu`.
 
 - `closed` to `account`. Trigger: click the settings button. Moves: the modal goes from clear to solid. 35 ms, ease-out. estimated.
 - `closed` to `account`. Trigger: the same click. Moves: the modal grows from 98% of its size to its full size. 160 ms, cubic-bezier(0, 0, 0.2, 1). estimated.
@@ -53,8 +53,7 @@ The pictures show the modal only in a wide window. So each case below 1000 px is
 
 ## Notes
 
-- This record and `settings/settings-window` are 2 patterns of one part, the settings window of a product. A product uses one of them. `settings/settings-window` shows all its groups together in one row, and it has a limit of 4 groups. This record has no such limit, and it has groups of sections and a search.
-- The help text says that a Settings row in the side list of the source opens the modal. The sketch has a settings button at the head of the side list, as `settings/settings-window` has. A product can also open the modal from the settings row of `navigation/user-menu` or of `navigation/foot-menu`.
+- The help text says that a Settings row in the side list of the source opens the modal. The sketch has a settings button at the head of the side list. A product can also open the modal from the settings row of `navigation/user-menu` or of `navigation/foot-menu`.
 - The source shows the name and the email of the member below the Account label. The sketch leaves them out, because its My account section shows them.
 - The left column of the source has a light grey fill. The sketch has one ink, so a line divides the 2 parts.
 - The 5 sections and their 12 settings are sample content. A product puts its own sections in its own groups.

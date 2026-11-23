@@ -2,14 +2,14 @@
 <!--
   Best for: a team product where a signed-in member reaches their own account: who is signed in, their settings and the way out.
   Row opens: no rows. The menu holds actions, and it holds no records.
-  Related: navigation/foot-menu is the same menu at the foot of the side list. settings/settings-window is the window that the settings row opens.
+  Related: navigation/foot-menu is the same menu at the foot of the side list. settings/settings-modal is the window that the settings row opens.
   Transition values, from transitions.json. Each duration and each delay is measured. Each easing is estimated.
   - menu-open: the menu goes from clear to solid, opacity 35 ms, ease-out, measured duration, estimated easing.
     The menu grows from 98% of its size to its full size, transform 160 ms, cubic-bezier(0, 0, 0.2, 1), measured duration, estimated easing.
   - closed: the menu goes to 98% of its size, transform 20 ms, linear, measured duration, estimated easing.
     After a delay of 20 ms, the menu goes from solid to clear, opacity 110 ms, cubic-bezier(0, 0, 0.2, 1), measured delay and duration, estimated easing.
   - theme-open, settings-open and signed-out: 0 ms. The source shows the submenu at once. The capture read no transition for the settings and for the sign-out.
-  The settings window is a part of settings/settings-window. This sketch draws it as a plain box with that name.
+  The settings window is a part of settings/settings-modal. This sketch draws it as a plain box with that name.
   The sketch draws only the parts that each product of this kind needs. It draws no part that belongs to one source.
   No value in this file is a design-system token.
 -->
@@ -30,7 +30,7 @@
   [data-sketch] .user_sub_anchor { position: relative; display: grid; }
   [data-sketch] .user_submenu { position: absolute; top: -8px; left: calc(100% + 4px); min-width: 180px; }
   [data-sketch] .user_submenu [aria-checked="false"] .sketch-icon { visibility: hidden; }
-  /* The settings window is a part of settings/settings-window. Here it is a plain box with that name, and it shows at once. */
+  /* The settings window is a part of settings/settings-modal. Here it is a plain box with that name, and it shows at once. */
   [data-sketch] .user_part { min-height: min(280px, calc(100dvh - 32px)); place-items: center; text-align: center; overflow-wrap: anywhere; }
   [data-sketch] .user_part > p { margin: 0; text-wrap: balance; }
   /* The box has no control, so the box takes the focus. The box is not a control, so it shows no focus ring. */
@@ -85,7 +85,7 @@
     <a href="#" aria-current="page"><i data-icon="home"></i>Home</a><a href="#"><i data-icon="comment"></i>Feed</a><a href="#"><i data-icon="box"></i>Catalog</a><a href="#"><i data-icon="user"></i>Members</a>
   </nav>
   <main class="sketch-main"><h1>Home</h1><div class="sketch-placeholder" style="min-height:240px">Portal page</div></main>
-  <dialog class="sketch-dialog user_part" id="part___state__" aria-label="Settings window"><p>Settings window. Pattern: settings/settings-window</p></dialog>
+  <dialog class="sketch-dialog user_part" id="part___state__" aria-label="Settings window"><p>Settings window. Pattern: settings/settings-modal</p></dialog>
 </template>
 
 <template id="part_submenu">
