@@ -1,0 +1,313 @@
+<!doctype html>
+<!--
+  Best for: a person looks for an add-on for a product, searches and filters a large catalog, reads about one item and adds it to their account.
+  Row opens: on the record's own page.
+  Related: account/connected-apps shows the add-ons that a person already has. content/catalog-tabs shows the records of one workspace.
+  An item with settings opens a dialog before it is added.
+  The start page has the title, a bar and the sections. The bar has a search, a switch for the kind and a Filter button. The first section holds the add-ons of the person. Each other section holds two columns of rows and a Show all link.
+  A row has the picture, the name with a verified mark, one line of text, and a line with the kind and the maker. The Add button of a row shows on hover and on focus. On a touch screen it always shows.
+  Transition values, from transitions.json: the Add button 60 ms, its tooltip 120 ms, the search field 60 ms, the Filter button 60 ms, the search spinner 1000 ms a turn, the start page, the list page and the results page 120 ms, the pictures of the item page 500 ms.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketplace</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .mk_page { max-width: 960px; }
+  [data-sketch] .mk_page > :is(h1, h2, p), [data-sketch] .mk_section :is(h2, p), [data-sketch] .mk_item_body :is(h2, p) { margin: 0; }
+  /* The bar: the search takes the free width, then the switch and the Filter button. */
+  [data-sketch] .mk_bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  [data-sketch] .mk_search { position: relative; flex: 1 1 260px; min-width: 0; }
+  [data-sketch] .mk_search > :is(svg, [data-icon]) { position: absolute; top: 13px; left: 12px; pointer-events: none; }
+  [data-sketch] .mk_search > .sketch-input { width: 100%; padding-left: 40px; transition: background-color 60ms cubic-bezier(.4, 0, .2, 1), box-shadow 60ms cubic-bezier(.4, 0, .2, 1); }
+  [data-sketch] .mk_search > .sketch-input:focus { background-color: var(--sketch-wash); box-shadow: 0 0 0 2px var(--sketch-ink); outline: none; }
+  [data-sketch] .mk_filter { transition: box-shadow 60ms cubic-bezier(.165, .84, .44, 1); }
+  [data-sketch] .mk_filter[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--sketch-ink); }
+  [data-sketch] .mk_filter_box { position: relative; }
+  [data-sketch] .sketch-menu-item[aria-pressed="true"] { background: var(--sketch-wash); font-weight: 600; }
+  /* The suggestions below the search field. */
+  [data-sketch] .mk_suggest { position: absolute; z-index: 5; inset: calc(100% + 6px) 0 auto; display: grid; padding: 6px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); background: var(--sketch-page); }
+  [data-sketch] .mk_suggest[hidden] { display: none; }
+  [data-sketch] .sketch-main .mk_suggest > :is(a, p) { display: grid; align-content: center; justify-content: stretch; justify-items: start; gap: 2px; min-height: 44px; margin: 0; padding: 6px 10px; text-decoration: none; }
+  [data-sketch] .sketch-main .mk_suggest > a:hover { background: var(--sketch-wash); }
+  [data-sketch] .sketch-main .mk_suggest > a:last-child { border-top: 1px solid var(--sketch-muted); }
+  [data-sketch] .mk_spin { position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; border: 2px solid var(--sketch-muted); border-top-color: var(--sketch-ink); border-radius: 50%; }
+  [data-sketch] .mk_spin:not([hidden]) { animation: mk_spin 1000ms linear infinite; }
+  @keyframes mk_spin { to { rotate: 360deg; } }
+  /* A section: its head with Show all, then the rows. */
+  [data-sketch] .mk_section { display: grid; gap: 4px; }
+  [data-sketch] .mk_section > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  [data-sketch] .mk_section > header h2 { font-size: 16px; }
+  [data-sketch] .mk_rows { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 32px; margin: 0 -8px; padding: 0; list-style: none; }
+  [data-sketch] .mk_rows.mk_one { grid-template-columns: minmax(0, 1fr); }
+  [data-sketch] .mk_rows > li { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr) 44px; align-items: start; gap: 2px 12px; padding: 12px 8px; border-radius: var(--sketch-wobble); }
+  [data-sketch] .mk_rows > li[hidden] { display: none; }
+  [data-sketch] .mk_rows > li::after { content: ""; position: absolute; inset: auto 8px 0 56px; border-bottom: 1px solid var(--sketch-muted); opacity: .4; }
+  [data-sketch] .mk_rows.mk_one > li::after { display: none; }
+  [data-sketch] .mk_rows > li:is(:hover, .mk_hover) { background: var(--sketch-wash); }
+  [data-sketch] .mk_text { display: grid; gap: 2px; min-width: 0; }
+  [data-sketch] .mk_text > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* The name link covers the row, so the whole row opens the page of the item. */
+  [data-sketch] .sketch-main .mk_rows a.mk_name { display: inline-flex; justify-self: start; justify-content: start; gap: 6px; min-height: 0; max-width: 100%; padding: 0; font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+  [data-sketch] .mk_name::after { content: ""; position: absolute; inset: 0; }
+  [data-sketch] .mk_meta { color: var(--sketch-muted); font-size: 14px; }
+  /* The Add button shows on hover and on focus. */
+  [data-sketch] .mk_add { position: relative; z-index: 1; opacity: 0; transition: opacity 60ms cubic-bezier(.4, 0, .2, 1); }
+  [data-sketch] .mk_rows > li:is(:hover, :focus-within, .mk_hover) .mk_add { opacity: 1; }
+  [data-sketch] .mk_tip { position: absolute; right: 0; bottom: calc(100% + 4px); padding: 4px 8px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; white-space: nowrap; opacity: 0; scale: .96; pointer-events: none; transition: opacity 120ms cubic-bezier(.32, .72, 0, 1), scale 120ms cubic-bezier(.32, .72, 0, 1); }
+  [data-sketch] .mk_add > button:is(:hover, :focus-visible) + .mk_tip, [data-sketch] .mk_tip.mk_show { opacity: 1; scale: 1; }
+  @media (hover: none) { [data-sketch] .mk_add { opacity: 1; } }
+  [data-sketch] .mk_dim .sketch-avatar { opacity: .5; }
+  [data-sketch] .mk_reveal { animation: mk_reveal 120ms cubic-bezier(.165, .84, .44, 1); }
+  @keyframes mk_reveal { from { opacity: 0; } }
+  /* The page of an item: the head, then the main part and a column of facts. */
+  [data-sketch] .mk_head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-bottom: 20px; border-bottom: 1px solid var(--sketch-muted); }
+  [data-sketch] .mk_head > .sketch-avatar { width: 48px; height: 48px; }
+  [data-sketch] .mk_head > div { flex: 1 1 200px; display: grid; gap: 2px; min-width: 0; }
+  [data-sketch] .mk_head h1 { margin: 0; overflow-wrap: anywhere; }
+  [data-sketch] .mk_item_body { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 32px 48px; align-items: start; }
+  [data-sketch] .mk_item_body > div { display: grid; gap: 16px; min-width: 0; }
+  [data-sketch] .mk_pictures { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  [data-sketch] .mk_pictures > .sketch-placeholder { min-height: 180px; padding: 8px; text-align: center; }
+  [data-sketch] .mk_fade { opacity: 0; transition: opacity 500ms cubic-bezier(.4, 0, .2, 1); }
+  [data-sketch] .mk_fade.mk_shown { opacity: 1; }
+  [data-sketch] .mk_item_body .sketch-facts { grid-template-columns: minmax(0, 1fr); gap: 16px; overflow-wrap: anywhere; }
+  [data-sketch] .mk_item_body ul { margin: 0; padding-left: 20px; }
+  /* The dialog of an item with settings. */
+  [data-sketch] .mk_connect :is(h2, p) { margin: 0; }
+  [data-sketch] .mk_connect > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  [data-sketch] .mk_choices { display: grid; gap: 4px; }
+  [data-sketch] .mk_choices > label { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; min-height: 44px; padding: 8px 0; cursor: pointer; }
+  [data-sketch] .mk_choices small { display: block; color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .mk_actions { justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--sketch-muted); }
+  @media (max-width: 719px) {
+    [data-sketch] .mk_item_body, [data-sketch] .mk_rows { grid-template-columns: minmax(0, 1fr); }
+    [data-sketch] .mk_head > .sketch-button { flex: 1 1 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-sketch] :is(.mk_add, .mk_tip, .mk_filter, .mk_fade, .mk_search > .sketch-input) { transition: none; }
+    [data-sketch] :is(.mk_reveal, .mk_spin:not([hidden])) { animation: none; }
+  }
+</style>
+<body data-sketch>
+<!-- The page script fills each state from the templates below. -->
+<section data-state="home" data-page="home"></section>
+<section data-state="row-hover" data-page="home" data-hover="calendar"></section>
+<section data-state="add-hover" data-page="home" data-hover="calendar" data-tip></section>
+<section data-state="kind" data-page="home" data-kind="App"></section>
+<section data-state="filter" data-page="home" data-filter-open></section>
+<section data-state="search" data-page="home" data-query="cal"></section>
+<section data-state="no-results" data-page="home" data-query="zebra"></section>
+<section data-state="results" data-page="results"></section>
+<section data-state="all" data-page="all"></section>
+<section data-state="loading" data-page="all" data-dim></section>
+<section data-state="item" data-page="item"></section>
+<section data-state="connect" data-page="home" data-open-part="connect"></section>
+<section data-state="added" data-page="item" data-added></section>
+
+<template id="bar">
+  <div class="mk_bar">
+    <div class="mk_search">
+      <i data-icon="search"></i>
+      <input class="sketch-input" type="search" placeholder="Search" aria-label="Search add-ons" autocomplete="off">
+      <i class="mk_spin" aria-hidden="true" hidden></i>
+      <div class="mk_suggest" hidden></div>
+    </div>
+    <div class="sketch-segmented" role="radiogroup" aria-label="Kind">
+      <label><input type="radio" name="kind___state__" value="" checked>All</label>
+      <label><input type="radio" name="kind___state__" value="App">Apps</label>
+      <label><input type="radio" name="kind___state__" value="Template">Templates</label>
+    </div>
+    <div class="mk_filter_box">
+      <button class="sketch-icon-button mk_filter" type="button" aria-label="Filter" data-sketch-popover="filter___state__"><i data-icon="filter"></i></button>
+      <div class="sketch-menu" id="filter___state__" aria-label="Filter">
+        <button class="sketch-menu-item" type="button" data-trust="verified">Verified</button>
+        <button class="sketch-menu-item" type="button" data-trust="community">Community</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="home">
+  <h1>Add-ons</h1>
+  <!--bar-->
+  <section class="mk_section" data-part="yours"><header><h2>Your add-ons</h2><a href="#all">Show all<i data-icon="arrow-right"></i></a></header><ul class="mk_rows mk_one" data-rows="notes" data-owned></ul></section>
+  <section class="mk_section"><header><h2>Most used</h2><a href="#all">Show all<i data-icon="arrow-right"></i></a></header><ul class="mk_rows" data-rows="calendar ledger survey maps voice brand"></ul></section>
+  <section class="mk_section"><header><h2>New</h2><a href="#all">Show all<i data-icon="arrow-right"></i></a></header><ul class="mk_rows" data-rows="invoice callnotes"></ul></section>
+</template>
+
+<template id="connect">
+  <dialog class="sketch-dialog mk_connect" id="connect___state__" aria-labelledby="connect_title___state__">
+    <header><h2 id="connect_title___state__">Connect Calendar Bridge</h2><button class="sketch-icon-button" type="button" aria-label="Close" data-sketch-close><i data-icon="close"></i></button></header>
+    <p class="sketch-muted">Choose the calendar account that you want to connect.</p>
+    <div class="mk_choices" role="radiogroup" aria-label="Account">
+      <label><input type="radio" name="account___state__" checked><span>Personal account<small>Connects your own events and your mail.</small></span></label>
+      <label><input type="radio" name="account___state__"><span>Work or school account<small>An account of your company or your school. Also connects the shared calendars.</small></span></label>
+    </div>
+    <p class="sketch-muted">You can connect one account at a time. To change it later, disconnect and connect again.</p>
+    <div class="sketch-row mk_actions">
+      <button class="sketch-button secondary" type="button" data-sketch-close>Cancel</button>
+      <a class="sketch-button" href="#added">Connect</a>
+    </div>
+  </dialog>
+</template>
+
+<template id="results">
+  <h1>Add-ons</h1>
+  <!--bar-->
+  <div class="sketch-stack mk_reveal">
+    <section class="mk_section"><header><h2>Your add-ons <span class="sketch-badge">1</span></h2></header><ul class="mk_rows mk_one" data-rows="notes" data-owned></ul></section>
+    <section class="mk_section"><header><h2>More you can add</h2></header><ul class="mk_rows" data-rows="calendar callnotes"></ul></section>
+  </div>
+</template>
+
+<template id="all">
+  <a href="#home"><i data-icon="arrow-left"></i>Add-ons</a>
+  <h1>All add-ons</h1>
+  <!--bar-->
+  <section class="mk_section"><header><h2>Most popular first</h2></header><ul class="mk_rows" data-rows="calendar ledger survey maps voice brand invoice callnotes"></ul></section>
+</template>
+
+<template id="item">
+  <a href="#home"><i data-icon="arrow-left"></i>Add-ons</a>
+  <div class="mk_head">
+    <span class="sketch-avatar square">CB</span>
+    <div><h1>Calendar Bridge</h1><span class="sketch-muted">By Bridge Tools. Plans meetings from your notes.</span></div>
+    <button class="sketch-icon-button" type="button" aria-label="Copy the link of this item" data-sketch-toast="The link is copied."><i data-icon="upload"></i></button>
+    <button class="sketch-button" type="button" data-sketch-open="connect___state__" data-item-add>Add</button>
+  </div>
+  <div class="mk_item_body">
+    <div>
+      <p>Calendar Bridge reads your free times and plans a meeting from a line in your notes. It asks before it changes an event.</p>
+      <div class="mk_pictures"><span class="sketch-placeholder mk_fade">Example: plan a meeting</span><span class="sketch-placeholder mk_fade">Example: move an event</span></div>
+      <h2>What it can do</h2>
+      <ul><li>Read your events</li><li>Add and change an event</li><li>Find a free time</li></ul>
+    </div>
+    <dl class="sketch-facts">
+      <div><dt>Developer</dt><dd>Bridge Tools <span class="sketch-badge">Verified</span></dd></div>
+      <div><dt>Access</dt><dd>Can send data to its maker</dd></div>
+      <div><dt>Authorization</dt><dd>Sign-in required</dd></div>
+      <div><dt>Categories</dt><dd>Calendar, Meetings</dd></div>
+      <div><dt>Listed</dt><dd>March 2025</dd></div>
+    </dl>
+  </div>
+  <section class="mk_section"><header><h2>Related add-ons</h2></header><ul class="mk_rows" data-rows="voice callnotes"></ul></section>
+</template>
+
+<script src="../../../assets/sketch.js"></script>
+<script>
+  const items = {
+    notes: ['NS', 'Notes Sync', 'Keeps your notes in step with your calendar', 'App', 'Studio North', 'verified'],
+    calendar: ['CB', 'Calendar Bridge', 'Plans meetings from your notes', 'App', 'Bridge Tools', 'verified'],
+    ledger: ['LL', 'Ledger Lines', 'Reads your invoices and totals each month', 'App', 'Ledger House', 'verified'],
+    survey: ['SD', 'Survey Desk', 'Writes a survey and collects the answers', 'App', 'Desk Works', 'verified'],
+    maps: ['MP', 'Map Pins', 'Puts the places of a list on a map', 'App', 'Pin Studio', 'community'],
+    voice: ['VN', 'Voice Notes', 'Turns a recorded talk into a short summary of what was said and decided', 'App', 'sample-user-1', 'community'],
+    brand: ['BB', 'Brand Board', 'A start page for the colours and the words of a brand', 'Template', 'Board Room', 'verified'],
+    invoice: ['IK', 'Invoice Kit', 'A set of invoice pages for a small company', 'Template', 'Ledger House', 'verified'],
+    callnotes: ['CN', 'Call Notes', 'Writes the notes of a call', 'App', 'sample-user-2', 'community'],
+  };
+
+  // An item with settings opens a dialog before it is added. The other items are added at once.
+  const settings = ['calendar'];
+
+  const row = (id, owned, state) => {
+    const [initials, name, text, kind, maker, trust] = items[id];
+    const mark = trust === 'verified' ? '<i data-icon="check" aria-label="Verified"></i>' : '<span class="sketch-badge">Community</span>';
+    const action = owned
+      ? `<button class="sketch-icon-button" style="position:relative;z-index:1" type="button" aria-label="More actions for ${name}" data-sketch-toast="Actions of ${name}. Pattern: account/connected-apps"><i data-icon="more"></i></button>`
+      : `<span class="mk_add"><button class="sketch-icon-button" type="button" aria-label="Add ${name}" ${settings.includes(id) ? `data-sketch-open="connect_${state}"` : `data-sketch-toast="${name} is added."`}><i data-icon="plus"></i></button><span class="mk_tip" aria-hidden="true">Add ${name}</span></span>`;
+    return `<li data-id="${id}" data-kind="${kind}" data-trust="${trust}"><span class="sketch-avatar square" aria-hidden="true">${initials}</span>` +
+      `<div class="mk_text"><a class="mk_name" href="#item">${name}${mark}</a><span>${text}</span><span class="mk_meta">${kind} by ${maker}</span></div>${action}</li>`;
+  };
+
+  // The kind and the trust of the bar hide the other rows. A section with no row left is hidden too.
+  const apply = (section, change) => {
+    Object.assign(section.dataset, change);
+    const { only_kind: kind = '', only_trust: trust = '' } = section.dataset;
+    section.querySelectorAll('[data-id]').forEach(item => {
+      item.hidden = Boolean((kind && item.dataset.kind !== kind) || (trust && item.dataset.trust !== trust));
+    });
+    section.querySelectorAll('.mk_section:has([data-id])').forEach(part => { part.hidden = !part.querySelector('[data-id]:not([hidden])'); });
+  };
+
+  // The suggestions below the search field: at most 5 items, then See all results.
+  const suggest = section => {
+    const input = section.querySelector('input[type="search"]');
+    const box = section.querySelector('.mk_suggest');
+    const words = input.value.trim().toLowerCase();
+    const hits = Object.values(items).filter(item => words && `${item[1]} ${item[2]}`.toLowerCase().includes(words)).slice(0, 5);
+    box.hidden = !words;
+    box.innerHTML = hits.length
+      ? hits.map(item => `<a href="#item"><b>${item[1]}</b><span class="sketch-muted">${item[3]} by ${item[4]}</span></a>`).join('') + '<a href="#results">See all results</a>'
+      : '<p class="sketch-muted">No results</p>';
+  };
+
+  document.querySelectorAll('[data-state]').forEach(section => {
+    const state = section.dataset.state;
+    const bar = document.getElementById('bar').innerHTML;
+    section.innerHTML = `<main class="sketch-main mk_page${['home', 'all'].includes(state) ? ' mk_reveal' : ''}">${document.getElementById(section.dataset.page).innerHTML.replace('<!--bar-->', bar)}</main>${document.getElementById('connect').innerHTML}`.replaceAll('__state__', state);
+    section.querySelectorAll('[data-rows]').forEach(list => {
+      list.innerHTML = list.dataset.rows.split(' ').map(id => row(id, 'owned' in list.dataset, state)).join('');
+      if ('dim' in section.dataset) list.classList.add('mk_dim');
+    });
+    if (section.dataset.hover) {
+      const target = section.querySelector(`[data-id="${section.dataset.hover}"]`);
+      target.classList.add('mk_hover');
+      if ('tip' in section.dataset) target.querySelector('.mk_tip').classList.add('mk_show');
+    }
+    if (section.dataset.kind) {
+      section.querySelector(`input[type="radio"][value="${section.dataset.kind}"]`).checked = true;
+      apply(section, { only_kind: section.dataset.kind });
+    }
+    if (section.dataset.openPart) section.querySelector(`#${section.dataset.openPart}_${state}`).setAttribute('data-open', '');
+    if ('filterOpen' in section.dataset) section.querySelector('.sketch-menu').setAttribute('data-open', '');
+    if (section.dataset.page === 'results') section.querySelector('input[type="search"]').value = 'cal';
+    if (section.dataset.query) {
+      section.querySelector('input[type="search"]').value = section.dataset.query;
+      suggest(section);
+    }
+    if ('added' in section.dataset) {
+      const add = section.querySelector('[data-item-add]');
+      add.outerHTML = '<span class="sketch-badge strong">Added</span>';
+    }
+  });
+
+  document.addEventListener('input', event => {
+    const section = event.target.closest('[data-state]');
+    if (event.target.matches('[name^="kind_"]')) apply(section, { only_kind: event.target.value });
+    if (!event.target.matches('input[type="search"]')) return;
+    const spin = section.querySelector('.mk_spin');
+    spin.hidden = false;
+    clearTimeout(section.search_timer);
+    section.search_timer = setTimeout(() => { spin.hidden = true; suggest(section); }, 600);
+  });
+
+  document.addEventListener('click', event => {
+    const choice = event.target.closest('.sketch-menu-item[data-trust]');
+    if (!choice) return;
+    const section = choice.closest('[data-state]');
+    apply(section, { only_trust: section.dataset.only_trust === choice.dataset.trust ? '' : choice.dataset.trust });
+    choice.closest('.sketch-menu').querySelectorAll('.sketch-menu-item').forEach(other => {
+      other.setAttribute('aria-pressed', String(other.dataset.trust === section.dataset.only_trust));
+    });
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') document.querySelectorAll('.mk_suggest').forEach(box => { box.hidden = true; });
+  });
+
+  initSketch();
+
+  // The pictures of the item page fade in each time the page opens.
+  const show_pictures = () => {
+    document.querySelectorAll('.mk_fade').forEach(picture => picture.classList.remove('mk_shown'));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.querySelectorAll('.mk_fade').forEach(picture => picture.classList.add('mk_shown'));
+    }));
+  };
+  addEventListener('hashchange', show_pictures);
+  show_pictures();
+</script>
