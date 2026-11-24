@@ -107,6 +107,7 @@ Put a `sketch-split-handle` between 2 columns of a `sketch-split`. Use one handl
 - The script gives the handle `role="separator"` and `aria-orientation="vertical"`. It gives the width as `aria-valuenow`, and the limits as `aria-valuemin` and `aria-valuemax`. Give the handle an `aria-label`.
 - The browser keeps the width for the next visit. When the window gets narrow, the column gets narrow down to its smallest width.
 - The handle shows from 600 px. It does not show while a column next to it is hidden. The change of the width has no motion.
+- On a touch screen, the handle is 44 px wide, so that a finger can drag it.
 
 ### A panel that slides in
 

@@ -460,7 +460,7 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   /* The focus outline goes around the grip. Around the handle it is 2 more lines next to the line of the split. */
   [data-sketch] .sketch-split > .sketch-split-handle:focus-visible { outline: 0; }
   [data-sketch] .sketch-split > .sketch-split-handle:focus-visible::after { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
-  @media (pointer: coarse) { [data-sketch] .sketch-split > .sketch-split-handle { --lead: 8px; width: 24px; } }
+  @media (pointer: coarse) { [data-sketch] .sketch-split > .sketch-split-handle { --lead: 22px; width: 44px; } } /* A finger needs a target of 44 px. */
   [data-sketch] .sketch-board { grid-auto-columns: 280px; }
   [data-sketch] .sketch-main { padding: 32px; }
 }
