@@ -58,6 +58,7 @@ The pictures show no motion. Each value below is the designer's choice, so each 
 ## Hard cases
 
 - The place in the channel: when the panel opens or closes, the words of the channel wrap again. A channel that shows its newest message stays at its newest message. In each other position, the card of the thread stays at the same height on the screen. This is drawn. The pictures show one position only.
+- The place in the thread: each time that a thread opens, the panel shows its newest reply. The size of the window, the width of the panel and the layout can change while the thread is closed. The thread still opens at its newest reply. Drawn.
 - Words in a message field: the words that the person typed in the channel field stay while the thread is open and after it closes. The words in the thread field stay when the same thread closes and opens again. Drawn.
 - Long thread name: in the card, the name goes on to a second line, and the link goes below it. In the bar of the panel and in the placeholder, the name is cut with an ellipsis.
 - Long last reply: the reply stays on one line and is cut with an ellipsis. The age stays in view at the end of the line.

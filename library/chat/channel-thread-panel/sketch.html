@@ -497,14 +497,14 @@
     return item;
   }
 
-  // view is ready, loading, error or deleted.
+  // view is ready, loading, error or deleted. Gives true when the messages of the panel changed.
   function draw_thread(id, view, fresh) {
     const key = [id, view, sent[id].length, arrived[id], new_line === id, failed[id] || ''].join('|');
     thread_name.textContent = threads[id].name;
     const field_name = `Message "${threads[id].name}"`;
     thread_field.placeholder = field_name;
     thread_field.setAttribute('aria-label', field_name);
-    if (drawn_thread === key) return;
+    if (drawn_thread === key) return false;
     if (!drawn_thread.startsWith(`${id}|`)) thread_field.value = '';
     drawn_thread = key;
     replies.replaceChildren(copy_of(`t_${id}`));
@@ -529,7 +529,7 @@
         replies.append(item);
       }
     }
-    thread_scroll.scrollTop = thread_scroll.scrollHeight;
+    return true;
   }
 
   // The drag of a phone. A class on the split shows the channel under the thread, and --ct_swipe is the part of the width that the thread moved.
@@ -576,6 +576,7 @@
     // The channel gets narrow or wide, and its words wrap again. A channel at its newest message stays there. In each other place, the card of the thread keeps its place on the screen.
     const anchor = cards[last_thread];
     const top_before = anchor.getBoundingClientRect().top;
+    const was_closed = panel.hidden;
     split.classList.toggle('ct_open', open_thread !== null);
     panel.hidden = open_thread === null;
     const no_messages = state === 'channel-empty';
@@ -583,13 +584,15 @@
     channel_start.hidden = !no_messages;
     if (open_thread) {
       const view = { 'thread-loading': 'loading', 'thread-error': 'error', 'quote-deleted': 'deleted' }[state] || 'ready';
-      draw_thread(open_thread, view, fresh);
+      const drawn = draw_thread(open_thread, view, fresh);
       const locked = state === 'thread-locked';
       thread_note.hidden = !locked && !archived[open_thread];
       thread_note.textContent = locked ? 'This thread is locked. Only a moderator can open it again.' : 'This thread is archived. A new message opens it again.';
       thread_form.hidden = locked;
       archive_item.textContent = archived[open_thread] ? 'Open thread again' : 'Archive thread';
       archive_item.hidden = locked;
+      // The panel shows its newest reply each time that it opens, and when its messages change. The page sets this place last, because the note and the message field change the height of the messages.
+      if (was_closed || drawn) thread_scroll.scrollTop = thread_scroll.scrollHeight;
     }
     Object.keys(threads).forEach(draw_card);
     if (at_newest) messages.scrollTop = messages.scrollHeight;
