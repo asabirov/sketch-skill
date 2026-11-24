@@ -1,0 +1,112 @@
+[
+  {
+    "label": "thread-open",
+    "trigger": "click a thread card or its link",
+    "element": "the thread panel",
+    "property": null,
+    "animation": "panel_in",
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "thread-empty",
+    "trigger": "click the card of a thread with no replies",
+    "element": "the thread panel",
+    "property": null,
+    "animation": "panel_in",
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "reply-sent",
+    "trigger": "click the send button of the thread panel, or press Enter in its message field",
+    "element": "the new message in the thread panel",
+    "property": null,
+    "animation": "message_in",
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "narrow-thread",
+    "trigger": "click a thread card or its link, in a window below 1000 px",
+    "element": "the thread panel",
+    "property": null,
+    "animation": "panel_in",
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "narrow-channel",
+    "trigger": "release of a long drag, in a window below 600 px",
+    "element": "the thread under the finger",
+    "property": "transform",
+    "animation": null,
+    "duration": 520,
+    "delay": 0,
+    "easing": "linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "narrow-channel",
+    "trigger": "release of a long drag, in a window below 600 px",
+    "element": "the channel under the thread",
+    "property": "transform",
+    "animation": null,
+    "duration": 520,
+    "delay": 0,
+    "easing": "linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "narrow-channel",
+    "trigger": "release of a long drag, in a window below 600 px",
+    "element": "the dim on the channel",
+    "property": "opacity",
+    "animation": null,
+    "duration": 520,
+    "delay": 0,
+    "easing": "linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "narrow-thread",
+    "trigger": "release of a short drag, in a window below 600 px",
+    "element": "the thread under the finger",
+    "property": "transform",
+    "animation": null,
+    "duration": 520,
+    "delay": 0,
+    "easing": "linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "narrow-thread",
+    "trigger": "release of a short drag, in a window below 600 px",
+    "element": "the channel under the thread",
+    "property": "transform",
+    "animation": null,
+    "duration": 520,
+    "delay": 0,
+    "easing": "linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%)",
+    "measurement": "estimated"
+  },
+  {
+    "label": "narrow-thread",
+    "trigger": "release of a short drag, in a window below 600 px",
+    "element": "the dim on the channel",
+    "property": "opacity",
+    "animation": null,
+    "duration": 520,
+    "delay": 0,
+    "easing": "linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%)",
+    "measurement": "estimated"
+  }
+]

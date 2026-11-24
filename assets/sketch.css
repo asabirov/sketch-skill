@@ -298,6 +298,9 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 [data-sketch] .sketch-bars i { background: var(--sketch-ink); border-radius: 5px 3px 0 0; }
 [data-sketch] .sketch-split { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; }
 [data-sketch] .sketch-split.panes { align-content: stretch; } /* On a phone, the open column fills the screen, so its last form is at the foot. */
+/* A handle on the line between 2 columns of a split: <div class="sketch-split-handle" aria-label="Width of the list"></div>. A drag or an arrow key sets --pane on the split:
+   the width of the column before the handle, or with "end" the column after it. Below 600 px the columns stack, so the handle is gone. */
+[data-sketch] .sketch-split-handle { display: none; }
 /* A board scrolls inside its own box until its columns fit. */
 [data-sketch] .sketch-board { display: grid; grid-auto-flow: column; grid-auto-columns: 85%; gap: 16px; align-items: start; overflow-x: auto; scroll-snap-type: x mandatory; }
 [data-sketch] .sketch-board > * { scroll-snap-align: start; } [data-sketch] .sketch-board .sketch-frame { padding: 12px 16px; }
@@ -427,21 +430,32 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 @media (max-width: 999px) {
   [data-sketch] .sketch-from-desktop, [data-sketch] .sketch-menu-button[aria-expanded="false"] + .sketch-collapse { display: none !important; }
   [data-sketch] .sketch-bar > .sketch-collapse { order: 1; }
-  [data-sketch] .sketch-split > :has(+ .sketch-from-desktop:last-child) { border-right: 0; } /* A desktop side panel is hidden, so its neighbour is the last column. */
+  [data-sketch] .sketch-split > :is(:has(+ .sketch-from-desktop:last-child), :has(+ .sketch-split-handle + .sketch-from-desktop:last-child)) { border-right: 0; } /* A desktop side panel is hidden, so its neighbour is the last column. */
 }
 @media (min-width: 600px) {
   [data-sketch] .sketch-phone-only { display: none !important; }
   [data-sketch] .sketch-rail { grid-template: auto 1fr / 88px minmax(0, 1fr); }
   [data-sketch] .sketch-rail > .sketch-nav { order: 0; position: static; grid-auto-flow: row; align-content: start; padding: 16px 8px; border-top: 0; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
   [data-sketch] .sketch-grid { grid-template-columns: repeat(var(--tablet, 2), minmax(0, 1fr)); }
-  [data-sketch] .sketch-split { grid-template-columns: 260px minmax(0, 1fr); min-height: calc(100vh - 62px); align-content: stretch; }
+  [data-sketch] .sketch-split { grid-template-columns: var(--pane, 260px) minmax(0, 1fr); min-height: calc(100vh - 62px); align-content: stretch; }
   [data-sketch] .sketch-split > :not(:last-child) { border-right: var(--sketch-stroke) solid var(--sketch-ink); }
   /* With "panes", the split fills the screen below the bar, each column scrolls on its own, and a column's last form stays at its foot. */
   [data-sketch] .sketch-shell:has(> .sketch-split.panes) { height: 100vh; } [data-sketch] .sketch-split.panes { grid-template-rows: minmax(0, 1fr); min-height: 0; }
-  [data-sketch] .sketch-split.panes { grid-template-columns: var(--split, 260px minmax(0, 1fr)); }
+  [data-sketch] .sketch-split.panes { grid-template-columns: var(--split, var(--pane, 260px) minmax(0, 1fr)); }
   [data-sketch] .sketch-split.panes > * { min-height: 0; overflow-y: auto; }
   [data-sketch] .sketch-split.panes > * > form:last-child { position: sticky; bottom: 0; padding-block: 8px; background: var(--sketch-page); }
   [data-sketch] .sketch-split > .sketch-nav { flex-direction: column; padding: 24px 16px; } [data-sketch] .sketch-split > .sketch-nav a { justify-content: start; }
+  /* The handle takes no column. It lies on the line after the column before it, with a grip at the middle of the line. It is 16 px wide and not 44 px, so that it covers no control
+     at the edge of a column. --lead is its part before the line: the smaller part, because a scrollbar is there. */
+  [data-sketch] .sketch-split:has(> .sketch-split-handle) { position: relative; }
+  [data-sketch] .sketch-split > .sketch-split-handle { display: block; position: absolute; z-index: 2; grid-area: 1 / 2 / -1; --lead: 4px; top: 0; bottom: 0; left: calc(-1 * var(--lead)); width: 16px; min-height: 0; overflow: visible; border: 0; cursor: col-resize; touch-action: none; user-select: none; }
+  [data-sketch] .sketch-split > :nth-child(2 of :not(.sketch-split-handle, .sketch-outline)) + .sketch-split-handle { grid-column-start: 3; } /* The handle after the second column. */
+  [data-sketch] .sketch-split > .sketch-split-handle::after { content: ""; position: absolute; top: 50%; left: calc(var(--lead) - var(--sketch-stroke) / 2); width: 6px; height: 32px; translate: -50% -50%; background: var(--sketch-page); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 3px; }
+  [data-sketch] .sketch-split > .sketch-split-handle:is(:hover, :active, :focus-visible)::after { background: var(--sketch-ink); }
+  /* The focus outline goes around the grip. Around the handle it is 2 more lines next to the line of the split. */
+  [data-sketch] .sketch-split > .sketch-split-handle:focus-visible { outline: 0; }
+  [data-sketch] .sketch-split > .sketch-split-handle:focus-visible::after { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+  @media (pointer: coarse) { [data-sketch] .sketch-split > .sketch-split-handle { --lead: 8px; width: 24px; } }
   [data-sketch] .sketch-board { grid-auto-columns: 280px; }
   [data-sketch] .sketch-main { padding: 32px; }
 }
@@ -454,8 +468,8 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
   [data-sketch] .sketch-cols { grid-template-columns: var(--cols, minmax(0, 1fr) 300px); }
   [data-sketch] .sketch-grid { grid-template-columns: repeat(var(--wide, 4), minmax(0, 1fr)); }
   [data-sketch] .sketch-grid > .sketch-span { grid-column: span 3; } [data-sketch] .sketch-grid > .sketch-span + * { grid-column: auto; }
-  [data-sketch] .sketch-split { grid-template-columns: var(--split, 260px minmax(0, 1fr)); }
-  [data-sketch] .sketch-split:has(> :nth-child(3)) { grid-template-columns: var(--split, 200px 300px minmax(0, 1fr)); }
+  [data-sketch] .sketch-split { grid-template-columns: var(--split, var(--pane, 260px) minmax(0, 1fr)); }
+  [data-sketch] .sketch-split:has(> :nth-child(3 of :where(:not(.sketch-split-handle)))) { grid-template-columns: var(--split, 200px 300px minmax(0, 1fr)); }
   [data-sketch] .sketch-board { grid-auto-columns: minmax(0, 1fr); }
   [data-sketch] .sketch-steps { flex-direction: column; }
   [data-sketch] .sketch-cols.flip > :first-child { order: 1; } /* A band with its picture on the other side. */
