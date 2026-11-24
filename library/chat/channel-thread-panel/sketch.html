@@ -1,0 +1,749 @@
+<!doctype html>
+<!--
+  Best for: a team chat with busy channels. A person sees which message has a thread, reads its last reply in the channel, and reads and answers the thread while the channel keeps its place.
+  Row opens: in a pane. The thread of a card opens in a pane at the right of the channel. In a window below 1000 px, the pane takes the place of the channel.
+  Related: chat/conversation-pane shows a list of conversations with the open conversation next to it. content/comment-thread shows the replies in place under a comment. navigation/swipe-back gives the drag of the phone layout. notifications/follow-menu is the notification choice of the bell.
+  Transition values, from transitions.json. The pictures of the source show no motion, so each value is estimated. Each value is the designer's choice.
+  - thread-open, thread-empty and narrow-thread: the thread panel slides in from the right edge, the kit part sketch-slide-in, 300 ms, cubic-bezier(0.2, 0, 0, 1). The channel gets narrow at once.
+  - thread-closed and narrow-channel: the thread panel goes at once, and the channel gets its width back at once. 0 ms.
+  - reply-sent: the new message of the thread goes from clear to solid, animation message_in 150 ms, cubic-bezier(0.4, 0, 0.2, 1). The card in the channel changes at once.
+  - narrow-dragging: below 600 px, a drag to the right from the left edge moves the thread with the finger. The channel shows under it, 48 px to the left and dimmed. This move has no duration.
+  - narrow-channel and narrow-thread after the release of a drag: the transform of the thread, the transform of the channel and the opacity of the dim, 520 ms, with the linear() spring of navigation/swipe-back. With reduced motion, the release shows the end position at once.
+  - The handle on the line between the channel and the thread panel: the line follows the pointer. An arrow key, Home, End, Enter and a double click change the width at once. 0 ms.
+  - Each other change is immediate: the menus, the load, the load error, the send error, the archived thread and the mark of new replies.
+  The pictures of the source show no narrow window. Below 1000 px, the thread takes the place of the channel, and a Back button takes the place of the close button. This is the designer's choice.
+  The drag is a proposal. The pictures of the source show no drag. Its values are the measured values of navigation/swipe-back.
+  It starts from the layout of the page template conversation/with-side-panel of the sketch skill.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Channel thread panel</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  /* The kit shows one state section at a time. Each state section is empty, and the page script draws the one page below for the state in the address.
+     So the channel keeps its scroll position and the words in its message field when the thread opens and closes. */
+
+  /* The window: the navigation box, then the split of the channel and the thread panel. */
+  [data-sketch] .ct_app { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); height: 100dvh; }
+  [data-sketch] .ct_nav { display: none; }
+  @media (min-width: 600px) {
+    [data-sketch] .ct_app { grid-template-columns: min(220px, 24%) minmax(0, 1fr); }
+    [data-sketch] .ct_nav { display: grid; padding: 12px; border-right: var(--sketch-stroke) solid var(--sketch-ink); }
+  }
+  /* The channel and the thread panel are the 2 columns of a kit split. The kit handle on the line between them sets --pane, the width of the panel.
+     Below 1000 px the split has one column, and the thread takes the place of the channel. The channel stays in the page but does not show, so it keeps its scroll position. */
+  [data-sketch] .ct_split { grid-template: minmax(0, 1fr) / minmax(0, 1fr); min-width: 0; min-height: 0; overflow: clip; }
+  [data-sketch] .ct_channel { grid-area: 1 / 1; --pane-min: 360px; }
+  [data-sketch] .ct_thread { grid-area: 1 / 1; --pane-min: 300px; }
+  /* With no open thread, the channel is the last column, so it has no line at its right. */
+  [data-sketch] .ct_split:not(.ct_open) > .ct_channel { border-right: 0; }
+  @media (max-width: 999px) { [data-sketch] .ct_open > .ct_channel { visibility: hidden; } }
+  @media (min-width: 1000px) {
+    [data-sketch] .ct_open { grid-template-columns: minmax(0, 1fr) var(--pane, clamp(340px, 32vw, 480px)); }
+    [data-sketch] .ct_thread { grid-area: 1 / 2; }
+  }
+  /* A plain box stands for a part that this pattern does not draw. It names the part. */
+  [data-sketch] .ct_part { display: grid; place-content: center; justify-items: center; gap: 2px; margin: 0; padding: 12px; border: var(--sketch-stroke) solid var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; overflow-wrap: anywhere; }
+
+  /* A pane: a bar, the messages, which scroll on their own, and a message field at the foot. The channel and the thread are each a pane. */
+  [data-sketch] .ct_pane { display: grid; grid-template: auto minmax(0, 1fr) auto / minmax(0, 1fr); min-width: 0; min-height: 0; }
+  [data-sketch] .ct_bar { display: flex; align-items: center; gap: 4px; min-height: 52px; padding: 0 8px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .ct_title { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; margin: 0 0 0 8px; font-size: 16px; line-height: 1.5; letter-spacing: 0; }
+  [data-sketch] .ct_page_name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  [data-sketch] .ct_title_words { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .ct_scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  [data-sketch] .ct_list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-content: end; min-height: 100%; margin: 0; padding: 16px; list-style: none; }
+  /* The date between the messages of 2 days. */
+  [data-sketch] .ct_day { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--sketch-muted); }
+  [data-sketch] .ct_day::before, [data-sketch] .ct_day::after { content: ""; flex: 1; border-top: 1px solid var(--sketch-wash); }
+
+  /* A message: the avatar at the left, then the name and the time on one line, and the words below. */
+  [data-sketch] .ct_msg { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  [data-sketch] .ct_row { display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto 1fr 1fr; column-gap: 12px; }
+  [data-sketch] .ct_face { grid-area: 1 / 1; justify-self: center; }
+  [data-sketch] .ct_body { grid-area: 1 / 2; min-width: 0; }
+  [data-sketch] .ct_meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; margin: 0; }
+  [data-sketch] .ct_time { font-size: 13px; color: var(--sketch-muted); }
+  [data-sketch] .ct_text { max-width: 72ch; margin: 0; overflow-wrap: anywhere; }
+  [data-sketch] .ct_note { margin: 0; color: var(--sketch-muted); }
+  /* The line above the first new reply of a thread. */
+  [data-sketch] .ct_fresh { color: var(--sketch-ink); font-weight: 600; }
+  /* A load error or a send error: the words, then the buttons. */
+  [data-sketch] .ct_fault { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 6px 0 0; }
+  [data-sketch] .ct_fault_words { flex: 1 1 100%; min-width: 0; margin: 0; overflow-wrap: anywhere; }
+
+  /* A message with a thread. A thin line starts under the avatar, goes down, and turns with a round corner to the middle of the card.
+     The card takes the last 2 rows of the message, and each row is half of the card. The line ends at the end of the first of them. */
+  [data-sketch] .ct_above_card { padding-bottom: 6px; }
+  [data-sketch] .ct_wire { grid-area: 1 / 1 / 3 / 2; justify-self: start; width: 28px; margin: 40px 0 0 calc(20px - var(--sketch-stroke) / 2); border: solid var(--sketch-muted); border-width: 0 0 var(--sketch-stroke) var(--sketch-stroke); border-bottom-left-radius: 10px; pointer-events: none; }
+  /* The card: the thread name and the link on the first line, and the last reply or a note on the second line. The link covers the card. */
+  [data-sketch] .ct_card { grid-area: 2 / 2 / 4 / 3; justify-self: start; position: relative; max-width: min(100%, 520px); padding: 8px 12px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .ct_card:hover { background: var(--sketch-wash); }
+  [data-sketch] .ct_card:has(.ct_card_link:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+  [data-sketch] .ct_card_head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; margin: 0; }
+  [data-sketch] .ct_card_name { font-weight: 600; overflow-wrap: anywhere; }
+  [data-sketch] .ct_card_link { font-weight: 600; white-space: nowrap; text-decoration: none; }
+  [data-sketch] .ct_card_label { text-decoration: underline; text-decoration-color: var(--sketch-muted); }
+  [data-sketch] .ct_card_link::after { content: ""; position: absolute; inset: 0; border-radius: var(--sketch-wobble); }
+  [data-sketch] .ct_card_link:focus-visible { outline: 0; }
+  [data-sketch] .ct_card_link > .sketch-icon { width: 14px; height: 14px; }
+  [data-sketch] .ct_card_last { display: flex; align-items: baseline; gap: 10px; min-width: 0; margin: 0; }
+  /* The last reply stays on one line. A note, such as the note of an empty thread, goes on to the next line. */
+  [data-sketch] .ct_card_text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .ct_card_words { min-width: 0; }
+  [data-sketch] .ct_card_age { flex: none; font-size: 13px; color: var(--sketch-muted); white-space: nowrap; }
+
+  /* A reply that quotes an earlier message. The quote is one line above the reply, and a line joins it to the avatar. */
+  [data-sketch] .ct_quote { position: relative; display: flex; align-items: center; gap: 6px; min-width: 0; margin: 0 0 0 52px; font-size: 13px; }
+  [data-sketch] .ct_quote::before { content: ""; position: absolute; left: calc(-32px - var(--sketch-stroke) / 2); top: 50%; bottom: -2px; width: 26px; border: solid var(--sketch-muted); border-width: var(--sketch-stroke) 0 0 var(--sketch-stroke); border-top-left-radius: 8px; }
+  [data-sketch] .ct_quote_face { display: grid; place-items: center; flex: none; width: 20px; height: 20px; border: var(--sketch-stroke) solid currentColor; border-radius: 50%; font-size: 11px; font-weight: 600; line-height: 1; }
+  [data-sketch] .ct_quote_name { flex: none; font-weight: 600; }
+  [data-sketch] .ct_quote_text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--sketch-muted); }
+
+  /* The message field: one outline around the add button, the field and the buttons at its end. */
+  [data-sketch] .ct_composer { display: flex; align-items: center; margin: 0 16px 16px; padding: 0 2px; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: var(--sketch-wobble); }
+  [data-sketch] .ct_composer:has(.ct_field:focus-visible) { outline: var(--sketch-stroke) solid var(--sketch-ink); outline-offset: 3px; }
+  [data-sketch] .ct_field { flex: 1; min-width: 0; min-height: 44px; padding: 0 8px; border: 0; background: none; text-overflow: ellipsis; }
+  [data-sketch] .ct_field:focus-visible { outline: 0; }
+  /* The thread panel has one more row: a note above the message field, for an archived thread. In a locked thread, the note takes the place of the field. */
+  [data-sketch] .ct_thread { grid-template-rows: auto minmax(0, 1fr) auto auto; }
+  [data-sketch] .ct_foot_note { margin: 0 16px 16px; overflow-wrap: anywhere; }
+
+  /* Each motion value below comes from transitions.json. */
+  @keyframes message_in { from { opacity: 0; } }
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sketch] .ct_new { animation: message_in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+  }
+
+  /* The drag of a phone, below 600 px. It is the drag of navigation/swipe-back, with the values of that pattern.
+     The thread moves with the finger. The channel shows under it, 48px to the left and thinned. */
+  [data-sketch] { --ct_spring: linear(0 0%, 0.009 1.05%, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.6%, 1.077 20.5%, 1.121 22.4%, 1.149 24.3%, 1.159 25.7%, 1.163 27.1%, 1.161 28.5%, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991 47.05%, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1 100%); }
+  @media (max-width: 599px) {
+    /* A drag up or down scrolls the thread. A drag sideways goes to the page script. */
+    [data-sketch] .ct_thread { touch-action: pan-y; }
+    [data-sketch] .ct_swipe { overflow: clip; user-select: none; }
+    [data-sketch] .ct_swipe > .ct_thread { transform: translateX(calc(var(--ct_swipe, 0) * 100%)); background: var(--sketch-page); box-shadow: calc(-1 * var(--sketch-stroke)) 0 0 var(--sketch-ink); }
+    [data-sketch] .ct_swipe > .ct_channel { position: relative; visibility: visible; transform: translateX(calc(48px * (var(--ct_swipe, 0) - 1))); pointer-events: none; }
+    [data-sketch] .ct_swipe > .ct_channel::after { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--sketch-page) 72%, transparent); opacity: calc(1 - var(--ct_swipe, 0)); }
+  }
+  @media (max-width: 599px) and (prefers-reduced-motion: no-preference) {
+    [data-sketch] .ct_settle > .ct_thread { transition: transform 520ms var(--ct_spring); }
+    [data-sketch] .ct_settle > .ct_channel { transition: transform 520ms var(--ct_spring); }
+    [data-sketch] .ct_settle > .ct_channel::after { transition: opacity 520ms var(--ct_spring); }
+  }
+</style>
+<body data-sketch>
+<!-- One empty section for each state. The page script reads the address and draws the page below. -->
+<section data-state="channel"></section>
+<section data-state="thread-open"></section>
+<section data-state="thread-empty"></section>
+<section data-state="thread-closed"></section>
+<section data-state="reply-sent"></section>
+<section data-state="narrow-channel"></section>
+<section data-state="narrow-thread"></section>
+<section data-state="narrow-dragging"></section>
+<section data-state="card-unread"></section>
+<section data-state="thread-loading"></section>
+<section data-state="thread-error"></section>
+<section data-state="reply-failed"></section>
+<section data-state="quote-deleted"></section>
+<section data-state="thread-archived"></section>
+<section data-state="thread-locked"></section>
+<section data-state="more-menu"></section>
+<section data-state="notify-menu"></section>
+<section data-state="channel-empty"></section>
+
+<main class="ct_app" id="ct_app">
+  <!-- The heading of the page. It stays when the thread covers the channel on a phone. -->
+  <h1 class="ct_page_name">Channel workshop</h1>
+  <!-- The list of channels is not a part of this pattern. -->
+  <nav class="ct_nav" aria-label="Channels">
+    <p class="ct_part"><strong>Navigation</strong><span>The list of channels</span></p>
+  </nav>
+
+  <div class="sketch-split ct_split" id="ct_split">
+  <!-- The channel: the bar, the messages and the message field. -->
+  <section class="ct_pane ct_channel" id="ct_channel" aria-labelledby="ct_channel_name">
+    <header class="ct_bar">
+      <button type="button" class="sketch-icon-button sketch-phone-only" aria-label="Channels" data-sketch-toast="Navigation: the list of channels opens (sample)"><i data-icon="menu"></i></button>
+      <h2 class="ct_title"><span class="sketch-muted" aria-hidden="true">#</span><span class="ct_title_words" id="ct_channel_name">workshop</span></h2>
+      <button type="button" class="sketch-icon-button sketch-from-tablet" aria-label="Members" data-sketch-toast="The list of members opens (sample)"><i data-icon="user"></i></button>
+      <button type="button" class="sketch-icon-button" aria-label="Search this channel" data-sketch-toast="The search opens (sample)"><i data-icon="search"></i></button>
+    </header>
+    <div class="ct_scroll" id="ct_messages">
+      <ol class="ct_list" id="ct_channel_list" aria-label="Messages in workshop">
+        <!-- A channel with no messages shows this note only. -->
+        <li class="ct_note" id="ct_channel_start" hidden>There are no messages in this channel yet.</li>
+        <li class="ct_day">18 November 2026</li>
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">IC</span>
+          <div class="ct_body"><p class="ct_meta"><b>Ines Calder</b><time class="ct_time" datetime="2026-11-18T09:05">18 Nov, 09:05</time></p><p class="ct_text">The parts order from the supplier is late. The new date is 26 November.</p></div>
+        </div></li>
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">SO</span>
+          <div class="ct_body"><p class="ct_meta"><b>Sam Okafor</b><time class="ct_time" datetime="2026-11-18T09:20">18 Nov, 09:20</time></p><p class="ct_text">Then the 2 wheel builds move to next week. I will call the customers.</p></div>
+        </div></li>
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">TR</span>
+          <div class="ct_body"><p class="ct_meta"><b>Tomas Reyes</b><time class="ct_time" datetime="2026-11-18T14:10">18 Nov, 14:10</time></p><p class="ct_text">The winter service checklist is on the wall next to bench 2.</p></div>
+        </div></li>
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+          <div class="ct_body"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-18T16:45">18 Nov, 16:45</time></p><p class="ct_text">The shop closes at 18:00 today. Please bring the test bikes in before that.</p></div>
+        </div></li>
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">IC</span>
+          <div class="ct_body"><p class="ct_meta"><b>Ines Calder</b><time class="ct_time" datetime="2026-11-18T17:30">18 Nov, 17:30</time></p><p class="ct_text">All 4 test bikes are in the back room.</p></div>
+        </div></li>
+        <li class="ct_day">19 November 2026</li>
+        <!-- Form count: the count of the messages is the link. The thread is quiet, so the second line is a note and the age of the last message. -->
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+          <div class="ct_body ct_above_card"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-19T10:02">19 Nov, 10:02</time></p><p class="ct_text">The till shows the wrong price for the tube set. Who can check the price list?</p></div>
+          <i class="ct_wire" aria-hidden="true"></i>
+          <div class="ct_card" data-thread="tube" data-form="count">
+            <p class="ct_card_head"><span class="ct_card_name">Tube set price</span><a class="ct_card_link" href="#thread-open"><span class="ct_card_label">2 messages</span> <i data-icon="chevron-right"></i></a><span class="sketch-badge strong ct_card_new" aria-hidden="true" hidden></span></p>
+            <p class="ct_card_last"><span class="ct_card_words">There are no recent messages in this thread.</span><span class="ct_card_age">5 d ago</span></p>
+          </div>
+        </div></li>
+        <li class="ct_day">24 November 2026</li>
+        <!-- Form last-reply: the link is "See thread", and the second line is the last reply and its age. -->
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">TR</span>
+          <div class="ct_body ct_above_card"><p class="ct_meta"><b>Tomas Reyes</b><time class="ct_time" datetime="2026-11-24T09:30">09:30</time></p><p class="ct_text">Can we close the workshop at 16:00 on Friday? The floor needs paint, and the paint must dry before Monday.</p></div>
+          <i class="ct_wire" aria-hidden="true"></i>
+          <div class="ct_card" data-thread="friday" data-form="last-reply">
+            <p class="ct_card_head"><span class="ct_card_name">Friday closing time</span><a class="ct_card_link" href="#thread-open"><span class="ct_card_label">See thread</span> <i data-icon="chevron-right"></i></a><span class="sketch-badge strong ct_card_new" aria-hidden="true" hidden></span></p>
+            <p class="ct_card_last"><span class="ct_card_text">Ines Calder: 16:00 is fine. I will tell the customers who collect a bike on Friday.</span><span class="ct_card_age">12 min ago</span></p>
+          </div>
+        </div></li>
+        <!-- Form empty: the link is "See thread", and the second line says that the thread has no messages. -->
+        <li class="ct_msg"><div class="ct_row">
+          <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+          <div class="ct_body ct_above_card"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-24T10:05">10:05</time></p><p class="ct_text">The photos of the new shop window are ready. Tell me which one goes on the door poster.</p></div>
+          <i class="ct_wire" aria-hidden="true"></i>
+          <div class="ct_card" data-thread="poster" data-form="empty">
+            <p class="ct_card_head"><span class="ct_card_name">Door poster photo</span><a class="ct_card_link" href="#thread-empty"><span class="ct_card_label">See thread</span> <i data-icon="chevron-right"></i></a><span class="sketch-badge strong ct_card_new" aria-hidden="true" hidden></span></p>
+            <p class="ct_card_last"><span class="ct_card_words">There are no messages in this thread yet.</span><span class="ct_card_age" hidden></span></p>
+          </div>
+        </div></li>
+      </ol>
+    </div>
+    <form class="ct_composer" id="ct_channel_form">
+      <button type="button" class="sketch-icon-button" aria-label="Add a file" data-sketch-toast="The file picker opens (sample)"><i data-icon="plus"></i></button>
+      <input class="ct_field" type="text" placeholder="Message #workshop" aria-label="Message #workshop" autocomplete="off">
+      <button type="button" class="sketch-icon-button" aria-label="Add an emoji" data-sketch-toast="The emoji picker opens (sample)"><i data-icon="smile"></i></button>
+      <button type="submit" class="sketch-icon-button" aria-label="Send to #workshop"><i data-icon="send"></i></button>
+    </form>
+  </section>
+
+  <!-- The kit handle on the line between the channel and the thread panel. A drag or an arrow key changes the width of the panel. -->
+  <div class="sketch-split-handle end sketch-from-desktop" id="ct_handle" aria-label="Width of the thread panel"></div>
+
+  <!-- The thread panel: its own bar, the messages of the thread and its own message field. -->
+  <section class="ct_pane ct_thread sketch-slide-in" id="ct_thread" aria-labelledby="ct_thread_name" hidden>
+    <header class="ct_bar">
+      <a class="sketch-icon-button sketch-until-desktop" id="ct_back" href="#narrow-channel" aria-label="Back to #workshop" data-leave><i data-icon="arrow-left"></i></a>
+      <h2 class="ct_title"><i data-glyph="thread"></i><span class="ct_title_words" id="ct_thread_name">Friday closing time</span></h2>
+      <button type="button" class="sketch-icon-button" id="ct_bell" aria-label="Notifications of this thread" data-sketch-popover="ct_notify"><i data-icon="bell"></i></button>
+      <button type="button" class="sketch-icon-button" id="ct_more" aria-label="More thread actions" data-sketch-popover="ct_more_menu"><i data-icon="more"></i></button>
+      <a class="sketch-icon-button sketch-from-desktop" href="#thread-closed" aria-label="Close thread" data-leave><i data-icon="close"></i></a>
+    </header>
+    <div class="ct_scroll" id="ct_thread_scroll">
+      <ol class="ct_list" id="ct_replies" aria-label="Messages in the thread"></ol>
+    </div>
+    <!-- The note of an archived thread or of a locked thread. -->
+    <p class="ct_foot_note" id="ct_thread_note" hidden></p>
+    <form class="ct_composer" id="ct_thread_form">
+      <button type="button" class="sketch-icon-button" aria-label="Add a file" data-sketch-toast="The file picker opens (sample)"><i data-icon="plus"></i></button>
+      <input class="ct_field" id="ct_thread_field" type="text" placeholder='Message "Friday closing time"' aria-label='Message "Friday closing time"' autocomplete="off">
+      <button type="button" class="sketch-icon-button" aria-label="Add an emoji" data-sketch-toast="The emoji picker opens (sample)"><i data-icon="smile"></i></button>
+      <button type="submit" class="sketch-icon-button" aria-label="Send to the thread"><i data-icon="send"></i></button>
+    </form>
+  </section>
+  </div>
+
+<!-- The more menu of the thread panel. -->
+<div class="sketch-menu" id="ct_more_menu" aria-label="Thread actions">
+  <button type="button" class="sketch-menu-item" data-sketch-toast="The form for the thread name opens (sample)">Edit thread</button>
+  <button type="button" class="sketch-menu-item" id="ct_archive">Archive thread</button>
+</div>
+<!-- The notification choice of the bell is a part of a different pattern, so a plain box stands for it. -->
+<div class="sketch-popover" id="ct_notify" role="dialog" aria-label="Notifications of this thread">
+  <p class="ct_part"><strong>Notification choice</strong><span>Pattern: notifications/follow-menu</span></p>
+</div>
+</main>
+
+<!-- The messages of each thread. A thread starts with the message of the channel that it hangs on. -->
+<template id="t_friday">
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">TR</span>
+    <div class="ct_body"><p class="ct_meta"><b>Tomas Reyes</b><time class="ct_time" datetime="2026-11-24T09:30">09:30</time></p><p class="ct_text">Can we close the workshop at 16:00 on Friday? The floor needs paint, and the paint must dry before Monday.</p></div>
+  </div></li>
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+    <div class="ct_body"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-24T09:34">09:34</time></p><p class="ct_text">That is fine for the shop. I will change the hours on the door.</p></div>
+  </div></li>
+  <li class="ct_msg" data-gone>
+    <p class="ct_quote"><span class="ct_quote_face" aria-hidden="true">T</span><span class="ct_quote_name">@Tomas Reyes</span><span class="ct_quote_text">Can we close the workshop at 16:00 on Friday? The floor needs paint, and the paint must dry before Monday.</span></p>
+    <div class="ct_row">
+      <span class="sketch-avatar ct_face" aria-hidden="true">SO</span>
+      <div class="ct_body"><p class="ct_meta"><b>Sam Okafor</b><time class="ct_time" datetime="2026-11-24T09:41">09:41</time></p><p class="ct_text">Does the paint need the full weekend, or is one night enough?</p></div>
+    </div>
+  </li>
+  <li class="ct_msg">
+    <p class="ct_quote" data-quote-gone><span class="ct_quote_face" aria-hidden="true">S</span><span class="ct_quote_name">@Sam Okafor</span><span class="ct_quote_text">Does the paint need the full weekend, or is one night enough?</span></p>
+    <div class="ct_row">
+      <span class="sketch-avatar ct_face" aria-hidden="true">TR</span>
+      <div class="ct_body"><p class="ct_meta"><b>Tomas Reyes</b><time class="ct_time" datetime="2026-11-24T09:44">09:44</time></p><p class="ct_text">The full weekend. The tin says 48 hours before a bike stand goes on the floor.</p></div>
+    </div>
+  </li>
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">IC</span>
+    <div class="ct_body"><p class="ct_meta"><b>Ines Calder</b><time class="ct_time" datetime="2026-11-24T09:58">09:58</time></p><p class="ct_text">16:00 is fine. I will tell the customers who collect a bike on Friday.</p></div>
+  </div></li>
+</template>
+
+<template id="t_tube">
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+    <div class="ct_body"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-19T10:02">19 Nov, 10:02</time></p><p class="ct_text">The till shows the wrong price for the tube set. Who can check the price list?</p></div>
+  </div></li>
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">TR</span>
+    <div class="ct_body"><p class="ct_meta"><b>Tomas Reyes</b><time class="ct_time" datetime="2026-11-19T10:15">19 Nov, 10:15</time></p><p class="ct_text">The list had the old price. I changed it to 14.50.</p></div>
+  </div></li>
+  <li class="ct_msg">
+    <p class="ct_quote"><span class="ct_quote_face" aria-hidden="true">T</span><span class="ct_quote_name">@Tomas Reyes</span><span class="ct_quote_text">The list had the old price. I changed it to 14.50.</span></p>
+    <div class="ct_row">
+      <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+      <div class="ct_body"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-19T10:20">19 Nov, 10:20</time></p><p class="ct_text">Thanks. The till shows 14.50 now.</p></div>
+    </div>
+  </li>
+</template>
+
+<template id="t_poster">
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+    <div class="ct_body"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-24T10:05">10:05</time></p><p class="ct_text">The photos of the new shop window are ready. Tell me which one goes on the door poster.</p></div>
+  </div></li>
+  <li class="ct_note">There are no messages in this thread yet.</li>
+</template>
+
+<!-- The replies of other people that come while the thread is closed, and the line above the first of them. -->
+<template id="t_friday_new">
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">PN</span>
+    <div class="ct_body"><p class="ct_meta"><b>Priya Nair</b><time class="ct_time" datetime="2026-11-24T10:11">10:11</time></p><p class="ct_text">The sign on the door now says 16:00 for Friday.</p></div>
+  </div></li>
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">TR</span>
+    <div class="ct_body"><p class="ct_meta"><b>Tomas Reyes</b><time class="ct_time" datetime="2026-11-24T10:12">10:12</time></p><p class="ct_text">Thanks. I will bring the paint on Thursday evening.</p></div>
+  </div></li>
+</template>
+<template id="t_new_line">
+  <li class="ct_day ct_fresh">New replies</li>
+</template>
+
+<!-- The thread while its replies load, and after the load fails. The message of the channel is above each of them. -->
+<template id="t_loading">
+  <li class="ct_note"><span role="status" tabindex="-1">Loading the replies…</span></li>
+</template>
+<template id="t_error">
+  <li class="ct_fault"><p class="ct_fault_words" role="alert"><strong>Error: the replies did not load.</strong> Check the connection, then try again.</p><button type="button" class="sketch-button secondary" data-load-retry>Retry</button></li>
+</template>
+
+<!-- The quote of a message that is deleted. -->
+<template id="t_quote_gone">
+  <span class="ct_quote_text">The earlier message was deleted.</span>
+</template>
+
+<!-- A message that the person sends in a thread. -->
+<template id="t_own">
+  <li class="ct_msg"><div class="ct_row">
+    <span class="sketch-avatar ct_face" aria-hidden="true">SO</span>
+    <div class="ct_body"><p class="ct_meta"><b>Sam Okafor</b><span class="ct_time">now</span></p><p class="ct_text"></p></div>
+  </div></li>
+</template>
+<!-- The line under a reply that the send did not deliver. -->
+<template id="t_send_error">
+  <div class="ct_fault" role="alert"><p class="ct_fault_words"><strong>Error: this reply was not sent.</strong></p><button type="button" class="sketch-button secondary" data-send-retry>Retry</button><button type="button" class="sketch-button secondary" data-send-delete>Delete</button></div>
+</template>
+
+<script>
+  // The thread icon: the line of a thread card, which turns to a small card.
+  window.sketchGlyphs = { thread: 'M5 4.5v7a4 4 0 0 0 4 4h1M10 11.5h9v8h-9z' };
+</script>
+<script src="../../../assets/sketch.js"></script>
+<script>
+  const narrow = matchMedia('(max-width: 999px)');
+  const phone = matchMedia('(max-width: 599px)');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const own_name = 'Sam Okafor';
+  // The name of each thread and the count of its replies at the start.
+  const threads = {
+    friday: { name: 'Friday closing time', replies: 4 },
+    tube: { name: 'Tube set price', replies: 2 },
+    poster: { name: 'Door poster photo', replies: 0 }
+  };
+  const sample_reply = 'Good. I will move my Friday repairs to the morning.';
+  const thread_states = ['thread-open', 'thread-empty', 'reply-sent', 'narrow-thread', 'narrow-dragging', 'thread-loading', 'thread-error', 'reply-failed', 'quote-deleted', 'thread-archived', 'thread-locked', 'more-menu', 'notify-menu'];
+  const channel_states = ['channel', 'thread-closed', 'narrow-channel', 'card-unread', 'channel-empty'];
+  // The sample thread that a state shows when no card was clicked. Each other state shows the first sample thread.
+  const state_thread = { 'thread-empty': 'poster', 'thread-archived': 'tube', 'thread-locked': 'tube' };
+  const split = document.getElementById('ct_split');
+  const channel = document.getElementById('ct_channel');
+  const messages = document.getElementById('ct_messages');
+  const channel_start = document.getElementById('ct_channel_start');
+  const channel_items = [...document.getElementById('ct_channel_list').children].filter(item => item !== channel_start);
+  const panel = document.getElementById('ct_thread');
+  const thread_scroll = document.getElementById('ct_thread_scroll');
+  const replies = document.getElementById('ct_replies');
+  const thread_name = document.getElementById('ct_thread_name');
+  const thread_note = document.getElementById('ct_thread_note');
+  const thread_form = document.getElementById('ct_thread_form');
+  const thread_field = document.getElementById('ct_thread_field');
+  const archive_item = document.getElementById('ct_archive');
+  // The state of each layer of the thread bar, and the button that opens the layer.
+  const layer_buttons = { 'more-menu': document.getElementById('ct_more'), 'notify-menu': document.getElementById('ct_bell') };
+  const cards = {};
+  document.querySelectorAll('.ct_card').forEach(card => { cards[card.dataset.thread] = card; });
+  const copy_of = id => document.getElementById(id).content.cloneNode(true);
+
+  // The replies that the person sent in this session, for each thread.
+  const sent = { friday: [], tube: [], poster: [] };
+  // The replies of other people that came in this session, and the count of them that the person did not read.
+  const arrived = { friday: 0, tube: 0, poster: 0 };
+  const unread = { friday: 0, tube: 0, poster: 0 };
+  // The reply that the send did not deliver, for each thread.
+  const failed = { friday: null, tube: null, poster: null };
+  const archived = { friday: false, tube: false, poster: false };
+  let open_thread = null;
+  let last_thread = 'friday';
+  // A click on a card picks its thread. An address from outside, such as a review frame, opens the sample thread of the state.
+  let picked_thread = null;
+  let fresh_reply = false;
+  let focus_next = null;
+  let drawn_thread = '';
+  // The thread whose panel shows the line above its new replies.
+  let new_line = null;
+  // A click on Retry starts a load that ends after a short time. A load from the address does not end, so that a reviewer can see it.
+  let load_retry = false;
+  let load_timer = 0;
+  // A channel that shows its newest message stays there when the window or the channel changes its size.
+  let at_newest = true;
+  messages.addEventListener('scroll', () => { at_newest = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 4; });
+  new ResizeObserver(() => { if (at_newest) messages.scrollTop = messages.scrollHeight; }).observe(messages);
+  // The thread panel does the same. The kit handle can fit the panel to the window after the panel opens, and its replies then wrap again.
+  let thread_at_newest = true;
+  thread_scroll.addEventListener('scroll', () => { thread_at_newest = thread_scroll.scrollHeight - thread_scroll.scrollTop - thread_scroll.clientHeight < 4; });
+  const thread_fit = new ResizeObserver(() => { if (thread_at_newest) thread_scroll.scrollTop = thread_scroll.scrollHeight; });
+  thread_fit.observe(thread_scroll);
+  thread_fit.observe(replies);
+
+  const state_of = () => {
+    const state = location.hash.slice(1);
+    return thread_states.includes(state) || channel_states.includes(state) ? state : 'channel';
+  };
+  const reply_count = id => threads[id].replies + arrived[id] + sent[id].length;
+  const open_state = () => narrow.matches ? 'narrow-thread' : 'thread-open';
+
+  // The card keeps its start words in the page. The newest reply of this session takes the place of the second line.
+  function draw_card(id) {
+    const card = cards[id];
+    const label = card.querySelector('.ct_card_label');
+    const mark = card.querySelector('.ct_card_new');
+    const line = card.querySelector('.ct_card_last > :first-child');
+    const age = card.querySelector('.ct_card_age');
+    if (!card.dataset.words) {
+      card.dataset.words = line.textContent;
+      card.dataset.kind = line.className;
+      card.dataset.age = age.textContent;
+    }
+    const mine = sent[id];
+    const count = reply_count(id);
+    // An archived thread with replies takes the form count: the count is the link, and the second line is the note of a quiet thread.
+    const quiet = archived[id] && count > 0;
+    label.textContent = card.dataset.form === 'count' || quiet ? `${count} messages` : 'See thread';
+    let words = card.dataset.words;
+    let kind = card.dataset.kind;
+    let when = card.dataset.age;
+    if (arrived[id]) {
+      const newest = document.getElementById(`t_${id}_new`).content.lastElementChild;
+      words = `${newest.querySelector('b').textContent}: ${newest.querySelector('.ct_text').textContent}`;
+      kind = 'ct_card_text';
+      when = '1 min ago';
+    }
+    if (mine.length) {
+      words = `${own_name}: ${mine.at(-1)}`;
+      kind = 'ct_card_text';
+      when = 'now';
+    }
+    if (quiet) {
+      words = 'There are no recent messages in this thread.';
+      kind = 'ct_card_words';
+    }
+    line.textContent = words;
+    line.className = kind;
+    age.textContent = when;
+    age.hidden = when === '';
+    mark.textContent = `${unread[id]} new`;
+    mark.hidden = unread[id] === 0;
+    const link = card.querySelector('.ct_card_link');
+    link.setAttribute('aria-label', `${label.textContent}: ${threads[id].name}${unread[id] ? `, ${unread[id]} new replies` : ''}`);
+    link.setAttribute('href', count ? '#thread-open' : '#thread-empty');
+  }
+
+  function own_message(text, fresh) {
+    const item = document.getElementById('t_own').content.firstElementChild.cloneNode(true);
+    item.querySelector('.ct_text').textContent = text;
+    item.classList.toggle('ct_new', fresh);
+    return item;
+  }
+
+  // view is ready, loading, error or deleted. Gives true when the messages of the panel changed.
+  function draw_thread(id, view, fresh) {
+    const key = [id, view, sent[id].length, arrived[id], new_line === id, failed[id] || ''].join('|');
+    thread_name.textContent = threads[id].name;
+    const field_name = `Message "${threads[id].name}"`;
+    thread_field.placeholder = field_name;
+    thread_field.setAttribute('aria-label', field_name);
+    if (drawn_thread === key) return false;
+    if (!drawn_thread.startsWith(`${id}|`)) thread_field.value = '';
+    drawn_thread = key;
+    replies.replaceChildren(copy_of(`t_${id}`));
+    if (view === 'loading' || view === 'error') {
+      // The message of the channel is on the device, so it shows before the replies come.
+      [...replies.children].slice(1).forEach(item => item.remove());
+      replies.append(copy_of(`t_${view}`));
+    } else {
+      if (view === 'deleted') {
+        replies.querySelector('[data-gone]').remove();
+        replies.querySelector('[data-quote-gone]').replaceChildren(copy_of('t_quote_gone'));
+      }
+      if (arrived[id]) {
+        if (new_line === id) replies.append(copy_of('t_new_line'));
+        replies.append(copy_of(`t_${id}_new`));
+      }
+      if (sent[id].length || failed[id]) replies.querySelector('.ct_note')?.remove();
+      sent[id].forEach((text, i) => replies.append(own_message(text, fresh && i === sent[id].length - 1)));
+      if (failed[id]) {
+        const item = own_message(failed[id], false);
+        item.querySelector('.ct_body').append(copy_of('t_send_error'));
+        replies.append(item);
+      }
+    }
+    return true;
+  }
+
+  // The drag of a phone. A class on the split shows the channel under the thread, and --ct_swipe is the part of the width that the thread moved.
+  let drag = null;
+  let settle_end = null;
+  const swipe_progress = () => parseFloat(split.style.getPropertyValue('--ct_swipe')) || 0;
+  function set_swipe(progress) {
+    split.classList.add('ct_swipe');
+    channel.inert = true;
+    split.style.setProperty('--ct_swipe', progress);
+  }
+  function clear_swipe() {
+    if (settle_end) panel.removeEventListener('transitionend', settle_end);
+    settle_end = null;
+    split.classList.remove('ct_swipe', 'ct_settle');
+    split.style.removeProperty('--ct_swipe');
+    channel.inert = false;
+  }
+
+  function show() {
+    const state = state_of();
+    const picked = picked_thread;
+    const fresh = fresh_reply;
+    const retry = load_retry;
+    picked_thread = null;
+    fresh_reply = false;
+    load_retry = false;
+    clearTimeout(load_timer);
+    if (state === 'thread-empty') { open_thread = 'poster'; sent.poster = []; }
+    else if (state === 'quote-deleted') open_thread = 'friday';
+    else if (thread_states.includes(state)) open_thread = picked || state_thread[state] || 'friday';
+    else open_thread = null;
+    if (state === 'reply-sent' && !sent[open_thread].length) sent[open_thread].push(sample_reply);
+    if (state === 'reply-failed' && !failed[open_thread]) failed[open_thread] = sample_reply;
+    if (state === 'card-unread') { arrived.friday = 2; unread.friday = 2; }
+    // A new message, or the menu, opens an archived thread again.
+    if (state === 'thread-archived') archived[open_thread] = true;
+    else if (['thread-open', 'narrow-thread', 'reply-sent'].includes(state)) archived[open_thread] = false;
+    // The panel shows a line above the replies that came while the thread was closed. The mark of the card goes.
+    if (open_thread && unread[open_thread]) { new_line = open_thread; unread[open_thread] = 0; }
+    else if (new_line !== open_thread) new_line = null;
+    if (open_thread) last_thread = open_thread;
+
+    // The channel gets narrow or wide, and its words wrap again. A channel at its newest message stays there. In each other place, the card of the thread keeps its place on the screen.
+    const anchor = cards[last_thread];
+    const top_before = anchor.getBoundingClientRect().top;
+    const was_closed = panel.hidden;
+    split.classList.toggle('ct_open', open_thread !== null);
+    panel.hidden = open_thread === null;
+    const no_messages = state === 'channel-empty';
+    channel_items.forEach(item => { item.hidden = no_messages; });
+    channel_start.hidden = !no_messages;
+    if (open_thread) {
+      const view = { 'thread-loading': 'loading', 'thread-error': 'error', 'quote-deleted': 'deleted' }[state] || 'ready';
+      const drawn = draw_thread(open_thread, view, fresh);
+      const locked = state === 'thread-locked';
+      thread_note.hidden = !locked && !archived[open_thread];
+      thread_note.textContent = locked ? 'This thread is locked. Only a moderator can open it again.' : 'This thread is archived. A new message opens it again.';
+      thread_form.hidden = locked;
+      archive_item.textContent = archived[open_thread] ? 'Open thread again' : 'Archive thread';
+      archive_item.hidden = locked;
+      // The panel shows its newest reply each time that it opens, and when its messages change. The page sets this place last, because the note and the message field change the height of the messages.
+      if (was_closed || drawn) { thread_at_newest = true; thread_scroll.scrollTop = thread_scroll.scrollHeight; }
+    }
+    Object.keys(threads).forEach(draw_card);
+    if (at_newest) messages.scrollTop = messages.scrollHeight;
+    else messages.scrollTop += anchor.getBoundingClientRect().top - top_before;
+    document.title = open_thread ? `Thread: ${threads[open_thread].name}` : 'Channel: workshop';
+
+    // The state narrow-dragging shows the thread under the finger, at half of the width.
+    clear_swipe();
+    if (state === 'narrow-dragging') set_swipe(0.5);
+
+    // The address of a layer opens the layer of the thread bar.
+    const layer_button = layer_buttons[state];
+    if (layer_button && layer_button.getAttribute('aria-expanded') !== 'true') layer_button.click();
+
+    // A load that Retry started ends, and the replies show.
+    if (state === 'thread-loading' && retry) load_timer = setTimeout(() => {
+      picked_thread = open_thread;
+      focus_next = 'thread';
+      go(open_state());
+    }, 900);
+
+    // Focus moves only after a click or a key in the page. In a wide window it goes to the message field of the thread.
+    if (focus_next === 'thread') (narrow.matches ? document.getElementById('ct_back') : thread_field).focus();
+    if (focus_next === 'card') cards[last_thread].querySelector('.ct_card_link').focus();
+    if (focus_next === 'status') replies.querySelector('[role="status"]')?.focus();
+    focus_next = null;
+  }
+
+  // An address that does not change fires no hashchange, so the page draws itself again.
+  function go(next) {
+    if (location.hash.slice(1) === next) show();
+    else location.hash = next;
+  }
+
+  document.addEventListener('click', event => {
+    const link = event.target.closest('.ct_card_link');
+    if (link) {
+      event.preventDefault();
+      const id = link.closest('.ct_card').dataset.thread;
+      picked_thread = id;
+      focus_next = 'thread';
+      go(reply_count(id) === 0 ? 'thread-empty' : archived[id] ? 'thread-archived' : open_state());
+      return;
+    }
+    if (event.target.closest('[data-leave]')) focus_next = 'card';
+    if (!open_thread) return;
+    picked_thread = open_thread;
+    if (event.target.closest('[data-load-retry]')) {
+      load_retry = true;
+      focus_next = 'status';
+      go('thread-loading');
+    } else if (event.target.closest('[data-send-retry]')) {
+      sent[open_thread].push(failed[open_thread]);
+      failed[open_thread] = null;
+      focus_next = 'thread';
+      go('reply-sent');
+    } else if (event.target.closest('[data-send-delete]')) {
+      failed[open_thread] = null;
+      focus_next = 'thread';
+      go(open_state());
+    } else if (event.target.closest('#ct_archive')) {
+      go(archived[open_thread] ? open_state() : 'thread-archived');
+    } else picked_thread = null;
+  });
+
+  thread_form.addEventListener('submit', event => {
+    event.preventDefault();
+    const text = thread_field.value.trim();
+    if (!text) { thread_field.focus(); return; }
+    sent[open_thread].push(text);
+    thread_field.value = '';
+    picked_thread = open_thread;
+    fresh_reply = true;
+    go('reply-sent');
+  });
+
+  // A message in the channel is not a part of this pattern.
+  document.getElementById('ct_channel_form').addEventListener('submit', event => {
+    event.preventDefault();
+    sketchToast('This sketch adds no message to the channel (sample)', event.submitter);
+  });
+
+  // Escape closes the thread, unless it closed a layer or a note of the kit first.
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.defaultPrevented || open_thread === null) return;
+    focus_next = 'card';
+    go(narrow.matches ? 'narrow-channel' : 'thread-closed');
+  });
+
+  // Below 600 px, a drag to the right that starts within 24 px of the left edge moves the thread with the pointer.
+  // A release after a third of the width, or after a fast flick, shows the channel. A shorter drag returns the thread.
+  panel.addEventListener('pointerdown', event => {
+    if (!phone.matches || event.button !== 0 || settle_end) return;
+    const box = split.getBoundingClientRect();
+    const held = swipe_progress() * box.width;
+    if (!held && event.clientX - box.left > 24) return;
+    drag = { id: event.pointerId, moved: held > 0, start: event.clientX - held, last: event.clientX, time: event.timeStamp, velocity: 0, distance: held, extent: box.width };
+  });
+  document.addEventListener('pointermove', event => {
+    if (!drag) return;
+    const elapsed = event.timeStamp - drag.time;
+    if (elapsed > 0) drag.velocity = (event.clientX - drag.last) / elapsed;
+    drag.last = event.clientX;
+    drag.time = event.timeStamp;
+    drag.distance = Math.max(0, Math.min(drag.extent, event.clientX - drag.start));
+    if (!drag.moved && drag.distance < 8) return;
+    if (!drag.captured) panel.setPointerCapture(drag.id);
+    drag.moved = drag.captured = true;
+    split.classList.remove('ct_settle');
+    set_swipe(drag.distance / drag.extent);
+  });
+  function release(event) {
+    if (!drag) return;
+    const { moved, distance, extent, velocity, time } = drag;
+    drag = null;
+    if (!moved) return;
+    // The release of a drag must not press the button under the pointer.
+    const stop_click = pressed => { pressed.stopPropagation(); pressed.preventDefault(); };
+    addEventListener('click', stop_click, { capture: true, once: true });
+    setTimeout(() => removeEventListener('click', stop_click, { capture: true }));
+    const goes_back = event.type !== 'pointercancel' && (distance >= extent / 3 || distance > 24 && velocity > .5 && event.timeStamp - time < 120);
+    const finish = () => {
+      if (goes_back) { focus_next = 'card'; go('narrow-channel'); }
+      else if (state_of() === 'narrow-dragging') { picked_thread = open_thread; go('narrow-thread'); }
+      else clear_swipe();
+    };
+    const target = goes_back ? 1 : 0;
+    // With reduced motion, the release shows the end position at once.
+    if (reduced.matches || Math.abs(distance / extent - target) < .002) { finish(); return; }
+    settle_end = ended => {
+      if (ended.target !== panel || ended.propertyName !== 'transform') return;
+      panel.removeEventListener('transitionend', settle_end);
+      settle_end = null;
+      finish();
+    };
+    panel.addEventListener('transitionend', settle_end);
+    split.classList.add('ct_settle');
+    panel.getBoundingClientRect();
+    split.style.setProperty('--ct_swipe', target);
+  }
+  document.addEventListener('pointerup', release);
+  document.addEventListener('pointercancel', release);
+
+  addEventListener('hashchange', show);
+
+  initSketch();
+  show();
+</script>

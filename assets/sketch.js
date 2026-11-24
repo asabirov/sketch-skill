@@ -45,7 +45,7 @@
     trash: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13', sliders: 'M4 7h10M18 7h2M16 5v4M4 17h4M12 17h8M10 15v4',
     settings: 'M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1',
     comment: 'M4 5h16v11H9l-5 4z', user: 'M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM4 21c1-4 4-6 8-6s7 2 8 6',
-    home: 'M4 11l8-7 8 7M6 9.5V20h12V9.5', bell: 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4',
+    home: 'M4 11l8-7 8 7M6 9.5V20h12V9.5', bell: 'M4 17h16c-1.3-1-2-2.5-2-4.5V10a6 6 0 0 0-12 0v2.5c0 2-.7 3.5-2 4.5zM10 20a2.3 2.3 0 0 0 4 0',
     calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4', copy: 'M8 8h12v12H8zM16 8V4H4v12h4',
     link: 'M10 14l4-4M9 7l2-2a4 4 0 0 1 6 6l-2 2M15 17l-2 2a4 4 0 0 1-6-6l2-2',
     upload: 'M12 16V4M7 9l5-5 5 5M4 20h16', download: 'M12 4v12M7 11l5 5 5-5M4 20h16',
@@ -211,6 +211,43 @@
     if (moveFocus) tab.focus();
   };
 
+  /* A split handle: the line between 2 columns of a sketch-split. It sets --pane on the split: the width of the
+     column before the handle, or with "end" the column after it. The other column takes the space that is left.
+     Each column keeps its --pane-min, a width in px. Without a value, the minimum is 240 px. */
+  const handlePanes = handle => {
+    const panes = [handle.previousElementSibling, handle.nextElementSibling];
+    return handle.classList.contains('end') ? panes.reverse() : panes;
+  };
+  const paneMin = pane => parseFloat(getComputedStyle(pane).getPropertyValue('--pane-min')) || 240;
+  const paneLimits = handle => {
+    const [pane, rest] = handlePanes(handle), min = paneMin(pane), now = pane.getBoundingClientRect().width;
+    return {min, max: Math.max(min, now + rest.getBoundingClientRect().width - paneMin(rest)), now};
+  };
+  /* Shows the width that the person chose, within the limits of the window. No chosen width shows the start width.
+     The handle shows only while the 2 columns next to it show. */
+  const fitPane = handle => {
+    const split = handle.parentElement;
+    if (handle.sketchPane == null) split.style.removeProperty('--pane');
+    handle.hidden = handlePanes(handle).some(pane => !pane.offsetWidth);
+    if (!handle.offsetWidth) return;
+    const {min, max} = paneLimits(handle);
+    if (handle.sketchPane != null) split.style.setProperty('--pane', `${Math.max(min, Math.min(handle.sketchPane, max))}px`);
+    handle.setAttribute('aria-valuemin', Math.round(min));
+    handle.setAttribute('aria-valuemax', Math.round(max));
+    handle.setAttribute('aria-valuenow', Math.round(paneLimits(handle).now));
+  };
+  const paneKey = handle => `sketch-pane:${location.pathname}:${handle.id || [...page.querySelectorAll('.sketch-split-handle')].indexOf(handle)}`;
+  /* A width from the person, or null for the start width. The browser keeps it for the next visit. */
+  const choosePane = (handle, width) => {
+    const {min, max} = paneLimits(handle);
+    handle.sketchPane = width == null ? null : Math.max(min, Math.min(width, max));
+    fitPane(handle);
+    try {
+      if (width == null) localStorage.removeItem(paneKey(handle)); else localStorage.setItem(paneKey(handle), handle.sketchPane);
+    } catch {}
+  };
+  let paneDrag = null;
+
   page.addEventListener('click', event => {
     const target = event.target;
     /* A menu button opens or closes the .sketch-collapse right after it. */
@@ -245,6 +282,19 @@
   });
   page.addEventListener('pointerdown', event => {
     if (open && !open.layer.contains(event.target) && !open.trigger.contains(event.target)) closeLayer(false);
+    const handle = event.target.closest('.sketch-split-handle');
+    if (!handle || event.button) return;
+    /* The width follows the pointer, with no duration. */
+    paneDrag = {handle, from: paneLimits(handle).now, x: event.clientX, way: handle.classList.contains('end') ? -1 : 1};
+    handle.setPointerCapture(event.pointerId);
+  });
+  page.addEventListener('pointermove', event => {
+    if (paneDrag) choosePane(paneDrag.handle, paneDrag.from + paneDrag.way * (event.clientX - paneDrag.x));
+  });
+  page.addEventListener('lostpointercapture', () => { paneDrag = null; });
+  page.addEventListener('dblclick', event => {
+    const handle = event.target.closest('.sketch-split-handle');
+    if (handle) choosePane(handle, null);
   });
   page.addEventListener('mousedown', event => {
     if (!ownsList(event.target)) return;
@@ -261,6 +311,13 @@
       const items = menuItems(menu), at = items.indexOf(event.target);
       const next = {ArrowDown: at + 1, ArrowUp: at - 1, Home: 0, End: items.length - 1}[event.key];
       items[(next + items.length) % items.length]?.focus();
+      event.preventDefault();
+    }
+    /* The arrow keys move the line by 16 px. Home and End give the column its smallest and its largest width. Enter gives the start width. */
+    const handle = event.target.closest('.sketch-split-handle');
+    if (handle && ['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter'].includes(event.key)) {
+      const {min, max, now} = paneLimits(handle), step = handle.classList.contains('end') ? -16 : 16;
+      choosePane(handle, {ArrowLeft: now - step, ArrowRight: now + step, Home: min, End: max, Enter: null}[event.key]);
       event.preventDefault();
     }
     const tab = event.target.closest('.sketch-tabs [role="tab"]');
@@ -318,6 +375,20 @@
       if (dialog.sketchReady) return;
       dialog.sketchReady = true;
       dialog.addEventListener('close', () => dialog.sketchOpener?.focus());
+    });
+    page.querySelectorAll('.sketch-split > .sketch-split-handle').forEach(handle => {
+      if (handle.sketchReady) return;
+      handle.sketchReady = true;
+      handle.setAttribute('role', 'separator');
+      handle.setAttribute('aria-orientation', 'vertical');
+      if (!handle.hasAttribute('aria-label')) handle.setAttribute('aria-label', 'Column width');
+      handle.tabIndex = 0;
+      const [pane, rest] = handlePanes(handle);
+      if (pane.id) handle.setAttribute('aria-controls', pane.id);
+      try { handle.sketchPane = parseFloat(localStorage.getItem(paneKey(handle))) || null; } catch { handle.sketchPane = null; }
+      const fit = new ResizeObserver(() => fitPane(handle));
+      fit.observe(pane);
+      fit.observe(rest);
     });
     page.querySelectorAll('.sketch-tabs').forEach(list => {
       list.setAttribute('role', 'tablist');

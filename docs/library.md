@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 70 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 71 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -22,6 +22,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 | [`chat/avatar-badges`](../library/chat/avatar-badges/) | A chat product where a person sees at a glance which chat is the main one and which chats have new messages. |
 | [`chat/avatar-badges-counts`](../library/chat/avatar-badges-counts/) | A chat product where the number of new messages changes what the person opens first, such as a support inbox. |
 | [`chat/avatar-badges-row-end`](../library/chat/avatar-badges-row-end/) | A chat product with small avatars, or with rows that have no avatar, where a person sees which chats have new messages. |
+| [`chat/channel-thread-panel`](../library/chat/channel-thread-panel/) | A team chat with busy channels, where a person sees which message has a thread, reads its last reply without leaving the channel, and reads and answers the thread while the channel keeps its place. |
 | [`chat/chat-list`](../library/chat/chat-list/) | A phone app where a person picks one chat from all their chats, or finds a chat by its text. |
 | [`chat/chat-list-filter-in-place`](../library/chat/chat-list-filter-in-place/) | A phone app with a short list of chats, where a search finds only chats. |
 | [`chat/chat-list-tab-bar`](../library/chat/chat-list-tab-bar/) | A phone app with 3 to 5 sections that a person changes between many times a day. One section is the list of chats. |

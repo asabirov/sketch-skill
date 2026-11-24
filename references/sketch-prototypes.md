@@ -83,8 +83,46 @@ The layout classes are at the end of `assets/sketch.css` (the block that starts 
 - `sketch-narrow`: `--width` is the largest width.
 - `sketch-cols`: `--cols` is the columns from 1000 px. Add `flip` to put the first child last.
 - `sketch-split`: `--split` is the columns from 1000 px. From 600 px to 999 px, the first column is 260 px. With `panes`, `--split` is the columns from 600 px, so give the first column a percentage limit, such as `min(380px,45%)`.
+- `sketch-split-handle`: a handle on the line between 2 columns of a `sketch-split`. A person changes the width of a column with it. "A column that a person can resize" shows how.
 
 `sketch-from-tablet` and `sketch-from-desktop` hide a region below 600 px and below 1000 px. `sketch-until-desktop` hides a region from 1000 px. Below 1000 px, a `sketch-menu-button` opens and closes the `sketch-collapse` right after it. A `sketch-meter` holds one `<i>` with a `width` in percent, and draws a usage bar.
+
+### A column that a person can resize
+
+Put a `sketch-split-handle` between 2 columns of a `sketch-split`. Use one handle in each split.
+
+```html
+<main class="sketch-split panes" style="--split:var(--pane, 320px) minmax(0,1fr)">
+  <section style="--pane-min:240px">The list</section>
+  <div class="sketch-split-handle" aria-label="Width of the list"></div>
+  <section style="--pane-min:320px">The open item</section>
+</main>
+```
+
+- The handle sets `--pane` on the split. `--pane` is the width in px of the column before the handle. Add `end` to the handle to set the column after it.
+- If you set `--split`, write the column as `var(--pane, 320px)`. The second value is the start width. Without `--split`, the first column already uses `--pane`.
+- `--pane-min` on a column is its smallest width in px. Without it, the smallest width is 240 px. The other column takes the space that is left.
+- A drag moves the line. The Left and Right arrow keys move it 16 px. Home and End give the column its smallest and its largest width.
+- A double click on the handle, or Enter, gives the start width.
+- The script gives the handle `role="separator"` and `aria-orientation="vertical"`. It gives the width as `aria-valuenow`, and the limits as `aria-valuemin` and `aria-valuemax`. Give the handle an `aria-label`.
+- The browser keeps the width for the next visit. When the window gets narrow, the column gets narrow down to its smallest width.
+- The handle shows from 600 px. It does not show while a column next to it is hidden. The change of the width has no motion.
+- On a touch screen, the handle is 44 px wide, so that a finger can drag it.
+
+### A panel that slides in
+
+Add `sketch-slide-in` to a panel that opens at the right edge, such as a thread or a detail panel. Each time the panel shows, it slides in from the right edge in 300 ms, with cubic-bezier(0.2, 0, 0, 1).
+
+```html
+<main class="sketch-split" style="overflow: clip">
+  <section>The list</section>
+  <aside class="sketch-slide-in" hidden>The open item</aside>
+</main>
+```
+
+- The panel covers what is under it, and its left edge is a line. At rest, this line lies on the line of the column before it.
+- The parent must clip the panel, so that the page does not scroll sideways while the panel slides.
+- With reduced motion, the panel shows at once. The close has no motion.
 
 To start a sketch, choose a category and copy one template to the project. Then change the words and the rows. Run the inlining command before you open the sketch.
 
