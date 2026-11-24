@@ -39,3 +39,4 @@ The capture is public pictures, so the agent read no transition from the source.
 - The source has a different look for its message box and a blue ring. The sketch has one ink, so the ring is thick ink.
 - The sketch keeps no brand, no colour and no picture of the source. All words are sample content.
 - The pictures of the source are not committed.
+- This record is a part, not a page. It sits inside a settings page, such as the Appearance section of `settings/settings`, which names it in a dashed box.
