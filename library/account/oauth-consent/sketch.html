@@ -23,7 +23,7 @@
   [data-sketch] .consent_window > div:not(.sketch-menu) { display: grid; gap: 16px; align-content: start; padding: 24px; min-height: 420px; }
   [data-sketch] .consent_window > div:not(.sketch-menu) > :is(h1, h2, p) { margin: 0; }
   [data-sketch] .consent_window td:last-child { text-align: right; }
-  /* The settings window is a part of settings/settings-window. It is a plain box with that name, and only the list is drawn in it. */
+  /* The settings window is a part of settings/settings-modal. It is a plain box with that name, and only the list is drawn in it. */
   [data-sketch] .consent_part { margin: 0; padding: 16px 24px 0; }
   @media (min-width: 700px) {
     [data-sketch] .consent_window:has(> nav) { grid-template-columns: 220px minmax(0, 1fr); }
@@ -103,7 +103,7 @@
     </div>
   </section>
   <section class="consent_window sketch-frame" data-state="clients-list" style="--state-duration:180ms" aria-labelledby="clients_heading">
-    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-modal</p>
     <div>
       <h1 id="clients_heading">Connected clients</h1>
       <p class="sketch-muted">These clients can use your account in <span data-workspace>Acme</span>.</p>
@@ -123,7 +123,7 @@
     </div>
   </section>
   <section class="consent_window sketch-frame" data-state="revoke-confirm" style="--state-duration:160ms" aria-labelledby="revoke_list_heading">
-    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-modal</p>
     <div>
       <h1 id="revoke_list_heading">Connected clients</h1>
       <p class="sketch-muted">These clients can use your account in <span data-workspace>Acme</span>.</p>
@@ -145,7 +145,7 @@
     </dialog>
   </section>
   <section class="consent_window sketch-frame" data-state="client-revoked" style="--state-duration:180ms" aria-labelledby="revoked_heading">
-    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-modal</p>
     <div>
       <h1 id="revoked_heading">Connected clients</h1>
       <p role="status">Notes Sync is disconnected. It can no longer use your account.</p>
@@ -161,7 +161,7 @@
     </div>
   </section>
   <section class="consent_window sketch-frame" data-state="other-revoked" style="--state-duration:180ms" aria-labelledby="other_revoked_heading">
-    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-modal</p>
     <div>
       <h1 id="other_revoked_heading">Connected clients</h1>
       <p role="status">Calendar Bridge is disconnected. It can no longer use your account.</p>
@@ -177,7 +177,7 @@
     </div>
   </section>
   <section class="consent_window sketch-frame" data-state="clients-empty" style="--state-duration:180ms" aria-labelledby="empty_heading">
-    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-window</p>
+    <p class="consent_part sketch-muted">Settings window. Pattern: settings/settings-modal</p>
     <div>
       <h1 id="empty_heading">Connected clients</h1>
       <p style="padding:96px 0;text-align:center">No client can use your account. When you connect a client, it shows here.</p>

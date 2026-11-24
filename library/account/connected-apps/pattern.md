@@ -3,7 +3,7 @@
 Captured: 2026-11-21, from the signed-in web app, recorded by an agent in a browser
 Best for: a signed-in reader sees each outside app that uses their account, with its access, the connect date and the last use, and disconnects one app after a confirmation. For a short list of the clients of a workspace inside a settings window, use `account/oauth-consent`.
 Row opens: on the record's own page. The app name opens a page with the access of the app. The source opens such a page from the name.
-Related: `account/oauth-consent`, the consent page that adds an app to this list, and a short list of clients in a settings window. `settings/settings-window`, the window form of settings. `navigation/user-menu`, the menu that opens the account pages.
+Related: `account/oauth-consent`, the consent page that adds an app to this list, and a short list of clients in a settings window. `settings/settings-modal`, the window form of settings. `navigation/user-menu`, the menu that opens the account pages.
 
 ## States
 

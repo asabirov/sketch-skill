@@ -3,7 +3,7 @@
 Captured: 2026-11-16, from public pictures and a public video
 Best for: a person lets an outside app act for their account, and later takes that right back in Settings.
 Row opens: in place. The designer's choice: Disconnect in the row menu opens a confirmation over the list. The source shows no confirmation.
-Related: `settings/settings-window`, the settings window that holds the list of connected clients. `account/connected-apps`, a full page of the apps that use an account, with the access, the connect date and the last use.
+Related: `settings/settings-modal`, the settings window that holds the list of connected clients. `account/connected-apps`, a full page of the apps that use an account, with the access, the connect date and the last use.
 
 ## States
 
@@ -15,7 +15,7 @@ Related: `settings/settings-window`, the settings window that holds the list of 
 - `service-off`: a message that the product does not let apps connect now. Opens on: a request while connections are off. The source shows no such state.
 - `app-return`: the app's own page, which shows the last result, a way to connect again and a way to open the product. The result is Connected, Not connected or The request expired. Opens on: Back to Notes Sync from `allowed`, `denied` or `request-expired`. The source video shows the app after the return at 00:56. Connect again opens a new `consent-request`.
 - `product-home`: the product with its side menu, which holds Settings. Opens on: Open [Product] from `app-return`. The source pictures show no such page. It is drawn so that the person finds Settings later.
-- `clients-list`: the settings window with Connected clients open. The window is a part of `settings/settings-window`, so the sketch draws it as a plain box with that name. A table lists each app with its maker, its access, when it was last used, and a menu button. Opens on: Settings, or Manage connected clients from `allowed`. The source shows My connected clients and Integrations in the Settings side menu, and a table with a menu on each row.
+- `clients-list`: the settings window with Connected clients open. The window is a part of `settings/settings-modal`, so the sketch draws it as a plain box with that name. A table lists each app with its maker, its access, when it was last used, and a menu button. Opens on: Settings, or Manage connected clients from `allowed`. The source shows My connected clients and Integrations in the Settings side menu, and a table with a menu on each row.
 - `revoke-confirm`: a confirmation over the list that names the app and says what stops. Disconnect and Keep connected. Opens on: Disconnect in the row menu. The source menu has Disconnect and shows no confirmation.
 - `client-revoked`: the list without the disconnected app, with a status line that names it. Opens on: Disconnect in the confirmation. The source shows no such state.
 - `other-revoked`: the list without the other app, with a status line that names it. Opens on: Disconnect of Calendar Bridge while both apps are in the list. The source shows no such state.
@@ -45,7 +45,7 @@ Related: `settings/settings-window`, the settings window that holds the list of 
 - Empty list: not seen. Say in one sentence that no client can use the account.
 - Many workspaces: the source puts the workspace in a choice above the list of access. The person must see which workspace the app gets before Continue.
 - Long app name or long access list: not seen. Let the name wrap, and keep Continue and Cancel in view.
-- 390 px screen: not seen. Keep one column. Each row of the table wraps. The settings window follows `settings/settings-window`.
+- 390 px screen: not seen. Keep one column. Each row of the table wraps. The settings window follows `settings/settings-modal`.
 
 ## Notes
 

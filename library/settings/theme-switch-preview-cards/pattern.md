@@ -3,7 +3,7 @@
 Captured: 2026-11-21, from public pictures
 Best for: a signed-in reader chooses how the product looks in a section of its own, and sees a small picture of each choice before choosing. The choice applies at once, with no Save button. For a product that has the look only as a short choice in its account menu, use the theme submenu of `navigation/user-menu`.
 Row opens: no rows. The page holds settings, and it holds no records.
-Related: `navigation/user-menu`, the menu whose Preferences row opens this page, with a theme submenu of its own. `settings/settings-modal` and `settings/settings-window`, the settings windows whose theme tab holds cards with words and no picture.
+Related: `navigation/user-menu`, the menu whose Preferences row opens this page, with a theme submenu of its own. `settings/settings-modal`, the settings window whose theme tab holds cards with words and no picture.
 
 ## States
 
