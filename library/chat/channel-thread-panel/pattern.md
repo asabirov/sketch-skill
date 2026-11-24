@@ -79,6 +79,7 @@ The pictures show no motion. Each value below is the designer's choice, so each 
 - Drag that starts outside the edge: a drag that starts more than 24 px from the left edge does not move the thread. A drag up or down scrolls the thread. Drawn.
 - Stopped gesture: if the system stops the gesture, the thread goes back to its position. Drawn.
 - Drag from 600 px: there is no drag. The navigation is at the left of the thread, so the left edge of the thread is not the edge of the screen. Drawn.
+- The swipe of the platform: a native app gets the swipe back from its navigation. In a browser, the open thread is an entry of the history, because the sketch changes the address. So the edge swipe of the browser, such as in Safari on an iPhone, also goes back to the channel. The drag of this sketch shows the motion in a review. A product uses the swipe of its platform. Not drawn.
 - Reduced motion: the thread still follows the finger. After the release, the end position shows at once. Drawn.
 
 ## Notes
