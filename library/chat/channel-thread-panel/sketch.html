@@ -349,10 +349,10 @@
 
 <!-- The thread while its replies load, and after the load fails. The message of the channel is above each of them. -->
 <template id="t_loading">
-  <li class="ct_note" role="status" tabindex="-1">Loading the replies…</li>
+  <li class="ct_note"><span role="status" tabindex="-1">Loading the replies…</span></li>
 </template>
 <template id="t_error">
-  <li class="ct_fault" role="alert"><p class="ct_fault_words"><strong>Error: the replies did not load.</strong> Check the connection, then try again.</p><button type="button" class="sketch-button secondary" data-load-retry>Retry</button></li>
+  <li class="ct_fault"><p class="ct_fault_words" role="alert"><strong>Error: the replies did not load.</strong> Check the connection, then try again.</p><button type="button" class="sketch-button secondary" data-load-retry>Retry</button></li>
 </template>
 
 <!-- The quote of a message that is deleted. -->
@@ -436,6 +436,12 @@
   let at_newest = true;
   messages.addEventListener('scroll', () => { at_newest = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 4; });
   new ResizeObserver(() => { if (at_newest) messages.scrollTop = messages.scrollHeight; }).observe(messages);
+  // The thread panel does the same. The kit handle can fit the panel to the window after the panel opens, and its replies then wrap again.
+  let thread_at_newest = true;
+  thread_scroll.addEventListener('scroll', () => { thread_at_newest = thread_scroll.scrollHeight - thread_scroll.scrollTop - thread_scroll.clientHeight < 4; });
+  const thread_fit = new ResizeObserver(() => { if (thread_at_newest) thread_scroll.scrollTop = thread_scroll.scrollHeight; });
+  thread_fit.observe(thread_scroll);
+  thread_fit.observe(replies);
 
   const state_of = () => {
     const state = location.hash.slice(1);
@@ -592,7 +598,7 @@
       archive_item.textContent = archived[open_thread] ? 'Open thread again' : 'Archive thread';
       archive_item.hidden = locked;
       // The panel shows its newest reply each time that it opens, and when its messages change. The page sets this place last, because the note and the message field change the height of the messages.
-      if (was_closed || drawn) thread_scroll.scrollTop = thread_scroll.scrollHeight;
+      if (was_closed || drawn) { thread_at_newest = true; thread_scroll.scrollTop = thread_scroll.scrollHeight; }
     }
     Object.keys(threads).forEach(draw_card);
     if (at_newest) messages.scrollTop = messages.scrollHeight;
