@@ -51,6 +51,7 @@
   [data-sketch] .ct_pane { display: grid; grid-template: auto minmax(0, 1fr) auto / minmax(0, 1fr); min-width: 0; min-height: 0; }
   [data-sketch] .ct_bar { display: flex; align-items: center; gap: 4px; min-height: 52px; padding: 0 8px; border-bottom: var(--sketch-stroke) solid var(--sketch-ink); }
   [data-sketch] .ct_title { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; margin: 0 0 0 8px; font-size: 16px; line-height: 1.5; letter-spacing: 0; }
+  [data-sketch] .ct_page_name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   [data-sketch] .ct_title_words { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   [data-sketch] .ct_scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
   [data-sketch] .ct_list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-content: end; min-height: 100%; margin: 0; padding: 16px; list-style: none; }
@@ -154,7 +155,9 @@
 <section data-state="notify-menu"></section>
 <section data-state="channel-empty"></section>
 
-<div class="ct_app" id="ct_app">
+<main class="ct_app" id="ct_app">
+  <!-- The heading of the page. It stays when the thread covers the channel on a phone. -->
+  <h1 class="ct_page_name">Channel workshop</h1>
   <!-- The list of channels is not a part of this pattern. -->
   <nav class="ct_nav" aria-label="Channels">
     <p class="ct_part"><strong>Navigation</strong><span>The list of channels</span></p>
@@ -162,10 +165,10 @@
 
   <div class="sketch-split ct_split" id="ct_split">
   <!-- The channel: the bar, the messages and the message field. -->
-  <main class="ct_pane ct_channel" id="ct_channel">
+  <section class="ct_pane ct_channel" id="ct_channel" aria-labelledby="ct_channel_name">
     <header class="ct_bar">
       <button type="button" class="sketch-icon-button sketch-phone-only" aria-label="Channels" data-sketch-toast="Navigation: the list of channels opens (sample)"><i data-icon="menu"></i></button>
-      <h1 class="ct_title"><span class="sketch-muted" aria-hidden="true">#</span><span class="ct_title_words">workshop</span></h1>
+      <h2 class="ct_title"><span class="sketch-muted" aria-hidden="true">#</span><span class="ct_title_words" id="ct_channel_name">workshop</span></h2>
       <button type="button" class="sketch-icon-button sketch-from-tablet" aria-label="Members" data-sketch-toast="The list of members opens (sample)"><i data-icon="user"></i></button>
       <button type="button" class="sketch-icon-button" aria-label="Search this channel" data-sketch-toast="The search opens (sample)"><i data-icon="search"></i></button>
     </header>
@@ -234,13 +237,13 @@
       <button type="button" class="sketch-icon-button" aria-label="Add an emoji" data-sketch-toast="The emoji picker opens (sample)"><i data-icon="smile"></i></button>
       <button type="submit" class="sketch-icon-button" aria-label="Send to #workshop"><i data-icon="send"></i></button>
     </form>
-  </main>
+  </section>
 
   <!-- The kit handle on the line between the channel and the thread panel. A drag or an arrow key changes the width of the panel. -->
   <div class="sketch-split-handle end sketch-from-desktop" id="ct_handle" aria-label="Width of the thread panel"></div>
 
   <!-- The thread panel: its own bar, the messages of the thread and its own message field. -->
-  <aside class="ct_pane ct_thread sketch-slide-in" id="ct_thread" aria-labelledby="ct_thread_name" hidden>
+  <section class="ct_pane ct_thread sketch-slide-in" id="ct_thread" aria-labelledby="ct_thread_name" hidden>
     <header class="ct_bar">
       <a class="sketch-icon-button sketch-until-desktop" id="ct_back" href="#narrow-channel" aria-label="Back to #workshop" data-leave><i data-icon="arrow-left"></i></a>
       <h2 class="ct_title"><i data-glyph="thread"></i><span class="ct_title_words" id="ct_thread_name">Friday closing time</span></h2>
@@ -259,9 +262,8 @@
       <button type="button" class="sketch-icon-button" aria-label="Add an emoji" data-sketch-toast="The emoji picker opens (sample)"><i data-icon="smile"></i></button>
       <button type="submit" class="sketch-icon-button" aria-label="Send to the thread"><i data-icon="send"></i></button>
     </form>
-  </aside>
+  </section>
   </div>
-</div>
 
 <!-- The more menu of the thread panel. -->
 <div class="sketch-menu" id="ct_more_menu" aria-label="Thread actions">
@@ -272,6 +274,7 @@
 <div class="sketch-popover" id="ct_notify" role="dialog" aria-label="Notifications of this thread">
   <p class="ct_part"><strong>Notification choice</strong><span>Pattern: notifications/follow-menu</span></p>
 </div>
+</main>
 
 <!-- The messages of each thread. A thread starts with the message of the channel that it hangs on. -->
 <template id="t_friday">
