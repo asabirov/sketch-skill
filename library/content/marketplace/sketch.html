@@ -59,7 +59,7 @@
   [data-sketch] .mk_tip { position: absolute; right: 0; bottom: calc(100% + 4px); padding: 4px 8px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; white-space: nowrap; opacity: 0; scale: .96; pointer-events: none; transition: opacity 120ms cubic-bezier(.32, .72, 0, 1), scale 120ms cubic-bezier(.32, .72, 0, 1); }
   [data-sketch] .mk_add > button:is(:hover, :focus-visible) + .mk_tip, [data-sketch] .mk_tip.mk_show { opacity: 1; scale: 1; }
   @media (hover: none) { [data-sketch] .mk_add { opacity: 1; } }
-  [data-sketch] .mk_dim { opacity: .5; }
+  [data-sketch] .mk_dim .sketch-avatar { opacity: .5; }
   [data-sketch] .mk_reveal { animation: mk_reveal 120ms cubic-bezier(.165, .84, .44, 1); }
   @keyframes mk_reveal { from { opacity: 0; } }
   /* The page of an item: the head, then the main part and a column of facts. */

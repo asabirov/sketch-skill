@@ -16,7 +16,7 @@ Related: `account/connected-apps` shows the add-ons that a person already has an
 - `no-results`: the same list with one line, "No results". Opens on: typed words that fit no item.
 - `results`: the start page with the results only. "Your add-ons" comes first with a count, then "More you can add" in two columns. A row of an unverified maker has a Community badge. The search field keeps the words. Opens on: See all results.
 - `all`: a back link, the title, the same bar and one list in two columns, the most popular item first. Opens on: Show all of a section.
-- `loading`: the list of `all` is dimmed while the page loads the items. Opens on: Show all, before the items are there.
+- `loading`: the source dims the list of `all` while the page loads the items. The sketch dims only the pictures of the rows, so that the text stays readable. Opens on: Show all, before the items are there.
 - `item`: the page of one item. A back link, then a head with the picture, the name, the maker, a share button and Add. Below a line, the text, two example pictures and what the item can do are on the left. The facts are in a column on the right: the developer, the access, the authorization, the categories and the date. Related items are at the end. Opens on: a click on a row.
 - `connect`: a dialog over the list, for an item with settings. It has a title with the name of the item, a close button, one line of text, 2 choices with a line of text each, a note, a line, and Cancel and Connect at the right. The first choice is made. Seen in a picture only. Opens on: Add, on an item with settings.
 - `added`: the head of the item page shows Added in the place of Add. The source shows no such state, because the agent did not press Add in the source. Opens on: Connect in the dialog.
@@ -40,7 +40,7 @@ Related: `account/connected-apps` shows the add-ons that a person already has an
 - Empty: not seen. Each section without a row is hidden in the sketch.
 - No match: the `no-results` state.
 - Long text: the text of a row stays on one line and ends with an ellipsis.
-- Slow network: a spinner turns in the search field. The old items of the search list fade after 500 ms (opacity 60 ms), and the sketch does not draw this. The list of `all` is dimmed, as in `loading`.
+- Slow network: a spinner turns in the search field. The old items of the search list fade after 500 ms (opacity 60 ms), and the sketch does not draw this. The source dims the list of `all`, as in `loading`. The sketch dims only the pictures of the rows, so that the text stays readable.
 - Narrow screen: not captured. The sketch draws one column below 720 px, and the facts of the item go below its text. The designer chose it.
 - Touch screen: not captured. The sketch always shows the Add button where no pointer can hover. The designer chose it.
 - Failed load: not seen.
