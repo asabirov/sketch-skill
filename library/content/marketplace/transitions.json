@@ -1,0 +1,14 @@
+[
+  {"label": "row-hover", "element": "Add button of a row", "property": "opacity", "duration": 60, "delay": 0, "easing": "cubic-bezier(0.4, 0, 0.2, 1)", "measurement": "measured"},
+  {"label": "add-hover", "element": "tooltip of the Add button", "property": "opacity", "duration": 120, "delay": 0, "easing": "cubic-bezier(0.32, 0.72, 0, 1)", "measurement": "measured"},
+  {"label": "add-hover", "element": "tooltip of the Add button", "property": "scale", "duration": 120, "delay": 0, "easing": "cubic-bezier(0.32, 0.72, 0, 1)", "measurement": "measured"},
+  {"label": "search", "element": "search field", "property": "background-color", "duration": 60, "delay": 0, "easing": "cubic-bezier(0.4, 0, 0.2, 1)", "measurement": "measured"},
+  {"label": "search", "element": "search field", "property": "box-shadow", "duration": 60, "delay": 0, "easing": "cubic-bezier(0.4, 0, 0.2, 1)", "measurement": "measured"},
+  {"label": "search", "element": "search spinner", "animation": "mk_spin", "duration": 1000, "delay": 0, "easing": "linear", "measurement": "measured"},
+  {"label": "home", "element": "Filter button", "property": "box-shadow", "duration": 60, "delay": 0, "easing": "cubic-bezier(0.165, 0.84, 0.44, 1)", "measurement": "measured"},
+  {"label": "results", "element": "result sections", "animation": "mk_reveal", "duration": 120, "delay": 0, "easing": "cubic-bezier(0.165, 0.84, 0.44, 1)", "measurement": "measured"},
+  {"label": "item", "element": "picture of the item, one entry for each of the 2 pictures", "property": "opacity", "duration": 500, "delay": 0, "easing": "cubic-bezier(0.4, 0, 0.2, 1)", "measurement": "measured"},
+  {"label": "all", "element": "list page", "animation": "mk_reveal", "duration": 120, "delay": 0, "easing": "cubic-bezier(0.165, 0.84, 0.44, 1)", "measurement": "measured"},
+  {"label": "home", "element": "start page", "animation": "mk_reveal", "duration": 120, "delay": 0, "easing": "cubic-bezier(0.165, 0.84, 0.44, 1)", "measurement": "measured"},
+  {"label": "item", "element": "picture of the item, one entry for each of the 2 pictures", "property": "opacity", "duration": 500, "delay": 0, "easing": "cubic-bezier(0.4, 0, 0.2, 1)", "measurement": "measured"}
+]

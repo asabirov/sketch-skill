@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- The pattern `content/marketplace`. A start page with sections of add-ons in two columns, a search with a short list, a kind switch, a filter menu, a results page, a full list and the page of one item. A dialog for an item with settings.
+
 ## 0.22.0 — 2026-11-24
 
 ### Changed

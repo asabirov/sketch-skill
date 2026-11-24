@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 69 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 70 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -53,6 +53,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 | [`content/forum-list`](../library/content/forum-list/) | A product where each post starts a discussion that members come back to. A member finds a discussion or starts one. |
 | [`content/kanban`](../library/content/kanban/) | A team product where a member compares the groups of its records, such as the stages, and then opens one record. |
 | [`content/leaderboard`](../library/content/leaderboard/) | A team product where a member compares many records by their rank in one number, and then opens one record. |
+| [`content/marketplace`](../library/content/marketplace/) | A person looks for an add-on for a product, searches and filters a large catalog, reads about one item and adds it to their account. |
 | [`content/product-page`](../library/content/product-page/) | A team product where a member reads the main numbers of one record, then the course of one number, and then the facts. |
 | [`content/ranked-groups`](../library/content/ranked-groups/) | A team product where a member compares groups of records by one number first, and then wants the best records of each group. |
 | [`content/sort-heads`](../library/content/sort-heads/) | A team product where a member compares 2 or more numbers of many records at the same time, and then opens one record. |
