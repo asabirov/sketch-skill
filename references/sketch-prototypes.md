@@ -108,6 +108,21 @@ Put a `sketch-split-handle` between 2 columns of a `sketch-split`. Use one handl
 - The browser keeps the width for the next visit. When the window gets narrow, the column gets narrow down to its smallest width.
 - The handle shows from 600 px. It does not show while a column next to it is hidden. The change of the width has no motion.
 
+### A panel that slides in
+
+Add `sketch-slide-in` to a panel that opens at the right edge, such as a thread or a detail panel. Each time the panel shows, it slides in from the right edge in 300 ms, with cubic-bezier(0.2, 0, 0, 1).
+
+```html
+<main class="sketch-split" style="overflow: clip">
+  <section>The list</section>
+  <aside class="sketch-slide-in" hidden>The open item</aside>
+</main>
+```
+
+- The panel covers what is under it, and its left edge is a line. At rest, this line lies on the line of the column before it.
+- The parent must clip the panel, so that the page does not scroll sideways while the panel slides.
+- With reduced motion, the panel shows at once. The close has no motion.
+
 To start a sketch, choose a category and copy one template to the project. Then change the words and the rows. Run the inlining command before you open the sketch.
 
 ## Start from a template

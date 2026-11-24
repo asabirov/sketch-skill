@@ -6,6 +6,7 @@
 
 - The pattern `chat/channel-thread-panel`. A message of a channel shows a card of its thread. The thread opens in a panel at the right of the channel, and the channel keeps its place. Below 1000 px the thread takes the place of the channel, and on a phone a drag from the left edge goes back.
 - The kit part `sketch-split-handle`: a handle on the line between 2 columns of a `sketch-split`. A drag, the arrow keys, Home and End change the width of a column, and a double click gives the start width. Each column keeps its `--pane-min`, and the browser keeps the width for the next visit. `references/sketch-prototypes.md` shows an example.
+- The kit part `sketch-slide-in`: a panel that slides in from the right edge in 300 ms each time it shows. With reduced motion, it shows at once.
 
 ### Changed
 

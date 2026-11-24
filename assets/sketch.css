@@ -301,6 +301,11 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 /* A handle on the line between 2 columns of a split: <div class="sketch-split-handle" aria-label="Width of the list"></div>. A drag or an arrow key sets --pane on the split:
    the width of the column before the handle, or with "end" the column after it. Below 600 px the columns stack, so the handle is gone. */
 [data-sketch] .sketch-split-handle { display: none; }
+/* A panel that slides in from the right edge each time it shows: <aside class="sketch-slide-in" hidden>. It covers what is under it,
+   and its left edge is the line. The parent must clip it, for example with overflow: clip. With reduced motion, it shows at once. */
+@keyframes sketch-slide-in { from { transform: translateX(100%); } }
+[data-sketch] .sketch-slide-in { background: var(--sketch-page); box-shadow: calc(-1 * var(--sketch-stroke)) 0 0 var(--sketch-ink); }
+@media (prefers-reduced-motion: no-preference) { [data-sketch] .sketch-slide-in { animation: sketch-slide-in 300ms cubic-bezier(0.2, 0, 0, 1); } }
 /* A board scrolls inside its own box until its columns fit. */
 [data-sketch] .sketch-board { display: grid; grid-auto-flow: column; grid-auto-columns: 85%; gap: 16px; align-items: start; overflow-x: auto; scroll-snap-type: x mandatory; }
 [data-sketch] .sketch-board > * { scroll-snap-align: start; } [data-sketch] .sketch-board .sketch-frame { padding: 12px 16px; }

@@ -4,7 +4,7 @@
   Row opens: in a pane. The thread of a card opens in a pane at the right of the channel. In a window below 1000 px, the pane takes the place of the channel.
   Related: chat/conversation-pane shows a list of conversations with the open conversation next to it. content/comment-thread shows the replies in place under a comment. navigation/swipe-back gives the drag of the phone layout. notifications/follow-menu is the notification choice of the bell.
   Transition values, from transitions.json. The pictures of the source show no motion, so each value is estimated. Each value is the designer's choice.
-  - thread-open, thread-empty and narrow-thread: the thread panel slides in from the right edge, animation panel_in 300 ms, cubic-bezier(0.2, 0, 0, 1). The channel gets narrow at once.
+  - thread-open, thread-empty and narrow-thread: the thread panel slides in from the right edge, the kit part sketch-slide-in, 300 ms, cubic-bezier(0.2, 0, 0, 1). The channel gets narrow at once.
   - thread-closed and narrow-channel: the thread panel goes at once, and the channel gets its width back at once. 0 ms.
   - reply-sent: the new message of the thread goes from clear to solid, animation message_in 150 ms, cubic-bezier(0.4, 0, 0.2, 1). The card in the channel changes at once.
   - narrow-dragging: below 600 px, a drag to the right from the left edge moves the thread with the finger. The channel shows under it, 48 px to the left and dimmed. This move has no duration.
@@ -111,11 +111,8 @@
   [data-sketch] .ct_foot_note { margin: 0 16px 16px; overflow-wrap: anywhere; }
 
   /* Each motion value below comes from transitions.json. */
-  @keyframes panel_in { from { transform: translateX(100%); } }
   @keyframes message_in { from { opacity: 0; } }
   @media (prefers-reduced-motion: no-preference) {
-    /* The panel covers what is under it while it slides, and its left edge is the line. At rest, this line lies on the line of the channel. */
-    [data-sketch] .ct_thread { animation: panel_in 300ms cubic-bezier(0.2, 0, 0, 1); background: var(--sketch-page); box-shadow: calc(-1 * var(--sketch-stroke)) 0 0 var(--sketch-ink); }
     [data-sketch] .ct_new { animation: message_in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
   }
 
@@ -169,7 +166,7 @@
     <header class="ct_bar">
       <button type="button" class="sketch-icon-button sketch-phone-only" aria-label="Channels" data-sketch-toast="Navigation: the list of channels opens (sample)"><i data-icon="menu"></i></button>
       <h1 class="ct_title"><span class="sketch-muted" aria-hidden="true">#</span><span class="ct_title_words">workshop</span></h1>
-      <button type="button" class="sketch-icon-button" aria-label="Threads of this channel" data-sketch-toast="The list of the threads of this channel opens (sample)"><i data-glyph="thread"></i></button>
+      <button type="button" class="sketch-icon-button sketch-from-tablet" aria-label="Threads of this channel" data-sketch-toast="The list of the threads of this channel opens (sample)"><i data-glyph="thread"></i></button>
       <button type="button" class="sketch-icon-button sketch-from-tablet" aria-label="Members" data-sketch-toast="The list of members opens (sample)"><i data-icon="user"></i></button>
       <button type="button" class="sketch-icon-button" aria-label="Search this channel" data-sketch-toast="The search opens (sample)"><i data-icon="search"></i></button>
     </header>
@@ -244,7 +241,7 @@
   <div class="sketch-split-handle end sketch-from-desktop" id="ct_handle" aria-label="Width of the thread panel"></div>
 
   <!-- The thread panel: its own bar, the messages of the thread and its own message field. -->
-  <aside class="ct_pane ct_thread" id="ct_thread" aria-labelledby="ct_thread_name" hidden>
+  <aside class="ct_pane ct_thread sketch-slide-in" id="ct_thread" aria-labelledby="ct_thread_name" hidden>
     <header class="ct_bar">
       <a class="sketch-icon-button sketch-until-desktop" id="ct_back" href="#narrow-channel" aria-label="Back to #workshop" data-leave><i data-icon="arrow-left"></i></a>
       <h2 class="ct_title"><i data-glyph="thread"></i><span class="ct_title_words" id="ct_thread_name">Friday closing time</span></h2>
