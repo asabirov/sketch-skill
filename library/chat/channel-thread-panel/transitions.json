@@ -5,9 +5,9 @@
     "element": "the thread panel",
     "property": null,
     "animation": "panel_in",
-    "duration": 150,
+    "duration": 300,
     "delay": 0,
-    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
     "measurement": "estimated"
   },
   {
@@ -16,9 +16,9 @@
     "element": "the thread panel",
     "property": null,
     "animation": "panel_in",
-    "duration": 150,
+    "duration": 300,
     "delay": 0,
-    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
     "measurement": "estimated"
   },
   {
@@ -38,9 +38,9 @@
     "element": "the thread panel",
     "property": null,
     "animation": "panel_in",
-    "duration": 150,
+    "duration": 300,
     "delay": 0,
-    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "easing": "cubic-bezier(0.2, 0, 0, 1)",
     "measurement": "estimated"
   },
   {

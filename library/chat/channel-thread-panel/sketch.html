@@ -4,7 +4,7 @@
   Row opens: in a pane. The thread of a card opens in a pane at the right of the channel. In a window below 1000 px, the pane takes the place of the channel.
   Related: chat/conversation-pane shows a list of conversations with the open conversation next to it. content/comment-thread shows the replies in place under a comment. navigation/swipe-back gives the drag of the phone layout. notifications/follow-menu is the notification choice of the bell.
   Transition values, from transitions.json. The pictures of the source show no motion, so each value is estimated. Each value is the designer's choice.
-  - thread-open, thread-empty and narrow-thread: the thread panel goes from clear to solid, animation panel_in 150 ms, cubic-bezier(0.4, 0, 0.2, 1). The channel gets narrow at once.
+  - thread-open, thread-empty and narrow-thread: the thread panel slides in from the right edge, animation panel_in 300 ms, cubic-bezier(0.2, 0, 0, 1). The channel gets narrow at once.
   - thread-closed and narrow-channel: the thread panel goes at once, and the channel gets its width back at once. 0 ms.
   - reply-sent: the new message of the thread goes from clear to solid, animation message_in 150 ms, cubic-bezier(0.4, 0, 0.2, 1). The card in the channel changes at once.
   - narrow-dragging: below 600 px, a drag to the right from the left edge moves the thread with the finger. The channel shows under it, 48 px to the left and dimmed. This move has no duration.
@@ -34,7 +34,7 @@
   }
   /* The channel and the thread panel are the 2 columns of a kit split. The kit handle on the line between them sets --pane, the width of the panel.
      Below 1000 px the split has one column, and the thread takes the place of the channel. The channel stays in the page but does not show, so it keeps its scroll position. */
-  [data-sketch] .ct_split { grid-template: minmax(0, 1fr) / minmax(0, 1fr); min-width: 0; min-height: 0; }
+  [data-sketch] .ct_split { grid-template: minmax(0, 1fr) / minmax(0, 1fr); min-width: 0; min-height: 0; overflow: clip; }
   [data-sketch] .ct_channel { grid-area: 1 / 1; --pane-min: 360px; }
   [data-sketch] .ct_thread { grid-area: 1 / 1; --pane-min: 300px; }
   /* With no open thread, the channel is the last column, so it has no line at its right. */
@@ -111,10 +111,11 @@
   [data-sketch] .ct_foot_note { margin: 0 16px 16px; overflow-wrap: anywhere; }
 
   /* Each motion value below comes from transitions.json. */
-  @keyframes panel_in { from { opacity: 0; } }
+  @keyframes panel_in { from { transform: translateX(100%); } }
   @keyframes message_in { from { opacity: 0; } }
   @media (prefers-reduced-motion: no-preference) {
-    [data-sketch] .ct_thread { animation: panel_in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
+    /* The panel covers what is under it while it slides, and its left edge is the line. At rest, this line lies on the line of the channel. */
+    [data-sketch] .ct_thread { animation: panel_in 300ms cubic-bezier(0.2, 0, 0, 1); background: var(--sketch-page); box-shadow: calc(-1 * var(--sketch-stroke)) 0 0 var(--sketch-ink); }
     [data-sketch] .ct_new { animation: message_in 150ms cubic-bezier(0.4, 0, 0.2, 1); }
   }
 
