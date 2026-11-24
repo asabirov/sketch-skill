@@ -2,7 +2,7 @@
 
 Captured: 2026-11-16, from public pictures and a public video
 Best for: a person lets an outside app act for their account, and later takes that right back in Settings.
-Row opens: in place. The designer's choice: Disconnect in the row menu opens a confirmation over the list. The source shows no confirmation.
+Row opens: in place. The designer's choice: Disconnect in the row opens a confirmation over the list. The source shows no confirmation.
 Related: `settings/settings-modal`, the settings window that holds the list of connected clients. `account/connected-apps`, a full page of the apps that use an account, with the access, the connect date and the last use.
 
 ## States
@@ -15,8 +15,8 @@ Related: `settings/settings-modal`, the settings window that holds the list of c
 - `service-off`: a message that the product does not let apps connect now. Opens on: a request while connections are off. The source shows no such state.
 - `app-return`: the app's own page, which shows the last result, a way to connect again and a way to open the product. The result is Connected, Not connected or The request expired. Opens on: Back to Notes Sync from `allowed`, `denied` or `request-expired`. The source video shows the app after the return at 00:56. Connect again opens a new `consent-request`.
 - `product-home`: the product with its side menu, which holds Settings. Opens on: Open [Product] from `app-return`. The source pictures show no such page. It is drawn so that the person finds Settings later.
-- `clients-list`: the settings window with Connected clients open. The window is a part of `settings/settings-modal`, so the sketch draws it as a plain box with that name. A table lists each app with its maker, its access, when it was last used, and a menu button. Opens on: Settings, or Manage connected clients from `allowed`. The source shows My connected clients and Integrations in the Settings side menu, and a table with a menu on each row.
-- `revoke-confirm`: a confirmation over the list that names the app and says what stops. Disconnect and Keep connected. Opens on: Disconnect in the row menu. The source menu has Disconnect and shows no confirmation.
+- `clients-list`: the settings window with Connected clients open. The window is a part of `settings/settings-modal`, so the sketch draws it as a plain box with that name. A table lists each app with its maker, its access, when it was last used, and a Disconnect button. Opens on: Settings, or Manage connected clients from `allowed`. The source shows My connected clients and Integrations in the Settings side menu, and a table with a menu on each row. The Disconnect button is drawn in place of that menu.
+- `revoke-confirm`: a confirmation over the list that names the app and says what stops. Disconnect and Keep connected. Opens on: Disconnect in the row. The source menu has Disconnect and shows no confirmation.
 - `client-revoked`: the list without the disconnected app, with a status line that names it. Opens on: Disconnect in the confirmation. The source shows no such state.
 - `other-revoked`: the list without the other app, with a status line that names it. Opens on: Disconnect of Calendar Bridge while both apps are in the list. The source shows no such state.
 - `clients-empty`: one sentence that says no client can use the account, and where a new client shows. Opens on: Disconnect of the last app. The source shows no empty list.
@@ -31,7 +31,7 @@ Related: `settings/settings-modal`, the settings window that holds the list of c
 - `allowed`, `denied` or `request-expired` to `app-return`. Trigger: click Back to Notes Sync. Moves: the page content. 180 ms, ease-out. estimated.
 - `app-return` to `product-home`. Trigger: click Open [Product]. Moves: the page content. 180 ms, ease-out. estimated.
 - `product-home` or `allowed` to `clients-list`. Trigger: click Settings or Manage connected clients. Moves: the settings content. 180 ms, ease-out. estimated.
-- `clients-list` to `revoke-confirm`. Trigger: click Disconnect in the row menu. Moves: the confirmation dialog. 160 ms, ease-out. estimated.
+- `clients-list` to `revoke-confirm`. Trigger: click Disconnect in the row. Moves: the confirmation dialog. 160 ms, ease-out. estimated.
 - `revoke-confirm` to `client-revoked`. Trigger: click Disconnect in the confirmation. Moves: the settings content. 180 ms, ease-out. estimated.
 - `clients-list` to `other-revoked`. Trigger: click Disconnect in the confirmation of the other app. Moves: the settings content. 180 ms, ease-out. estimated.
 - `client-revoked` or `other-revoked` to `clients-empty`. Trigger: disconnect the last app. Moves: the settings content. 180 ms, ease-out. estimated.
@@ -45,7 +45,7 @@ Related: `settings/settings-modal`, the settings window that holds the list of c
 - Empty list: not seen. Say in one sentence that no client can use the account.
 - Many workspaces: the source puts the workspace in a choice above the list of access. The person must see which workspace the app gets before Continue.
 - Long app name or long access list: not seen. Let the name wrap, and keep Continue and Cancel in view.
-- 390 px screen: not seen. Keep one column. Each row of the table wraps. The settings window follows `settings/settings-modal`.
+- 390 px screen: not seen. Keep one column. Each row of the table wraps, and the Disconnect button gets its own line. The settings window follows `settings/settings-modal`.
 
 ## Notes
 
@@ -54,5 +54,5 @@ Related: `settings/settings-modal`, the settings window that holds the list of c
 - Say in each result and each error whether access was given.
 - Say on the consent page where the person can disconnect the app later.
 - Put Settings in the side menu of the product, and Connected clients in the account group of Settings. The source names this item My connected apps. The sketch uses Connected clients, the name that the owner chose. A disconnected app stays out of the list until the person connects it again.
-- Put Disconnect in a menu on each row, as the source does. Add a confirmation that names the app and says what stops. Keep connected is the safe action.
+- A row with one action shows that action as a direct button. Use a row menu only when a row has more than one action. The source puts Disconnect in a menu with two more items. The sketch keeps only Disconnect, so it is a button. Add a confirmation that names the app and says what stops. Keep connected is the safe action.
 - The source menu also has Visit developer website and Contact support. The sketch leaves them out, because they leave the product.

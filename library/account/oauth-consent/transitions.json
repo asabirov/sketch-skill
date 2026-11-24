@@ -89,7 +89,7 @@
   },
   {
     "label": "revoke-confirm",
-    "trigger": "click Disconnect in the row menu",
+    "trigger": "click Disconnect in the row",
     "element": "confirmation dialog",
     "property": "opacity",
     "animation": null,
