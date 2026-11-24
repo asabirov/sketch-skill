@@ -20,9 +20,11 @@
   [data-sketch] .consent_window > nav :is(a, span) { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; text-decoration: none; border-radius: var(--sketch-wobble); }
   [data-sketch] .consent_window > nav a:hover { background: var(--sketch-wash); }
   [data-sketch] .consent_window > nav [aria-current] { background: var(--sketch-wash); font-weight: 600; }
-  [data-sketch] .consent_window > div:not(.sketch-menu) { display: grid; gap: 16px; align-content: start; padding: 24px; min-height: 420px; }
-  [data-sketch] .consent_window > div:not(.sketch-menu) > :is(h1, h2, p) { margin: 0; }
-  [data-sketch] .consent_window td:last-child { text-align: right; }
+  [data-sketch] .consent_window > div { display: grid; gap: 16px; align-content: start; padding: 24px; min-height: 420px; }
+  [data-sketch] .consent_window > div > :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .consent_window :is(th, td):last-child { text-align: right; }
+  /* On a phone, the row wraps and the Disconnect button gets its own line. */
+  @media (max-width: 599px) { [data-sketch] .consent_window td:last-child { flex-basis: 100%; margin-top: 8px; text-align: left; } }
   /* The settings window is a part of settings/settings-modal. It is a plain box with that name, and only the list is drawn in it. */
   [data-sketch] .consent_part { margin: 0; padding: 16px 24px 0; }
   @media (min-width: 700px) {
@@ -110,16 +112,10 @@
       <div class="sketch-table-box"><table class="sketch-table">
         <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
         <tbody>
-          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="notes_menu" aria-label="More actions for Notes Sync"><i data-icon="more"></i></button></td></tr>
-          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="bridge_menu" aria-label="More actions for Calendar Bridge"><i data-icon="more"></i></button></td></tr>
+          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td><a class="sketch-button secondary" href="#revoke-confirm" aria-label="Disconnect Notes Sync">Disconnect</a></td></tr>
+          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td><button class="sketch-button secondary" type="button" data-sketch-open="revoke_bridge_dialog" aria-label="Disconnect Calendar Bridge">Disconnect</button></td></tr>
         </tbody>
       </table></div>
-    </div>
-    <div class="sketch-menu sketch-frame" id="notes_menu" hidden>
-      <a class="sketch-menu-item" href="#revoke-confirm"><i data-icon="trash"></i>Disconnect Notes Sync</a>
-    </div>
-    <div class="sketch-menu sketch-frame" id="bridge_menu" hidden>
-      <button class="sketch-menu-item" type="button" data-sketch-open="revoke_bridge_dialog"><i data-icon="trash"></i>Disconnect Calendar Bridge</button>
     </div>
   </section>
   <section class="consent_window sketch-frame" data-state="revoke-confirm" style="--state-duration:160ms" aria-labelledby="revoke_list_heading">
@@ -130,8 +126,8 @@
       <div class="sketch-table-box"><table class="sketch-table">
         <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
         <tbody>
-          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td></td></tr>
-          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td></td></tr>
+          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td><button class="sketch-button secondary" type="button" data-sketch-open="revoke_dialog" aria-label="Disconnect Notes Sync">Disconnect</button></td></tr>
+          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td><button class="sketch-button secondary" type="button" data-sketch-open="revoke_bridge_dialog" aria-label="Disconnect Calendar Bridge">Disconnect</button></td></tr>
         </tbody>
       </table></div>
     </div>
@@ -152,12 +148,9 @@
       <div class="sketch-table-box"><table class="sketch-table">
         <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
         <tbody>
-          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="bridge_last_menu" aria-label="More actions for Calendar Bridge"><i data-icon="more"></i></button></td></tr>
+          <tr><td><b>Calendar Bridge</b><br><span class="sketch-muted">Northwind</span></td><td>Read pages</td><td>3 weeks ago</td><td><button class="sketch-button secondary" type="button" data-sketch-open="revoke_last_dialog" aria-label="Disconnect Calendar Bridge">Disconnect</button></td></tr>
         </tbody>
       </table></div>
-    </div>
-    <div class="sketch-menu sketch-frame" id="bridge_last_menu" hidden>
-      <button class="sketch-menu-item" type="button" data-sketch-open="revoke_last_dialog"><i data-icon="trash"></i>Disconnect Calendar Bridge</button>
     </div>
   </section>
   <section class="consent_window sketch-frame" data-state="other-revoked" style="--state-duration:180ms" aria-labelledby="other_revoked_heading">
@@ -168,12 +161,9 @@
       <div class="sketch-table-box"><table class="sketch-table">
         <thead><tr><th>Client</th><th>Access</th><th>Last used</th><th><span class="sketch-from-tablet">Actions</span></th></tr></thead>
         <tbody>
-          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td><button class="sketch-icon-button" type="button" data-sketch-popover="notes_last_menu" aria-label="More actions for Notes Sync"><i data-icon="more"></i></button></td></tr>
+          <tr><td><b>Notes Sync</b><br><span class="sketch-muted">Example Labs</span></td><td>Read and change pages</td><td>Today</td><td><button class="sketch-button secondary" type="button" data-sketch-open="revoke_notes_last_dialog" aria-label="Disconnect Notes Sync">Disconnect</button></td></tr>
         </tbody>
       </table></div>
-    </div>
-    <div class="sketch-menu sketch-frame" id="notes_last_menu" hidden>
-      <button class="sketch-menu-item" type="button" data-sketch-open="revoke_notes_last_dialog"><i data-icon="trash"></i>Disconnect Notes Sync</button>
     </div>
   </section>
   <section class="consent_window sketch-frame" data-state="clients-empty" style="--state-duration:180ms" aria-labelledby="empty_heading">
@@ -219,16 +209,16 @@
     { label: 'app-return', trigger: 'click Back to Notes Sync', element: 'page content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
     { label: 'product-home', trigger: 'click Open [Product]', element: 'page content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
     { label: 'clients-list', trigger: 'click Settings or Manage connected clients', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
-    { label: 'revoke-confirm', trigger: 'click Disconnect in the row menu', element: 'confirmation dialog', property: 'opacity', animation: null, duration: 160, delay: 0, easing: 'ease-out', measurement: 'estimated' },
+    { label: 'revoke-confirm', trigger: 'click Disconnect in the row', element: 'confirmation dialog', property: 'opacity', animation: null, duration: 160, delay: 0, easing: 'ease-out', measurement: 'estimated' },
     { label: 'client-revoked', trigger: 'click Disconnect in the confirmation', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
     { label: 'other-revoked', trigger: 'click Disconnect in the confirmation of the other app', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' },
     { label: 'clients-empty', trigger: 'disconnect the last app', element: 'settings content', property: 'opacity', animation: null, duration: 180, delay: 0, easing: 'ease-out', measurement: 'estimated' }
   ];
   window.__sketchTransitions = transition_records;
-  /* Escape closes the linked confirmation. The list then opens, and focus goes back to the menu button of the row. */
+  /* Escape closes the linked confirmation. The list then opens, and focus goes back to the Disconnect button of the row. */
   document.getElementById('revoke_dialog').addEventListener('cancel', event => {
     event.preventDefault();
-    addEventListener('hashchange', () => document.querySelector('[data-state="clients-list"] [aria-label="More actions for Notes Sync"]').focus(), {once: true});
+    addEventListener('hashchange', () => document.querySelector('[data-state="clients-list"] [aria-label="Disconnect Notes Sync"]').focus(), {once: true});
     location.hash = '#clients-list';
   });
   /* The chosen workspace names every result and Settings. */

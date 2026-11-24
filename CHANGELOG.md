@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- `account/connected-apps` and `account/oauth-consent`: each row shows Disconnect as a direct button. A row menu is used only when a row has more than one action. The `menu` state of `account/connected-apps` is gone.
+
 ## 0.21.0 — 2026-11-24
 
 ### Added
