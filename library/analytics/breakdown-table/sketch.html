@@ -1,0 +1,132 @@
+<!doctype html>
+<!--
+  Best for: a report that splits the money in and the money out of a range into their largest parts, with each part's share of the total.
+  Row opens: a row opens the transactions of that part, with the same range and direction.
+  Related: analytics/flow-chart shows the same parts as bands. analytics/cashflow-chart shows the totals by period. analytics/filter-bar sets the range.
+  One panel with a switch of the direction (Money in or Money out), the total of that direction, and a switch of the split: Source (Recipient for the money out), Category and Account code.
+  The table shows the largest parts, each with a share meter and the amount. A row sums the rest and opens the full list, only when 2 or more parts remain. A single part shows as its own row.
+  Transition values, from transitions.json: the rows of a new split fade in 200 ms, ease-out. A loading block pulses 1000 ms, ease.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breakdown table with shares</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .bt_page { max-width: 640px; }
+  [data-sketch] .bt_page :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .bt_split { display: grid; gap: 16px; }
+  [data-sketch] .bt_switches { display: flex; flex-wrap: wrap; gap: 8px; }
+  [data-sketch] .bt_split > section { display: grid; gap: 12px; align-content: start; }
+  [data-sketch] .bt_head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  [data-sketch] .bt_head span { font-size: 18px; font-weight: 600; }
+  [data-sketch] .bt_split tbody { animation: bt_fade 200ms ease-out; }
+  @keyframes bt_fade { from { opacity: 0; } }
+  [data-sketch] .bt_split .sketch-meter { width: 100%; min-width: 60px; height: 8px; }
+  [data-sketch] .bt_split :is(td, th):last-child { text-align: right; white-space: nowrap; }
+  [data-sketch] .bt_share { display: grid; grid-template-columns: 40px minmax(60px, 1fr); align-items: center; gap: 8px; }
+  [data-sketch] .bt_split tbody tr { cursor: pointer; }
+  [data-sketch] .bt_split tbody tr:hover { background: var(--sketch-wash); }
+  [data-sketch] .bt_split td:first-child button { all: unset; cursor: pointer; }
+  [data-sketch] .bt_split td:first-child button:focus-visible { outline: 2px solid var(--sketch-ink); outline-offset: 2px; }
+  [data-sketch] .bt_rest td { color: var(--sketch-muted); }
+  [data-sketch] .bt_pulse { height: 220px; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: bt_pulse 1000ms ease infinite alternate; }
+  @keyframes bt_pulse { to { opacity: .4; } }
+  [data-sketch] .bt_empty { padding: 24px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); color: var(--sketch-muted); text-align: center; }
+  @media (max-width: 599px) {
+    [data-sketch] .bt_split tbody tr:not([data-less]) { display: grid; grid-template-columns: minmax(0, 1fr) 110px 64px; align-items: center; gap: 8px; }
+    [data-sketch] .bt_split tbody td:last-child { text-align: right; }
+  }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] :is(.bt_split tbody, .bt_pulse) { animation: none; } }
+</style>
+<body data-sketch>
+<section data-state="by-source"></section>
+<section data-state="by-category" data-by="category"></section>
+<section data-state="by-code" data-by="code"></section>
+<section data-state="money-out" data-side="out"></section>
+<section data-state="remaining-open" data-all="in"></section>
+<section data-state="loading" data-loading></section>
+<section data-state="empty" data-empty></section>
+
+<template id="page">
+  <main class="sketch-main bt_page">
+    <h1>Where the money came from and went</h1>
+    <p class="sketch-muted">17 Aug – today. A row opens its transactions.</p>
+    <div class="bt_split" data-split></div>
+  </main>
+</template>
+
+<script>
+  // Each list is sorted by amount. The table shows the top 3 and sums the rest into one row, only when 2 or more parts remain.
+  const lists = {
+    in: {
+      'source': [['Customer sales', 420], ['Loan', 300], ['Card refunds', 160], ['Interest', 62], ['Card cash back', 36], ['Grants', 24]],
+      category: [['Sales', 471], ['Financing', 300], ['Refunds', 160], ['Interest', 71]],
+      code: [['4000 Revenue', 471], ['2400 Loans', 300], ['4900 Other income', 231]]
+    },
+    out: {
+      'source': [['Payroll service', 430], ['Fabric supplier', 170], ['Landlord', 73], ['Cloud host', 40], ['Card spend', 30], ['Travel agent', 20]],
+      category: [['Payroll', 430], ['Suppliers', 260], ['Rent', 73]],
+      code: [['6000 Salaries', 430], ['5000 Cost of goods', 260], ['6100 Rent', 73]]
+    }
+  };
+  const total = {in: 1002, out: 763};
+  const money = (v, side) => `${side === 'out' ? '−' : ''}€${v.toLocaleString('en') + 'k'}`;
+
+  function fill(section) {
+    const id = section.dataset.state, ds = section.dataset;
+    section.innerHTML = document.getElementById('page').innerHTML;
+    const split = section.querySelector('[data-split]');
+    if (ds.loading !== undefined) { split.innerHTML = '<div class="bt_pulse" aria-label="Loading"></div>'; return; }
+    if (ds.empty !== undefined) { split.innerHTML = '<p class="bt_empty">No money came in or went out in this range, so there is nothing to split.</p>'; return; }
+    const st = {in: {by: ds.by || 'source', all: ds.all === 'in'}, out: {by: ds.by || 'source', all: ds.all === 'out'}, side: ds.side || 'in'};
+
+    function rows(side) {
+      const list = lists[side][st[side].by], fold = !st[side].all && list.length > 4, shown = fold ? list.slice(0, 3) : list, rest = fold ? list.slice(3) : [];
+      const row = ([name, v]) => { const p = Math.round(v / total[side] * 100); return `<tr data-row="${name}"><td><button type="button">${name}</button></td><td><span class="bt_share">${p}%<span class="sketch-meter" role="img" aria-label="${p}% of the total"><i style="width:${p}%"></i></span></span></td><td>${money(v, side)}</td></tr>`; };
+      let html = shown.map(row).join('');
+      if (rest.length) {
+        const v = rest.reduce((a, [, x]) => a + x, 0), p = Math.round(v / total[side] * 100);
+        html += `<tr class="bt_rest" data-rest="${side}"><td><button type="button">${rest.length} more</button></td><td><span class="bt_share">${p}%<span class="sketch-meter" role="img" aria-label="${p}% of the total"><i style="width:${p}%"></i></span></span></td><td>${money(v, side)}</td></tr>`;
+      }
+      if (st[side].all && list.length > 4) html += `<tr class="bt_rest" data-less="${side}"><td colspan="3"><button type="button">Show the top 3 only</button></td></tr>`;
+      return html;
+    }
+
+    function panel(side) {
+      const title = side === 'in' ? 'Money in' : 'Money out', who = side === 'in' ? 'Source' : 'Recipient', by = st[side].by;
+      const head = {'source': who, category: 'Category', code: 'Account code'}[by];
+      return `<section class="sketch-panel sketch-frame" data-side="${side}">
+        <div class="bt_head"><h2>${title}</h2><span>${money(total[side], side)}</span></div>
+        <div class="bt_switches">
+        <div class="sketch-segmented" role="radiogroup" aria-label="Direction">
+          ${[['in', 'Money in'], ['out', 'Money out']].map(([v, l]) => `<label><input type="radio" name="side_${id}" value="${v}" data-side-pick ${side === v ? 'checked' : ''}>${l}</label>`).join('')}
+        </div>
+        <div class="sketch-segmented" role="radiogroup" aria-label="Split ${title.toLowerCase()} by">
+          ${[['source', who], ['category', 'Category'], ['code', 'Account code']].map(([v, l]) => `<label><input type="radio" name="by_${side}_${id}" value="${v}" data-by-pick ${by === v ? 'checked' : ''}>${l}</label>`).join('')}
+        </div>
+        </div>
+        <div class="sketch-table-box"><table class="sketch-table"><thead><tr><th>${head}</th><th>Share</th><th>Amount</th></tr></thead><tbody>${rows(side)}</tbody></table></div>
+      </section>`;
+    }
+
+    function draw() {
+      split.innerHTML = panel(st.side);
+      split.querySelectorAll('[data-side]').forEach(p => {
+        const side = p.dataset.side;
+        p.querySelectorAll('[data-by-pick]').forEach(r => r.addEventListener('change', () => { st[side].by = r.value; st[side].all = false; draw(); if (window.initSketch) initSketch(); }));
+        p.querySelectorAll('[data-side-pick]').forEach(r => r.addEventListener('change', () => { st.side = r.value; draw(); if (window.initSketch) initSketch(); }));
+        p.querySelectorAll('tbody tr').forEach(tr => tr.addEventListener('click', () => {
+          if (tr.dataset.rest) { st[side].all = true; draw(); return; }
+          if (tr.dataset.less) { st[side].all = false; draw(); return; }
+          sketchToast(`Opens the transactions of ${tr.dataset.row} (sample)`);
+        }));
+      });
+    }
+    draw();
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>
