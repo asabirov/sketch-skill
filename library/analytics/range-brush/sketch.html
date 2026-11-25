@@ -33,6 +33,11 @@
   /* The hit area of a handle grows away from the frame, so the 2 areas never cover each other or the middle of the frame. */
   [data-sketch] .rb_handle::before { content: ""; position: absolute; inset: -9px -4px -9px -20px; }
   [data-sketch] .rb_handle[data-end="b"]::before { inset: -9px -20px -9px -4px; }
+  /* Below 768 px a one-month frame can be narrower than 24 px. Its handles sit fully outside it, so they stay at least 30 px apart, and the whole frame takes a touch drag. */
+  @media (max-width: 767px) {
+    [data-sketch] .rb_one .rb_handle[data-end="a"] { left: -13px; } [data-sketch] .rb_one .rb_handle[data-end="b"] { right: -13px; }
+    [data-sketch] .rb_one .rb_handle[data-end="a"]::before { inset: -9px 0 -9px -20px; } [data-sketch] .rb_one .rb_handle[data-end="b"]::before { inset: -9px -20px -9px 0; }
+  }
   /* Each handle sits mostly outside the frame, so the 2 handles of a one-month frame stay at least 24 px apart. */
   [data-sketch] .rb_handle[data-end="a"] { left: -8px; } [data-sketch] .rb_handle[data-end="b"] { right: -8px; }
   [data-sketch] .rb_handle:is(:focus-visible, .rb_focus) { outline: 2px solid var(--sketch-ink); outline-offset: 2px; }
@@ -96,7 +101,7 @@
       const near = new Set([st.a - 1, st.a, st.b - 1, st.b]);
       bar.innerHTML = month_names.map((m, i) => `<span${near.has(i) ? ' class="rb_near"' : ''}>${m}</span>`).join('') +
         `<div class="rb_mini" aria-hidden="true">${values.map(v => `<i style="--v:${Math.round(v / top_value * 100)}"></i>`).join('')}</div>` +
-        `<div class="rb_window${st.a + st.b > 20 && st.b - st.a < 5 ? ' rb_right' : ''}" style="--a:${st.a};--b:${st.b}"><b>${name}</b>
+        `<div class="rb_window${st.a + st.b > 20 && st.b - st.a < 5 ? ' rb_right' : ''}${st.b - st.a === 1 ? ' rb_one' : ''}" style="--a:${st.a};--b:${st.b}"><b>${name}</b>
           <button class="rb_handle" type="button" role="slider" aria-label="Start of the range" aria-valuemin="0" aria-valuemax="14" aria-valuenow="${st.a}" aria-valuetext="${month_names[st.a]}" data-end="a"></button>
           <button class="rb_handle" type="button" role="slider" aria-label="End of the range" aria-valuemin="1" aria-valuemax="15" aria-valuenow="${st.b}" aria-valuetext="${month_names[st.b - 1]}" data-end="b"></button></div>`;
       const win = bar.querySelector('.rb_window'), label = win.querySelector('b');
@@ -108,8 +113,12 @@
         if (changed) sketchToast(`Range: ${range_name(a, b)} (sample)`);
       };
       // A drag moves the frame with the pointer, then snaps it to whole months on release.
-      const drag = (target, end) => target.addEventListener('pointerdown', e => {
+      const drag = (target, own_end) => target.addEventListener('pointerdown', e => {
+        let end = own_end;
         if (end === 'window' && e.target !== win && e.target !== label) return;
+        // Chrome can move a touch on a narrow frame to a handle, but it keeps the real touch point. A touch point inside the frame drags the frame.
+        const r = win.getBoundingClientRect();
+        if (end !== 'window' && e.pointerType === 'touch' && e.clientX > r.left && e.clientX < r.right) end = 'window';
         e.preventDefault();
         target.setPointerCapture(e.pointerId);
         win.classList.add('rb_drag');

@@ -71,6 +71,9 @@
   // The pressed button is drawn again or removed, so the focus goes to the first control of the card body, or else of the card.
   const focus_first = section => (section.querySelector('[data-body] :is(a[href], button:not(:disabled))') || section.querySelector('a[href], button:not(:disabled)'))?.focus();
 
+  // During a load the loading block holds the focus, so the focus never goes to the page.
+  const hold = box => { const s = box.querySelector('[role="status"]'); if (s) { s.tabIndex = -1; s.focus(); } };
+
   function fill(section) {
     const id = section.dataset.state, ds = section.dataset;
     section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
@@ -83,7 +86,7 @@
     if (ds.loading !== undefined) { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; return; }
     if (ds.error !== undefined) {
       body.innerHTML = '<div class="sketch-stack"><p>The card did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
-      body.querySelector('[data-retry]').addEventListener('click', () => { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; setTimeout(() => { delete ds.error; fill(section); if (window.initSketch) initSketch(); focus_first(section); }, 1200); });
+      body.querySelector('[data-retry]').addEventListener('click', () => { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; hold(body); setTimeout(() => { delete ds.error; fill(section); if (window.initSketch) initSketch(); focus_first(section); }, 1200); });
       return;
     }
     if (ds.empty !== undefined) { body.innerHTML = '<div class="sketch-stack"><p>No card yet.</p><button class="sketch-button secondary" type="button" data-sketch-toast="Order a card (sample)">Order a card</button></div>'; return; }

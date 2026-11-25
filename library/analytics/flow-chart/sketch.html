@@ -124,6 +124,9 @@
     return [{in: d_in, out: d_out}, `<svg class="fc_svg" width="${w}" height="${h}" role="group" aria-label="Flow of the money in, ${k(total)} in all">${path}${nodes}${labels}</svg>`];
   }
 
+  // During a load the loading block holds the focus, so the focus never goes to the page.
+  const hold = box => { const s = box.querySelector('[role="status"]'); if (s) { s.tabIndex = -1; s.focus(); } };
+
   function fill(section) {
     const ds = section.dataset;
     section.innerHTML = document.getElementById('page').innerHTML;
@@ -133,6 +136,7 @@
       chart.innerHTML = '<div class="fc_empty"><p>No money came in or went out in this range.</p><button class="sketch-button secondary" type="button" data-wide>Show the last 12 months</button></div>';
       chart.querySelector('[data-wide]').addEventListener('click', () => {
         chart.innerHTML = '<div class="fc_pulse" role="status" aria-label="Loading"></div>';
+        hold(chart);
         // Show the last 12 months is gone after the load, so the focus goes to the first band of the chart.
         setTimeout(() => { delete ds.empty; fill(section); section.querySelector('.band')?.focus(); }, 1200);
       });
@@ -159,6 +163,8 @@
     // The chart fades in only when it first shows. A change of width draws it again at once, as pattern.md says.
     function draw(fade) {
       const w = Math.max(320, chart.clientWidth || 320);
+      // A redraw replaces the bands, so the band that had the focus gets it again.
+      const had = chart.contains(document.activeElement) ? document.activeElement.dataset.key : null;
       let html;
       [shown, html] = draw_svg(d, w);
       chart.innerHTML = html;
@@ -171,7 +177,8 @@
         el.addEventListener('blur', () => pick(null));
       });
       chart.querySelector('svg').addEventListener('pointerleave', () => pick(null));
-      if (picked) requestAnimationFrame(() => pick(picked));
+      if (had) chart.querySelector(`.band[data-key="${had}"]`)?.focus();
+      else if (picked) requestAnimationFrame(() => pick(picked));
     }
     draw(true);
     let frame = 0;

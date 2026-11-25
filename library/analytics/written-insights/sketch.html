@@ -52,6 +52,9 @@
     ['Money in', 'Money in reached €640k in November. The new <a href="#filter-link" data-filter="Loan">loan</a> is €300k of it.']
   ];
 
+  // During a load the loading block holds the focus, so the focus never goes to the page.
+  const hold = box => { const s = box.querySelector('[role="status"]'); if (s) { s.tabIndex = -1; s.focus(); } };
+
   function fill(section) {
     const ds = section.dataset;
     section.innerHTML = document.getElementById('page').innerHTML;
@@ -62,6 +65,7 @@
       body.innerHTML = '<div class="sketch-stack"><p>The insights did not load. The chart still shows the numbers.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
       body.querySelector('[data-retry]').addEventListener('click', () => {
         body.innerHTML = '<div aria-busy="true" role="status" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>';
+        hold(body);
         // Try again is gone after the load, so the focus goes to the first control of the insights.
         setTimeout(() => { delete ds.error; fill(section); section.querySelector('[data-body] :is(a[href], button)')?.focus(); }, 1200);
       });

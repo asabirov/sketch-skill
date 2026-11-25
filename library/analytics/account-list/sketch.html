@@ -80,7 +80,10 @@
 
   // A button that shows another state moves the focus to the first control of that state, so the focus does not go to the page.
   function go(state) {
-    addEventListener('hashchange', () => document.querySelector(`[data-state="${state}"]`)?.querySelector('a[href], button:not(:disabled), input:not(:disabled), [tabindex="0"]')?.focus(), {once: true});
+    const focus = () => document.querySelector(`[data-state="${state}"]`)?.querySelector('a[href], button:not(:disabled), input:not(:disabled), [tabindex="0"]')?.focus();
+    // Without a change of hash no hashchange comes, so the focus moves at once and no listener waits.
+    if (location.hash === `#${state}`) { focus(); return; }
+    addEventListener('hashchange', focus, {once: true});
     location.hash = state;
   }
 

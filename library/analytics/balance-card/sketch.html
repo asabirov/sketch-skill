@@ -123,6 +123,9 @@
     </dl>
     <p class="bc_note">The cash balance is the money of all accounts together. It counts the transfers between your own accounts that are on the way.</p>`;
 
+  // During a load the loading block holds the focus, so the focus never goes to the page.
+  const hold = box => { const s = box.querySelector('[role="status"]'); if (s) { s.tabIndex = -1; s.focus(); } };
+
   function fill(section) {
     const id = section.dataset.state;
     section.innerHTML = document.getElementById('card').innerHTML.replaceAll('__state__', id);
@@ -158,6 +161,7 @@
         body.innerHTML = '<div class="bc_message"><p>Error: the balance did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
         body.querySelector('[data-retry]').addEventListener('click', () => {
           show('loading');
+          hold(section);
           // Try again is gone after the load, so the focus goes to the period button, the first control of the card.
           setTimeout(() => { show('chart'); initSketch(); section.querySelector(`[data-sketch-popover="${menu.id}"]`)?.focus(); }, 1200);
         });
