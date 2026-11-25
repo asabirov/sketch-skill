@@ -2,7 +2,7 @@
 <!--
   Best for: any chart over time where a person sets the shown range by a drag, and needs to see where that range sits in the whole time.
   Row opens: no rows.
-  Related: analytics/filter-bar holds the range button that names the same range. analytics/cashflow-chart is a chart that a brush can sit under.
+  Related: analytics/filter-bar holds the range button that names the same range.
   A detail chart shows only the chosen months. Below it, a slim brush shows the whole time line: a small copy of the data and the month names. A frame on the brush marks the chosen range. A small filled label above the frame names its dates. The frame has a handle at each end.
   A drag of a handle moves that end. A drag of the frame moves the whole range. During a drag, the frame follows the pointer. When the pointer lets go, the frame snaps to whole months, and the detail chart shows the new months. The arrow keys move a handle by one month.
   Transition values, from transitions.json: the frame follows the pointer with no motion of its own, and snaps at once. The detail chart changes at once.
@@ -116,9 +116,9 @@
       const drag = (target, own_end) => target.addEventListener('pointerdown', e => {
         let end = own_end;
         if (end === 'window' && e.target !== win && e.target !== label) return;
-        // Chrome can move a touch on a narrow frame to a handle, but it keeps the real touch point. A touch point inside the frame drags the frame.
-        const r = win.getBoundingClientRect();
-        if (end !== 'window' && e.pointerType === 'touch' && e.clientX > r.left && e.clientX < r.right) end = 'window';
+        // Chrome can move a touch on a narrow frame to a handle, but it keeps the real touch point. A touch point inside the frame and outside the handle drags the frame.
+        const r = win.getBoundingClientRect(), h = target.getBoundingClientRect();
+        if (end !== 'window' && e.pointerType === 'touch' && e.clientX > r.left && e.clientX < r.right && (e.clientX < h.left || e.clientX > h.right)) end = 'window';
         e.preventDefault();
         target.setPointerCapture(e.pointerId);
         win.classList.add('rb_drag');

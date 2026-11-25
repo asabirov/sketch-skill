@@ -3,7 +3,7 @@
 Captured: 2026-11-25, recorded by an agent
 Best for: a person opens a money product to see how much money the business has now, and how the total moved over a period that they choose.
 Row opens: no rows
-Related: `analytics/dashboard-grid` puts this card first in a grid of cards. `analytics/cashflow-chart` shows the money in and the money out of a period in full. `analytics/account-list` splits the total by account.
+Related: `analytics/dashboard-grid` puts this card first in a grid of cards. `analytics/account-list` splits the total by account.
 
 ## States
 

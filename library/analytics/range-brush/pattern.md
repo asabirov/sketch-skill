@@ -3,7 +3,7 @@
 Captured: 2026-11-25, recorded by an agent
 Best for: any chart over time where a person sets the shown range by a drag, and needs to see where that range sits in the whole time.
 Row opens: no rows.
-Related: `analytics/filter-bar` holds the range button that names the same range. `analytics/cashflow-chart` is a chart that a brush can sit under.
+Related: `analytics/filter-bar` holds the range button that names the same range.
 
 ## Scenarios
 

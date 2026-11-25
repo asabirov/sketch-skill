@@ -3,7 +3,7 @@
 Captured: 2026-11-25, recorded by an agent
 Best for: the top of a report page, where a person sets what the whole report shows: a saved view, filters, a date range and the direction of the money.
 Row opens: no rows.
-Related: `analytics/range-brush` sets the same range by a drag on a time line. `analytics/cashflow-chart`, `analytics/breakdown-table` and `analytics/written-insights` follow the filters of this bar. `content/catalog-base-view` has a bar with the view name, Filter and Sort for a set of records, with no range. The sketch template `search/results` filters in a side panel.
+Related: `analytics/range-brush` sets the same range by a drag on a time line. `analytics/breakdown-table` and `analytics/written-insights` follow the filters of this bar. `content/catalog-base-view` has a bar with the view name, Filter and Sort for a set of records, with no range. The sketch template `search/results` filters in a side panel.
 
 ## Scenarios
 
