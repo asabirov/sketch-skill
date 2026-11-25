@@ -1,0 +1,147 @@
+<!doctype html>
+<!--
+  Best for: any chart over time where a person sets the shown range by a drag, and needs to see where that range sits in the whole time.
+  Row opens: no rows.
+  Related: analytics/filter-bar holds the range button that names the same range. analytics/cashflow-chart is a chart that a brush can sit under.
+  A detail chart shows only the chosen months. Below it, a slim brush shows the whole time line: a small copy of the data and the month names. A frame on the brush marks the chosen range. A small filled label above the frame names its dates. The frame has a handle at each end.
+  A drag of a handle moves that end. A drag of the frame moves the whole range. During a drag, the frame follows the pointer. When the pointer lets go, the frame snaps to whole months, and the detail chart shows the new months. The arrow keys move a handle by one month.
+  Transition values, from transitions.json: the frame follows the pointer with no motion of its own, and snaps at once. The detail chart changes at once.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Range brush under a chart</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .rb_page { max-width: 1120px; }
+  [data-sketch] .rb_page :is(h1, p) { margin: 0; }
+  [data-sketch] .rb_head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+  [data-sketch] .rb_chart { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); align-items: end; gap: 4px; height: 220px; padding: 0 10px; border-bottom: 1px solid var(--sketch-muted); }
+  [data-sketch] .rb_chart > div { display: grid; justify-items: center; gap: 4px; height: 100%; grid-template-rows: 1fr auto; }
+  [data-sketch] .rb_chart i { align-self: end; width: min(48px, 70%); height: calc(var(--v) * 1%); border: var(--sketch-stroke) solid var(--sketch-ink); border-bottom: 0; border-radius: 4px 4px 0 0; background: var(--sketch-wash); }
+  [data-sketch] .rb_chart span { color: var(--sketch-muted); font-size: 12px; white-space: nowrap; }
+  [data-sketch] .rb_bar { margin: 0 10px; position: relative; display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); align-items: end; height: 96px; padding: 22px 0 4px; border-bottom: 1px solid var(--sketch-muted); user-select: none; }
+  [data-sketch] .rb_bar > span { color: var(--sketch-muted); font-size: 12px; text-align: center; white-space: nowrap; }
+  [data-sketch] .rb_mini { position: absolute; inset: 24px 0 22px; display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); align-items: end; pointer-events: none; }
+  [data-sketch] .rb_mini > i { justify-self: center; width: 40%; height: calc(var(--v) * 1%); background: var(--sketch-muted); opacity: .45; }
+  [data-sketch] .rb_window { position: absolute; top: 18px; bottom: 2px; left: calc(var(--a) / 15 * 100%); width: calc((var(--b) - var(--a)) / 15 * 100%); border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px; background: var(--sketch-wash); cursor: grab; touch-action: none; }
+  [data-sketch] .rb_window.rb_drag { cursor: grabbing; }
+  [data-sketch] .rb_window > b { position: absolute; bottom: 100%; left: -2px; padding: 0 6px; border-radius: 3px 3px 3px 0; background: var(--sketch-ink); color: var(--sketch-page); font-size: 12px; font-weight: 500; white-space: nowrap; }
+  [data-sketch] .rb_window.rb_right > b { left: auto; right: -2px; border-radius: 3px 3px 0 3px; }
+  [data-sketch] .rb_handle { position: absolute; top: 50%; width: 12px; height: 26px; margin-top: -13px; padding: 0; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px; background: var(--sketch-page); cursor: ew-resize; touch-action: none; }
+  [data-sketch] .rb_handle::before { content: ""; position: absolute; inset: -9px -16px; }
+  [data-sketch] .rb_handle[data-end="a"] { left: -7px; } [data-sketch] .rb_handle[data-end="b"] { right: -7px; }
+  [data-sketch] .rb_handle:is(:focus-visible, .rb_focus) { outline: 2px solid var(--sketch-ink); outline-offset: 2px; }
+  [data-sketch] .rb_note { color: var(--sketch-muted); font-size: 14px; }
+  @media (max-width: 599px) {
+    [data-sketch] .rb_bar > span:nth-child(3n + 2), [data-sketch] .rb_bar > span:nth-child(3n + 3) { visibility: hidden; }
+    [data-sketch] .rb_chart[data-many] > div:nth-child(2n) span { visibility: hidden; }
+  }
+</style>
+<body data-sketch>
+<section data-state="range"></section>
+<section data-state="end-moved" data-a="8"></section>
+<section data-state="range-moved" data-a="6" data-b="13"></section>
+<section data-state="handle-focus" data-focus="b"></section>
+<section data-state="one-month" data-a="13" data-b="14"></section>
+
+<template id="page">
+  <main class="sketch-main rb_page">
+    <div class="rb_head"><h1>Money in</h1>
+      <button class="sketch-button secondary" type="button" data-sketch-toast="The range popover (sample)"><i data-icon="calendar"></i><span data-name></span><i data-icon="chevron-down"></i></button></div>
+    <div class="rb_chart" data-chart role="img"></div>
+    <div class="rb_bar" data-bar></div>
+    <p class="rb_note">The brush shows the whole time. Drag a handle to move one end, or drag the frame to move the whole range. A handle also takes the Left and Right arrow keys.</p>
+  </main>
+</template>
+
+<script>
+  const month_names = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan 2026', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+  // One value for each month, in thousands. The chart and the brush use the same scale, so the bars keep their size.
+  const values = [120, 140, 95, 160, 180, 150, 210, 190, 230, 205, 260, 240, 280, 310, 290];
+  const top_value = 320;
+  const range_name = (a, b) => {
+    const start = a === 11 ? '17 Aug' : `1 ${month_names[a].replace(' 2026', '')}`;
+    const end = b === 15 ? 'today' : `end of ${month_names[b - 1].replace(' 2026', '')}`;
+    return `${start} – ${end}`;
+  };
+
+  function fill(section) {
+    const id = section.dataset.state, ds = section.dataset;
+    section.innerHTML = document.getElementById('page').innerHTML;
+    const st = {a: Number(ds.a || 11), b: Number(ds.b || 15)};
+    const bar = section.querySelector('[data-bar]');
+
+    const chart = section.querySelector('[data-chart]');
+    function draw_chart() {
+      const months = month_names.slice(st.a, st.b);
+      chart.style.setProperty('--n', months.length);
+      chart.toggleAttribute('data-many', months.length > 6);
+      chart.setAttribute('aria-label', `Money in by month, ${range_name(st.a, st.b)}`);
+      chart.innerHTML = months.map((m, i) => `<div><i style="--v:${Math.round(values[st.a + i] / top_value * 100)}" title="${m}: €${values[st.a + i]}k"></i><span>${m}</span></div>`).join('');
+    }
+
+    function draw() {
+      const name = range_name(st.a, st.b);
+      section.querySelector('[data-name]').textContent = name;
+      draw_chart();
+      bar.innerHTML = month_names.map(m => `<span>${m}</span>`).join('') +
+        `<div class="rb_mini" aria-hidden="true">${values.map(v => `<i style="--v:${Math.round(v / top_value * 100)}"></i>`).join('')}</div>` +
+        `<div class="rb_window${st.a + st.b > 20 && st.b - st.a < 5 ? ' rb_right' : ''}" style="--a:${st.a};--b:${st.b}"><b>${name}</b>
+          <button class="rb_handle" type="button" role="slider" aria-label="Start of the range" aria-valuemin="0" aria-valuemax="14" aria-valuenow="${st.a}" aria-valuetext="${month_names[st.a]}" data-end="a"></button>
+          <button class="rb_handle" type="button" role="slider" aria-label="End of the range" aria-valuemin="1" aria-valuemax="15" aria-valuenow="${st.b}" aria-valuetext="${month_names[st.b - 1]}" data-end="b"></button></div>`;
+      const win = bar.querySelector('.rb_window'), label = win.querySelector('b');
+      const commit = (a, b, focus) => {
+        const changed = a !== st.a || b !== st.b;
+        st.a = a; st.b = b;
+        draw();
+        if (focus) bar.querySelector(`[data-end="${focus}"]`).focus();
+        if (changed) sketchToast(`Range: ${range_name(a, b)} (sample)`);
+      };
+      // A drag moves the frame with the pointer, then snaps it to whole months on release.
+      const drag = (target, end) => target.addEventListener('pointerdown', e => {
+        if (end === 'window' && e.target !== win && e.target !== label) return;
+        e.preventDefault();
+        target.setPointerCapture(e.pointerId);
+        win.classList.add('rb_drag');
+        const month = bar.getBoundingClientRect().width / 15, x0 = e.clientX;
+        let a = st.a, b = st.b;
+        const on_move = ev => {
+          const dx = (ev.clientX - x0) / month;
+          if (end === 'a') a = Math.max(0, Math.min(st.b - 1, st.a + dx));
+          else if (end === 'b') b = Math.max(st.a + 1, Math.min(15, st.b + dx));
+          else { const shift = Math.max(-st.a, Math.min(15 - st.b, dx)); a = st.a + shift; b = st.b + shift; }
+          win.style.setProperty('--a', a); win.style.setProperty('--b', b);
+          label.textContent = range_name(Math.round(a), Math.round(b));
+        };
+        const on_up = () => {
+          target.removeEventListener('pointermove', on_move);
+          target.removeEventListener('pointerup', on_up);
+          target.removeEventListener('pointercancel', on_up);
+          commit(Math.round(a), Math.round(b), end === 'window' ? null : end);
+        };
+        target.addEventListener('pointermove', on_move);
+        target.addEventListener('pointerup', on_up);
+        target.addEventListener('pointercancel', on_up);
+      });
+      bar.querySelectorAll('.rb_handle').forEach(h => {
+        drag(h, h.dataset.end);
+        h.addEventListener('keydown', e => {
+          const step = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0;
+          if (!step) return;
+          e.preventDefault();
+          if (h.dataset.end === 'a') commit(Math.max(0, Math.min(st.b - 1, st.a + step)), st.b, 'a');
+          else commit(st.a, Math.max(st.a + 1, Math.min(15, st.b + step)), 'b');
+        });
+      });
+      drag(win, 'window');
+    }
+
+    draw();
+    if (ds.focus) bar.querySelector(`[data-end="${ds.focus}"]`).classList.add('rb_focus');
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>
