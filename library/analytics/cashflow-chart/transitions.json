@@ -81,5 +81,23 @@
     "delay": 0,
     "easing": "ease",
     "measurement": "measured"
+  },
+  {
+    "label": "quarter",
+    "element": "chart",
+    "animation": "cc_fade",
+    "duration": 300,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
+  },
+  {
+    "label": "quarter",
+    "element": "point of the net line, one entry for the first point; each next point waits about 153 ms more",
+    "animation": "cc_grow",
+    "duration": 160,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "estimated"
   }
 ]

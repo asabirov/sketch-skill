@@ -270,7 +270,9 @@
         const place = (ev) => {
           card.style.transform = 'none';
           const now = card.getBoundingClientRect();
-          card.style.transform = `translate(${ev.clientX - x0 + home.left - now.left}px, ${ev.clientY - y0 + home.top - now.top}px)`;
+          // The card stays inside the window across, so the page does not scroll sideways.
+          const left = Math.min(Math.max(home.left + ev.clientX - x0, 0), Math.max(0, document.documentElement.clientWidth - home.width));
+          card.style.transform = `translate(${left - now.left}px, ${ev.clientY - y0 + home.top - now.top}px)`;
         };
         // Near the top or the bottom edge, the page scrolls, so a card can reach a place that is off screen.
         let last_ev = e, edge_frame = 0;

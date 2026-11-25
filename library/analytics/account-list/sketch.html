@@ -78,6 +78,12 @@
         <div class="al_tip" role="tooltip" id="tip_${i}"><dl><dt>On the way in</dt><dd>${way_in}</dd><dt>On the way out</dt><dd>${way_out}</dd><dt>Free to use</dt><dd>${free}</dd></dl></div></li>`).join('')}</ul>`;
   }
 
+  // A button that shows another state moves the focus to the first control of that state, so the focus does not go to the page.
+  function go(state) {
+    addEventListener('hashchange', () => document.querySelector(`[data-state="${state}"]`)?.querySelector('a[href], button:not(:disabled), input:not(:disabled), [tabindex="0"]')?.focus(), {once: true});
+    location.hash = state;
+  }
+
   function fill(section) {
     const id = section.dataset.state;
     section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
@@ -89,7 +95,7 @@
     }
     if (ds.error !== undefined) {
       body.innerHTML = '<div class="sketch-stack"><p>The accounts did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
-      body.querySelector('[data-retry]').addEventListener('click', () => { location.hash = 'list'; });
+      body.querySelector('[data-retry]').addEventListener('click', () => go('list'));
       return;
     }
     if (ds.one !== undefined) {

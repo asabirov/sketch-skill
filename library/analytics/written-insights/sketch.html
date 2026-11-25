@@ -62,7 +62,8 @@
       body.innerHTML = '<div class="sketch-stack"><p>The insights did not load. The chart still shows the numbers.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
       body.querySelector('[data-retry]').addEventListener('click', () => {
         body.innerHTML = '<div aria-busy="true" role="status" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>';
-        setTimeout(() => { delete ds.error; fill(section); }, 1200);
+        // Try again is gone after the load, so the focus goes to the first control of the insights.
+        setTimeout(() => { delete ds.error; fill(section); section.querySelector('[data-body] :is(a[href], button)')?.focus(); }, 1200);
       });
       return;
     }

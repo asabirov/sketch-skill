@@ -104,6 +104,8 @@
       if (st.first === null) { st.first = i; st.a = st.b = i; }
       else { st.a = Math.min(st.first, i); st.b = Math.max(st.first, i); st.first = null; }
       draw();
+      // The month buttons are drawn again, so the focus returns to the same month.
+      $(`[data-months] [data-month="${i}"]`).focus();
     });
     $('[data-preset]').addEventListener('change', e => {
       st.preset = e.target.value; st.first = null;

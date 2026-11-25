@@ -68,6 +68,9 @@
       <div class="sc_foot"><span><small>New</small>4 bills · €6,300</span><a href="#counts" data-sketch-toast="All bills (sample)">View<i data-icon="chevron-right"></i></a></div>
     </div>`;
 
+  // The pressed button is drawn again or removed, so the focus goes to the first control of the card body, or else of the card.
+  const focus_first = section => (section.querySelector('[data-body] :is(a[href], button:not(:disabled))') || section.querySelector('a[href], button:not(:disabled)'))?.focus();
+
   function fill(section) {
     const id = section.dataset.state, ds = section.dataset;
     section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
@@ -80,7 +83,7 @@
     if (ds.loading !== undefined) { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; return; }
     if (ds.error !== undefined) {
       body.innerHTML = '<div class="sketch-stack"><p>The card did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
-      body.querySelector('[data-retry]').addEventListener('click', () => { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; setTimeout(() => { delete ds.error; fill(section); if (window.initSketch) initSketch(); }, 1200); });
+      body.querySelector('[data-retry]').addEventListener('click', () => { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; setTimeout(() => { delete ds.error; fill(section); if (window.initSketch) initSketch(); focus_first(section); }, 1200); });
       return;
     }
     if (ds.empty !== undefined) { body.innerHTML = '<div class="sketch-stack"><p>No card yet.</p><button class="sketch-button secondary" type="button" data-sketch-toast="Order a card (sample)">Order a card</button></div>'; return; }
@@ -88,7 +91,7 @@
     const draw = paid => {
       body.innerHTML = ds.near !== undefined ? limit_body('€18,900.00', 95, '€1,100.00', paid) : limit_body('€8,240.10', 41, '€11,759.90', paid);
       const pay = body.querySelector('[data-pay]');
-      if (pay) pay.addEventListener('click', () => { draw(true); sketchToast('Paid (sample)'); });
+      if (pay) pay.addEventListener('click', () => { draw(true); sketchToast('Paid (sample)'); focus_first(section); });
     };
     draw(ds.paid !== undefined);
     if (ds.openMenu !== undefined) section.querySelector(`#more_${id}`).setAttribute('data-open', '');
