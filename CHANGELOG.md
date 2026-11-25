@@ -4,6 +4,7 @@
 
 ### Added
 
+- The pattern `analytics/dashboard-grid`: Dashboard grid. A dashboard home where each person chooses which cards to see, their order and their size, and the same layout must hold from a phone to a wide screen.
 - The pattern `analytics/breakdown-table`: Breakdown table with shares. A report that splits the money in and the money out of a range into their largest parts, with each part's share of the total.
 - The pattern `analytics/written-insights`: Written insights. Any page with data where a program writes its few most useful facts in plain sentences, next to a chart, a table or a list, for a reader who does not read the data.
 - The pattern `analytics/flow-chart`: Flow chart. A report that shows where the money of a period came from and where it went, in one picture.
