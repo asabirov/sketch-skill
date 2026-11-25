@@ -40,6 +40,7 @@ Related: `analytics/filter-bar` sets the range and the direction. `analytics/flo
 - Negative net: the net line goes below the zero line, and the total has a minus sign.
 - One period far larger than the others: the value axis keeps 3 grid lines, with the zero line in the middle, so the small periods stay flat. The tooltip gives their values.
 - Many periods: a long range by month gives many thin bars. Offer Quarter for a range of more than 12 months.
+- Group by quarter: the quarters hold the same money of the range as the months, so the totals do not change. A quarter that the range cuts names its part, such as "Q3 from 17 Aug". The scale grows to the largest quarter.
 - Narrow screen: at 390 px the totals wrap, the group button and the switch stand on 2 lines, and the chart takes the full width.
 - Touch screen: a tap on a period shows its tooltip. The bars and the points are not the targets. The whole period is.
 - Colour: the source marks the series by colour. The sketch uses a filled bar and a lighter bar, a solid line and a dashed line, and round and square points, and names each in the key.

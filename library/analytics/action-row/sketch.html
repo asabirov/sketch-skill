@@ -16,6 +16,7 @@
 <style>
   [data-sketch] .qa_page { max-width: 1040px; }
   [data-sketch] .qa_page :is(h1, p) { margin: 0; }
+  [data-sketch] .qa_items { display: contents; }
   [data-sketch] .qa_row { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; min-width: 0; }
   [data-sketch] .qa_row > [data-action][hidden], [data-sketch] .qa_more[hidden] { display: none; }
   [data-sketch] .qa_more, [data-sketch] .qa_end { position: relative; flex: none; }
@@ -45,7 +46,7 @@
         <button class="sketch-button secondary" type="button" data-action="Upload bill"><i data-icon="upload"></i>Upload bill</button>
         <span class="qa_more">
           <button class="sketch-button secondary" type="button" data-sketch-popover="more___s__">More<i data-icon="chevron-down"></i></button>
-          <span class="sketch-menu" id="more___s__" role="menu" aria-label="More actions"></span>
+          <span class="sketch-menu" id="more___s__" role="menu" aria-label="More actions"><span class="qa_items" data-items></span></span>
         </span>
         <span class="qa_end"><button class="sketch-icon-button" type="button" aria-label="Customize the page" data-sketch-toast="Customize (sample)"><i data-icon="sliders"></i></button></span>
       </div>
@@ -69,6 +70,8 @@
     actions.forEach(a => a.addEventListener('click', () => start(a.dataset.action)));
 
     // Show every action, then move the last ones into More until the row fits.
+    // The items sit in a child of the menu, so the outline that the kit drew stays. They change only when the moved set changes.
+    let last = null;
     function fit() {
       actions.forEach(a => { a.hidden = false; });
       more.hidden = true;
@@ -77,8 +80,10 @@
         more.hidden = false;
         for (let i = actions.length - 1; i >= 0 && !fits(); i--) actions[i].hidden = true;
       }
-      const moved = actions.filter(a => a.hidden);
-      menu.innerHTML = moved.map(a => `<button class="sketch-menu-item" type="button" role="menuitem" data-moved="${a.dataset.action}"><i data-icon="${icons[a.dataset.action]}"></i>${a.dataset.action}</button>`).join('');
+      const moved = actions.filter(a => a.hidden), key = moved.map(a => a.dataset.action).join('|');
+      if (key === last) return;
+      last = key;
+      menu.querySelector('[data-items]').innerHTML = moved.map(a => `<button class="sketch-menu-item" type="button" role="menuitem" data-moved="${a.dataset.action}"><i data-icon="${icons[a.dataset.action]}"></i>${a.dataset.action}</button>`).join('');
       if (window.initSketch) initSketch();
     }
     menu.addEventListener('click', e => { const item = e.target.closest('[data-moved]'); if (item) start(item.dataset.moved); });

@@ -40,6 +40,9 @@
   [data-sketch] .cc_svg .series.dashed { stroke-width: 1.5; stroke-dasharray: 5 4; }
   [data-sketch] .cc_svg .dot { fill: var(--sketch-page); stroke: var(--sketch-ink); stroke-width: 2; paint-order: stroke; filter: drop-shadow(0 0 1.5px var(--sketch-page)); transform-box: fill-box; transform-origin: center; animation: cc_grow 160ms ease-out backwards; }
   [data-sketch] .cc_svg .dot.square { fill: var(--sketch-ink); }
+  /* A key mark draws its series as the chart does: a solid line with a round point, or a dashed line with a square point. */
+  [data-sketch] .cc_mark { display: inline-block; overflow: visible; vertical-align: middle; margin-right: 6px; }
+  [data-sketch] .cc_mark .dot { animation: none; filter: none; }
   @keyframes cc_grow { from { transform: scale(0); } }
   [data-sketch] .cc_svg .col_hit { fill: transparent; }
   [data-sketch] .cc_svg .col_hit.on { fill: var(--sketch-wash); }
@@ -100,10 +103,10 @@
 
 <script>
   const data = {
-    month: {labels: ['Aug', 'Sep', 'Oct', 'Nov'], in: [82, 120, 160, 640], out: [95, 88, 270, 310]},
-    quarter: {labels: ['Q1', 'Q2', 'Q3', 'Q4 to date'], in: [310, 280, 290, 800], out: [340, 300, 290, 580]}
+    // A quarter holds the same money of the range as its months, so the totals do not change. top is the top of the scale.
+    month: {labels: ['Aug', 'Sep', 'Oct', 'Nov'], in: [82, 120, 160, 640], out: [95, 88, 270, 310], payroll: [52, 50, 160, 168], top: 700, cat_top: 350},
+    quarter: {labels: ['Q3 from 17 Aug', 'Q4 to date'], in: [202, 800], out: [183, 580], payroll: [102, 328], top: 900, cat_top: 600}
   };
-  const payroll = [52, 50, 160, 168];
   const k = v => `€${Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'M' : v + 'k'}`;
   const signed = v => (v < 0 ? '−' : '+') + k(Math.abs(v));
 
@@ -115,7 +118,7 @@
     : `<circle class="dot" cx="${x}" cy="${y}" r="4.5" style="animation-delay:${Math.round(i * 153.33)}ms"/>`).join('');
 
   function overview_svg(d, direction, w) {
-    const mid = (top_y + base_y - 20) / 2, half = mid - top_y, scale = half / 700;
+    const mid = (top_y + base_y - 20) / 2, half = mid - top_y, scale = half / d.top;
     const n = d.labels.length, step = (w - gutter) / n, bar_w = Math.min(48, step * .5);
     let bars = '', hits = '', labels = '', points = [];
     d.labels.forEach((label, i) => {
@@ -130,34 +133,34 @@
     const line = points.map(p => p.join(',')).join(' ');
     const net = direction === 'all' ? `<polyline class="casing" points="${line}"/><polyline class="net" points="${line}"/>${dots(points)}` : '';
     return `<svg class="cc_svg cc_fade" width="${w}" height="${chart_h}" role="img" aria-label="Money in and money out: ${d.labels.map((l, i) => `${l}, in ${k(d.in[i])}, out ${k(d.out[i])}`).join('; ')}.">
-        ${hits}${axis([[top_y, '+€700k'], [mid, '0', true], [mid + half, '−€700k']])}${bars}${net}${labels}
+        ${hits}${axis([[top_y, `+€${d.top}k`], [mid, '0', true], [mid + half, `−€${d.top}k`]])}${bars}${net}${labels}
       </svg>
       <ul class="sketch-key" aria-hidden="true">${direction !== 'out' ? '<li><i></i>Money in, up</li>' : ''}${direction !== 'in' ? '<li><i class="second"></i>Money out, down</li>' : ''}${direction === 'all' ? '<li><i class="line"></i>Net cash flow</li>' : ''}</ul>`;
   }
 
   function line_svg(d, w) {
-    const low = base_y - 8, scale = (low - top_y) / 700, n = d.labels.length, step = (w - gutter) / n;
+    const low = base_y - 8, scale = (low - top_y) / d.top, n = d.labels.length, step = (w - gutter) / n;
     const pts = series => series.map((v, i) => [gutter + step * i + step / 2, low - v * scale]);
     const a = pts(d.in), b = pts(d.out), poly = p => p.map(q => q.join(',')).join(' ');
     let hits = '';
     d.labels.forEach((l, i) => { hits += `<rect class="col_hit" data-col="${i}" x="${gutter + step * i}" y="0" width="${step}" height="${low}"/>`; });
     return `<svg class="cc_svg cc_fade" width="${w}" height="${chart_h}" role="img" aria-label="Money in and money out as lines: ${d.labels.map((l, i) => `${l}, in ${k(d.in[i])}, out ${k(d.out[i])}`).join('; ')}.">
-        ${hits}${axis([[top_y, '€700k'], [(top_y + low) / 2, '€350k'], [low, '0', true]])}
+        ${hits}${axis([[top_y, `€${d.top}k`], [(top_y + low) / 2, `€${d.top / 2}k`], [low, '0', true]])}
         <polyline class="series" points="${poly(a)}"/><polyline class="series dashed" points="${poly(b)}"/>
         ${dots(a)}${dots(b, true)}
         ${d.labels.map((l, i) => `<text x="${gutter + step * i + step / 2}" y="${base_y + 14}" text-anchor="middle">${l}</text>`).join('')}
       </svg>
-      <ul class="sketch-key" aria-hidden="true"><li><i class="line"></i>Money in</li><li><i class="line compare"></i>Money out</li></ul>`;
+      <ul class="sketch-key" aria-hidden="true"><li><svg class="cc_svg cc_mark" width="28" height="12"><line class="series" x1="1" x2="27" y1="6" y2="6"/><circle class="dot" cx="14" cy="6" r="3.5"/></svg>Money in</li><li><svg class="cc_svg cc_mark" width="28" height="12"><line class="series dashed" x1="1" x2="27" y1="6" y2="6"/><rect class="dot square" x="11" y="3" width="6" height="6"/></svg>Money out</li></ul>`;
   }
 
   function category_html(d) {
-    const top = 350;
+    const top = d.cat_top;
     const cols = d.labels.map((l, i) => {
-      const all = d.out[i], pay = Math.min(payroll[i], all);
+      const all = d.out[i], pay = Math.min(d.payroll[i], all);
       return `<div style="--v:${(all / top * 100).toFixed(1)}%"><b>${k(all)}</b><i class="second" style="--v:${((all - pay) / top * 100).toFixed(1)}%"></i><i style="--v:${(pay / top * 100).toFixed(1)}%"></i></div>`;
     }).join('');
-    return `<div class="cc_fade sketch-stack"><div class="sketch-chart" style="--n:${d.labels.length}" role="img" aria-label="Money out by category: ${d.labels.map((l, i) => `${l}, payroll ${k(payroll[i])}, everything else ${k(d.out[i] - payroll[i])}`).join('; ')}.">
-        <div class="sketch-plot" style="--h:164px"><span class="sketch-tick" style="--v:0%"><span>0</span></span><span class="sketch-tick" style="--v:100%"><span>€350k</span></span>${cols}</div>
+    return `<div class="cc_fade sketch-stack"><div class="sketch-chart" style="--n:${d.labels.length}" role="img" aria-label="Money out by category: ${d.labels.map((l, i) => `${l}, payroll ${k(d.payroll[i])}, everything else ${k(d.out[i] - d.payroll[i])}`).join('; ')}.">
+        <div class="sketch-plot" style="--h:164px"><span class="sketch-tick" style="--v:0%"><span>0</span></span><span class="sketch-tick" style="--v:100%"><span>€${top}k</span></span>${cols}</div>
         <ol class="sketch-periods" aria-hidden="true">${d.labels.map(l => `<li>${l}</li>`).join('')}</ol>
       </div>
       <ul class="sketch-key" aria-hidden="true"><li><i></i>Payroll</li><li><i class="second"></i>Everything else</li></ul></div>`;

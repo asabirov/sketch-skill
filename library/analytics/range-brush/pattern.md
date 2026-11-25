@@ -33,7 +33,7 @@ Related: `analytics/filter-bar` holds the range button that names the same range
 - One month: a handle cannot pass the other handle, so the range is at least one month.
 - The ends of the time: the frame stops at the first and the last month.
 - Today in the last month: the label says "today" in place of the last date.
-- Narrow screen: at 390 px the source hides the bar and keeps only the range button. The sketch keeps the brush and shows every third month name. With more than 6 months, the detail chart names every second month.
+- Narrow screen: at 390 px the source hides the bar and keeps only the range button. The sketch keeps the brush and shows every third month name. It hides the names beside each edge of the frame, so a handle never crosses a name, and the frame label names the range. With more than 6 months, the detail chart names every second month.
 - Same scale: the detail chart and the brush use one scale, so a bar keeps its size when the range moves.
 - Touch screen: each handle has a target of 44 px. The page does not scroll sideways during a drag.
 - Keyboard: each handle is a slider with its value in words.
