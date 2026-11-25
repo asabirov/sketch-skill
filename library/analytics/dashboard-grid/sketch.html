@@ -164,10 +164,12 @@
         <button class="sketch-button secondary" type="button" data-cancel>Cancel</button>
         <button class="sketch-button" type="button" data-done>Done</button>`
         : '<button class="sketch-button secondary" type="button" data-customize><i data-icon="edit"></i>Customize</button>';
-      bar.querySelector('[data-customize]')?.addEventListener('click', () => { st.edit = true; st.saved = st.cards.map(c => [...c]); draw(); say('Drag a card by its handle, or use the arrows or the card menu. One layout serves every width.'); });
-      bar.querySelector('[data-done]')?.addEventListener('click', () => { st.edit = false; draw(); say('Home is saved.'); });
-      bar.querySelector('[data-cancel]')?.addEventListener('click', () => { st.edit = false; flip(() => { st.cards = st.saved; draw(); }); say('No change was saved.'); });
-      bar.querySelector('[data-reset]')?.addEventListener('click', () => { const undo = st.cards.map(c => [...c]); flip(() => { st.cards = start.map(c => [...c]); draw(); }); say('Home has the first layout again.', undo); });
+      // The bar is written again, so each bar button gives the focus to the same button, or else to the first button of the new bar.
+      const focus_bar = sel => ($(`[data-bar] ${sel}`) || $('[data-bar] button'))?.focus();
+      bar.querySelector('[data-customize]')?.addEventListener('click', () => { st.edit = true; st.saved = st.cards.map(c => [...c]); draw(); say('Drag a card by its handle, or use the arrows or the card menu. One layout serves every width.'); focus_bar('[data-customize]'); });
+      bar.querySelector('[data-done]')?.addEventListener('click', () => { st.edit = false; draw(); say('Home is saved.'); focus_bar('[data-done]'); });
+      bar.querySelector('[data-cancel]')?.addEventListener('click', () => { st.edit = false; flip(() => { st.cards = st.saved; draw(); }); say('No change was saved.'); focus_bar('[data-cancel]'); });
+      bar.querySelector('[data-reset]')?.addEventListener('click', () => { const undo = st.cards.map(c => [...c]); flip(() => { st.cards = start.map(c => [...c]); draw(); }); say('Home has the first layout again.', undo); focus_bar('[data-reset]'); });
       bar.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
         const undo = st.cards.map(c => [...c]);
         flip(() => { st.cards.push([b.dataset.add, 1]); draw(); });
@@ -243,6 +245,9 @@
         const undo = st.cards.map(c => [...c]);
         flip(() => { st.cards[i][1] = Number(b.dataset.size); draw_cards(); });
         say(`${title} is now ${size_name[b.dataset.size]}.`, undo);
+        // The focus returns to the button that opened the size choice: the size button, or the card menu button in a narrow card.
+        const size_button = grid.querySelector(`[data-key="${key}"] .cg_wide [data-sketch-popover^="size_"]`);
+        if (size_button && size_button.offsetParent) size_button.focus(); else grid.querySelector(`[data-key="${key}"] .cg_narrow [data-sketch-popover]`)?.focus();
       }));
       el.querySelectorAll('[data-hide]').forEach(b => b.addEventListener('click', () => {
         const undo = st.cards.map(c => [...c]);
