@@ -1,0 +1,3 @@
+[
+  {"label": "loading", "element": "pulsing block of each row", "animation": "al_pulse", "duration": 1000, "delay": 0, "easing": "ease", "measurement": "estimated"}
+]

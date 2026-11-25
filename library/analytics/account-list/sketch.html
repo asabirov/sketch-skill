@@ -1,0 +1,106 @@
+<!doctype html>
+<!--
+  Best for: a card on an overview page that compares the money in a few accounts, pots or wallets, and opens one of them.
+  Row opens: on the record's own page. A row opens the page of that account.
+  Related: analytics/summary-card shows one key number of one part of the product. analytics/balance-card shows the total of all accounts and how it moved.
+  The card has a name, an add action and a more menu. Each row has an initial, the name of the account and its amount at the right. The card shows at most 4 rows, then a link to all accounts with their count.
+  A pointer or the keyboard focus on a row shows a tooltip with the money on the way in, the money on the way out and the money that is free.
+  Transition values, from transitions.json: the tooltip and the menu show at once. The loading pulse takes 1000 ms, ease.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account list card</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .al_page { max-width: 560px; }
+  [data-sketch] .al_page :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .al_card { display: grid; gap: 12px; align-content: start; }
+  [data-sketch] .al_card > header { display: flex; align-items: center; gap: 4px; min-height: 44px; }
+  [data-sketch] .al_card > header h2 { flex: 1; font-size: 15px; font-weight: 500; }
+  [data-sketch] .al_card > header > div { position: relative; }
+  [data-sketch] .al_rows { margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .al_rows li { position: relative; }
+  [data-sketch] .sketch-main .al_rows a { display: flex; justify-content: flex-start; align-items: center; gap: 12px; min-height: 44px; padding: 0 8px; margin: 0 -8px; border-radius: var(--sketch-wobble); color: inherit; text-decoration: none; }
+  [data-sketch] .sketch-main .al_rows a:is(:hover, .al_hover) { background: var(--sketch-wash); }
+  [data-sketch] .sketch-main .al_rows a > span:nth-child(2) { min-width: 0; overflow-wrap: anywhere; }
+  [data-sketch] .sketch-main .al_rows a > b { margin-left: auto; padding-left: 12px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  /* The tooltip of a row: the money on the way, and what is free. */
+  [data-sketch] .al_tip { position: absolute; z-index: 4; right: 0; bottom: calc(100% + 4px); display: none; grid-template-columns: auto auto; gap: 2px 24px; margin: 0; padding: 8px 12px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; pointer-events: none; }
+  [data-sketch] .al_tip dd { margin: 0; text-align: right; }
+  [data-sketch] .al_rows a:is(:hover, :focus-visible, .al_hover) + .al_tip { display: grid; }
+  [data-sketch] .al_pulse { height: 44px; margin: 4px 0; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: al_pulse 1000ms ease infinite alternate; }
+  @keyframes al_pulse { to { opacity: .4; } }
+  [data-sketch] .al_card .sketch-stack > .sketch-button { justify-self: start; }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] .al_pulse { animation: none; } }
+</style>
+<body data-sketch>
+<section data-state="list"></section>
+<section data-state="row-hover" data-hover="1"></section>
+<section data-state="more-menu" data-open-menu></section>
+<section data-state="account-opened" data-opened="Payroll"></section>
+<section data-state="long-name" data-long></section>
+<section data-state="loading" data-loading></section>
+<section data-state="one-account" data-one></section>
+<section data-state="error" data-error></section>
+
+<template id="page">
+  <main class="sketch-main al_page">
+    <section class="sketch-panel sketch-frame al_card" aria-labelledby="h___s__">
+      <header><h2 id="h___s__">Accounts</h2>
+        <button class="sketch-icon-button" type="button" aria-label="Add an account" data-sketch-toast="Add an account (sample)"><i data-icon="plus"></i></button>
+        <div><button class="sketch-icon-button" type="button" aria-label="More for Accounts" data-sketch-popover="more___s__"><i data-icon="more"></i></button>
+          <div class="sketch-menu" id="more___s__" role="menu" aria-label="More for Accounts">
+            <button class="sketch-menu-item" type="button" data-sketch-toast="Statements (sample)"><i data-icon="download"></i>Statements</button>
+            <button class="sketch-menu-item" type="button" data-sketch-toast="Transfer rules (sample)"><i data-icon="settings"></i>Transfer rules</button>
+          </div></div>
+      </header>
+      <div data-body></div>
+    </section>
+    <p class="sketch-muted" data-note></p>
+  </main>
+</template>
+
+<script>
+  const accounts = [
+    ['Operations', '€182,410.20', '€4,200.00', '€18,900.00', '€167,710.20'],
+    ['Payroll', '€96,000.00', '€12,000.00', '€0.00', '€84,000.00'],
+    ['Tax reserve', '€64,520.05', '€0.00', '€0.00', '€64,520.05'],
+    ['Savings', '€69,900.00', '€0.00', '€0.00', '€69,900.00']
+  ];
+
+  function rows(list) {
+    return `<ul class="al_rows">${list.map(([name, amount, way_in, way_out, free], i) => `<li>
+        <a href="#account-opened" data-row="${name}" aria-describedby="tip_${i}"><span class="sketch-avatar square" aria-hidden="true">${name[0]}</span><span>${name}</span><b>${amount}</b></a>
+        <dl class="al_tip" role="tooltip" id="tip_${i}"><dt>On the way in</dt><dd>${way_in}</dd><dt>On the way out</dt><dd>${way_out}</dd><dt>Free to use</dt><dd>${free}</dd></dl></li>`).join('')}</ul>`;
+  }
+
+  function fill(section) {
+    const id = section.dataset.state;
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
+    const body = section.querySelector('[data-body]'), note = section.querySelector('[data-note]');
+    const ds = section.dataset;
+    if (ds.loading !== undefined) {
+      body.innerHTML = '<div aria-busy="true" aria-label="Loading">' + '<div class="al_pulse"></div>'.repeat(4) + '</div>';
+      return;
+    }
+    if (ds.error !== undefined) {
+      body.innerHTML = '<div class="sketch-stack"><p>The accounts did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
+      body.querySelector('[data-retry]').addEventListener('click', () => { location.hash = 'list'; });
+      return;
+    }
+    if (ds.one !== undefined) {
+      body.innerHTML = rows([['Operations', '€0.00', '€0.00', '€0.00', '€0.00']]) + '<div class="sketch-stack"><p class="sketch-muted">Add money to start.</p><button class="sketch-button" type="button" data-sketch-toast="Add money (sample)">Add money</button></div>';
+      return;
+    }
+    const list = ds.long !== undefined ? [['Operations and supplier payments in the euro area', '€182,410.20', '€4,200.00', '€18,900.00', '€167,710.20'], ...accounts.slice(1)] : accounts;
+    body.innerHTML = rows(list) + '<a href="#list" data-sketch-toast="All accounts (sample)">All 6 accounts<i data-icon="arrow-right"></i></a>';
+    if (ds.hover) section.querySelectorAll('[data-row]')[Number(ds.hover)].classList.add('al_hover');
+    if (ds.openMenu !== undefined) section.querySelector(`#more_${id}`).setAttribute('data-open', '');
+    if (ds.opened) note.textContent = `The page of ${ds.opened} opens, with its own transactions.`;
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>
