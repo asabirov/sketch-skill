@@ -1,0 +1,179 @@
+<!doctype html>
+<!--
+  Best for: a report that shows where the money of a period came from and where it went, in one picture.
+  Row opens: no rows.
+  Related: analytics/cashflow-chart shows the same money by period. analytics/breakdown-table lists the same sources and uses with their shares.
+  The sources of the money in stand on the left, one bar for all the money in stands at the middle, and the uses stand on the right. A band joins each source and each use to the middle. The width of a band is its amount.
+  The smallest items go into one Other node, so the labels never overlap. The pointer or the keyboard focus on a band or a node shows its amount and its share of the total, and fades the other bands.
+  The chart draws at the real pixel width of the block, and draws again when the width changes.
+  Transition values, from transitions.json: the chart fades in 300 ms, ease-out. The other bands fade in 150 ms, ease-out, when a band is chosen.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow chart</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .fc_page { max-width: 1040px; }
+  [data-sketch] .fc_page :is(h1, p) { margin: 0; }
+  [data-sketch] .fc_box { position: relative; }
+  [data-sketch] .fc_svg { display: block; overflow: visible; animation: fc_fade 300ms ease-out; }
+  @keyframes fc_fade { from { opacity: 0; } }
+  [data-sketch] .fc_svg .band { fill: var(--sketch-wash); stroke: var(--sketch-ink); stroke-width: .75; transition: opacity 150ms ease-out; cursor: pointer; }
+  [data-sketch] .fc_svg .band:focus { outline: none; }
+  [data-sketch] .fc_svg .band:is(.on, :focus-visible) { fill: color-mix(in srgb, var(--sketch-ink) 30%, var(--sketch-page)); }
+  [data-sketch] .fc_svg.picked .band:not(.on) { opacity: .25; }
+  [data-sketch] .fc_svg .node { fill: var(--sketch-ink); }
+  [data-sketch] .fc_svg .hit { fill: transparent; cursor: pointer; }
+  [data-sketch] .fc_svg text { fill: var(--sketch-ink); font-size: 13px; }
+  @media (max-width: 599px) { [data-sketch] .fc_svg text { font-size: 12px; } }
+  [data-sketch] .fc_svg text.muted { fill: var(--sketch-muted); font-size: 12px; }
+  [data-sketch] .fc_tip { position: absolute; z-index: 3; display: grid; grid-template-columns: auto auto; gap: 2px 20px; margin: 0; padding: 8px 12px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; pointer-events: none; }
+  [data-sketch] .fc_tip dd { margin: 0; text-align: right; }
+  [data-sketch] .fc_tip[hidden] { display: none; }
+  [data-sketch] .fc_pulse { height: 280px; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: fc_pulse 1000ms ease infinite alternate; }
+  @keyframes fc_pulse { to { opacity: .4; } }
+  [data-sketch] .fc_empty { display: grid; place-items: center; align-content: center; gap: 8px; height: 280px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] :is(.fc_svg, .fc_pulse) { animation: none; } [data-sketch] .fc_svg .band { transition: none; } }
+</style>
+<body data-sketch>
+<section data-state="flow"></section>
+<section data-state="band-picked" data-pick="out-0"></section>
+<section data-state="node-picked" data-pick="in-1"></section>
+<section data-state="many-items" data-many></section>
+<section data-state="loading" data-loading></section>
+<section data-state="empty" data-empty></section>
+
+<template id="page">
+  <main class="sketch-main fc_page">
+    <h1>Where the money went</h1>
+    <p class="sketch-muted">17 Aug – today. Point at a band or a source to see its share.</p>
+    <div class="fc_box" data-box>
+      <div data-chart></div>
+      <dl class="fc_tip" hidden data-tip></dl>
+    </div>
+  </main>
+</template>
+
+<script>
+  const k = v => `€${v >= 1000 ? (v / 1000).toFixed(1) + 'M' : v + 'k'}`;
+  const base = {
+    in: [['Customer sales', 420], ['Loan', 300], ['Refunds', 160], ['Interest', 122]],
+    out: [['Payroll', 430], ['Suppliers', 260], ['Rent', 140], ['Kept', 172]]
+  };
+  const many = {
+    in: [['Customer sales', 420], ['Loan', 300], ['Refunds', 90], ['Card cash back', 40], ['Interest', 32], ['Grants', 30], ['Other sources', 90]],
+    out: [['Payroll', 430], ['Suppliers', 190], ['Rent', 140], ['Software', 30], ['Travel', 22], ['Other uses', 18], ['Kept', 172]]
+  };
+
+  // Put each item that is too small for its own label into the Other node of its side.
+  function compact(items, total, inner, other, line_px) {
+    const least = total * line_px / inner;
+    const keep = items.filter(([name, v]) => v >= least || name === 'Kept');
+    const rest = items.filter(i => !keep.includes(i));
+    if (rest.length < 2 && !(rest.length === 1 && keep.some(([n]) => n.startsWith('Other')))) return items;
+    const sum = rest.reduce((a, [, v]) => a + v, 0);
+    const kept = keep.filter(([n]) => n === 'Kept'), shown = keep.filter(([n]) => n !== 'Kept' && !n.startsWith('Other'));
+    const old = keep.find(([n]) => n.startsWith('Other'));
+    return [...shown, [other, sum + (old ? old[1] : 0)], ...kept];
+  }
+
+  // Lay out one column: each node gets a height in proportion to its amount, with a gap between nodes.
+  let shown_items = null;
+  function column(items, total, top, height, gap) {
+    const free = height - gap * (items.length - 1);
+    let y = top;
+    return items.map(([name, v]) => { const h = Math.max(2, v / total * free); const node = {name, v, y, h}; y += h + gap; return node; });
+  }
+
+  function draw_svg(d, w) {
+    const total = d.in.reduce((a, [, v]) => a + v, 0), narrow = w < 600, h = narrow ? 340 : 280, top = 8, inner = h - 44;
+    const label_w = narrow ? Math.min(124, w * .34) : Math.min(170, w * .26);
+    const x_in = label_w, x_out = w - label_w, mid = w / 2;
+    const d_in = compact(d.in, total, inner, 'Other sources', narrow ? 30 : 16), d_out = compact(d.out, total, inner, 'Other uses', narrow ? 30 : 16);
+    const left = column(d_in, total, top, inner, 10), right = column(d_out, total, top, inner, 10);
+    const label = (x, y, anchor, name, v) => narrow
+      ? `<text x="${x}" y="${y - 3}" text-anchor="${anchor}">${name}</text><text class="muted" x="${x}" y="${y + 12}" text-anchor="${anchor}">${k(v)}</text>`
+      : `<text x="${x}" y="${y + 4}" text-anchor="${anchor}">${name} <tspan class="muted">${k(v)}</tspan></text>`;
+    const mid_scale = inner / total;
+    let path = '', nodes = '', labels = '', y_mid = top;
+    const band = (x1, y1, x2, y2, hh, key, text) => {
+      const c = (x1 + x2) / 2;
+      return `<path class="band" tabindex="0" data-key="${key}" aria-label="${text}" d="M${x1},${y1} C${c},${y1} ${c},${y2} ${x2},${y2} L${x2},${y2 + hh} C${c},${y2 + hh} ${c},${y1 + hh} ${x1},${y1 + hh} Z"/>`;
+    };
+    left.forEach((n, i) => {
+      const hh = n.v * mid_scale;
+      path += band(x_in + 4, n.y, mid - 5, y_mid, Math.min(hh, n.h), `in-${i}`, `${n.name}, ${k(n.v)}, ${Math.round(n.v / total * 100)}% of the money in`);
+      y_mid += hh;
+      nodes += `<rect class="node" x="${x_in}" y="${n.y}" width="4" height="${n.h}"/><rect class="hit" data-key="in-${i}" x="0" y="${n.y - 2}" width="${x_in + 4}" height="${Math.max(n.h + 4, 20)}"/>`;
+      labels += label(x_in - 8, n.y + n.h / 2, 'end', n.name, n.v);
+    });
+    y_mid = top;
+    right.forEach((n, i) => {
+      const hh = n.v * mid_scale;
+      path += band(mid + 5, y_mid, x_out - 4, n.y, Math.min(hh, n.h), `out-${i}`, `${n.name}, ${k(n.v)}, ${Math.round(n.v / total * 100)}% of the money in`);
+      y_mid += hh;
+      nodes += `<rect class="node" x="${x_out - 4}" y="${n.y}" width="4" height="${n.h}"/><rect class="hit" data-key="out-${i}" x="${x_out - 4}" y="${n.y - 2}" width="${label_w + 4}" height="${Math.max(n.h + 4, 20)}"/>`;
+      labels += label(x_out + 8, n.y + n.h / 2, 'start', n.name, n.v);
+    });
+    nodes += `<rect class="node" x="${mid - 5}" y="${top}" width="10" height="${inner}"/>`;
+    labels += `<text x="${mid}" y="${h - 12}" text-anchor="middle">All money in, ${k(total)}</text>`;
+    shown_items = {in: d_in, out: d_out};
+    return `<svg class="fc_svg" width="${w}" height="${h}" role="group" aria-label="Flow of the money in, ${k(total)} in all">${path}${nodes}${labels}</svg>`;
+  }
+
+  function fill(section) {
+    const ds = section.dataset;
+    section.innerHTML = document.getElementById('page').innerHTML;
+    const chart = section.querySelector('[data-chart]'), tip = section.querySelector('[data-tip]'), box = section.querySelector('[data-box]');
+    if (ds.loading !== undefined) { chart.innerHTML = '<div class="fc_pulse" aria-label="Loading"></div>'; return; }
+    if (ds.empty !== undefined) {
+      chart.innerHTML = '<div class="fc_empty"><p>No money came in or went out in this range.</p><button class="sketch-button secondary" type="button" data-wide>Show the last 12 months</button></div>';
+      chart.querySelector('[data-wide]').addEventListener('click', () => {
+        chart.innerHTML = '<div class="fc_pulse" aria-label="Loading"></div>';
+        setTimeout(() => { delete ds.empty; fill(section); }, 1200);
+      });
+      return;
+    }
+    const d = ds.many !== undefined ? many : base;
+    const total = d.in.reduce((a, [, v]) => a + v, 0);
+    let picked = ds.pick || null;
+
+    function pick(key) {
+      const svg = chart.querySelector('svg');
+      svg.querySelectorAll('.band').forEach(b => b.classList.toggle('on', b.dataset.key === key));
+      svg.classList.toggle('picked', !!key);
+      if (!key) { tip.hidden = true; return; }
+      const [side, i] = key.split('-'), [name, v] = shown_items[side][Number(i)];
+      tip.innerHTML = `<dt>${name}</dt><dd>${k(v)}</dd><dt>Share of the money in</dt><dd>${Math.round(v / total * 100)}%</dd>`;
+      tip.hidden = false;
+      const b = svg.querySelector(`.band[data-key="${key}"]`).getBoundingClientRect(), r = box.getBoundingClientRect();
+      tip.style.left = `${Math.min(r.width - tip.offsetWidth, Math.max(0, b.left - r.left + b.width / 2 - tip.offsetWidth / 2))}px`;
+      // On a phone the labels sit close to the bands, so the tip goes below the chart and covers no label.
+      tip.style.top = r.width < 600 ? `${r.height + 8}px` : `${Math.max(0, b.top - r.top - tip.offsetHeight - 8)}px`;
+    }
+
+    function draw() {
+      const w = Math.max(320, chart.clientWidth || 320);
+      chart.innerHTML = draw_svg(d, w);
+      chart.dataset.width = w;
+      chart.querySelectorAll('[data-key]').forEach(el => {
+        el.addEventListener('pointerenter', () => pick(el.dataset.key));
+        el.addEventListener('focus', () => pick(el.dataset.key));
+        el.addEventListener('blur', () => pick(null));
+      });
+      chart.querySelector('svg').addEventListener('pointerleave', () => pick(null));
+      if (picked) requestAnimationFrame(() => pick(picked));
+    }
+    draw();
+    let frame = 0;
+    new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => { if (chart.clientWidth && Number(chart.dataset.width) !== chart.clientWidth) draw(); });
+    }).observe(chart);
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>

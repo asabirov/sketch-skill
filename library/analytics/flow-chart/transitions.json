@@ -1,0 +1,5 @@
+[
+  {"label": "flow", "element": "chart", "animation": "fc_fade", "duration": 300, "delay": 0, "easing": "ease-out", "measurement": "measured"},
+  {"label": "band-picked", "element": "the other bands", "property": "opacity", "duration": 150, "delay": 0, "easing": "ease-out", "measurement": "estimated"},
+  {"label": "loading", "element": "pulsing block", "animation": "fc_pulse", "duration": 1000, "delay": 0, "easing": "ease", "measurement": "measured"}
+]
