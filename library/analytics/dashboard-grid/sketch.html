@@ -49,6 +49,9 @@
   [data-sketch] .cg_handle { cursor: grab; touch-action: none; }
   [data-sketch] .cg_card.cg_drag { z-index: 5; cursor: grabbing; box-shadow: 0 12px 28px color-mix(in srgb, var(--sketch-ink) 22%, transparent); background: var(--sketch-page); }
   [data-sketch] .cg_card.cg_drag .cg_handle { cursor: grabbing; }
+  /* The dragging state shows a card lifted up and to the left. Below 1000 px a card fills the row, so it lifts only up and stays in the window. */
+  [data-sketch] .cg_card.cg_lifted { transform: translate(-40px, -96px); }
+  @media (max-width: 999px) { [data-sketch] .cg_card.cg_lifted { transform: translate(0, -48px); } }
   [data-sketch] .cg_big { font-size: 26px; font-weight: 600; }
   [data-sketch] .cg_lines { display: grid; gap: 6px; }
   [data-sketch] .cg_lines span { display: block; height: 10px; border-radius: 4px; background: var(--sketch-wash); }
@@ -137,7 +140,7 @@
       note.innerHTML = text ? `<span>${text}</span>` : '';
       if (undo) {
         note.insertAdjacentHTML('beforeend', '<button class="sketch-button secondary" type="button" data-undo>Undo</button>');
-        note.querySelector('[data-undo]').addEventListener('click', () => { flip(() => { st.cards = undo; draw_cards(); }); say('The change is undone.'); });
+        note.querySelector('[data-undo]').addEventListener('click', () => { flip(() => { st.cards = undo; draw(); }); say('The change is undone.'); });
       }
     }
 
@@ -225,11 +228,13 @@
         flip(() => { st.cards[i][1] = Number(b.dataset.size); draw_cards(); });
         say(`${title} is now ${size_name[b.dataset.size]}.`, undo);
       }));
-      el.querySelector('[data-hide]').addEventListener('click', () => {
+      el.querySelectorAll('[data-hide]').forEach(b => b.addEventListener('click', () => {
         const undo = st.cards.map(c => [...c]);
         flip(() => { st.cards.splice(i, 1); draw(); });
         say(`${title} is hidden. Add it again from Add a card.`, undo);
-      });
+        // The card is gone, so the focus goes to Undo.
+        note.querySelector('[data-undo]').focus();
+      }));
       // A drag lifts the card under the pointer. The other cards slide out of its way. On release it slides into its new place.
       el.querySelector('[data-handle]').addEventListener('pointerdown', e => {
         e.preventDefault();
@@ -319,8 +324,7 @@
     if (ds.openCatalog !== undefined) $(`#catalog_${id}`).setAttribute('data-open', '');
     if (ds.drag) {
       const card = grid.querySelector(`[data-key="${ds.drag}"]`);
-      card.classList.add('cg_drag');
-      card.style.transform = 'translate(-40px, -96px)';
+      card.classList.add('cg_drag', 'cg_lifted');
     }
   }
 

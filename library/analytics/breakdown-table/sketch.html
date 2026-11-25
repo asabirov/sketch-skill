@@ -26,6 +26,8 @@
   [data-sketch] .bt_split .sketch-meter { width: 100%; min-width: 60px; height: 8px; }
   [data-sketch] .bt_split :is(td, th):last-child { text-align: right; white-space: nowrap; }
   [data-sketch] .bt_share { display: grid; grid-template-columns: 40px minmax(60px, 1fr); align-items: center; gap: 8px; }
+  /* A long name wraps, and the share and the amount stay on its first line. */
+  [data-sketch] .bt_split tbody td { vertical-align: top; }
   [data-sketch] .bt_split tbody tr { cursor: pointer; }
   [data-sketch] .bt_split tbody tr:hover { background: var(--sketch-wash); }
   [data-sketch] .bt_split td:first-child button { all: unset; cursor: pointer; }
@@ -35,7 +37,7 @@
   @keyframes bt_pulse { to { opacity: .4; } }
   [data-sketch] .bt_empty { padding: 24px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); color: var(--sketch-muted); text-align: center; }
   @media (max-width: 599px) {
-    [data-sketch] .bt_split tbody tr:not([data-less]) { display: grid; grid-template-columns: minmax(0, 1fr) 110px 64px; align-items: center; gap: 8px; }
+    [data-sketch] .bt_split tbody tr:not([data-less]) { display: grid; grid-template-columns: minmax(0, 1fr) 110px 64px; align-items: start; gap: 8px; }
     [data-sketch] .bt_split tbody td:last-child { text-align: right; }
   }
   @media (prefers-reduced-motion: reduce) { [data-sketch] :is(.bt_split tbody, .bt_pulse) { animation: none; } }

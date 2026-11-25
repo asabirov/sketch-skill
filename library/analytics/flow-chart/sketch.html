@@ -100,7 +100,7 @@
     let path = '', nodes = '', labels = '', y_mid = top;
     const band = (x1, y1, x2, y2, hh, key, text) => {
       const c = (x1 + x2) / 2;
-      return `<path class="band" tabindex="0" data-key="${key}" aria-label="${text}" d="M${x1},${y1} C${c},${y1} ${c},${y2} ${x2},${y2} L${x2},${y2 + hh} C${c},${y2 + hh} ${c},${y1 + hh} ${x1},${y1 + hh} Z"/>`;
+      return `<path class="band" role="img" tabindex="0" data-key="${key}" aria-label="${text}" d="M${x1},${y1} C${c},${y1} ${c},${y2} ${x2},${y2} L${x2},${y2 + hh} C${c},${y2 + hh} ${c},${y1 + hh} ${x1},${y1 + hh} Z"/>`;
     };
     left.forEach((n, i) => {
       const hh = n.v * mid_scale;
