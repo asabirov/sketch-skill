@@ -3,7 +3,7 @@
 Captured: 2026-11-25, recorded by an agent
 Best for: a report that splits the money in and the money out of a range into their largest parts, with each part's share of the total.
 Row opens: the transactions of that part, with the same range and direction.
-Related: `analytics/flow-chart` shows the same parts as bands. `analytics/cashflow-chart` shows the totals by period. `analytics/filter-bar` sets the range.
+Related: `analytics/flow-chart` shows the same parts as bands. `analytics/filter-bar` sets the range.
 
 ## Scenarios
 
