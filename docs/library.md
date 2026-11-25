@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 79 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 80 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -26,6 +26,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 | [`analytics/flow-chart`](../library/analytics/flow-chart/) | A report that shows where the money of a period came from and where it went, in one picture. |
 | [`analytics/range-brush`](../library/analytics/range-brush/) | Any chart over time where a person sets the shown range by a drag, and needs to see where that range sits in the whole time. |
 | [`analytics/summary-card`](../library/analytics/summary-card/) | A small card on an overview page that answers one question about one part of the product, such as "how much of the limit is used" or "how many bills are late", and links to the full page. |
+| [`analytics/written-insights`](../library/analytics/written-insights/) | Any page with data where a program writes its few most useful facts in plain sentences, next to a chart, a table or a list, for a reader who does not read the data. |
 
 ## chat
 

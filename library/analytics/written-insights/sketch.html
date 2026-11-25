@@ -1,0 +1,91 @@
+<!doctype html>
+<!--
+  Best for: any page with data where a program writes its few most useful facts in plain sentences, next to a chart, a table or a list, for a reader who does not read the data.
+  Row opens: no rows.
+  Related: analytics/cashflow-chart shows the same data as a chart. analytics/filter-bar sets the range that the insights describe.
+  Each insight has a short heading and 1 or 2 sentences with the numbers. A word that names a filter, such as a category, is a link that sets that filter. Each insight has Helpful, Not helpful and Copy. A note below says that a program writes the insights and can make mistakes.
+  Transition values, from transitions.json: the values of a new range fade up in 200 ms, ease-out. The loading lines pulse 1000 ms, ease.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Written insights</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .wt_page { max-width: 480px; }
+  [data-sketch] .wt_page :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .wt_list { display: grid; gap: 20px; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .wt_list > li { display: grid; gap: 6px; animation: wt_rise 200ms ease-out; }
+  @keyframes wt_rise { from { opacity: 0; transform: translateY(6px); } }
+  [data-sketch] .wt_list h2 { font-size: 15px; }
+  [data-sketch] .wt_list p a[href] { display: inline; min-height: 0; padding: 0; color: inherit; text-decoration: underline dotted; text-underline-offset: 3px; }
+  [data-sketch] .wt_tools { display: flex; align-items: center; gap: 4px; }
+  [data-sketch] .wt_tools [aria-pressed="true"] { background: var(--sketch-wash); }
+  [data-sketch] .wt_tools small { margin-left: 8px; color: var(--sketch-muted); }
+  [data-sketch] .wt_note { color: var(--sketch-muted); font-size: 13px; }
+  [data-sketch] .wt_pulse { display: block; height: 16px; margin: 6px 0; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: wt_pulse 1000ms ease infinite alternate; }
+  @keyframes wt_pulse { to { opacity: .4; } }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] :is(.wt_list > li, .wt_pulse) { animation: none; } }
+</style>
+<body data-sketch>
+<section data-state="insights"></section>
+<section data-state="feedback-given" data-voted="0"></section>
+<section data-state="filter-link" data-filtered></section>
+<section data-state="loading" data-loading></section>
+<section data-state="empty" data-empty></section>
+<section data-state="error" data-error></section>
+
+<template id="page">
+  <main class="sketch-main wt_page">
+    <h1>Insights</h1>
+    <p class="sketch-muted" data-range>17 Aug – today</p>
+    <div data-body></div>
+    <p class="wt_note">A program writes these insights from the numbers of the range. It can make mistakes.</p>
+  </main>
+</template>
+
+<script>
+  const insights = [
+    ['Runway and cash', 'Net cash flow this year is −€42k. With a monthly burn of €38k, the cash lasts about 11 months.'],
+    ['Money out', 'Payroll was €168k in November, up from €160k in October. <a href="#filter-link" data-filter="Payroll">Payroll</a> is 54% of the money out.'],
+    ['Money in', 'Money in reached €640k in November. The new <a href="#filter-link" data-filter="Loan">loan</a> is €300k of it.']
+  ];
+
+  function fill(section) {
+    const ds = section.dataset;
+    section.innerHTML = document.getElementById('page').innerHTML;
+    const body = section.querySelector('[data-body]');
+    if (ds.loading !== undefined) { body.innerHTML = '<div aria-busy="true" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>'; return; }
+    if (ds.empty !== undefined) { body.innerHTML = '<p>No insights for this range. No money came in or went out.</p>'; return; }
+    if (ds.error !== undefined) {
+      body.innerHTML = '<div class="sketch-stack"><p>The insights did not load. The chart still shows the numbers.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
+      body.querySelector('[data-retry]').addEventListener('click', () => {
+        body.innerHTML = '<div aria-busy="true" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>';
+        setTimeout(() => { delete ds.error; fill(section); }, 1200);
+      });
+      return;
+    }
+    body.innerHTML = `<ul class="wt_list">${insights.map(([h, t], i) => `<li>
+        <h2>${h}</h2><p>${t}</p>
+        <div class="wt_tools" role="group" aria-label="Rate or copy this insight">
+          <button class="sketch-icon-button" type="button" aria-label="Helpful" aria-pressed="false" data-vote="up"><i data-icon="check"></i></button>
+          <button class="sketch-icon-button" type="button" aria-label="Not helpful" aria-pressed="false" data-vote="down"><i data-icon="close"></i></button>
+          <button class="sketch-icon-button" type="button" aria-label="Copy" data-copy><i data-icon="copy"></i></button>
+          <small data-said></small>
+        </div></li>`).join('')}</ul>`;
+    body.querySelectorAll('.wt_list > li').forEach(li => {
+      li.querySelectorAll('[data-vote]').forEach(b => b.addEventListener('click', () => {
+        li.querySelectorAll('[data-vote]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+        li.querySelector('[data-said]').textContent = b.dataset.vote === 'up' ? 'Thanks. Marked helpful.' : 'Thanks. The next insights learn from it.';
+      }));
+      li.querySelector('[data-copy]').addEventListener('click', () => sketchToast('Insight copied (sample)'));
+    });
+    body.querySelectorAll('[data-filter]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); sketchToast(`Filter: ${a.dataset.filter} (sample)`); section.querySelector('[data-range]').textContent = `17 Aug – today · ${a.dataset.filter}`; }));
+    if (ds.voted) body.querySelectorAll('[data-vote="up"]')[Number(ds.voted)].click();
+    if (ds.filtered !== undefined) section.querySelector('[data-range]').textContent = '17 Aug – today · Payroll';
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>
