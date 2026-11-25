@@ -30,8 +30,11 @@
   [data-sketch] .rb_window > b { position: absolute; bottom: 100%; left: -2px; padding: 0 6px; border-radius: 3px 3px 3px 0; background: var(--sketch-ink); color: var(--sketch-page); font-size: 12px; font-weight: 500; white-space: nowrap; }
   [data-sketch] .rb_window.rb_right > b { left: auto; right: -2px; border-radius: 3px 3px 0 3px; }
   [data-sketch] .rb_handle { position: absolute; top: 50%; width: 12px; height: 26px; margin-top: -13px; padding: 0; border: var(--sketch-stroke) solid var(--sketch-ink); border-radius: 4px; background: var(--sketch-page); cursor: ew-resize; touch-action: none; }
-  [data-sketch] .rb_handle::before { content: ""; position: absolute; inset: -9px -16px; }
-  [data-sketch] .rb_handle[data-end="a"] { left: -7px; } [data-sketch] .rb_handle[data-end="b"] { right: -7px; }
+  /* The hit area of a handle grows away from the frame, so the 2 areas never cover each other or the middle of the frame. */
+  [data-sketch] .rb_handle::before { content: ""; position: absolute; inset: -9px -4px -9px -20px; }
+  [data-sketch] .rb_handle[data-end="b"]::before { inset: -9px -20px -9px -4px; }
+  /* Each handle sits mostly outside the frame, so the 2 handles of a one-month frame stay at least 24 px apart. */
+  [data-sketch] .rb_handle[data-end="a"] { left: -8px; } [data-sketch] .rb_handle[data-end="b"] { right: -8px; }
   [data-sketch] .rb_handle:is(:focus-visible, .rb_focus) { outline: 2px solid var(--sketch-ink); outline-offset: 2px; }
   [data-sketch] .rb_note { color: var(--sketch-muted); font-size: 14px; }
   /* Below 768 px a month is narrower than its longest name, so the brush names every third month. */

@@ -21,7 +21,7 @@
   [data-sketch] .bt_split > section { display: grid; gap: 12px; align-content: start; }
   [data-sketch] .bt_head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
   [data-sketch] .bt_head span { font-size: 18px; font-weight: 600; }
-  [data-sketch] .bt_split tbody { animation: bt_fade 200ms ease-out; }
+  [data-sketch] .bt_split tbody.bt_new { animation: bt_fade 200ms ease-out; }
   @keyframes bt_fade { from { opacity: 0; } }
   [data-sketch] .bt_split .sketch-meter { width: 100%; min-width: 60px; height: 8px; }
   [data-sketch] .bt_split :is(td, th):last-child { text-align: right; white-space: nowrap; }
@@ -113,15 +113,18 @@
       </section>`;
     }
 
-    function draw() {
+    // A new split fades its rows in. The "more" row shows the rows at once, as pattern.md says.
+    function draw(fade = true) {
       split.innerHTML = panel(st.side);
+      if (fade) split.querySelectorAll('tbody').forEach(t => t.classList.add('bt_new'));
       split.querySelectorAll('[data-side]').forEach(p => {
         const side = p.dataset.side;
         p.querySelectorAll('[data-by-pick]').forEach(r => r.addEventListener('change', () => { st[side].by = r.value; st[side].all = false; draw(); if (window.initSketch) initSketch(); }));
         p.querySelectorAll('[data-side-pick]').forEach(r => r.addEventListener('change', () => { st.side = r.value; draw(); if (window.initSketch) initSketch(); }));
         p.querySelectorAll('tbody tr').forEach(tr => tr.addEventListener('click', () => {
-          if (tr.dataset.rest) { st[side].all = true; draw(); return; }
-          if (tr.dataset.less) { st[side].all = false; draw(); return; }
+          // The row is drawn again, so the focus goes to the row that does the opposite.
+          if (tr.dataset.rest) { st[side].all = true; draw(false); split.querySelector(`[data-side="${side}"] tr[data-less] button`)?.focus(); return; }
+          if (tr.dataset.less) { st[side].all = false; draw(false); split.querySelector(`[data-side="${side}"] tr[data-rest] button`)?.focus(); return; }
           sketchToast(`Opens the transactions of ${tr.dataset.row} (sample)`);
         }));
       });

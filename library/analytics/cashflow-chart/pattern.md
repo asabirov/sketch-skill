@@ -31,7 +31,7 @@ Related: `analytics/filter-bar` sets the range and the direction. `analytics/flo
 - `overview` to `line` or `by-category`, and back to `overview`. Trigger: a click in the switch. Moves: the new chart fades in (opacity). 300 ms, ease-out. measured. On the overview and the line views, each point grows from nothing (scale) in 160 ms, ease-out, with a delay of about 153 ms more for each point. measured.
 - `overview` to `hover`. Trigger: the pointer on a period. Moves: nothing. The ground and the tooltip show at once. measured.
 - `overview` to `group-menu`. Trigger: a click on the group button. Moves: the menu fades in and grows (opacity and scale). 150 ms, cubic-bezier(0.4, 0, 0.2, 1). Measured duration and easing. The start scale of 0.96 is estimated.
-- `group-menu` to `quarter`. Trigger: Quarter. Moves: while the new values load, a block pulses (opacity), 1000 ms, ease. measured. Then the totals rise into place (opacity and position), 200 ms, ease-out. measured.
+- `group-menu` to `quarter`. Trigger: Quarter. Moves: while the new values load, a block pulses (opacity), 1000 ms, ease. measured. Then the totals rise into place (opacity and position), 200 ms, ease-out. measured. At the same time the new chart fades in (opacity), 300 ms, ease-out, and on the overview its points grow from nothing (scale) in 160 ms, ease-out, about 153 ms apart, as for a new view. estimated.
 - A change of width. Trigger: the window or the column gets wider or narrower. Moves: nothing. The chart draws again at the new width at once. The designer chose it. estimated.
 
 ## Hard cases

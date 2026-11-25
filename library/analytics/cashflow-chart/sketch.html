@@ -46,6 +46,8 @@
   [data-sketch] .cc_mark { display: inline-block; overflow: visible; vertical-align: middle; margin-right: 6px; }
   [data-sketch] .cc_mark .dot { animation: none; filter: none; }
   @keyframes cc_grow { from { transform: scale(0); } }
+  /* A change of width draws the chart again at once, with no fade and no growth, as pattern.md says. */
+  [data-sketch] .cc_still :is(.cc_fade, .dot) { animation: none; }
   [data-sketch] .cc_svg .col_hit { fill: transparent; }
   [data-sketch] .cc_svg .col_hit.on { fill: var(--sketch-wash); }
   [data-sketch] .cc_tip { position: absolute; z-index: 3; top: 48px; display: grid; grid-template-columns: auto auto; gap: 2px 20px; padding: 8px 12px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; pointer-events: none; }
@@ -168,6 +170,12 @@
       <ul class="sketch-key" aria-hidden="true"><li><i></i>Payroll</li><li><i class="second"></i>Everything else</li></ul></div>`;
   }
 
+  // A button that shows another state moves the focus to the first control of that state, so the focus does not go to the page.
+  function go(state) {
+    addEventListener('hashchange', () => document.querySelector(`[data-state="${state}"]`)?.querySelector('a[href], button:not(:disabled), input:not(:disabled), [tabindex="0"]')?.focus(), {once: true});
+    location.hash = state;
+  }
+
   function fill(section) {
     const id = section.dataset.state;
     section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
@@ -182,8 +190,9 @@
       $('[data-totals]').innerHTML = items.map(([t, v]) => `<div><dt>${t}</dt><dd><b class="${rise ? 'cc_rise' : ''}">${v}</b></dd></div>`).join('');
     }
 
-    function draw_chart() {
+    function draw_chart(still = false) {
       const chart = $('[data-chart]'), d = data[st.group];
+      chart.classList.toggle('cc_still', still);
       section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === st.view; });
       $('[data-group-name]').textContent = st.group === 'month' ? 'Month' : 'Quarter';
       $(`#group_${id}`).innerHTML = ['Month', 'Quarter'].map(g => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="${g.toLowerCase() === st.group}" data-group="${g.toLowerCase()}"><i data-icon="check"></i>${g}</button>`).join('');
@@ -199,7 +208,7 @@
       cancelAnimationFrame(resize_frame);
       resize_frame = requestAnimationFrame(() => {
         const chart = $('[data-chart]');
-        if (chart.clientWidth && chart.querySelector('.cc_svg[width]') && Number(chart.dataset.width) !== chart.clientWidth) draw_chart();
+        if (chart.clientWidth && chart.querySelector('.cc_svg[width]') && Number(chart.dataset.width) !== chart.clientWidth) draw_chart(true);
       });
     }).observe($('[data-chart]'));
 
@@ -237,7 +246,7 @@
     if (st.view === 'empty') {
       $('[data-totals]').innerHTML = '<div><dt>Net cash flow</dt><dd><b>€0</b></dd></div><div><dt>Money in</dt><dd><b>€0</b></dd></div><div><dt>Money out</dt><dd><b>€0</b></dd></div>';
       $('[data-chart]').innerHTML = '<div class="cc_empty"><p>No money came in or went out in this range.</p><button class="sketch-button secondary" type="button" data-wide>Show the last 12 months</button></div>';
-      $('[data-chart] [data-wide]').addEventListener('click', () => { location.hash = 'overview'; });
+      $('[data-chart] [data-wide]').addEventListener('click', () => go('overview'));
       section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === 'overview'; });
       $('[data-group-name]').textContent = 'Month';
       return;
