@@ -238,8 +238,10 @@
         flip(() => { undo = move(i, i + Number(b.dataset.move)); draw_cards(); });
         say(`${title} is now in place ${i + Number(b.dataset.move) + 1} of ${st.cards.length}.`, undo);
         // The focus returns to the same control of the moved card: its arrow button, or its card menu button in a narrow card.
-        const arrow = grid.querySelector(`[data-key="${key}"] .cg_wide [data-move="${b.dataset.move}"]:not(:disabled)`);
-        if (arrow && arrow.offsetParent) arrow.focus(); else grid.querySelector(`[data-key="${key}"] .cg_narrow [data-sketch-popover]`)?.focus();
+        // At the first or last place that arrow is disabled, so the focus goes to the other arrow.
+        const card = grid.querySelector(`[data-key="${key}"]`);
+        const arrow = card.querySelector(`.cg_wide [data-move="${b.dataset.move}"]:not(:disabled)`) || card.querySelector('.cg_wide [data-move]:not(:disabled)');
+        if (arrow && arrow.offsetParent) arrow.focus(); else card.querySelector('.cg_narrow [data-sketch-popover]')?.focus();
       }));
       el.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => {
         const undo = st.cards.map(c => [...c]);
