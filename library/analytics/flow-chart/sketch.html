@@ -127,11 +127,11 @@
     const ds = section.dataset;
     section.innerHTML = document.getElementById('page').innerHTML;
     const chart = section.querySelector('[data-chart]'), tip = section.querySelector('[data-tip]'), box = section.querySelector('[data-box]');
-    if (ds.loading !== undefined) { chart.innerHTML = '<div class="fc_pulse" aria-label="Loading"></div>'; return; }
+    if (ds.loading !== undefined) { chart.innerHTML = '<div class="fc_pulse" role="status" aria-label="Loading"></div>'; return; }
     if (ds.empty !== undefined) {
       chart.innerHTML = '<div class="fc_empty"><p>No money came in or went out in this range.</p><button class="sketch-button secondary" type="button" data-wide>Show the last 12 months</button></div>';
       chart.querySelector('[data-wide]').addEventListener('click', () => {
-        chart.innerHTML = '<div class="fc_pulse" aria-label="Loading"></div>';
+        chart.innerHTML = '<div class="fc_pulse" role="status" aria-label="Loading"></div>';
         setTimeout(() => { delete ds.empty; fill(section); }, 1200);
       });
       return;

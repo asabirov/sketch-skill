@@ -56,12 +56,12 @@
     const ds = section.dataset;
     section.innerHTML = document.getElementById('page').innerHTML;
     const body = section.querySelector('[data-body]');
-    if (ds.loading !== undefined) { body.innerHTML = '<div aria-busy="true" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>'; return; }
+    if (ds.loading !== undefined) { body.innerHTML = '<div aria-busy="true" role="status" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>'; return; }
     if (ds.empty !== undefined) { body.innerHTML = '<p>No insights for this range. No money came in or went out.</p>'; return; }
     if (ds.error !== undefined) {
       body.innerHTML = '<div class="sketch-stack"><p>The insights did not load. The chart still shows the numbers.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
       body.querySelector('[data-retry]').addEventListener('click', () => {
-        body.innerHTML = '<div aria-busy="true" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>';
+        body.innerHTML = '<div aria-busy="true" role="status" aria-label="Loading">' + '<span class="wt_pulse"></span><span class="wt_pulse"></span><span class="wt_pulse" style="width:60%"></span>'.repeat(2) + '</div>';
         setTimeout(() => { delete ds.error; fill(section); }, 1200);
       });
       return;

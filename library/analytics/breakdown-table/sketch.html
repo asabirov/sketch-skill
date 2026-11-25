@@ -80,7 +80,7 @@
     const id = section.dataset.state, ds = section.dataset;
     section.innerHTML = document.getElementById('page').innerHTML;
     const split = section.querySelector('[data-split]');
-    if (ds.loading !== undefined) { split.innerHTML = '<div class="bt_pulse" aria-label="Loading"></div>'; return; }
+    if (ds.loading !== undefined) { split.innerHTML = '<div class="bt_pulse" role="status" aria-label="Loading"></div>'; return; }
     if (ds.empty !== undefined) { split.innerHTML = '<p class="bt_empty">No money came in or went out in this range, so there is nothing to split.</p>'; return; }
     const st = {in: {by: ds.by || 'source', all: ds.all === 'in'}, out: {by: ds.by || 'source', all: ds.all === 'out'}, side: ds.side || 'in'};
 
