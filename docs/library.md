@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 72 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 73 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -18,6 +18,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 
 | Pattern | Best for |
 | --- | --- |
+| [`analytics/action-row`](../library/analytics/action-row/) | The top of an overview page, where a person starts the most common jobs of the product without a menu. |
 | [`analytics/balance-card`](../library/analytics/balance-card/) | A person opens a money product to see how much money the business has now, and how the total moved over a period that they choose. |
 
 ## chat
