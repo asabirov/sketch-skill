@@ -1,0 +1,329 @@
+<!doctype html>
+<!--
+  Best for: a dashboard home where each person chooses which cards to see, their order and their size, and the same layout must hold from a phone to a wide screen.
+  Row opens: no rows. Each card opens its own page.
+  Related: the sketch template list/card-grid is a grid of records that people find by picture, not a dashboard. analytics/balance-card, analytics/action-row, analytics/account-list, analytics/summary-card and analytics/cashflow-chart are cards that this grid holds.
+  The grid keeps one order of cards for all widths. Each card has a size: Small (1 column), Medium (2 columns) or Large (the full row). The grid has 4 columns from 960 px, 2 from 560 px and 1 below it. A size never takes more than the full row.
+  Customize opens the edit mode. In it, each card head keeps one line: a handle to drag and the title. A card with room shows Move earlier, Move later, a size menu and Hide as buttons. A narrow card puts them into one card menu. Add a card opens a catalog of the hidden cards. Reset restores the default. Cancel undoes every change, and Done keeps them.
+  A line below the bar says what the last change did, with Undo. A screen reader hears the same line.
+  The states tablet and phone narrow the page, so the reflow shows at any window width.
+  Transition values, from transitions.json: when the order, a size or the column count changes, each card slides from its old place to its new place in 250 ms, cubic-bezier(0.2, 0, 0, 1). With reduced motion the cards jump.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard grid</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .cg_frame { max-width: var(--cg-w, 1120px); margin: 0 auto; }
+  [data-sketch] .cg_page { max-width: none; }
+  [data-sketch] .cg_page :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .cg_head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+  [data-sketch] .cg_head > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  [data-sketch] .cg_head > div > span { position: relative; }
+  [data-sketch] .cg_note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 28px; color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .cg_note .sketch-button { min-height: 28px; padding: 0 10px; }
+  [data-sketch] .cg_grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 16px; }
+  [data-sketch] .cg_card { position: relative; display: grid; gap: 10px; align-content: start; min-height: 150px; }
+  [data-sketch] .cg_card:has([data-open]), [data-sketch] .cg_card:focus-within { z-index: 2; }
+  [data-sketch] .cg_card { min-width: 0; }
+  /* The head stays on one line. A card with room shows each edit action as a button. A narrow card puts them into one card menu.
+     The card width decides, not the screen width, so a Small card and a Large card on the same screen can differ. */
+  [data-sketch] .cg_card { container-type: inline-size; }
+  [data-sketch] .cg_wide { display: flex; align-items: center; gap: 2px; }
+  [data-sketch] .cg_narrow { display: none; }
+  @container (max-width: 339px) {
+    [data-sketch] .cg_wide { display: none; }
+    [data-sketch] .cg_narrow { display: block; }
+  }
+  [data-sketch] .cg_card_head { display: flex; align-items: center; gap: 6px; }
+  [data-sketch] .cg_card_head h2 { flex: 1; min-width: 0; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+  [data-sketch] .cg_card_head > .cg_tools:last-child { margin-left: auto; }
+  [data-sketch] .cg_card_menu hr { margin: 4px 0; border: 0; border-top: 1px solid var(--sketch-muted); opacity: .4; }
+  [data-sketch] .cg_card .sketch-meter { width: 100%; }
+  [data-sketch] .cg_card_head > span { position: relative; }
+  [data-sketch] .cg_tools { display: none; align-items: center; gap: 2px; }
+  [data-sketch] .cg_edit .cg_tools { display: flex; }
+  [data-sketch] .cg_edit .cg_card { border-style: dashed; }
+  [data-sketch] .cg_handle { cursor: grab; touch-action: none; }
+  [data-sketch] .cg_card.cg_drag { z-index: 5; cursor: grabbing; box-shadow: 0 12px 28px color-mix(in srgb, var(--sketch-ink) 22%, transparent); background: var(--sketch-page); }
+  [data-sketch] .cg_card.cg_drag .cg_handle { cursor: grabbing; }
+  [data-sketch] .cg_big { font-size: 26px; font-weight: 600; }
+  [data-sketch] .cg_lines { display: grid; gap: 6px; }
+  [data-sketch] .cg_lines span { display: block; height: 10px; border-radius: 4px; background: var(--sketch-wash); }
+  [data-sketch] .cg_bars { display: flex; align-items: end; gap: 6px; height: 70px; }
+  [data-sketch] .cg_bars i { flex: 1; border: 1px solid var(--sketch-ink); border-radius: 3px 3px 0 0; background: var(--sketch-wash); }
+  [data-sketch] .cg_pulse { animation: cg_pulse 1000ms ease infinite alternate; }
+  @keyframes cg_pulse { to { opacity: .4; } }
+  [data-sketch] .cg_empty { grid-column: 1 / -1; display: grid; justify-items: center; gap: 8px; padding: 32px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; }
+  [data-sketch] .cg_catalog { width: min(320px, 86vw); }
+  [data-sketch] .cg_catalog li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  [data-sketch] .cg_catalog ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  [data-sketch] .sketch-menu-item[aria-checked="false"] > :first-child { visibility: hidden; }
+  [data-sketch] .cg_sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] .cg_pulse { animation: none; } }
+</style>
+<body data-sketch>
+<section data-state="grid"></section>
+<section data-state="edit" data-edit></section>
+<section data-state="size-menu" data-edit data-open-size="chart"></section>
+<section data-state="card-menu" data-edit data-open-card="actions"></section>
+<section data-state="catalog" data-edit data-open-catalog></section>
+<section data-state="dragging" data-edit data-drag="list"></section>
+<section data-state="card-hidden" data-edit data-hide="count"></section>
+<section data-state="tablet" data-width="820"></section>
+<section data-state="phone" data-width="390"></section>
+<section data-state="loading" data-loading></section>
+<section data-state="no-cards" data-edit data-none></section>
+
+<template id="page">
+  <div class="cg_frame" data-frame>
+    <main class="sketch-main cg_page" data-page>
+      <div class="cg_head">
+        <h1>Home</h1>
+        <div data-bar></div>
+      </div>
+      <p class="cg_note" data-note aria-live="polite"></p>
+      <div class="cg_grid" data-grid></div>
+    </main>
+  </div>
+</template>
+
+<script>
+  // General card bodies: the grid is the pattern, not the content of each card.
+  const all_cards = {
+    number: {title: 'Key number', body: '<span class="cg_big">12,400</span><span class="sketch-muted">A short note</span>'},
+    actions: {title: 'Actions', body: '<div class="sketch-row"><button class="sketch-button" type="button" data-sketch-toast="Main action (sample)">Main</button><button class="sketch-button secondary" type="button" data-sketch-toast="Second action (sample)">Second</button></div>'},
+    progress: {title: 'Progress', body: '<span class="sketch-meter" role="img" aria-label="60%"><i style="width:60%"></i></span><span class="sketch-muted">60% of the goal</span>'},
+    chart: {title: 'Chart', body: '<div class="cg_bars" aria-hidden="true"><i style="height:40%"></i><i style="height:55%"></i><i style="height:35%"></i><i style="height:80%"></i><i style="height:60%"></i><i style="height:90%"></i></div>'},
+    list: {title: 'List', body: '<div class="cg_lines"><span style="width:90%"></span><span style="width:75%"></span><span style="width:82%"></span></div>'},
+    count: {title: 'Count', body: '<span class="cg_big">3</span><span class="sketch-muted">A short note</span>'},
+    table: {title: 'Table', body: '<div class="cg_lines"><span style="width:100%"></span><span style="width:100%"></span></div>'},
+    note: {title: 'Note', body: '<div class="cg_lines"><span style="width:70%"></span></div>'}
+  };
+  const start = [['number', 2], ['actions', 1], ['progress', 1], ['chart', 4], ['list', 2], ['count', 2]];
+  const size_name = {1: 'Small', 2: 'Medium', 4: 'Large'};
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fill(section) {
+    const id = section.dataset.state, ds = section.dataset;
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
+    const $ = sel => section.querySelector(sel);
+    const grid = $('[data-grid]'), frame = $('[data-frame]'), note = $('[data-note]');
+    const st = {edit: ds.edit !== undefined, cards: start.map(c => [...c]), saved: null, cols: 4, last: null};
+    if (ds.hide) st.cards = st.cards.filter(([k]) => k !== ds.hide);
+    if (ds.none !== undefined) st.cards = [];
+    if (st.edit) st.saved = start.map(c => [...c]);
+
+    // The column count comes from the width of the grid, not of the window, so the grid also fits a narrow column.
+    const cols_for = w => w >= 960 ? 4 : w >= 560 ? 2 : 1;
+
+    // Slide each card from its old place to its new place (first, last, invert, play).
+    function flip(change) {
+      const before = new Map([...grid.children].map(el => [el.dataset.key, el.getBoundingClientRect()]));
+      change();
+      if (reduce) return;
+      grid.querySelectorAll('[data-key]').forEach(el => {
+        const a = before.get(el.dataset.key);
+        if (!a || el.classList.contains('cg_drag')) return;
+        const b = el.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+        el.animate([{transform: `translate(${dx}px, ${dy}px)`}, {transform: 'none'}], {duration: 250, easing: 'cubic-bezier(0.2, 0, 0, 1)'});
+      });
+    }
+
+    function say(text, undo) {
+      note.innerHTML = text ? `<span>${text}</span>` : '';
+      if (undo) {
+        note.insertAdjacentHTML('beforeend', '<button class="sketch-button secondary" type="button" data-undo>Undo</button>');
+        note.querySelector('[data-undo]').addEventListener('click', () => { flip(() => { st.cards = undo; draw_cards(); }); say('The change is undone.'); });
+      }
+    }
+
+    function draw_bar() {
+      const bar = $('[data-bar]');
+      const hidden = Object.keys(all_cards).filter(k => !st.cards.some(([c]) => c === k));
+      bar.innerHTML = st.edit ? `
+        <span><button class="sketch-button secondary" type="button" data-sketch-popover="catalog_${id}"><i data-icon="plus"></i>Add a card</button>
+          <div class="sketch-popover cg_catalog sketch-stack" id="catalog_${id}" role="dialog" aria-label="Add a card">
+            <b>Cards you can add</b>
+            ${hidden.length ? `<ul>${hidden.map(k => `<li><span>${all_cards[k].title}</span><button class="sketch-button secondary" type="button" data-add="${k}">Add</button></li>`).join('')}</ul>` : '<p class="sketch-muted">Every card is on Home.</p>'}
+          </div></span>
+        <button class="sketch-button secondary" type="button" data-reset>Reset</button>
+        <button class="sketch-button secondary" type="button" data-cancel>Cancel</button>
+        <button class="sketch-button" type="button" data-done>Done</button>`
+        : '<button class="sketch-button secondary" type="button" data-customize><i data-icon="edit"></i>Customize</button>';
+      bar.querySelector('[data-customize]')?.addEventListener('click', () => { st.edit = true; st.saved = st.cards.map(c => [...c]); draw(); say('Drag a card by its handle, or use the arrows or the card menu. One layout serves every width.'); });
+      bar.querySelector('[data-done]')?.addEventListener('click', () => { st.edit = false; draw(); say('Home is saved.'); });
+      bar.querySelector('[data-cancel]')?.addEventListener('click', () => { st.edit = false; flip(() => { st.cards = st.saved; draw(); }); say('No change was saved.'); });
+      bar.querySelector('[data-reset]')?.addEventListener('click', () => { const undo = st.cards.map(c => [...c]); flip(() => { st.cards = start.map(c => [...c]); draw(); }); say('Home has the first layout again.', undo); });
+      bar.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+        const undo = st.cards.map(c => [...c]);
+        flip(() => { st.cards.push([b.dataset.add, 1]); draw(); });
+        say(`${all_cards[b.dataset.add].title} is added at the end, Small.`, undo);
+      }));
+    }
+
+    function card_html([key, size], i) {
+      const c = all_cards[key], n = st.cards.length, span = Math.min(size, st.cols);
+      return `<section class="sketch-panel sketch-frame cg_card" data-key="${key}" style="grid-column: span ${span}" aria-label="${c.title}, ${size_name[size]}, place ${i + 1} of ${n}">
+        <div class="cg_card_head">
+          <span class="cg_tools"><button class="sketch-icon-button cg_handle" type="button" aria-label="Drag ${c.title}" data-handle><i data-icon="menu"></i></button></span>
+          <h2>${c.title}</h2>
+          <span class="cg_tools"><span class="cg_wide">
+            <button class="sketch-icon-button" type="button" aria-label="Move ${c.title} earlier" data-move="-1" ${i === 0 ? 'disabled' : ''}><i data-icon="chevron-left"></i></button>
+            <button class="sketch-icon-button" type="button" aria-label="Move ${c.title} later" data-move="1" ${i === n - 1 ? 'disabled' : ''}><i data-icon="chevron-right"></i></button>
+            <span style="position: relative"><button class="sketch-icon-button" type="button" aria-label="Size of ${c.title}" data-sketch-popover="size_${key}_${id}"><i data-icon="sliders"></i></button>
+              <div class="sketch-menu" id="size_${key}_${id}" role="menu" aria-label="Size of ${c.title}">
+                ${[1, 2, 4].map(s => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="${s === size}" data-size="${s}"><i data-icon="check"></i>${size_name[s]}</button>`).join('')}
+              </div></span>
+            <button class="sketch-icon-button" type="button" aria-label="Hide ${c.title}" data-hide><i data-icon="eye"></i></button>
+          </span><span class="cg_narrow"><button class="sketch-icon-button" type="button" aria-label="Edit ${c.title}" data-sketch-popover="card_${key}_${id}"><i data-icon="more"></i></button>
+            <div class="sketch-menu cg_card_menu" id="card_${key}_${id}" role="menu" aria-label="Edit ${c.title}">
+              <button class="sketch-menu-item" type="button" role="menuitem" data-move="-1" ${i === 0 ? 'disabled' : ''}><i data-icon="chevron-left"></i>Move earlier</button>
+              <button class="sketch-menu-item" type="button" role="menuitem" data-move="1" ${i === n - 1 ? 'disabled' : ''}><i data-icon="chevron-right"></i>Move later</button>
+              <hr>
+              ${[1, 2, 4].map(s => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="${s === size}" data-size="${s}"><i data-icon="check"></i>${size_name[s]}</button>`).join('')}
+              <hr>
+              <button class="sketch-menu-item" type="button" role="menuitem" data-hide><i data-icon="eye"></i>Hide</button>
+            </div></span></span>
+        </div>
+        ${ds.loading !== undefined ? '<div class="cg_lines cg_pulse"><span style="width:80%;height:22px"></span><span style="width:60%"></span><span style="width:70%"></span></div>' : c.body}
+      </section>`;
+    }
+
+    function draw_cards() {
+      grid.style.setProperty('--cols', st.cols);
+      grid.innerHTML = st.cards.length ? st.cards.map(card_html).join('')
+        : `<div class="cg_empty"><p>No cards on Home.</p><p class="sketch-muted">Add a card to see it here.</p></div>`;
+      grid.querySelectorAll('[data-key]').forEach((el, i) => wire(el, i));
+      if (window.initSketch) initSketch();
+    }
+
+    function draw() { $('[data-page]').classList.toggle('cg_edit', st.edit); draw_bar(); draw_cards(); }
+
+    function move(from, to) {
+      if (to < 0 || to >= st.cards.length || to === from) return;
+      const undo = st.cards.map(c => [...c]), [card] = st.cards.splice(from, 1);
+      st.cards.splice(to, 0, card);
+      return undo;
+    }
+
+    function wire(el, i) {
+      const key = el.dataset.key, title = all_cards[key].title;
+      el.querySelectorAll('[data-move]').forEach(b => b.addEventListener('click', () => {
+        let undo;
+        flip(() => { undo = move(i, i + Number(b.dataset.move)); draw_cards(); });
+        say(`${title} is now in place ${i + Number(b.dataset.move) + 1} of ${st.cards.length}.`, undo);
+        // The focus returns to the same control of the moved card: its arrow button, or its card menu button in a narrow card.
+        const arrow = grid.querySelector(`[data-key="${key}"] .cg_wide [data-move="${b.dataset.move}"]:not(:disabled)`);
+        if (arrow && arrow.offsetParent) arrow.focus(); else grid.querySelector(`[data-key="${key}"] .cg_narrow [data-sketch-popover]`)?.focus();
+      }));
+      el.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => {
+        const undo = st.cards.map(c => [...c]);
+        flip(() => { st.cards[i][1] = Number(b.dataset.size); draw_cards(); });
+        say(`${title} is now ${size_name[b.dataset.size]}.`, undo);
+      }));
+      el.querySelector('[data-hide]').addEventListener('click', () => {
+        const undo = st.cards.map(c => [...c]);
+        flip(() => { st.cards.splice(i, 1); draw(); });
+        say(`${title} is hidden. Add it again from Add a card.`, undo);
+      });
+      // A drag lifts the card under the pointer. The other cards slide out of its way. On release it slides into its new place.
+      el.querySelector('[data-handle]').addEventListener('pointerdown', e => {
+        e.preventDefault();
+        // The card moves in the page during the drag, which ends a pointer capture, so the document follows the pointer.
+        const undo = st.cards.map(c => [...c]);
+        const card = el;
+        card.classList.add('cg_drag');
+        const x0 = e.clientX, y0 = e.clientY, home = card.getBoundingClientRect();
+        let last_over = null;
+        const place = (ev) => {
+          card.style.transform = 'none';
+          const now = card.getBoundingClientRect();
+          card.style.transform = `translate(${ev.clientX - x0 + home.left - now.left}px, ${ev.clientY - y0 + home.top - now.top}px)`;
+        };
+        // Near the top or the bottom edge, the page scrolls, so a card can reach a place that is off screen.
+        let last_ev = e, edge_frame = 0;
+        const edge = () => {
+          const y = last_ev.clientY, step = y < 48 ? -12 : y > innerHeight - 48 ? 12 : 0;
+          if (step) { scrollBy(0, step); on_move(last_ev); }
+          edge_frame = requestAnimationFrame(edge);
+        };
+        edge_frame = requestAnimationFrame(edge);
+        const on_move = ev => {
+          last_ev = ev;
+          place(ev);
+          const over = [...grid.querySelectorAll('[data-key]')].find(o => {
+            if (o === card) return false;
+            const r = o.getBoundingClientRect();
+            return ev.clientX > r.left && ev.clientX < r.right && ev.clientY > r.top && ev.clientY < r.bottom;
+          });
+          // One swap for each card that the pointer enters, so 2 cards do not swap back and forth.
+          if (over === last_over) return;
+          last_over = over;
+          if (!over) return;
+          const from = st.cards.findIndex(([k]) => k === key), to = st.cards.findIndex(([k]) => k === over.dataset.key);
+          flip(() => { move(from, to); if (to > from) over.after(card); else over.before(card); });
+          place(ev);
+        };
+        const on_up = () => {
+          cancelAnimationFrame(edge_frame);
+          document.removeEventListener('pointermove', on_move);
+          document.removeEventListener('pointerup', on_up);
+          document.removeEventListener('pointercancel', on_up);
+          const from = card.getBoundingClientRect();
+          card.style.transform = '';
+          card.classList.remove('cg_drag');
+          const to = card.getBoundingClientRect();
+          if (!reduce) card.animate([{transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)`}, {transform: 'none'}], {duration: 250, easing: 'cubic-bezier(0.2, 0, 0, 1)'});
+          const n = st.cards.findIndex(([k]) => k === key);
+          draw_cards();
+          if (JSON.stringify(undo) !== JSON.stringify(st.cards)) say(`${title} is now in place ${n + 1} of ${st.cards.length}.`, undo);
+        };
+        document.addEventListener('pointermove', on_move);
+        document.addEventListener('pointerup', on_up);
+        document.addEventListener('pointercancel', on_up);
+      });
+    }
+
+    // The states tablet and phone narrow the page. The grid follows its own width, not the window.
+    if (ds.width) frame.style.setProperty('--cg-w', `${ds.width}px`);
+
+    st.cols = cols_for(grid.clientWidth || 1120);
+    draw();
+    // The cards slide only when a settled page changes its width. The first layout, and a hidden state that shows, set the columns at once.
+    const settled_at = performance.now() + 800;
+    let last_w = grid.clientWidth;
+    new ResizeObserver(() => {
+      const w = grid.clientWidth, slide = last_w > 0 && performance.now() > settled_at;
+      last_w = w;
+      if (!w) return;
+      const cols = cols_for(w);
+      if (cols === st.cols) return;
+      if (slide) flip(() => { st.cols = cols; draw_cards(); });
+      else {
+        // Set the spans in place, so an open menu keeps its card. The kit then places the menu again.
+        st.cols = cols;
+        grid.style.setProperty('--cols', cols);
+        st.cards.forEach(([key, size]) => { const el = grid.querySelector(`[data-key="${key}"]`); if (el) el.style.gridColumn = `span ${Math.min(size, cols)}`; });
+        dispatchEvent(new Event('resize'));
+      }
+    }).observe(grid);
+
+    if (ds.hide) say(`${all_cards[ds.hide].title} is hidden. Add it again from Add a card.`, start.map(c => [...c]));
+    else if (st.edit && ds.none === undefined) say('Drag a card by its handle, or use the arrows or the card menu. One layout serves every width.');
+    if (ds.openSize) $(`#size_${ds.openSize}_${id}`).setAttribute('data-open', '');
+    if (ds.openCard) $(`#card_${ds.openCard}_${id}`).setAttribute('data-open', '');
+    if (ds.openCatalog !== undefined) $(`#catalog_${id}`).setAttribute('data-open', '');
+    if (ds.drag) {
+      const card = grid.querySelector(`[data-key="${ds.drag}"]`);
+      card.classList.add('cg_drag');
+      card.style.transform = 'translate(-40px, -96px)';
+    }
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>
