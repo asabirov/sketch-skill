@@ -1,0 +1,5 @@
+[
+  {"label": "edit", "element": "each card that changes place", "property": "transform", "duration": 250, "delay": 0, "easing": "cubic-bezier(0.2, 0, 0, 1)", "measurement": "estimated"},
+  {"label": "phone", "element": "each card when the column count changes", "property": "transform", "duration": 250, "delay": 0, "easing": "cubic-bezier(0.2, 0, 0, 1)", "measurement": "estimated"},
+  {"label": "loading", "element": "pulsing card content", "animation": "cg_pulse", "duration": 1000, "delay": 0, "easing": "ease", "measurement": "estimated"}
+]

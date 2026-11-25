@@ -1,0 +1,126 @@
+<!doctype html>
+<!--
+  Best for: the top of a report page, where a person sets what the whole report shows: a saved view, filters, a date range and the direction of the money.
+  Row opens: no rows.
+  Related: analytics/range-brush sets the same range by a drag on a time line. analytics/breakdown-table and analytics/written-insights follow the filters of this bar. content/catalog-base-view has a bar with the view name, Filter and Sort for a set of records, with no range. The sketch template search/results filters in a side panel.
+  The bar has Saved views, Filters, a range button, a direction button, and at the right end Compare to. Compare to is off when the range is too long, and a short line says why.
+  The range popover has a set range or Custom, a From field and a To field, and the months of the year as buttons. A click on 2 months picks a range.
+  The direction popover has All cash flow, Money in and Money out, each with a line of examples.
+  Transition values, from transitions.json: the chevron of a button turns in 200 ms, cubic-bezier(0.35, 0, 0.25, 1). The popovers show at once.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filter bar with range and direction</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .fb_page { max-width: 1120px; }
+  [data-sketch] .fb_page :is(h1, p) { margin: 0; }
+  [data-sketch] .fb_bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  [data-sketch] .fb_bar > span { position: relative; }
+  [data-sketch] .fb_bar > .fb_end { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  [data-sketch] .fb_turn > :last-child { transition: transform 200ms cubic-bezier(.35, 0, .25, 1); }
+  [data-sketch] .fb_turn[aria-expanded="true"] > :last-child { transform: rotate(180deg); }
+  [data-sketch] .fb_note { color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .fb_months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  [data-sketch] .fb_months .sketch-chip { justify-content: center; }
+  [data-sketch] .fb_dir label { align-items: start; }
+  [data-sketch] .fb_dir small { display: block; color: var(--sketch-muted); font-size: 13px; }
+  [data-sketch] .fb_result { padding: 16px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); color: var(--sketch-muted); }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] .fb_turn > :last-child { transition: none; } }
+</style>
+<body data-sketch>
+<section data-state="bar"></section>
+<section data-state="range-menu" data-open="range"></section>
+<section data-state="months-picked" data-open="range" data-pick="4,6"></section>
+<section data-state="preset-picked" data-preset="This quarter"></section>
+<section data-state="direction-menu" data-open="direction"></section>
+<section data-state="money-in" data-direction="in"></section>
+<section data-state="compare-on" data-preset="Last 30 days"></section>
+
+<template id="page">
+  <main class="sketch-main fb_page">
+    <h1>Cash flow</h1>
+    <div class="fb_bar">
+      <button class="sketch-button secondary" type="button" data-sketch-toast="Saved views (sample)">Saved views<i data-icon="chevron-down"></i></button>
+      <button class="sketch-button secondary" type="button" data-sketch-toast="Filters (sample)"><i data-icon="filter"></i>Filters</button>
+      <span>
+        <button class="sketch-button secondary fb_turn" type="button" data-sketch-popover="range___s__"><i data-icon="calendar"></i><span data-range-name></span><i data-icon="chevron-down"></i></button>
+        <div class="sketch-popover sketch-stack" id="range___s__" role="dialog" aria-label="Range">
+          <label class="sketch-field">Range <select class="sketch-input" data-preset><option>Custom</option><option>Last 30 days</option><option>This quarter</option><option>This year</option></select></label>
+          <div class="sketch-row"><label class="sketch-field">From <input class="sketch-input" data-from></label><label class="sketch-field">To <input class="sketch-input" data-to></label></div>
+          <b>2026</b>
+          <div class="fb_months" data-months></div>
+          <span class="fb_note">Click a first month, then a last month.</span>
+        </div>
+      </span>
+      <span>
+        <button class="sketch-button secondary fb_turn" type="button" data-sketch-popover="direction___s__"><span data-direction-name></span><i data-icon="chevron-down"></i></button>
+        <div class="sketch-popover fb_dir" id="direction___s__" role="dialog" aria-label="Direction">
+          <label class="sketch-choice"><input type="radio" name="dir___s__" value="all"><span>All cash flow</span></label>
+          <label class="sketch-choice"><input type="radio" name="dir___s__" value="in"><span>Money in<small>Such as sales and refunds</small></span></label>
+          <label class="sketch-choice"><input type="radio" name="dir___s__" value="out"><span>Money out<small>Such as payments and card spend</small></span></label>
+        </div>
+      </span>
+      <span class="fb_end"><button class="sketch-button secondary" type="button" data-compare>Compare to<i data-icon="chevron-down"></i></button><span class="fb_note" data-compare-note></span></span>
+    </div>
+    <p class="fb_result" data-result></p>
+  </main>
+</template>
+
+<script>
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const presets = {'Last 30 days': [10, 10], 'This quarter': [9, 10], 'This year': [0, 10]};
+
+  function fill(section) {
+    const id = section.dataset.state, ds = section.dataset;
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
+    const $ = sel => section.querySelector(sel);
+    const st = {a: 7, b: 10, preset: 'Custom', direction: ds.direction || 'all', first: null};
+    if (ds.preset) { st.preset = ds.preset; [st.a, st.b] = presets[ds.preset]; }
+    if (ds.pick) [st.a, st.b] = ds.pick.split(',').map(Number);
+
+    function draw() {
+      const name = st.preset !== 'Custom' ? st.preset : st.a === 7 && st.b === 10 ? '17 Aug – today' : `${months[st.a]} – ${months[st.b]}`;
+      $('[data-range-name]').textContent = name;
+      $('[data-preset]').value = st.preset;
+      $('[data-from]').value = st.a === 7 && st.preset === 'Custom' ? '17 Aug 2026' : `1 ${months[st.a]} 2026`;
+      $('[data-to]').value = st.b === 10 ? 'Today' : `end of ${months[st.b]} 2026`;
+      $('[data-months]').innerHTML = months.map((m, i) => `<button class="sketch-chip" type="button" data-month="${i}" aria-pressed="${i >= st.a && i <= st.b}" ${i > 10 ? 'disabled' : ''}>${m}</button>`).join('');
+      const one_month = st.b - st.a === 0;
+      $('[data-compare]').disabled = !one_month;
+      $('[data-compare-note]').textContent = one_month ? '' : 'Compare needs one month or less.';
+      const dir = {all: 'All cash flow', in: 'Money in', out: 'Money out'}[st.direction];
+      $('[data-direction-name]').textContent = dir;
+      $('[data-result]').textContent = `The report below shows ${dir.toLowerCase()} for ${name}.`;
+    }
+
+    $('[data-months]').addEventListener('click', e => {
+      const b = e.target.closest('[data-month]');
+      if (!b) return;
+      const i = Number(b.dataset.month);
+      st.preset = 'Custom';
+      if (st.first === null) { st.first = i; st.a = st.b = i; }
+      else { st.a = Math.min(st.first, i); st.b = Math.max(st.first, i); st.first = null; }
+      draw();
+      // The month buttons are drawn again, so the focus returns to the same month.
+      $(`[data-months] [data-month="${i}"]`).focus();
+    });
+    $('[data-preset]').addEventListener('change', e => {
+      st.preset = e.target.value; st.first = null;
+      if (presets[st.preset]) [st.a, st.b] = presets[st.preset];
+      draw();
+    });
+    section.querySelectorAll(`input[name="dir_${id}"]`).forEach(r => {
+      r.checked = r.value === st.direction;
+      r.addEventListener('change', () => { st.direction = r.value; draw(); });
+    });
+    $('[data-compare]').addEventListener('click', () => sketchToast('Compare to the month before (sample)'));
+    draw();
+    if (ds.open) $(`#${ds.open}_${id}`).setAttribute('data-open', '');
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>

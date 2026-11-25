@@ -1,0 +1,105 @@
+<!doctype html>
+<!--
+  Best for: a small card on an overview page that answers one question about one part of the product, such as "how much of the limit is used" or "how many bills are late", and links to the full page.
+  Row opens: no rows. The foot line opens the full page of that part.
+  Related: analytics/account-list is a card with rows. analytics/balance-card is a card with a chart.
+  Each card keeps the same frame: a name, at most one icon action, a more menu, the key numbers, and one foot line below a thin line with a link or one action.
+  The sketch shows one card. Its body is one key number with a meter of its limit. The state counts shows the other form of the body: a row of 2 or 3 counts.
+  Transition values, from transitions.json: the menu shows at once. The loading pulse takes 1000 ms, ease.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Summary card</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .sc_page { max-width: 400px; }
+  [data-sketch] .sc_page :is(h1, h2, p) { margin: 0; }
+  [data-sketch] .sc_grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); align-items: start; }
+  [data-sketch] .sc_card { display: grid; gap: 12px; align-content: start; }
+  [data-sketch] .sc_card > header { display: flex; align-items: center; gap: 4px; min-height: 44px; }
+  [data-sketch] .sc_card > header h2 { flex: 1; font-size: 15px; font-weight: 500; }
+  [data-sketch] .sc_card > header > div { position: relative; }
+  [data-sketch] .sc_card:has([data-open]), [data-sketch] .sc_card:focus-within { z-index: 2; }
+  [data-sketch] .sc_big { font-size: 22px; font-weight: 600; }
+  [data-sketch] .sc_nums { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; }
+  [data-sketch] .sc_nums dt { color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .sc_nums dd { margin: 0; font-size: 22px; font-weight: 600; }
+  [data-sketch] .sc_foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--sketch-muted); }
+  [data-sketch] .sc_foot small { display: block; color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .sc_card .sketch-stack > .sketch-button { justify-self: start; }
+  [data-sketch] .sc_pulse { height: 120px; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: sc_pulse 1000ms ease infinite alternate; }
+  @keyframes sc_pulse { to { opacity: .4; } }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] .sc_pulse { animation: none; } }
+</style>
+<body data-sketch>
+<section data-state="card"></section>
+<section data-state="more-menu" data-open-menu></section>
+<section data-state="near-limit" data-near></section>
+<section data-state="action-done" data-paid></section>
+<section data-state="loading" data-loading></section>
+<section data-state="empty" data-empty></section>
+<section data-state="error" data-error></section>
+<section data-state="counts" data-counts></section>
+
+<template id="page">
+  <main class="sketch-main sc_page">
+    <section class="sketch-panel sketch-frame sc_card" aria-labelledby="h___s__">
+      <header><h2 id="h___s__" data-title></h2>
+        <span data-icon-action></span>
+        <div><button class="sketch-icon-button" type="button" aria-label="More" data-sketch-popover="more___s__"><i data-icon="more"></i></button>
+          <div class="sketch-menu" id="more___s__" role="menu" aria-label="More" data-menu></div></div>
+      </header>
+      <div data-body></div>
+    </section>
+  </main>
+</template>
+
+<script>
+  const limit_body = (used, pct, free, paid) => `<div class="sketch-stack">
+      <b class="sc_big">${used} spent</b>
+      <div class="sketch-meter" role="img" aria-label="${pct}% of the €20,000 limit used"><i style="width:${pct}%"></i></div>
+      <span class="sketch-muted">${free} of €20,000 free</span>
+      <div class="sc_foot">${paid ? '<span><small>Next payment</small>Paid today</span><span class="sketch-muted">Done</span>' : '<span><small>Next payment</small>30 Nov</span><button class="sketch-button secondary" type="button" data-pay>Pay now</button>'}</div>
+    </div>`;
+  const counts_body = `<div class="sketch-stack">
+      <dl class="sc_nums"><div><dt>To pay</dt><dd>9</dd></div><div><dt>Late</dt><dd>2</dd></div><div><dt>Due this week</dt><dd>3</dd></div></dl>
+      <div class="sc_foot"><span><small>New</small>4 bills · €6,300</span><a href="#counts" data-sketch-toast="All bills (sample)">View<i data-icon="chevron-right"></i></a></div>
+    </div>`;
+
+  // The pressed button is drawn again or removed, so the focus goes to the first control of the card body, or else of the card.
+  const focus_first = section => (section.querySelector('[data-body] :is(a[href], button:not(:disabled))') || section.querySelector('a[href], button:not(:disabled)'))?.focus();
+
+  // During a load the loading block holds the focus, so the focus never goes to the page.
+  const hold = box => { const s = box.querySelector('[role="status"]'); if (s) { s.tabIndex = -1; s.focus(); } };
+
+  function fill(section) {
+    const id = section.dataset.state, ds = section.dataset;
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
+    const body = section.querySelector('[data-body]'), counts = ds.counts !== undefined;
+    section.querySelector('[data-title]').textContent = counts ? 'Bills to pay' : 'Company card';
+    section.querySelector('[data-icon-action]').innerHTML = counts ? '<button class="sketch-icon-button" type="button" aria-label="Upload a bill" data-sketch-toast="Upload a bill (sample)"><i data-icon="upload"></i></button>' : '';
+    section.querySelector('[data-menu]').innerHTML = counts
+      ? '<button class="sketch-menu-item" type="button" data-sketch-toast="Bill settings (sample)"><i data-icon="settings"></i>Bill settings</button>'
+      : '<button class="sketch-menu-item" type="button" data-sketch-toast="Change the limit (sample)"><i data-icon="sliders"></i>Change the limit</button><button class="sketch-menu-item" type="button" data-sketch-toast="Report the card lost (sample)"><i data-icon="warning"></i>Report it lost</button>';
+    if (ds.loading !== undefined) { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; return; }
+    if (ds.error !== undefined) {
+      body.innerHTML = '<div class="sketch-stack"><p>The card did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
+      body.querySelector('[data-retry]').addEventListener('click', () => { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; hold(body); setTimeout(() => { delete ds.error; fill(section); if (window.initSketch) initSketch(); focus_first(section); }, 1200); });
+      return;
+    }
+    if (ds.empty !== undefined) { body.innerHTML = '<div class="sketch-stack"><p>No card yet.</p><button class="sketch-button secondary" type="button" data-sketch-toast="Order a card (sample)">Order a card</button></div>'; return; }
+    if (counts) { body.innerHTML = counts_body; return; }
+    const draw = paid => {
+      body.innerHTML = ds.near !== undefined ? limit_body('€18,900.00', 95, '€1,100.00', paid) : limit_body('€8,240.10', 41, '€11,759.90', paid);
+      const pay = body.querySelector('[data-pay]');
+      if (pay) pay.addEventListener('click', () => { draw(true); sketchToast('Paid (sample)'); focus_first(section); });
+    };
+    draw(ds.paid !== undefined);
+    if (ds.openMenu !== undefined) section.querySelector(`#more_${id}`).setAttribute('data-open', '');
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>

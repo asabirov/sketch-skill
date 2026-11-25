@@ -1,0 +1,4 @@
+[
+  {"label": "by-category", "element": "table rows", "animation": "bt_fade", "duration": 200, "delay": 0, "easing": "ease-out", "measurement": "estimated"},
+  {"label": "loading", "element": "pulsing block", "animation": "bt_pulse", "duration": 1000, "delay": 0, "easing": "ease", "measurement": "estimated"}
+]

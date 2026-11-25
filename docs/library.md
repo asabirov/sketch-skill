@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 71 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 81 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -13,6 +13,21 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 | [`account/live-preview-signup`](../library/account/live-preview-signup/) | The sign-up of a team product, where each answer can show its result at once. Use it when a new team names its workspace, says what it uses the product for, and takes its first steps in the app. |
 | [`account/oauth-consent`](../library/account/oauth-consent/) | A person lets an outside app act for their account, and later takes that right back in Settings. |
 | [`account/waitlist`](../library/account/waitlist/) | A person asks for access to a new service and needs a clear result. |
+
+## analytics
+
+| Pattern | Best for |
+| --- | --- |
+| [`analytics/account-list`](../library/analytics/account-list/) | A card on an overview page that compares the money in a few accounts, pots or wallets, and opens one of them. |
+| [`analytics/action-row`](../library/analytics/action-row/) | The top of an overview page, where a person starts the most common jobs of the product without a menu. |
+| [`analytics/balance-card`](../library/analytics/balance-card/) | A person opens a money product to see how much money the business has now, and how the total moved over a period that they choose. |
+| [`analytics/breakdown-table`](../library/analytics/breakdown-table/) | A report that splits the money in and the money out of a range into their largest parts, with each part's share of the total. |
+| [`analytics/dashboard-grid`](../library/analytics/dashboard-grid/) | A dashboard home where each person chooses which cards to see, their order and their size, and the same layout must hold from a phone to a wide screen. |
+| [`analytics/filter-bar`](../library/analytics/filter-bar/) | The top of a report page, where a person sets what the whole report shows: a saved view, filters, a date range and the direction of the money. |
+| [`analytics/flow-chart`](../library/analytics/flow-chart/) | A report that shows where the money of a period came from and where it went, in one picture. |
+| [`analytics/range-brush`](../library/analytics/range-brush/) | Any chart over time where a person sets the shown range by a drag, and needs to see where that range sits in the whole time. |
+| [`analytics/summary-card`](../library/analytics/summary-card/) | A small card on an overview page that answers one question about one part of the product, such as "how much of the limit is used" or "how many bills are late", and links to the full page. |
+| [`analytics/written-insights`](../library/analytics/written-insights/) | Any page with data where a program writes its few most useful facts in plain sentences, next to a chart, a table or a list, for a reader who does not read the data. |
 
 ## chat
 

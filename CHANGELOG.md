@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- The pattern `analytics/dashboard-grid`: Dashboard grid. A dashboard home where each person chooses which cards to see, their order and their size, and the same layout must hold from a phone to a wide screen.
+- The pattern `analytics/breakdown-table`: Breakdown table with shares. A report that splits the money in and the money out of a range into their largest parts, with each part's share of the total.
+- The pattern `analytics/written-insights`: Written insights. Any page with data where a program writes its few most useful facts in plain sentences, next to a chart, a table or a list, for a reader who does not read the data.
+- The pattern `analytics/flow-chart`: Flow chart. A report that shows where the money of a period came from and where it went, in one picture.
+- The pattern `analytics/filter-bar`: Filter bar with range and direction. The top of a report page, where a person sets what the whole report shows: a saved view, filters, a date range and the direction of the money.
+- The pattern `analytics/range-brush`: Range brush under a chart. Any chart over time where a person sets the shown range by a drag, and needs to see where that range sits in the whole time.
+- The pattern `analytics/summary-card`: Summary card. A small card on an overview page that answers one question about one part of the product, such as "how much of the limit is used" or "how many bills are late", and links to the full page.
+- The pattern `analytics/account-list`: Account list card. A card on an overview page that compares the money in a few accounts, pots or wallets, and opens one of them.
+- The pattern `analytics/action-row`: Action row with a More menu. The top of an overview page, where a person starts the most common jobs of the product without a menu.
+- The pattern `analytics/balance-card`: Balance card. A person opens a money product to see how much money the business has now, and how the total moved over a period that they choose.
+
 ## 0.24.0 — 2026-11-24
 
 ### Added

@@ -1,0 +1,102 @@
+<!doctype html>
+<!--
+  Best for: the top of an overview page, where a person starts the most common jobs of the product without a menu.
+  Row opens: no rows.
+  Related: analytics/summary-card holds one direct action for one part of the product. analytics/balance-card is often the first card below this row.
+  One filled main action comes first. Outlined actions follow, then a page action, such as Customize, at the right end.
+  The row keeps as many outlined actions as fit its width. The others go into a More menu, in the same order. The main action never moves into More.
+  Transition values, from transitions.json: the More menu shows at once, and the actions move to More at once when the width changes.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Action row with a More menu</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .qa_page { max-width: 1040px; }
+  [data-sketch] .qa_page :is(h1, p) { margin: 0; }
+  [data-sketch] .qa_items { display: contents; }
+  [data-sketch] .qa_row { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; min-width: 0; }
+  [data-sketch] .qa_row > [data-action][hidden], [data-sketch] .qa_more[hidden] { display: none; }
+  [data-sketch] .qa_more, [data-sketch] .qa_end { position: relative; flex: none; }
+  [data-sketch] .qa_end { margin-left: auto; }
+  [data-sketch] .qa_row > .sketch-button { flex: none; }
+  [data-sketch] .qa_frame { width: 100%; }
+  [data-sketch] [data-width="medium"] .qa_frame { max-width: 620px; padding: 12px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] [data-width="narrow"] .qa_frame { max-width: 360px; padding: 12px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); }
+  [data-sketch] .qa_note { color: var(--sketch-muted); font-size: 14px; }
+</style>
+<body data-sketch>
+<section data-state="actions"></section>
+<section data-state="more-open" data-width="medium" data-open-more></section>
+<section data-state="narrow" data-width="narrow"></section>
+<section data-state="narrow-more" data-width="narrow" data-open-more></section>
+<section data-state="action-started" data-started="Transfer"></section>
+
+<template id="page">
+  <main class="sketch-main qa_page">
+    <h1>Good morning, Rosa</h1>
+    <div class="qa_frame">
+      <div class="qa_row" role="toolbar" aria-label="Quick actions">
+        <button class="sketch-button" type="button" data-main data-sketch-toast="Send money (sample)"><i data-icon="send"></i>Send money</button>
+        <button class="sketch-button secondary" type="button" data-action="Transfer"><i data-icon="arrow-right"></i>Transfer</button>
+        <button class="sketch-button secondary" type="button" data-action="Deposit"><i data-icon="plus"></i>Deposit</button>
+        <button class="sketch-button secondary" type="button" data-action="Request"><i data-icon="download"></i>Request</button>
+        <button class="sketch-button secondary" type="button" data-action="Upload bill"><i data-icon="upload"></i>Upload bill</button>
+        <span class="qa_more">
+          <button class="sketch-button secondary" type="button" data-sketch-popover="more___s__">More<i data-icon="chevron-down"></i></button>
+          <span class="sketch-menu" id="more___s__" role="menu" aria-label="More actions"><span class="qa_items" data-items></span></span>
+        </span>
+        <span class="qa_end"><button class="sketch-icon-button" type="button" aria-label="Customize the page" data-sketch-toast="Customize (sample)"><i data-icon="sliders"></i></button></span>
+      </div>
+    </div>
+    <p class="qa_note" data-note></p>
+  </main>
+</template>
+
+<script>
+  const icons = {Transfer: 'arrow-right', Deposit: 'plus', Request: 'download', 'Upload bill': 'upload'};
+
+  function fill(section) {
+    const id = section.dataset.state;
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
+    const row = section.querySelector('.qa_row'), more = section.querySelector('.qa_more'), menu = section.querySelector(`#more_${id}`);
+    const actions = [...row.querySelectorAll('[data-action]')];
+    const start = name => {
+      section.querySelector('[data-note]').textContent = `${name} opens its own form.`;
+      sketchToast(`${name} (sample)`);
+    };
+    actions.forEach(a => a.addEventListener('click', () => start(a.dataset.action)));
+
+    // Show every action, then move the last ones into More until the row fits.
+    // The items sit in a child of the menu, so the outline that the kit drew stays. They change only when the moved set changes.
+    let last = null;
+    function fit() {
+      actions.forEach(a => { a.hidden = false; });
+      more.hidden = true;
+      const fits = () => row.scrollWidth <= row.clientWidth;
+      if (!fits()) {
+        more.hidden = false;
+        for (let i = actions.length - 1; i >= 0 && !fits(); i--) actions[i].hidden = true;
+      }
+      const moved = actions.filter(a => a.hidden), key = moved.map(a => a.dataset.action).join('|');
+      if (key === last) return;
+      last = key;
+      menu.querySelector('[data-items]').innerHTML = moved.map(a => `<button class="sketch-menu-item" type="button" role="menuitem" data-moved="${a.dataset.action}"><i data-icon="${icons[a.dataset.action]}"></i>${a.dataset.action}</button>`).join('');
+      if (window.initSketch) initSketch();
+    }
+    menu.addEventListener('click', e => { const item = e.target.closest('[data-moved]'); if (item) start(item.dataset.moved); });
+    let frame = 0;
+    new ResizeObserver(() => { cancelAnimationFrame(frame); frame = requestAnimationFrame(fit); }).observe(row);
+    fit();
+    if (section.dataset.width) section.querySelector('[data-note]').textContent = 'The dashed frame shows a narrower space for the row.';
+    if (section.dataset.openMore !== undefined) {
+      menu.setAttribute('data-open', '');
+    }
+    if (section.dataset.started) section.querySelector('[data-note]').textContent = `${section.dataset.started} opens its own form.`;
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>

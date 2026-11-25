@@ -1,0 +1,5 @@
+[
+  {"label": "period-menu", "element": "chevron of the period button", "property": "transform", "duration": 200, "delay": 0, "easing": "cubic-bezier(0.35, 0, 0.25, 1)", "measurement": "measured"},
+  {"label": "period-changed", "element": "chevron of the period button", "property": "transform", "duration": 200, "delay": 0, "easing": "cubic-bezier(0.35, 0, 0.25, 1)", "measurement": "measured"},
+  {"label": "loading", "element": "pulsing blocks of the total and the chart", "animation": "bc_pulse", "duration": 1000, "delay": 0, "easing": "ease", "measurement": "estimated"}
+]
