@@ -1,0 +1,4 @@
+[
+  {"label": "insights", "element": "each insight", "animation": "wt_rise", "duration": 200, "delay": 0, "easing": "ease-out", "measurement": "estimated"},
+  {"label": "loading", "element": "pulsing lines", "animation": "wt_pulse", "duration": 1000, "delay": 0, "easing": "ease", "measurement": "measured"}
+]
