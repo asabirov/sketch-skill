@@ -172,7 +172,10 @@
 
   // A button that shows another state moves the focus to the first control of that state, so the focus does not go to the page.
   function go(state) {
-    addEventListener('hashchange', () => document.querySelector(`[data-state="${state}"]`)?.querySelector('a[href], button:not(:disabled), input:not(:disabled), [tabindex="0"]')?.focus(), {once: true});
+    const focus = () => document.querySelector(`[data-state="${state}"]`)?.querySelector('a[href], button:not(:disabled), input:not(:disabled), [tabindex="0"]')?.focus();
+    // Without a change of hash no hashchange comes, so the focus moves at once and no listener waits.
+    if (location.hash === `#${state}`) { focus(); return; }
+    addEventListener('hashchange', focus, {once: true});
     location.hash = state;
   }
 
@@ -195,7 +198,8 @@
       chart.classList.toggle('cc_still', still);
       section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === st.view; });
       $('[data-group-name]').textContent = st.group === 'month' ? 'Month' : 'Quarter';
-      $(`#group_${id}`).innerHTML = ['Month', 'Quarter'].map(g => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="${g.toLowerCase() === st.group}" data-group="${g.toLowerCase()}"><i data-icon="check"></i>${g}</button>`).join('');
+      // The menu items stay, and only their marks change, so the outline that the kit drew on the menu stays.
+      $(`#group_${id}`).querySelectorAll('[data-group]').forEach(i => i.setAttribute('aria-checked', String(i.dataset.group === st.group)));
       const w = Math.max(280, chart.clientWidth);
       if (st.view === 'line') chart.innerHTML = line_svg(d, w);
       else if (st.view === 'by-category') chart.innerHTML = category_html(d);
@@ -203,6 +207,7 @@
       chart.dataset.width = w;
       wire_hover();
     }
+    $(`#group_${id}`).insertAdjacentHTML('beforeend', ['Month', 'Quarter'].map(g => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="false" data-group="${g.toLowerCase()}"><i data-icon="check"></i>${g}</button>`).join(''));
     let resize_frame = 0;
     new ResizeObserver(() => {
       cancelAnimationFrame(resize_frame);
@@ -224,7 +229,8 @@
       section.querySelectorAll('.col_hit').forEach(c => c.addEventListener('pointerenter', () => show(Number(c.dataset.col))));
       const svg = $('.cc_svg');
       if (svg) svg.addEventListener('pointerleave', () => { tip.hidden = true; section.querySelectorAll('.col_hit').forEach(c => c.classList.remove('on')); });
-      if (section.dataset.hover && section.querySelector('.col_hit')) requestAnimationFrame(() => show(Number(section.dataset.hover)));
+      // The hover column of the state exists only in the month view, so the quarter view shows no tooltip at the start.
+      if (section.dataset.hover && section.querySelector(`.col_hit[data-col="${section.dataset.hover}"]`)) requestAnimationFrame(() => show(Number(section.dataset.hover)));
     }
 
     section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => r.addEventListener('change', () => { st.view = r.value; draw_chart(); initSketch(); }));
