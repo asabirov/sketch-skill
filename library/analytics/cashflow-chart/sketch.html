@@ -1,0 +1,248 @@
+<!doctype html>
+<!--
+  Best for: a report that shows whether each month or quarter earned or burned money, and how the money in and the money out moved.
+  Row opens: no rows.
+  Related: analytics/filter-bar sets the range and the direction. analytics/flow-chart shows where the money came from and went. analytics/breakdown-table splits the same totals by source or category. analytics/balance-card shows the total of today.
+  The block has the totals of the range: the net cash flow (largest), the money in and the money out. Below them, a group button (Month or Quarter) and a switch of 3 chart views above the chart.
+  Overview: money in is a bar up from the zero line, money out is a bar down, and the net cash flow is a line with points. Lines: money in and money out as 2 lines from zero. By category: the money out of each period, split into its largest category and everything else.
+  The pointer on a period gives the period a ground and a tooltip with its money in, money out and net.
+  The charts draw at the real pixel width of the block and draw again when the width changes, so a point stays round and a label keeps its shape.
+  Transition values, from transitions.json: a new view fades in 300 ms, ease-out, and its points grow in 160 ms, ease-out, one after the other about 153 ms apart. The group menu fades and grows in 150 ms, cubic-bezier(0.4, 0, 0.2, 1). After a new grouping, the totals rise in 200 ms, ease-out, and a loading block pulses 1000 ms, ease.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cash flow chart</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .cc_page { max-width: 1120px; }
+  [data-sketch] .cc_page :is(h1, h2, h3, p) { margin: 0; }
+  /* The totals and the chart area. */
+  /* The totals keep one height in every state, so the chart below does not move. */
+  [data-sketch] .cc_totals { min-height: 61px; align-content: start; }
+  [data-sketch] .cc_totals dd b { font-size: 22px; }
+  [data-sketch] .cc_totals div:first-child dd b { font-size: 36px; }
+  [data-sketch] .cc_rise { animation: cc_rise 200ms ease-out; }
+  @keyframes cc_rise { from { opacity: 0; transform: translateY(6px); } }
+  [data-sketch] .cc_chart_bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+  [data-sketch] .cc_chart_box { position: relative; display: grid; gap: 8px; }
+  [data-sketch] .cc_fade { animation: cc_fade 300ms ease-out; }
+  @keyframes cc_fade { from { opacity: 0; } }
+  [data-sketch] .cc_svg { display: block; overflow: visible; }
+  [data-sketch] .cc_svg text { fill: var(--sketch-muted); font-size: 11px; }
+  [data-sketch] .cc_svg .grid { stroke: var(--sketch-muted); stroke-width: 1; stroke-dasharray: 2 4; }
+  [data-sketch] .cc_svg .zero { stroke: var(--sketch-ink); stroke-width: 1; }
+  [data-sketch] .cc_svg .in { fill: var(--sketch-ink); }
+  [data-sketch] .cc_svg .out { fill: color-mix(in srgb, var(--sketch-ink) 40%, var(--sketch-page)); }
+  [data-sketch] .cc_svg .net, [data-sketch] .cc_svg .series { fill: none; stroke: var(--sketch-ink); stroke-width: 2; stroke-linejoin: round; }
+  [data-sketch] .cc_svg .casing { fill: none; stroke: var(--sketch-page); stroke-width: 5; stroke-linejoin: round; }
+  [data-sketch] .cc_svg .series.dashed { stroke-width: 1.5; stroke-dasharray: 5 4; }
+  [data-sketch] .cc_svg .dot { fill: var(--sketch-page); stroke: var(--sketch-ink); stroke-width: 2; paint-order: stroke; filter: drop-shadow(0 0 1.5px var(--sketch-page)); transform-box: fill-box; transform-origin: center; animation: cc_grow 160ms ease-out backwards; }
+  [data-sketch] .cc_svg .dot.square { fill: var(--sketch-ink); }
+  @keyframes cc_grow { from { transform: scale(0); } }
+  [data-sketch] .cc_svg .col_hit { fill: transparent; }
+  [data-sketch] .cc_svg .col_hit.on { fill: var(--sketch-wash); }
+  [data-sketch] .cc_tip { position: absolute; z-index: 3; top: 48px; display: grid; grid-template-columns: auto auto; gap: 2px 20px; padding: 8px 12px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; pointer-events: none; }
+  [data-sketch] .cc_tip dd { margin: 0; text-align: right; }
+  [data-sketch] .cc_tip[hidden] { display: none; }
+  [data-sketch] [data-chart] { height: 258px; }
+  [data-sketch] .cc_pulse { height: 258px; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: cc_pulse 1000ms ease infinite alternate; }
+  [data-sketch] .cc_pulse.cc_line { height: 18px; }
+  @keyframes cc_pulse { to { opacity: .4; } }
+  [data-sketch] .cc_empty { display: grid; place-items: center; align-content: center; gap: 8px; height: 258px; border: 1px dashed var(--sketch-muted); border-radius: var(--sketch-wobble); text-align: center; }
+  [data-sketch] .sketch-menu.cc_pop { transition: opacity 150ms cubic-bezier(.4, 0, .2, 1), scale 150ms cubic-bezier(.4, 0, .2, 1); }
+  @starting-style { [data-sketch] .sketch-menu.cc_pop:not([hidden]) { opacity: 0; scale: .96; } }
+  [data-sketch] .sketch-menu-item[aria-checked="false"] > :first-child { visibility: hidden; }
+  @media (min-width: 1000px) {
+  }
+  @media (max-width: 599px) {
+    [data-sketch] .cc_totals div:first-child dd b { font-size: 30px; }
+    [data-sketch] .cc_totals { min-height: 113px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-sketch] :is(.cc_rise, .cc_fade, .cc_svg .dot, .cc_pulse) { animation: none; }
+  }
+</style>
+<body data-sketch>
+<!-- The page script fills each state from the template below. -->
+<section data-state="overview" data-view="overview"></section>
+<section data-state="hover" data-view="overview" data-hover="2"></section>
+<section data-state="line" data-view="line"></section>
+<section data-state="by-category" data-view="by-category"></section>
+<section data-state="group-menu" data-view="overview" data-open-part="group"></section>
+<section data-state="quarter" data-view="overview" data-group="quarter"></section>
+<section data-state="money-in-only" data-view="overview" data-direction="in"></section>
+<section data-state="loading" data-view="loading"></section>
+<section data-state="empty" data-view="empty"></section>
+
+<template id="page">
+  <main class="sketch-main cc_page">
+    <h1>Cash flow</h1>
+    <dl class="sketch-summary cc_totals" data-totals></dl>
+    <div class="cc_chart_box">
+      <div class="cc_chart_bar">
+        <span>
+          <button class="sketch-button secondary" type="button" data-sketch-popover="group___s__"><span data-group-name></span><i data-icon="chevron-down"></i></button>
+          <div class="sketch-menu cc_pop" id="group___s__" role="menu" aria-label="Group by"></div>
+        </span>
+        <div class="sketch-segmented" role="radiogroup" aria-label="Chart">
+          <label><input type="radio" name="view___s__" value="overview">Overview</label>
+          <label><input type="radio" name="view___s__" value="line">Lines</label>
+          <label><input type="radio" name="view___s__" value="by-category">By category</label>
+        </div>
+      </div>
+      <div data-chart></div>
+      <dl class="cc_tip" hidden data-tip></dl>
+    </div>
+  </main>
+</template>
+
+<script>
+  const data = {
+    month: {labels: ['Aug', 'Sep', 'Oct', 'Nov'], in: [82, 120, 160, 640], out: [95, 88, 270, 310]},
+    quarter: {labels: ['Q1', 'Q2', 'Q3', 'Q4 to date'], in: [310, 280, 290, 800], out: [340, 300, 290, 580]}
+  };
+  const payroll = [52, 50, 160, 168];
+  const k = v => `€${Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + 'M' : v + 'k'}`;
+  const signed = v => (v < 0 ? '−' : '+') + k(Math.abs(v));
+
+  // Both charts draw at the real pixel width of the chart, so a point stays round and a label keeps its shape.
+  const chart_h = 240, gutter = 56, top_y = 12, base_y = 212;
+  const axis = (ticks) => ticks.map(([y, t, zero]) => `<line class="${zero ? 'zero' : 'grid'}" x1="${gutter}" x2="100%" y1="${y}" y2="${y}"/><text x="${gutter - 8}" y="${y + 4}" text-anchor="end">${t}</text>`).join('');
+  const dots = (pts, square) => pts.map(([x, y], i) => square
+    ? `<rect class="dot square" x="${x - 4}" y="${y - 4}" width="8" height="8" style="animation-delay:${Math.round(i * 153.33)}ms"/>`
+    : `<circle class="dot" cx="${x}" cy="${y}" r="4.5" style="animation-delay:${Math.round(i * 153.33)}ms"/>`).join('');
+
+  function overview_svg(d, direction, w) {
+    const mid = (top_y + base_y - 20) / 2, half = mid - top_y, scale = half / 700;
+    const n = d.labels.length, step = (w - gutter) / n, bar_w = Math.min(48, step * .5);
+    let bars = '', hits = '', labels = '', points = [];
+    d.labels.forEach((label, i) => {
+      const x = gutter + step * i + step / 2;
+      const in_v = direction === 'out' ? 0 : d.in[i], out_v = direction === 'in' ? 0 : d.out[i];
+      hits += `<rect class="col_hit" data-col="${i}" x="${gutter + step * i}" y="0" width="${step}" height="${base_y - 16}"/>`;
+      bars += `<rect class="in" x="${x - bar_w / 2}" y="${mid - in_v * scale}" width="${bar_w}" height="${in_v * scale}"/>`;
+      bars += `<rect class="out" x="${x - bar_w / 2}" y="${mid}" width="${bar_w}" height="${out_v * scale}"/>`;
+      labels += `<text x="${x}" y="${base_y + 14}" text-anchor="middle">${label}</text>`;
+      points.push([x, mid - (in_v - out_v) * scale]);
+    });
+    const line = points.map(p => p.join(',')).join(' ');
+    const net = direction === 'all' ? `<polyline class="casing" points="${line}"/><polyline class="net" points="${line}"/>${dots(points)}` : '';
+    return `<svg class="cc_svg cc_fade" width="${w}" height="${chart_h}" role="img" aria-label="Money in and money out: ${d.labels.map((l, i) => `${l}, in ${k(d.in[i])}, out ${k(d.out[i])}`).join('; ')}.">
+        ${hits}${axis([[top_y, '+€700k'], [mid, '0', true], [mid + half, '−€700k']])}${bars}${net}${labels}
+      </svg>
+      <ul class="sketch-key" aria-hidden="true">${direction !== 'out' ? '<li><i></i>Money in, up</li>' : ''}${direction !== 'in' ? '<li><i class="second"></i>Money out, down</li>' : ''}${direction === 'all' ? '<li><i class="line"></i>Net cash flow</li>' : ''}</ul>`;
+  }
+
+  function line_svg(d, w) {
+    const low = base_y - 8, scale = (low - top_y) / 700, n = d.labels.length, step = (w - gutter) / n;
+    const pts = series => series.map((v, i) => [gutter + step * i + step / 2, low - v * scale]);
+    const a = pts(d.in), b = pts(d.out), poly = p => p.map(q => q.join(',')).join(' ');
+    let hits = '';
+    d.labels.forEach((l, i) => { hits += `<rect class="col_hit" data-col="${i}" x="${gutter + step * i}" y="0" width="${step}" height="${low}"/>`; });
+    return `<svg class="cc_svg cc_fade" width="${w}" height="${chart_h}" role="img" aria-label="Money in and money out as lines: ${d.labels.map((l, i) => `${l}, in ${k(d.in[i])}, out ${k(d.out[i])}`).join('; ')}.">
+        ${hits}${axis([[top_y, '€700k'], [(top_y + low) / 2, '€350k'], [low, '0', true]])}
+        <polyline class="series" points="${poly(a)}"/><polyline class="series dashed" points="${poly(b)}"/>
+        ${dots(a)}${dots(b, true)}
+        ${d.labels.map((l, i) => `<text x="${gutter + step * i + step / 2}" y="${base_y + 14}" text-anchor="middle">${l}</text>`).join('')}
+      </svg>
+      <ul class="sketch-key" aria-hidden="true"><li><i class="line"></i>Money in</li><li><i class="line compare"></i>Money out</li></ul>`;
+  }
+
+  function category_html(d) {
+    const top = 350;
+    const cols = d.labels.map((l, i) => {
+      const all = d.out[i], pay = Math.min(payroll[i], all);
+      return `<div style="--v:${(all / top * 100).toFixed(1)}%"><b>${k(all)}</b><i class="second" style="--v:${((all - pay) / top * 100).toFixed(1)}%"></i><i style="--v:${(pay / top * 100).toFixed(1)}%"></i></div>`;
+    }).join('');
+    return `<div class="cc_fade sketch-stack"><div class="sketch-chart" style="--n:${d.labels.length}" role="img" aria-label="Money out by category: ${d.labels.map((l, i) => `${l}, payroll ${k(payroll[i])}, everything else ${k(d.out[i] - payroll[i])}`).join('; ')}.">
+        <div class="sketch-plot" style="--h:164px"><span class="sketch-tick" style="--v:0%"><span>0</span></span><span class="sketch-tick" style="--v:100%"><span>€350k</span></span>${cols}</div>
+        <ol class="sketch-periods" aria-hidden="true">${d.labels.map(l => `<li>${l}</li>`).join('')}</ol>
+      </div>
+      <ul class="sketch-key" aria-hidden="true"><li><i></i>Payroll</li><li><i class="second"></i>Everything else</li></ul></div>`;
+  }
+
+  function fill(section) {
+    const id = section.dataset.state;
+    section.innerHTML = document.getElementById('page').innerHTML.replaceAll('__s__', id);
+    const st = {view: section.dataset.view, group: section.dataset.group || 'month', direction: section.dataset.direction || 'all'};
+    const $ = sel => section.querySelector(sel);
+
+    function draw_totals(rise) {
+      const d = data[st.group];
+      const sum = a => a.reduce((x, y) => x + y, 0);
+      const tin = sum(d.in), tout = sum(d.out);
+      const items = st.direction === 'in' ? [['Money in', `+${k(tin)}`]] : st.direction === 'out' ? [['Money out', `−${k(tout)}`]] : [['Net cash flow', signed(tin - tout)], ['Money in', `+${k(tin)}`], ['Money out', `−${k(tout)}`]];
+      $('[data-totals]').innerHTML = items.map(([t, v]) => `<div><dt>${t}</dt><dd><b class="${rise ? 'cc_rise' : ''}">${v}</b></dd></div>`).join('');
+    }
+
+    function draw_chart() {
+      const chart = $('[data-chart]'), d = data[st.group];
+      section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === st.view; });
+      $('[data-group-name]').textContent = st.group === 'month' ? 'Month' : 'Quarter';
+      $(`#group_${id}`).innerHTML = ['Month', 'Quarter'].map(g => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="${g.toLowerCase() === st.group}" data-group="${g.toLowerCase()}"><i data-icon="check"></i>${g}</button>`).join('');
+      const w = Math.max(280, chart.clientWidth);
+      if (st.view === 'line') chart.innerHTML = line_svg(d, w);
+      else if (st.view === 'by-category') chart.innerHTML = category_html(d);
+        else chart.innerHTML = overview_svg(d, st.direction, w);
+      chart.dataset.width = w;
+      wire_hover();
+    }
+    let resize_frame = 0;
+    new ResizeObserver(() => {
+      cancelAnimationFrame(resize_frame);
+      resize_frame = requestAnimationFrame(() => {
+        const chart = $('[data-chart]');
+        if (chart.clientWidth && chart.querySelector('.cc_svg[width]') && Number(chart.dataset.width) !== chart.clientWidth) draw_chart();
+      });
+    }).observe($('[data-chart]'));
+
+    function wire_hover() {
+      const tip = $('[data-tip]'), box = $('.cc_chart_box'), d = data[st.group];
+      const show = i => {
+        section.querySelectorAll('.col_hit').forEach(c => c.classList.toggle('on', Number(c.dataset.col) === i));
+        tip.innerHTML = `<dt>Money in</dt><dd>+${k(d.in[i])}</dd><dt>Money out</dt><dd>−${k(d.out[i])}</dd><dt>${d.labels[i]} net</dt><dd>${signed(d.in[i] - d.out[i])}</dd>`;
+        tip.hidden = false;
+        const col = section.querySelector(`.col_hit[data-col="${i}"]`).getBoundingClientRect(), r = box.getBoundingClientRect();
+        tip.style.left = `${Math.min(r.width - tip.offsetWidth, Math.max(0, col.left - r.left + col.width / 2 - tip.offsetWidth / 2))}px`;
+      };
+      section.querySelectorAll('.col_hit').forEach(c => c.addEventListener('pointerenter', () => show(Number(c.dataset.col))));
+      const svg = $('.cc_svg');
+      if (svg) svg.addEventListener('pointerleave', () => { tip.hidden = true; section.querySelectorAll('.col_hit').forEach(c => c.classList.remove('on')); });
+      if (section.dataset.hover && section.querySelector('.col_hit')) requestAnimationFrame(() => show(Number(section.dataset.hover)));
+    }
+
+    section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => r.addEventListener('change', () => { st.view = r.value; draw_chart(); initSketch(); }));
+    $(`#group_${id}`).addEventListener('click', e => {
+      const item = e.target.closest('[data-group]');
+      if (!item) return;
+      st.group = item.dataset.group;
+      $('[data-chart]').innerHTML = '<div class="cc_pulse" aria-label="Loading"></div>';
+      setTimeout(() => { draw_totals(true); draw_chart(); initSketch(); }, 400);
+    });
+
+    if (st.view === 'loading') {
+      $('[data-totals]').innerHTML = '<div><dt>Net cash flow</dt><dd><span class="cc_pulse cc_line" style="display:block;width:160px"></span></dd></div>';
+      $('[data-chart]').innerHTML = '<div class="cc_pulse" aria-label="Loading"></div>';
+      section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === 'overview'; });
+      $('[data-group-name]').textContent = 'Month';
+      return;
+    }
+    if (st.view === 'empty') {
+      $('[data-totals]').innerHTML = '<div><dt>Net cash flow</dt><dd><b>€0</b></dd></div><div><dt>Money in</dt><dd><b>€0</b></dd></div><div><dt>Money out</dt><dd><b>€0</b></dd></div>';
+      $('[data-chart]').innerHTML = '<div class="cc_empty"><p>No money came in or went out in this range.</p><button class="sketch-button secondary" type="button" data-wide>Show the last 12 months</button></div>';
+      $('[data-chart] [data-wide]').addEventListener('click', () => { location.hash = 'overview'; });
+      section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === 'overview'; });
+      $('[data-group-name]').textContent = 'Month';
+      return;
+    }
+    draw_totals(st.group === 'quarter');
+    draw_chart();
+    const open = section.dataset.openPart;
+    if (open) $(`#${open}_${id}`).setAttribute('data-open', '');
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>

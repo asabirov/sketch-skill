@@ -1,0 +1,85 @@
+[
+  {
+    "label": "line",
+    "element": "chart",
+    "animation": "cc_fade",
+    "duration": 300,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "line",
+    "element": "point of a line, one entry for the first point; each next point waits about 153 ms more",
+    "animation": "cc_grow",
+    "duration": 160,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "by-category",
+    "element": "chart",
+    "animation": "cc_fade",
+    "duration": 300,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "overview",
+    "element": "chart",
+    "animation": "cc_fade",
+    "duration": 300,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "overview",
+    "element": "point of the net line, one entry for the first point; each next point waits about 153 ms more",
+    "animation": "cc_grow",
+    "duration": 160,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "group-menu",
+    "element": "group menu",
+    "property": "opacity",
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured",
+    "animation": null
+  },
+  {
+    "label": "group-menu",
+    "element": "group menu",
+    "property": "scale",
+    "duration": 150,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured",
+    "animation": null
+  },
+  {
+    "label": "quarter",
+    "element": "values of the totals",
+    "animation": "cc_rise",
+    "duration": 200,
+    "delay": 0,
+    "easing": "ease-out",
+    "measurement": "measured"
+  },
+  {
+    "label": "quarter",
+    "element": "loading blocks",
+    "animation": "cc_pulse",
+    "duration": 1000,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  }
+]
