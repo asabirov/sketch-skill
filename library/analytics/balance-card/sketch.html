@@ -209,9 +209,11 @@
       const name = item.textContent.trim();
       if (menu_keys[name]) key = menu_keys[name];
       else sketchToast(`${name} (sample: the sketch draws 3 periods)`);
-      draw_menu();
+      // The items stay, and only their marks change. initSketch() closes the menu, so the focus then goes back to the period button.
+      menu.querySelectorAll('.sketch-menu-item').forEach(i => i.setAttribute('aria-checked', String(i.textContent.trim() === periods[key].name)));
       show('chart');
       initSketch();
+      section.querySelector(`[data-sketch-popover="${menu.id}"]`)?.focus();
     });
     radios.forEach(r => r.addEventListener('change', () => { show(r.value); initSketch(); }));
     if (section.dataset.menu !== undefined) menu.setAttribute('data-open', '');

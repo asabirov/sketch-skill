@@ -30,6 +30,8 @@
   [data-sketch] .cc_fade { animation: cc_fade 300ms ease-out; }
   @keyframes cc_fade { from { opacity: 0; } }
   [data-sketch] .cc_svg { display: block; overflow: visible; }
+  /* The svg has a fixed width until the next draw. The chart box does not take its width from the svg, so it gets narrower with the window, and the observer draws again. */
+  [data-sketch] [data-chart] { contain: inline-size; }
   [data-sketch] .cc_svg text { fill: var(--sketch-muted); font-size: 11px; }
   [data-sketch] .cc_svg .grid { stroke: var(--sketch-muted); stroke-width: 1; stroke-dasharray: 2 4; }
   [data-sketch] .cc_svg .zero { stroke: var(--sketch-ink); stroke-width: 1; }

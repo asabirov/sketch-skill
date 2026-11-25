@@ -19,6 +19,8 @@
   [data-sketch] .fc_page :is(h1, p) { margin: 0; }
   [data-sketch] .fc_box { position: relative; }
   [data-sketch] .fc_svg { display: block; overflow: visible; animation: fc_fade 300ms ease-out; }
+  /* The svg has a fixed width until the next draw. The chart box does not take its width from the svg, so it gets narrower with the window, and the observer draws again. */
+  [data-sketch] [data-chart] { contain: inline-size; }
   @keyframes fc_fade { from { opacity: 0; } }
   [data-sketch] .fc_svg .band { fill: var(--sketch-wash); stroke: var(--sketch-ink); stroke-width: .75; transition: opacity 150ms ease-out; cursor: pointer; }
   [data-sketch] .fc_svg .band:focus { outline: none; }
