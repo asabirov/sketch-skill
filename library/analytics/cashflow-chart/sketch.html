@@ -221,13 +221,13 @@
       const item = e.target.closest('[data-group]');
       if (!item) return;
       st.group = item.dataset.group;
-      $('[data-chart]').innerHTML = '<div class="cc_pulse" aria-label="Loading"></div>';
+      $('[data-chart]').innerHTML = '<div class="cc_pulse" role="status" aria-label="Loading"></div>';
       setTimeout(() => { draw_totals(true); draw_chart(); initSketch(); }, 400);
     });
 
     if (st.view === 'loading') {
       $('[data-totals]').innerHTML = '<div><dt>Net cash flow</dt><dd><span class="cc_pulse cc_line" style="display:block;width:160px"></span></dd></div>';
-      $('[data-chart]').innerHTML = '<div class="cc_pulse" aria-label="Loading"></div>';
+      $('[data-chart]').innerHTML = '<div class="cc_pulse" role="status" aria-label="Loading"></div>';
       section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === 'overview'; });
       $('[data-group-name]').textContent = 'Month';
       return;
@@ -249,3 +249,10 @@
   document.querySelectorAll('[data-state]').forEach(fill);
 </script>
 <script src="../../../assets/sketch.js"></script>
+<script>
+  // The kit gives each menu item the role menuitem. A choice with a check keeps the role menuitemradio, as navigation/user-menu does.
+  const keep_radios = () => document.querySelectorAll('.sketch-menu-item[aria-checked]').forEach(item => item.setAttribute('role', 'menuitemradio'));
+  const kit_init = window.initSketch;
+  window.initSketch = (...args) => { kit_init(...args); keep_radios(); };
+  keep_radios();
+</script>

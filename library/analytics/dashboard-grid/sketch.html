@@ -49,9 +49,9 @@
   [data-sketch] .cg_handle { cursor: grab; touch-action: none; }
   [data-sketch] .cg_card.cg_drag { z-index: 5; cursor: grabbing; box-shadow: 0 12px 28px color-mix(in srgb, var(--sketch-ink) 22%, transparent); background: var(--sketch-page); }
   [data-sketch] .cg_card.cg_drag .cg_handle { cursor: grabbing; }
-  /* The dragging state shows a card lifted up and to the left. Below 1000 px a card fills the row, so it lifts only up and stays in the window. */
+  /* The dragging state shows a card lifted up and to the left. Up to 1135 px the grid has a small edge, so the card lifts only up and stays in the window. */
   [data-sketch] .cg_card.cg_lifted { transform: translate(-40px, -96px); }
-  @media (max-width: 999px) { [data-sketch] .cg_card.cg_lifted { transform: translate(0, -48px); } }
+  @media (max-width: 1135px) { [data-sketch] .cg_card.cg_lifted { transform: translate(0, -48px); } }
   [data-sketch] .cg_big { font-size: 26px; font-weight: 600; }
   [data-sketch] .cg_lines { display: grid; gap: 6px; }
   [data-sketch] .cg_lines span { display: block; height: 10px; border-radius: 4px; background: var(--sketch-wash); }
@@ -140,7 +140,14 @@
       note.innerHTML = text ? `<span>${text}</span>` : '';
       if (undo) {
         note.insertAdjacentHTML('beforeend', '<button class="sketch-button secondary" type="button" data-undo>Undo</button>');
-        note.querySelector('[data-undo]').addEventListener('click', () => { flip(() => { st.cards = undo; draw(); }); say('The change is undone.'); });
+        note.querySelector('[data-undo]').addEventListener('click', () => {
+          const before = new Set(st.cards.map(([k]) => k));
+          flip(() => { st.cards = undo; draw(); });
+          say('The change is undone.');
+          // Undo removes its own button, so the focus goes to the card that comes back, or else to Add a card.
+          const back = st.cards.find(([k]) => !before.has(k));
+          focus_card(back && back[0]);
+        });
       }
     }
 
@@ -165,6 +172,7 @@
         const undo = st.cards.map(c => [...c]);
         flip(() => { st.cards.push([b.dataset.add, 1]); draw(); });
         say(`${all_cards[b.dataset.add].title} is added at the end, Small.`, undo);
+        focus_card(b.dataset.add);
       }));
     }
 
@@ -202,6 +210,14 @@
         : `<div class="cg_empty"><p>No cards on Home.</p><p class="sketch-muted">Add a card to see it here.</p></div>`;
       grid.querySelectorAll('[data-key]').forEach((el, i) => wire(el, i));
       if (window.initSketch) initSketch();
+    }
+
+    // The focus goes to the Hide control of a card that stays: its button, or its card menu button in a narrow card. Without a card, it goes to Add a card.
+    function focus_card(key) {
+      const card = key && grid.querySelector(`[data-key="${key}"]`);
+      const wide = card && card.querySelector('.cg_wide [data-hide]');
+      const target = wide && wide.offsetParent ? wide : card ? card.querySelector('.cg_narrow [data-sketch-popover]') : $('[data-bar] [data-sketch-popover^="catalog_"]');
+      target?.focus();
     }
 
     function draw() { $('[data-page]').classList.toggle('cg_edit', st.edit); draw_bar(); draw_cards(); }
@@ -331,3 +347,10 @@
   document.querySelectorAll('[data-state]').forEach(fill);
 </script>
 <script src="../../../assets/sketch.js"></script>
+<script>
+  // The kit gives each menu item the role menuitem. A choice with a check keeps the role menuitemradio, as navigation/user-menu does.
+  const keep_radios = () => document.querySelectorAll('.sketch-menu-item[aria-checked]').forEach(item => item.setAttribute('role', 'menuitemradio'));
+  const kit_init = window.initSketch;
+  window.initSketch = (...args) => { kit_init(...args); keep_radios(); };
+  keep_radios();
+</script>

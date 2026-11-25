@@ -27,9 +27,11 @@
   [data-sketch] .sketch-main .al_rows a > span:nth-child(2) { min-width: 0; overflow-wrap: anywhere; }
   [data-sketch] .sketch-main .al_rows a > b { margin-left: auto; padding-left: 12px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
   /* The tooltip of a row: the money on the way, and what is free. */
-  [data-sketch] .al_tip { position: absolute; z-index: 4; right: 0; bottom: calc(100% + 4px); display: none; grid-template-columns: auto auto; gap: 2px 24px; margin: 0; padding: 8px 12px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; pointer-events: none; }
+  [data-sketch] .al_tip { position: absolute; z-index: 4; right: 0; bottom: calc(100% + 4px); display: none; margin: 0; padding: 8px 12px; border-radius: 6px; background: var(--sketch-ink); color: var(--sketch-page); font-size: 13px; pointer-events: none; }
+  /* The tooltip is a div, so the list inside it keeps its own meaning. */
+  [data-sketch] .al_tip dl { display: grid; grid-template-columns: auto auto; gap: 2px 24px; margin: 0; }
   [data-sketch] .al_tip dd { margin: 0; text-align: right; }
-  [data-sketch] .al_rows a:is(:hover, :focus-visible, .al_hover) + .al_tip { display: grid; }
+  [data-sketch] .al_rows a:is(:hover, :focus-visible, .al_hover) + .al_tip { display: block; }
   [data-sketch] .al_pulse { height: 44px; margin: 4px 0; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: al_pulse 1000ms ease infinite alternate; }
   @keyframes al_pulse { to { opacity: .4; } }
   [data-sketch] .al_card .sketch-stack > .sketch-button { justify-self: start; }
@@ -73,7 +75,7 @@
   function rows(list) {
     return `<ul class="al_rows">${list.map(([name, amount, way_in, way_out, free], i) => `<li>
         <a href="#account-opened" data-row="${name}" aria-describedby="tip_${i}"><span class="sketch-avatar square" aria-hidden="true">${name[0]}</span><span>${name}</span><b>${amount}</b></a>
-        <dl class="al_tip" role="tooltip" id="tip_${i}"><dt>On the way in</dt><dd>${way_in}</dd><dt>On the way out</dt><dd>${way_out}</dd><dt>Free to use</dt><dd>${free}</dd></dl></li>`).join('')}</ul>`;
+        <div class="al_tip" role="tooltip" id="tip_${i}"><dl><dt>On the way in</dt><dd>${way_in}</dd><dt>On the way out</dt><dd>${way_out}</dd><dt>Free to use</dt><dd>${free}</dd></dl></div></li>`).join('')}</ul>`;
   }
 
   function fill(section) {
@@ -82,7 +84,7 @@
     const body = section.querySelector('[data-body]'), note = section.querySelector('[data-note]');
     const ds = section.dataset;
     if (ds.loading !== undefined) {
-      body.innerHTML = '<div aria-busy="true" aria-label="Loading">' + '<div class="al_pulse"></div>'.repeat(4) + '</div>';
+      body.innerHTML = '<div aria-busy="true" role="status" aria-label="Loading">' + '<div class="al_pulse"></div>'.repeat(4) + '</div>';
       return;
     }
     if (ds.error !== undefined) {

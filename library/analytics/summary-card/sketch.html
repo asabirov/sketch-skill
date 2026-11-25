@@ -77,10 +77,10 @@
     section.querySelector('[data-menu]').innerHTML = counts
       ? '<button class="sketch-menu-item" type="button" data-sketch-toast="Bill settings (sample)"><i data-icon="settings"></i>Bill settings</button>'
       : '<button class="sketch-menu-item" type="button" data-sketch-toast="Change the limit (sample)"><i data-icon="sliders"></i>Change the limit</button><button class="sketch-menu-item" type="button" data-sketch-toast="Report the card lost (sample)"><i data-icon="warning"></i>Report it lost</button>';
-    if (ds.loading !== undefined) { body.innerHTML = '<div class="sc_pulse" aria-label="Loading"></div>'; return; }
+    if (ds.loading !== undefined) { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; return; }
     if (ds.error !== undefined) {
       body.innerHTML = '<div class="sketch-stack"><p>The card did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
-      body.querySelector('[data-retry]').addEventListener('click', () => { body.innerHTML = '<div class="sc_pulse" aria-label="Loading"></div>'; setTimeout(() => { delete ds.error; fill(section); if (window.initSketch) initSketch(); }, 1200); });
+      body.querySelector('[data-retry]').addEventListener('click', () => { body.innerHTML = '<div class="sc_pulse" role="status" aria-label="Loading"></div>'; setTimeout(() => { delete ds.error; fill(section); if (window.initSketch) initSketch(); }, 1200); });
       return;
     }
     if (ds.empty !== undefined) { body.innerHTML = '<div class="sketch-stack"><p>No card yet.</p><button class="sketch-button secondary" type="button" data-sketch-toast="Order a card (sample)">Order a card</button></div>'; return; }

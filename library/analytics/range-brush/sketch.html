@@ -34,8 +34,11 @@
   [data-sketch] .rb_handle[data-end="a"] { left: -7px; } [data-sketch] .rb_handle[data-end="b"] { right: -7px; }
   [data-sketch] .rb_handle:is(:focus-visible, .rb_focus) { outline: 2px solid var(--sketch-ink); outline-offset: 2px; }
   [data-sketch] .rb_note { color: var(--sketch-muted); font-size: 14px; }
-  @media (max-width: 599px) {
+  /* Below 768 px a month is narrower than its longest name, so the brush names every third month. */
+  @media (max-width: 767px) {
     [data-sketch] .rb_bar > span:nth-child(3n + 2), [data-sketch] .rb_bar > span:nth-child(3n + 3), [data-sketch] .rb_bar > span.rb_near { visibility: hidden; }
+  }
+  @media (max-width: 599px) {
     [data-sketch] .rb_chart[data-many] > div:nth-child(2n) span { visibility: hidden; }
   }
 </style>
@@ -86,7 +89,7 @@
       const name = range_name(st.a, st.b);
       section.querySelector('[data-name]').textContent = name;
       draw_chart();
-      // On a phone a label is wider than its month, so the labels beside each frame edge get rb_near and hide.
+      // Below 768 px a label can be wider than its month, so the labels beside each frame edge get rb_near and hide.
       const near = new Set([st.a - 1, st.a, st.b - 1, st.b]);
       bar.innerHTML = month_names.map((m, i) => `<span${near.has(i) ? ' class="rb_near"' : ''}>${m}</span>`).join('') +
         `<div class="rb_mini" aria-hidden="true">${values.map(v => `<i style="--v:${Math.round(v / top_value * 100)}"></i>`).join('')}</div>` +

@@ -147,7 +147,7 @@
       radios.forEach(r => { r.checked = r.value === (v === 'table' ? 'table' : 'chart'); });
       section.querySelector('[data-part="line"]').hidden = v === 'table' || v === 'error';
       if (v === 'loading') {
-        total.innerHTML = '<span class="bc_pulse bc_small" style="display:block" aria-label="Loading"></span>';
+        total.innerHTML = '<span class="bc_pulse bc_small" style="display:block" role="status" aria-label="Loading"></span>';
         moves.textContent = '';
         period_name.textContent = p.name;
         body.innerHTML = '<div class="bc_pulse" aria-hidden="true"></div>';
@@ -221,3 +221,10 @@
   document.querySelectorAll('[data-state]').forEach(fill);
 </script>
 <script src="../../../assets/sketch.js"></script>
+<script>
+  // The kit gives each menu item the role menuitem. A choice with a check keeps the role menuitemradio, as navigation/user-menu does.
+  const keep_radios = () => document.querySelectorAll('.sketch-menu-item[aria-checked]').forEach(item => item.setAttribute('role', 'menuitemradio'));
+  const kit_init = window.initSketch;
+  window.initSketch = (...args) => { kit_init(...args); keep_radios(); };
+  keep_radios();
+</script>
