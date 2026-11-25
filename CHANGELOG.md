@@ -4,6 +4,7 @@
 
 ### Added
 
+- The pattern `analytics/summary-card`: Summary card. A small card on an overview page that answers one question about one part of the product, such as "how much of the limit is used" or "how many bills are late", and links to the full page.
 - The pattern `analytics/account-list`: Account list card. A card on an overview page that compares the money in a few accounts, pots or wallets, and opens one of them.
 - The pattern `analytics/action-row`: Action row with a More menu. The top of an overview page, where a person starts the most common jobs of the product without a menu.
 - The pattern `analytics/balance-card`: Balance card. A person opens a money product to see how much money the business has now, and how the total moved over a period that they choose.
