@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- The pattern `analytics/balance-card`: Balance card. A person opens a money product to see how much money the business has now, and how the total moved over a period that they choose.
 ## 0.24.0 — 2026-11-24
 
 ### Added

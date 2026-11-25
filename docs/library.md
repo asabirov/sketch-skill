@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 71 patterns in 8 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 72 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -13,6 +13,12 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 | [`account/live-preview-signup`](../library/account/live-preview-signup/) | The sign-up of a team product, where each answer can show its result at once. Use it when a new team names its workspace, says what it uses the product for, and takes its first steps in the app. |
 | [`account/oauth-consent`](../library/account/oauth-consent/) | A person lets an outside app act for their account, and later takes that right back in Settings. |
 | [`account/waitlist`](../library/account/waitlist/) | A person asks for access to a new service and needs a clear result. |
+
+## analytics
+
+| Pattern | Best for |
+| --- | --- |
+| [`analytics/balance-card`](../library/analytics/balance-card/) | A person opens a money product to see how much money the business has now, and how the total moved over a period that they choose. |
 
 ## chat
 

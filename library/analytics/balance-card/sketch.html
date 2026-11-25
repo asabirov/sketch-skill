@@ -1,0 +1,223 @@
+<!doctype html>
+<!--
+  Best for: a person opens a money product to see how much money the business has now, and how the total moved over a period that they choose.
+  Row opens: no rows.
+  Related: analytics/dashboard-grid puts this card first in a grid of cards. analytics/cashflow-chart shows the money in and out of a period in full. analytics/account-list splits the total by account.
+  The card has the name of the total, the total, a period button, the money in and the money out of the period, and a chart of the total over the period. A switch at the top right changes the chart to a table that splits the total.
+  A pointer on the chart shows the total of that day. The line under the total then gives the day and the change from the start of the period.
+  Transition values, from transitions.json: the chevron of the period button turns in 200 ms, cubic-bezier(0.35, 0, 0.25, 1). The period menu, the new period, the table and the pointer line show at once. The loading pulse takes 1000 ms, ease. Try again in the error state shows the loading state, then the chart.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance card</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .bc_page { max-width: 560px; }
+  [data-sketch] .bc_card { display: grid; gap: 12px; }
+  [data-sketch] .bc_card :is(h2, p) { margin: 0; }
+  [data-sketch] .bc_head { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 12px; }
+  [data-sketch] .bc_head h2 { font-size: 15px; font-weight: 500; }
+  [data-sketch] .bc_total { display: block; font-size: clamp(24px, 7vw, 32px); font-weight: 600; line-height: 1.1; white-space: nowrap; }
+  [data-sketch] .bc_total small { font-size: 18px; }
+  [data-sketch] .bc_line { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 16px; min-height: 44px; }
+  [data-sketch] .bc_moves { display: flex; gap: 16px; }
+  [data-sketch] .bc_period > :last-child { transition: transform 200ms cubic-bezier(.35, 0, .25, 1); }
+  [data-sketch] .bc_period[aria-expanded="true"] > :last-child { transform: rotate(180deg); }
+  [data-sketch] .bc_day { font-weight: 500; }
+  [data-sketch] .sketch-menu-item[aria-checked="true"] { font-weight: 600; }
+  [data-sketch] .sketch-menu-item[aria-checked="false"] > :first-child { visibility: hidden; }
+  /* The pointer line: a thin line across the plot and a ring on the line of the total. */
+  [data-sketch] .bc_cursor { position: absolute; inset: 0 auto 0 var(--x); width: 0; border-left: 1px solid var(--sketch-ink); pointer-events: none; }
+  [data-sketch] .bc_cursor::after { content: ""; position: absolute; top: calc(100% - var(--v)); left: -6px; width: 10px; height: 10px; margin-top: -5px; border: 2px solid var(--sketch-ink); border-radius: 50%; background: var(--sketch-page); }
+  [data-sketch] .bc_cursor[hidden] { display: none; }
+  [data-sketch] .bc_plot { cursor: crosshair; touch-action: pan-y; }
+  [data-sketch] .bc_split { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; margin: 0; }
+  [data-sketch] .bc_split dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  [data-sketch] .bc_split .bc_sub { padding-left: 20px; color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .bc_note { padding-top: 12px; border-top: 1px solid var(--sketch-muted); color: var(--sketch-muted); font-size: 14px; }
+  [data-sketch] .bc_pulse { height: 180px; border-radius: var(--sketch-wobble); background: var(--sketch-wash); animation: bc_pulse 1000ms ease infinite alternate; }
+  [data-sketch] .bc_pulse.bc_small { width: 60%; height: 36px; }
+  @keyframes bc_pulse { to { opacity: .4; } }
+  [data-sketch] .bc_message { display: grid; place-items: center; align-content: center; gap: 8px; min-height: 180px; text-align: center; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-sketch] .bc_period > :last-child { transition: none; }
+    [data-sketch] .bc_pulse { animation: none; }
+  }
+</style>
+<body data-sketch>
+<!-- The page script fills each state from the template below. -->
+<section data-state="chart" data-view="chart"></section>
+<section data-state="hover" data-view="chart" data-hover="6"></section>
+<section data-state="period-menu" data-view="chart" data-menu></section>
+<section data-state="period-changed" data-view="chart" data-period="90"></section>
+<section data-state="table" data-view="table"></section>
+<section data-state="loading" data-view="loading"></section>
+<section data-state="empty" data-view="chart" data-period="empty"></section>
+<section data-state="error" data-view="error"></section>
+
+<template id="card">
+  <main class="sketch-main bc_page">
+    <section class="sketch-panel sketch-frame bc_card" aria-labelledby="bc_title___state__">
+      <div class="bc_head">
+        <div>
+          <h2 id="bc_title___state__">Cash balance</h2>
+          <b class="bc_total" data-total></b>
+        </div>
+        <div class="sketch-segmented" role="radiogroup" aria-label="Show as">
+          <label><input type="radio" name="view___state__" value="chart">Chart</label>
+          <label><input type="radio" name="view___state__" value="table">Table</label>
+        </div>
+      </div>
+      <div class="bc_line" data-part="line">
+        <div data-part="period">
+          <button class="sketch-button secondary bc_period" type="button" data-sketch-popover="period___state__"><span data-period-name></span><i data-icon="chevron-down"></i></button>
+          <div class="sketch-menu" id="period___state__" role="menu" aria-label="Period"></div>
+        </div>
+        <span class="bc_day" data-part="day" hidden></span>
+        <span class="bc_moves" data-part="moves"></span>
+      </div>
+      <div data-part="body"></div>
+    </section>
+  </main>
+</template>
+
+<script>
+  const periods = {
+    '7': {name: 'Last 7 days', start: '18 Nov', labels: ['18 Nov', '20 Nov', '22 Nov', '24 Nov'], in: '+€22.4k', out: '−€9.1k', values: [52, 50, 55, 54, 58, 60, 57, 64], days: ['18 Nov', '19 Nov', '20 Nov', '21 Nov', '22 Nov', '23 Nov', '24 Nov', '25 Nov']},
+    '30': {name: 'Last 30 days', start: '26 Oct', labels: ['27 Oct', '3 Nov', '10 Nov', '17 Nov', '24 Nov'], in: '+€96.0k', out: '−€41.3k', values: [30, 34, 31, 38, 42, 40, 47, 52, 49, 58], days: ['27 Oct', '30 Oct', '2 Nov', '5 Nov', '8 Nov', '11 Nov', '14 Nov', '17 Nov', '20 Nov', '25 Nov']},
+    '90': {name: 'Last 90 days', start: '27 Aug', labels: ['Sep', 'Oct', 'Nov'], in: '+€251.7k', out: '−€188.2k', values: [44, 38, 35, 41, 36, 33, 39, 45, 50, 58], days: ['27 Aug', '6 Sep', '16 Sep', '26 Sep', '6 Oct', '16 Oct', '26 Oct', '5 Nov', '15 Nov', '25 Nov']},
+    empty: {name: 'Last 30 days', start: '26 Oct', labels: ['27 Oct', '3 Nov', '10 Nov', '17 Nov', '24 Nov'], in: '€0', out: '€0', values: [40, 40, 40, 40, 40, 40, 40, 40, 40, 40], days: ['27 Oct', '30 Oct', '2 Nov', '5 Nov', '8 Nov', '11 Nov', '14 Nov', '17 Nov', '20 Nov', '25 Nov']}
+  };
+  const menu_names = ['Last 7 days', 'Last 30 days', 'Last 90 days', 'Last 365 days', 'Week to date', 'Month to date', 'Quarter to date', 'Year to date'];
+  const menu_keys = {'Last 7 days': '7', 'Last 30 days': '30', 'Last 90 days': '90'};
+  const top_value = 70, low_value = 20;
+
+  const euro = v => '€' + (380 + v * 0.62).toFixed(1) + 'k';
+  const euro_full = v => '€' + Math.round((380 + v * 0.62) * 1000).toLocaleString('en-GB') + '.00';
+  const percent = v => ((v - low_value) / (top_value - low_value) * 100).toFixed(1);
+
+  function chart_html(key) {
+    const p = periods[key], n = p.values.length;
+    const points = p.values.map((v, k) => `${10 * k + 5},${(100 - percent(v)).toFixed(1)}`).join(' ');
+    const area = `${points} ${10 * n - 5},100 5,100`;
+    const rows = p.values.map((v, k) => `<tr><td>${p.days[k]}</td><td>${euro(v)}</td></tr>`).join('');
+    return `<div class="sketch-chart" style="--n:${n}" role="img" aria-label="Cash balance, ${p.name}: from ${euro(p.values[0])} to ${euro(p.values[n - 1])}.">
+        <div class="sketch-plot line bc_plot">
+          <span class="sketch-tick" style="--v:0%"><span>${euro(low_value)}</span></span>
+          <svg class="sketch-line" viewBox="0 0 ${n * 10} 100" preserveAspectRatio="none" aria-hidden="true"><polygon class="area" points="${area}"/><polyline points="${points}"/></svg>
+          ${p.values.map(() => '<div></div>').join('')}
+          <span class="bc_cursor" hidden></span>
+        </div>
+        <ol class="sketch-periods ends" aria-hidden="true" style="--n:${p.labels.length}">${p.labels.map(l => `<li>${l}</li>`).join('')}</ol>
+      </div>
+      <table class="sketch-chart-data"><caption>Cash balance, ${p.name}</caption><tbody>${rows}</tbody></table>`;
+  }
+
+  const split_html = `<dl class="bc_split">
+      <dt>Booked balance</dt><dd>€418,240.50</dd>
+      <dt>Available</dt><dd>€412,830.25</dd>
+      <dt class="bc_sub">Payments on the way out</dt><dd class="bc_sub">−€5,410.25</dd>
+      <dt>Payments on the way in</dt><dd>€1,200.00</dd>
+    </dl>
+    <p class="bc_note">The cash balance is the money of all accounts together. It counts the transfers between your own accounts that are on the way.</p>`;
+
+  function fill(section) {
+    const id = section.dataset.state;
+    section.innerHTML = document.getElementById('card').innerHTML.replaceAll('__state__', id);
+    const view = section.dataset.view;
+    let key = section.dataset.period || '30';
+    const total = section.querySelector('[data-total]');
+    const body = section.querySelector('[data-part="body"]');
+    const menu = section.querySelector('.sketch-menu');
+    const period_name = section.querySelector('[data-period-name]');
+    const moves = section.querySelector('[data-part="moves"]');
+    const day = section.querySelector('[data-part="day"]');
+    const radios = section.querySelectorAll('input[type="radio"]');
+
+    function draw_menu() {
+      menu.innerHTML = menu_names.map(name => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="${name === periods[key].name}"><i data-icon="check"></i>${name}</button>`).join('');
+    }
+    function set_total(value) { total.innerHTML = value.replace(/(\.\d\d)$/, '<small>$1</small>'); }
+    function show_moves(p) { moves.innerHTML = `<span>In ${p.in}</span><span>Out ${p.out}</span>`; }
+
+    function show(v) {
+      const p = periods[key];
+      radios.forEach(r => { r.checked = r.value === (v === 'table' ? 'table' : 'chart'); });
+      section.querySelector('[data-part="line"]').hidden = v === 'table' || v === 'error';
+      if (v === 'loading') {
+        total.innerHTML = '<span class="bc_pulse bc_small" style="display:block" aria-label="Loading"></span>';
+        moves.textContent = '';
+        period_name.textContent = p.name;
+        body.innerHTML = '<div class="bc_pulse" aria-hidden="true"></div>';
+        return;
+      }
+      if (v === 'error') {
+        total.textContent = '€ –';
+        body.innerHTML = '<div class="bc_message"><p>Error: the balance did not load.</p><button class="sketch-button secondary" type="button" data-retry>Try again</button></div>';
+        body.querySelector('[data-retry]').addEventListener('click', () => {
+          show('loading');
+          setTimeout(() => { show('chart'); initSketch(); }, 1200);
+        });
+        return;
+      }
+      set_total(key === 'empty' ? '€404,800.00' : '€412,830.25');
+      period_name.textContent = p.name;
+      show_moves(p);
+      if (v === 'table') { body.innerHTML = split_html; return; }
+      body.innerHTML = chart_html(key);
+      if (key === 'empty') body.insertAdjacentHTML('beforeend', '<p class="sketch-muted">No money came in or went out in this period.</p>');
+      wire_plot();
+    }
+
+    function wire_plot() {
+      const plot = body.querySelector('.bc_plot');
+      const cursor = plot.querySelector('.bc_cursor');
+      const p = periods[key], n = p.values.length;
+      function point_at(k) {
+        const v = p.values[k];
+        cursor.hidden = false;
+        cursor.style.setProperty('--x', `${(k + .5) / n * 100}%`);
+        cursor.style.setProperty('--v', `${percent(v)}%`);
+        set_total(euro_full(v));
+        const change = (v - p.values[0]) * 0.62;
+        day.textContent = p.days[k];
+        day.hidden = false;
+        section.querySelector('[data-part="period"]').hidden = true;
+        moves.textContent = `${change >= 0 ? '+' : '−'}€${Math.abs(change).toFixed(1)}k since ${p.start}`;
+      }
+      function leave() {
+        cursor.hidden = true;
+        day.hidden = true;
+        section.querySelector('[data-part="period"]').hidden = false;
+        set_total(key === 'empty' ? '€404,800.00' : '€412,830.25');
+        show_moves(p);
+      }
+      plot.addEventListener('pointermove', e => {
+        const r = plot.getBoundingClientRect();
+        point_at(Math.max(0, Math.min(n - 1, Math.floor((e.clientX - r.left) / r.width * n))));
+      });
+      plot.addEventListener('pointerleave', leave);
+      if (section.dataset.hover) point_at(Number(section.dataset.hover));
+    }
+
+    draw_menu();
+    menu.addEventListener('click', e => {
+      const item = e.target.closest('.sketch-menu-item');
+      if (!item) return;
+      const name = item.textContent.trim();
+      if (menu_keys[name]) key = menu_keys[name];
+      else sketchToast(`${name} (sample: the sketch draws 3 periods)`);
+      draw_menu();
+      show('chart');
+      initSketch();
+    });
+    radios.forEach(r => r.addEventListener('change', () => { show(r.value); initSketch(); }));
+    if (section.dataset.menu !== undefined) menu.setAttribute('data-open', '');
+    show(view);
+  }
+
+  document.querySelectorAll('[data-state]').forEach(fill);
+</script>
+<script src="../../../assets/sketch.js"></script>
