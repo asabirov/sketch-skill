@@ -81,14 +81,14 @@ An early mockup that looks finished gets feedback about colours and fonts. A ske
 
 ## Pattern library
 
-The library has 82 patterns in 9 categories. Each pattern holds a record, its transitions and a sketch. See each pattern and its "Best for" line in [`docs/library.md`](docs/library.md).
+The library has 83 patterns in 9 categories. Each pattern holds a record, its transitions and a sketch. See each pattern and its "Best for" line in [`docs/library.md`](docs/library.md).
 
 | Category | Patterns | Holds |
 | --- | ---: | --- |
 | Account | 5 | Sign-up, waitlist, OAuth consent, connected apps |
 | Analytics | 11 | Account list, action row, balance card, breakdown table, cash flow chart, dashboard grid, filter bar, flow chart, range brush, summary card, written insights |
 | Chat | 15 | Chat list, conversation pane, channel thread panel, create a chat, voice message, avatar badges, app in a chat |
-| Content | 22 | Feeds, catalog views, comment threads, document match, fact cards, forum list, kanban, timeline, product page, leaderboard, marketplace |
+| Content | 23 | Feeds, catalog views, comment threads, document match, fact cards, forum list, kanban, timeline, product page, leaderboard, marketplace, bulk action bar |
 | Navigation | 8 | User menu, foot menu, topics tree, swipe back |
 | Notifications | 5 | Notification inbox, inbox popover, activity feed, follow menu, subscribe popover |
 | Profile | 4 | Member profile, portfolio profile, profile card, character builder |
