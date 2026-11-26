@@ -22,7 +22,7 @@ Related: `analytics/filter-bar` sets the range and the direction. `analytics/flo
 - `by-category`: the money out of each period as one bar from zero, split into the largest category and everything else, with the total above the bar. Opens on: By category in the switch.
 - `group-menu`: a menu below the group button with Month and Quarter. The chosen item has a check mark. Opens on: a click on the group button.
 - `quarter`: one column for each quarter. The totals rise into place again. Opens on: Quarter in the group menu.
-- `money-in-only`: the totals show only the money in, and the chart shows only the bars up. Opens on: Money in in the direction popover of `analytics/filter-bar`.
+- `money-in-only`: the totals, the chart and the tooltip show only the money in. Overview shows only the bars up, Lines shows only the solid line, and By category shows one bar of the money in for each period. Opens on: Money in in the direction popover of `analytics/filter-bar`.
 - `loading`: the net total and the chart are pulsing blocks. Opens on: a new range, a new grouping or the first load.
 - `empty`: the totals are €0, and the chart area has one line of text and a way to the last 12 months. The source shows a "No data" tooltip on a month without data, and no empty block. Opens on: a range without money in or out.
 
