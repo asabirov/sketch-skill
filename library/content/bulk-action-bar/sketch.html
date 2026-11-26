@@ -1,0 +1,550 @@
+<!doctype html>
+<!--
+Pattern record: content/bulk-action-bar. The sample words are the designer's own. No brand, text or picture of the source.
+Best for: a work tool where a person gives many records of a list the same change, such as a status, an owner or a date, in one step, and then goes on with the same records.
+Row opens: on the record's own page. The source frames show no row that opens. This is the designer's choice: the invoice number links to a plain box.
+States: none, selected, picker-open, applied, all-selected, more-open, confirm-delete, record.
+Transitions: the source gives no value. The values are estimated and not measured.
+- none to selected: the bar fades in and rises 8 px. opacity 200 ms and transform 200 ms, cubic-bezier(0, 0, 0.2, 1). Reduced motion: the bar shows at once.
+- selected to none: the bar fades out and drops 8 px, with the same values.
+- every other change: at once, 0 ms.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk action bar</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+/* The bulk bar. A filled ink block with page-coloured words, so it is the other theme of the page.
+   It sits in its own room after the list and sticks 16 px over the bottom of the view. */
+[data-sketch] .bulk-table .bulk-tick { width: 44px; padding-block: 0; }
+[data-sketch] .bulk-table .bulk-tick input { vertical-align: middle; }
+[data-sketch] .bulk-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+[data-sketch] .bulk-table .payee { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-sketch] .bulk-table tr[aria-selected="true"] > td { background: var(--sketch-wash); }
+[data-sketch] .bulk-room { position: sticky; bottom: 16px; z-index: 30; min-height: 60px; display: grid; justify-items: center; pointer-events: none; }
+[data-sketch] .bulk-bar {
+  pointer-events: auto; display: flex; align-items: center; gap: 2px; width: min(100%, calc(100% - 64px)); min-height: 60px; padding: 8px;
+  background: var(--sketch-ink); color: var(--sketch-page); border-radius: var(--sketch-wobble);
+  opacity: 0; transform: translateY(8px); visibility: hidden;
+  transition: opacity 200ms cubic-bezier(0, 0, 0.2, 1), transform 200ms cubic-bezier(0, 0, 0.2, 1), visibility 0s linear 200ms;
+}
+[data-sketch] .bulk-bar[data-shown] { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; }
+[data-sketch] .bulk-count { display: inline-flex; align-items: center; gap: 4px; padding-left: 12px; margin-right: 8px; white-space: nowrap;
+  border: var(--sketch-stroke) solid color-mix(in srgb, var(--sketch-page) 45%, transparent); border-radius: var(--sketch-wobble); }
+[data-sketch] :is(.bulk-act, .bulk-x) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 0 10px;
+  background: none; border: 0; color: inherit; border-radius: var(--sketch-wobble); cursor: pointer; white-space: nowrap;
+}
+[data-sketch] :is(.bulk-act, .bulk-x):hover { background: color-mix(in srgb, var(--sketch-page) 18%, transparent); color: var(--sketch-page); }
+[data-sketch] :is(.bulk-act, .bulk-x)[aria-expanded="true"] { background: var(--sketch-page); color: var(--sketch-ink); }
+[data-sketch] :is(.bulk-act, .bulk-x)[aria-expanded="true"]:hover { background: var(--sketch-page); color: var(--sketch-ink); }
+[data-sketch] :is(.bulk-act, .bulk-x):focus-visible { outline: var(--sketch-stroke) solid var(--sketch-page); outline-offset: -4px; }
+[data-sketch] .bulk-picker { padding: 8px; gap: 4px; min-width: 220px; }
+[data-sketch] .bulk-picker-list { display: grid; }
+[data-sketch] .sketch-menu-item.bulk-narrow, [data-sketch] .sketch-menu-item.bulk-phone { display: none; }
+@media (max-width: 999px) {
+  [data-sketch] .bulk-act.bulk-wide { display: none; }
+  [data-sketch] .sketch-menu-item.bulk-narrow { display: flex; }
+}
+@media (max-width: 599px) {
+  [data-sketch] .bulk-act.bulk-tablet, [data-sketch] .bulk-label { display: none; }
+  [data-sketch] .sketch-menu-item.bulk-phone { display: flex; }
+  [data-sketch] .bulk-bar { width: 100%; }
+  [data-sketch] .bulk-table .payee { max-width: 60vw; }
+  [data-sketch] .bulk-table tr[aria-selected="true"] { background: var(--sketch-wash); }
+  [data-sketch] .bulk-table tr[aria-selected="true"] > td { background: none; }
+}
+@media (prefers-reduced-motion: reduce) { [data-sketch] .bulk-bar { transition: none; } }
+/* The message sits above the bar, so the bar stays usable for the next change. */
+[data-sketch]:has(.bulk-state:not([hidden]) .bulk-bar[data-shown]) > .sketch-toast { bottom: 92px; }
+</style>
+<body data-sketch>
+<header class="sketch-bar"><strong>Ledger</strong></header>
+<section data-state="none" class="bulk-state">
+<main class="sketch-main">
+  <h1>Invoices</h1>
+  <label class="sketch-choice sketch-phone-only"><input type="checkbox" class="bulk-all">Select all</label>
+  <div class="sketch-table-box"><table class="sketch-table bulk-table">
+<thead><tr><th class="bulk-tick"><input type="checkbox" class="bulk-all" aria-label="Select all invoices"></th><th>Invoice</th><th>Payee</th><th>Due</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1041"></td><td><a href="#record">INV-1041</a></td><td class="payee">Harbor Print Co.</td><td data-field="Due">3 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€1,240.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1042"></td><td><a href="#record">INV-1042</a></td><td class="payee">Lumen Studio</td><td data-field="Due">5 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€860.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1043"></td><td><a href="#record">INV-1043</a></td><td class="payee">Northwind Freight</td><td data-field="Due">6 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€4,315.50</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1044"></td><td><a href="#record">INV-1044</a></td><td class="payee">Okafor Legal</td><td data-field="Due">8 Dec</td><td data-field="Status"><span class="sketch-badge">Overdue</span></td><td class="num">€2,100.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1045"></td><td><a href="#record">INV-1045</a></td><td class="payee">Pine &amp; Vale Catering</td><td data-field="Due">9 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€395.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1046"></td><td><a href="#record">INV-1046</a></td><td class="payee">Quarry Cloud Hosting</td><td data-field="Due">10 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€129.99</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1047"></td><td><a href="#record">INV-1047</a></td><td class="payee">Ridge Office Supply</td><td data-field="Due">12 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€74.20</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1048"></td><td><a href="#record">INV-1048</a></td><td class="payee">Saltmarsh Design and Brand Strategy Partners</td><td data-field="Due">14 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€3,600.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1049"></td><td><a href="#record">INV-1049</a></td><td class="payee">Tern Couriers</td><td data-field="Due">15 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€58.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1050"></td><td><a href="#record">INV-1050</a></td><td class="payee">Upland Insurance</td><td data-field="Due">18 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€912.40</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1051"></td><td><a href="#record">INV-1051</a></td><td class="payee">Vesper Recruiting</td><td data-field="Due">20 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€5,000.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1052"></td><td><a href="#record">INV-1052</a></td><td class="payee">Willow Cleaning</td><td data-field="Due">22 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€240.00</td></tr>
+</tbody></table></div>
+  <p class="sketch-muted">12 invoices</p>
+  <div class="bulk-room"><div class="bulk-bar" role="toolbar" aria-label="Actions on the selected invoices">
+  <span class="bulk-count"><span aria-live="polite"><b class="bulk-n">0</b> selected</span><button class="bulk-x" type="button" aria-label="Clear the selection"><i data-icon="close"></i></button></span>
+  <span class="sketch-spacer"></span>
+  <button class="bulk-act" type="button" data-sketch-popover="status-none"><i data-icon="check"></i>Status</button>
+  <button class="bulk-act bulk-tablet" type="button" data-sketch-popover="owner-none"><i data-icon="user"></i>Owner</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="due-none"><i data-icon="calendar"></i>Due date</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="tags-none"><i data-icon="link"></i>Tags</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="move-none"><i data-icon="arrow-right"></i>Move</button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Duplicate" data-bulk-toast="Duplicated"><i data-icon="copy"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Archive" data-bulk-toast="Archived"><i data-icon="box"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Delete" data-sketch-open="delete-none"><i data-icon="trash"></i></button>
+  <button class="bulk-act" type="button" aria-label="More actions" data-sketch-popover="more-none"><i data-icon="more"></i><span class="bulk-label">More</span></button>
+</div></div>
+<div class="sketch-popover bulk-picker" id="status-none" role="dialog" aria-label="Set status"><input class="sketch-input" type="search" aria-label="Search status" placeholder="Search"><div class="bulk-picker-list"><button class="sketch-menu-item" type="button" data-field="Status" data-value="Draft" data-sketch-close>Draft</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Sent" data-sketch-close>Sent</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Paid" data-sketch-close>Paid</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Overdue" data-sketch-close>Overdue</button></div></div>
+<div class="sketch-menu" id="owner-none" aria-label="Set owner"><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ana Ruiz" data-sketch-close>Ana Ruiz</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ben Okoro" data-sketch-close>Ben Okoro</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Chen Li" data-sketch-close>Chen Li</button></div>
+<div class="sketch-menu" id="due-none" aria-label="Set due"><button class="sketch-menu-item" type="button" data-field="Due" data-value="Today" data-sketch-close>Today</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="Tomorrow" data-sketch-close>Tomorrow</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a week" data-sketch-close>In a week</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a month" data-sketch-close>In a month</button></div>
+<div class="sketch-menu" id="tags-none" aria-label="Set tags"><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Q4" data-sketch-close>Q4</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Travel" data-sketch-close>Travel</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Software" data-sketch-close>Software</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Needs a receipt" data-sketch-close>Needs a receipt</button></div>
+<div class="sketch-menu" id="move-none" aria-label="Set folder"><button class="sketch-menu-item" type="button" data-field="Folder" data-value="2026 Q4" data-sketch-close>2026 Q4</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Archive 2025" data-sketch-close>Archive 2025</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Disputes" data-sketch-close>Disputes</button></div>
+<div class="sketch-menu" id="more-none" aria-label="More actions">
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-popover="owner-none"><i data-icon="user"></i>Owner</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="due-none"><i data-icon="calendar"></i>Due date</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="tags-none"><i data-icon="link"></i>Tags</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="move-none"><i data-icon="arrow-right"></i>Move</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Duplicated" data-sketch-close><i data-icon="copy"></i>Duplicate</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Archived" data-sketch-close><i data-icon="box"></i>Archive</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-open="delete-none"><i data-icon="trash"></i>Delete</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Exported" data-sketch-close><i data-icon="download"></i>Export</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Links copied for" data-sketch-close><i data-icon="copy"></i>Copy links</button>
+</div>
+<dialog class="sketch-dialog" id="delete-none" aria-labelledby="delete-none-title">
+  <h2 id="delete-none-title">Delete <span class="bulk-n">0</span> invoices?</h2>
+  <p>You can restore them from the bin for 30 days.</p>
+  <div class="sketch-row">
+    <button class="sketch-button" type="button" data-bulk-delete data-sketch-close>Delete</button>
+    <button class="sketch-button secondary" type="button" data-sketch-close data-bulk-keep>Keep</button>
+  </div>
+</dialog>
+</main>
+</section>
+<section data-state="selected" class="bulk-state">
+<main class="sketch-main">
+  <h1>Invoices</h1>
+  <label class="sketch-choice sketch-phone-only"><input type="checkbox" class="bulk-all" data-mixed>Select all</label>
+  <div class="sketch-table-box"><table class="sketch-table bulk-table">
+<thead><tr><th class="bulk-tick"><input type="checkbox" class="bulk-all" aria-label="Select all invoices" data-mixed></th><th>Invoice</th><th>Payee</th><th>Due</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1041"></td><td><a href="#record">INV-1041</a></td><td class="payee">Harbor Print Co.</td><td data-field="Due">3 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€1,240.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1042" checked></td><td><a href="#record">INV-1042</a></td><td class="payee">Lumen Studio</td><td data-field="Due">5 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€860.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1043" checked></td><td><a href="#record">INV-1043</a></td><td class="payee">Northwind Freight</td><td data-field="Due">6 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€4,315.50</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1044"></td><td><a href="#record">INV-1044</a></td><td class="payee">Okafor Legal</td><td data-field="Due">8 Dec</td><td data-field="Status"><span class="sketch-badge">Overdue</span></td><td class="num">€2,100.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1045"></td><td><a href="#record">INV-1045</a></td><td class="payee">Pine &amp; Vale Catering</td><td data-field="Due">9 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€395.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1046"></td><td><a href="#record">INV-1046</a></td><td class="payee">Quarry Cloud Hosting</td><td data-field="Due">10 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€129.99</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1047"></td><td><a href="#record">INV-1047</a></td><td class="payee">Ridge Office Supply</td><td data-field="Due">12 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€74.20</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1048"></td><td><a href="#record">INV-1048</a></td><td class="payee">Saltmarsh Design and Brand Strategy Partners</td><td data-field="Due">14 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€3,600.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1049"></td><td><a href="#record">INV-1049</a></td><td class="payee">Tern Couriers</td><td data-field="Due">15 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€58.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1050"></td><td><a href="#record">INV-1050</a></td><td class="payee">Upland Insurance</td><td data-field="Due">18 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€912.40</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1051"></td><td><a href="#record">INV-1051</a></td><td class="payee">Vesper Recruiting</td><td data-field="Due">20 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€5,000.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1052"></td><td><a href="#record">INV-1052</a></td><td class="payee">Willow Cleaning</td><td data-field="Due">22 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€240.00</td></tr>
+</tbody></table></div>
+  <p class="sketch-muted">12 invoices</p>
+  <div class="bulk-room"><div class="bulk-bar" role="toolbar" aria-label="Actions on the selected invoices" data-shown>
+  <span class="bulk-count"><span aria-live="polite"><b class="bulk-n">2</b> selected</span><button class="bulk-x" type="button" aria-label="Clear the selection"><i data-icon="close"></i></button></span>
+  <span class="sketch-spacer"></span>
+  <button class="bulk-act" type="button" data-sketch-popover="status-selected"><i data-icon="check"></i>Status</button>
+  <button class="bulk-act bulk-tablet" type="button" data-sketch-popover="owner-selected"><i data-icon="user"></i>Owner</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="due-selected"><i data-icon="calendar"></i>Due date</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="tags-selected"><i data-icon="link"></i>Tags</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="move-selected"><i data-icon="arrow-right"></i>Move</button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Duplicate" data-bulk-toast="Duplicated"><i data-icon="copy"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Archive" data-bulk-toast="Archived"><i data-icon="box"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Delete" data-sketch-open="delete-selected"><i data-icon="trash"></i></button>
+  <button class="bulk-act" type="button" aria-label="More actions" data-sketch-popover="more-selected"><i data-icon="more"></i><span class="bulk-label">More</span></button>
+</div></div>
+<div class="sketch-popover bulk-picker" id="status-selected" role="dialog" aria-label="Set status"><input class="sketch-input" type="search" aria-label="Search status" placeholder="Search"><div class="bulk-picker-list"><button class="sketch-menu-item" type="button" data-field="Status" data-value="Draft" data-sketch-close>Draft</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Sent" data-sketch-close>Sent</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Paid" data-sketch-close>Paid</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Overdue" data-sketch-close>Overdue</button></div></div>
+<div class="sketch-menu" id="owner-selected" aria-label="Set owner"><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ana Ruiz" data-sketch-close>Ana Ruiz</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ben Okoro" data-sketch-close>Ben Okoro</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Chen Li" data-sketch-close>Chen Li</button></div>
+<div class="sketch-menu" id="due-selected" aria-label="Set due"><button class="sketch-menu-item" type="button" data-field="Due" data-value="Today" data-sketch-close>Today</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="Tomorrow" data-sketch-close>Tomorrow</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a week" data-sketch-close>In a week</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a month" data-sketch-close>In a month</button></div>
+<div class="sketch-menu" id="tags-selected" aria-label="Set tags"><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Q4" data-sketch-close>Q4</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Travel" data-sketch-close>Travel</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Software" data-sketch-close>Software</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Needs a receipt" data-sketch-close>Needs a receipt</button></div>
+<div class="sketch-menu" id="move-selected" aria-label="Set folder"><button class="sketch-menu-item" type="button" data-field="Folder" data-value="2026 Q4" data-sketch-close>2026 Q4</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Archive 2025" data-sketch-close>Archive 2025</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Disputes" data-sketch-close>Disputes</button></div>
+<div class="sketch-menu" id="more-selected" aria-label="More actions">
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-popover="owner-selected"><i data-icon="user"></i>Owner</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="due-selected"><i data-icon="calendar"></i>Due date</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="tags-selected"><i data-icon="link"></i>Tags</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="move-selected"><i data-icon="arrow-right"></i>Move</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Duplicated" data-sketch-close><i data-icon="copy"></i>Duplicate</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Archived" data-sketch-close><i data-icon="box"></i>Archive</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-open="delete-selected"><i data-icon="trash"></i>Delete</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Exported" data-sketch-close><i data-icon="download"></i>Export</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Links copied for" data-sketch-close><i data-icon="copy"></i>Copy links</button>
+</div>
+<dialog class="sketch-dialog" id="delete-selected" aria-labelledby="delete-selected-title">
+  <h2 id="delete-selected-title">Delete <span class="bulk-n">2</span> invoices?</h2>
+  <p>You can restore them from the bin for 30 days.</p>
+  <div class="sketch-row">
+    <button class="sketch-button" type="button" data-bulk-delete data-sketch-close>Delete</button>
+    <button class="sketch-button secondary" type="button" data-sketch-close data-bulk-keep>Keep</button>
+  </div>
+</dialog>
+</main>
+</section>
+<section data-state="picker-open" class="bulk-state">
+<main class="sketch-main">
+  <h1>Invoices</h1>
+  <label class="sketch-choice sketch-phone-only"><input type="checkbox" class="bulk-all" data-mixed>Select all</label>
+  <div class="sketch-table-box"><table class="sketch-table bulk-table">
+<thead><tr><th class="bulk-tick"><input type="checkbox" class="bulk-all" aria-label="Select all invoices" data-mixed></th><th>Invoice</th><th>Payee</th><th>Due</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1041"></td><td><a href="#record">INV-1041</a></td><td class="payee">Harbor Print Co.</td><td data-field="Due">3 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€1,240.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1042" checked></td><td><a href="#record">INV-1042</a></td><td class="payee">Lumen Studio</td><td data-field="Due">5 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€860.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1043" checked></td><td><a href="#record">INV-1043</a></td><td class="payee">Northwind Freight</td><td data-field="Due">6 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€4,315.50</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1044"></td><td><a href="#record">INV-1044</a></td><td class="payee">Okafor Legal</td><td data-field="Due">8 Dec</td><td data-field="Status"><span class="sketch-badge">Overdue</span></td><td class="num">€2,100.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1045"></td><td><a href="#record">INV-1045</a></td><td class="payee">Pine &amp; Vale Catering</td><td data-field="Due">9 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€395.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1046"></td><td><a href="#record">INV-1046</a></td><td class="payee">Quarry Cloud Hosting</td><td data-field="Due">10 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€129.99</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1047"></td><td><a href="#record">INV-1047</a></td><td class="payee">Ridge Office Supply</td><td data-field="Due">12 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€74.20</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1048"></td><td><a href="#record">INV-1048</a></td><td class="payee">Saltmarsh Design and Brand Strategy Partners</td><td data-field="Due">14 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€3,600.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1049"></td><td><a href="#record">INV-1049</a></td><td class="payee">Tern Couriers</td><td data-field="Due">15 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€58.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1050"></td><td><a href="#record">INV-1050</a></td><td class="payee">Upland Insurance</td><td data-field="Due">18 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€912.40</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1051"></td><td><a href="#record">INV-1051</a></td><td class="payee">Vesper Recruiting</td><td data-field="Due">20 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€5,000.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1052"></td><td><a href="#record">INV-1052</a></td><td class="payee">Willow Cleaning</td><td data-field="Due">22 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€240.00</td></tr>
+</tbody></table></div>
+  <p class="sketch-muted">12 invoices</p>
+  <div class="bulk-room"><div class="bulk-bar" role="toolbar" aria-label="Actions on the selected invoices" data-shown>
+  <span class="bulk-count"><span aria-live="polite"><b class="bulk-n">2</b> selected</span><button class="bulk-x" type="button" aria-label="Clear the selection"><i data-icon="close"></i></button></span>
+  <span class="sketch-spacer"></span>
+  <button class="bulk-act" type="button" data-sketch-popover="status-picker-open"><i data-icon="check"></i>Status</button>
+  <button class="bulk-act bulk-tablet" type="button" data-sketch-popover="owner-picker-open"><i data-icon="user"></i>Owner</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="due-picker-open"><i data-icon="calendar"></i>Due date</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="tags-picker-open"><i data-icon="link"></i>Tags</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="move-picker-open"><i data-icon="arrow-right"></i>Move</button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Duplicate" data-bulk-toast="Duplicated"><i data-icon="copy"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Archive" data-bulk-toast="Archived"><i data-icon="box"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Delete" data-sketch-open="delete-picker-open"><i data-icon="trash"></i></button>
+  <button class="bulk-act" type="button" aria-label="More actions" data-sketch-popover="more-picker-open"><i data-icon="more"></i><span class="bulk-label">More</span></button>
+</div></div>
+<div class="sketch-popover bulk-picker" id="status-picker-open" role="dialog" data-open aria-label="Set status"><input class="sketch-input" type="search" aria-label="Search status" placeholder="Search"><div class="bulk-picker-list"><button class="sketch-menu-item" type="button" data-field="Status" data-value="Draft" data-sketch-close>Draft</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Sent" data-sketch-close>Sent</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Paid" data-sketch-close>Paid</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Overdue" data-sketch-close>Overdue</button></div></div>
+<div class="sketch-menu" id="owner-picker-open" aria-label="Set owner"><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ana Ruiz" data-sketch-close>Ana Ruiz</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ben Okoro" data-sketch-close>Ben Okoro</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Chen Li" data-sketch-close>Chen Li</button></div>
+<div class="sketch-menu" id="due-picker-open" aria-label="Set due"><button class="sketch-menu-item" type="button" data-field="Due" data-value="Today" data-sketch-close>Today</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="Tomorrow" data-sketch-close>Tomorrow</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a week" data-sketch-close>In a week</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a month" data-sketch-close>In a month</button></div>
+<div class="sketch-menu" id="tags-picker-open" aria-label="Set tags"><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Q4" data-sketch-close>Q4</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Travel" data-sketch-close>Travel</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Software" data-sketch-close>Software</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Needs a receipt" data-sketch-close>Needs a receipt</button></div>
+<div class="sketch-menu" id="move-picker-open" aria-label="Set folder"><button class="sketch-menu-item" type="button" data-field="Folder" data-value="2026 Q4" data-sketch-close>2026 Q4</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Archive 2025" data-sketch-close>Archive 2025</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Disputes" data-sketch-close>Disputes</button></div>
+<div class="sketch-menu" id="more-picker-open" aria-label="More actions">
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-popover="owner-picker-open"><i data-icon="user"></i>Owner</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="due-picker-open"><i data-icon="calendar"></i>Due date</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="tags-picker-open"><i data-icon="link"></i>Tags</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="move-picker-open"><i data-icon="arrow-right"></i>Move</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Duplicated" data-sketch-close><i data-icon="copy"></i>Duplicate</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Archived" data-sketch-close><i data-icon="box"></i>Archive</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-open="delete-picker-open"><i data-icon="trash"></i>Delete</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Exported" data-sketch-close><i data-icon="download"></i>Export</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Links copied for" data-sketch-close><i data-icon="copy"></i>Copy links</button>
+</div>
+<dialog class="sketch-dialog" id="delete-picker-open" aria-labelledby="delete-picker-open-title">
+  <h2 id="delete-picker-open-title">Delete <span class="bulk-n">2</span> invoices?</h2>
+  <p>You can restore them from the bin for 30 days.</p>
+  <div class="sketch-row">
+    <button class="sketch-button" type="button" data-bulk-delete data-sketch-close>Delete</button>
+    <button class="sketch-button secondary" type="button" data-sketch-close data-bulk-keep>Keep</button>
+  </div>
+</dialog>
+</main>
+</section>
+<section data-state="applied" class="bulk-state">
+<main class="sketch-main">
+  <h1>Invoices</h1>
+  <label class="sketch-choice sketch-phone-only"><input type="checkbox" class="bulk-all" data-mixed>Select all</label>
+  <div class="sketch-table-box"><table class="sketch-table bulk-table">
+<thead><tr><th class="bulk-tick"><input type="checkbox" class="bulk-all" aria-label="Select all invoices" data-mixed></th><th>Invoice</th><th>Payee</th><th>Due</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1041"></td><td><a href="#record">INV-1041</a></td><td class="payee">Harbor Print Co.</td><td data-field="Due">3 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€1,240.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1042" checked></td><td><a href="#record">INV-1042</a></td><td class="payee">Lumen Studio</td><td data-field="Due">5 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€860.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1043" checked></td><td><a href="#record">INV-1043</a></td><td class="payee">Northwind Freight</td><td data-field="Due">6 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€4,315.50</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1044"></td><td><a href="#record">INV-1044</a></td><td class="payee">Okafor Legal</td><td data-field="Due">8 Dec</td><td data-field="Status"><span class="sketch-badge">Overdue</span></td><td class="num">€2,100.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1045"></td><td><a href="#record">INV-1045</a></td><td class="payee">Pine &amp; Vale Catering</td><td data-field="Due">9 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€395.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1046"></td><td><a href="#record">INV-1046</a></td><td class="payee">Quarry Cloud Hosting</td><td data-field="Due">10 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€129.99</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1047"></td><td><a href="#record">INV-1047</a></td><td class="payee">Ridge Office Supply</td><td data-field="Due">12 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€74.20</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1048"></td><td><a href="#record">INV-1048</a></td><td class="payee">Saltmarsh Design and Brand Strategy Partners</td><td data-field="Due">14 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€3,600.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1049"></td><td><a href="#record">INV-1049</a></td><td class="payee">Tern Couriers</td><td data-field="Due">15 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€58.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1050"></td><td><a href="#record">INV-1050</a></td><td class="payee">Upland Insurance</td><td data-field="Due">18 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€912.40</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1051"></td><td><a href="#record">INV-1051</a></td><td class="payee">Vesper Recruiting</td><td data-field="Due">20 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€5,000.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1052"></td><td><a href="#record">INV-1052</a></td><td class="payee">Willow Cleaning</td><td data-field="Due">22 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€240.00</td></tr>
+</tbody></table></div>
+  <p class="sketch-muted">12 invoices</p>
+  <div class="bulk-room"><div class="bulk-bar" role="toolbar" aria-label="Actions on the selected invoices" data-shown>
+  <span class="bulk-count"><span aria-live="polite"><b class="bulk-n">2</b> selected</span><button class="bulk-x" type="button" aria-label="Clear the selection"><i data-icon="close"></i></button></span>
+  <span class="sketch-spacer"></span>
+  <button class="bulk-act" type="button" data-sketch-popover="status-applied"><i data-icon="check"></i>Status</button>
+  <button class="bulk-act bulk-tablet" type="button" data-sketch-popover="owner-applied"><i data-icon="user"></i>Owner</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="due-applied"><i data-icon="calendar"></i>Due date</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="tags-applied"><i data-icon="link"></i>Tags</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="move-applied"><i data-icon="arrow-right"></i>Move</button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Duplicate" data-bulk-toast="Duplicated"><i data-icon="copy"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Archive" data-bulk-toast="Archived"><i data-icon="box"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Delete" data-sketch-open="delete-applied"><i data-icon="trash"></i></button>
+  <button class="bulk-act" type="button" aria-label="More actions" data-sketch-popover="more-applied"><i data-icon="more"></i><span class="bulk-label">More</span></button>
+</div></div>
+<div class="sketch-popover bulk-picker" id="status-applied" role="dialog" aria-label="Set status"><input class="sketch-input" type="search" aria-label="Search status" placeholder="Search"><div class="bulk-picker-list"><button class="sketch-menu-item" type="button" data-field="Status" data-value="Draft" data-sketch-close>Draft</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Sent" data-sketch-close>Sent</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Paid" data-sketch-close>Paid</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Overdue" data-sketch-close>Overdue</button></div></div>
+<div class="sketch-menu" id="owner-applied" aria-label="Set owner"><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ana Ruiz" data-sketch-close>Ana Ruiz</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ben Okoro" data-sketch-close>Ben Okoro</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Chen Li" data-sketch-close>Chen Li</button></div>
+<div class="sketch-menu" id="due-applied" aria-label="Set due"><button class="sketch-menu-item" type="button" data-field="Due" data-value="Today" data-sketch-close>Today</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="Tomorrow" data-sketch-close>Tomorrow</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a week" data-sketch-close>In a week</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a month" data-sketch-close>In a month</button></div>
+<div class="sketch-menu" id="tags-applied" aria-label="Set tags"><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Q4" data-sketch-close>Q4</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Travel" data-sketch-close>Travel</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Software" data-sketch-close>Software</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Needs a receipt" data-sketch-close>Needs a receipt</button></div>
+<div class="sketch-menu" id="move-applied" aria-label="Set folder"><button class="sketch-menu-item" type="button" data-field="Folder" data-value="2026 Q4" data-sketch-close>2026 Q4</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Archive 2025" data-sketch-close>Archive 2025</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Disputes" data-sketch-close>Disputes</button></div>
+<div class="sketch-menu" id="more-applied" aria-label="More actions">
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-popover="owner-applied"><i data-icon="user"></i>Owner</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="due-applied"><i data-icon="calendar"></i>Due date</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="tags-applied"><i data-icon="link"></i>Tags</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="move-applied"><i data-icon="arrow-right"></i>Move</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Duplicated" data-sketch-close><i data-icon="copy"></i>Duplicate</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Archived" data-sketch-close><i data-icon="box"></i>Archive</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-open="delete-applied"><i data-icon="trash"></i>Delete</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Exported" data-sketch-close><i data-icon="download"></i>Export</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Links copied for" data-sketch-close><i data-icon="copy"></i>Copy links</button>
+</div>
+<dialog class="sketch-dialog" id="delete-applied" aria-labelledby="delete-applied-title">
+  <h2 id="delete-applied-title">Delete <span class="bulk-n">2</span> invoices?</h2>
+  <p>You can restore them from the bin for 30 days.</p>
+  <div class="sketch-row">
+    <button class="sketch-button" type="button" data-bulk-delete data-sketch-close>Delete</button>
+    <button class="sketch-button secondary" type="button" data-sketch-close data-bulk-keep>Keep</button>
+  </div>
+</dialog>
+</main>
+</section>
+<section data-state="all-selected" class="bulk-state">
+<main class="sketch-main">
+  <h1>Invoices</h1>
+  <label class="sketch-choice sketch-phone-only"><input type="checkbox" class="bulk-all" checked>Select all</label>
+  <div class="sketch-table-box"><table class="sketch-table bulk-table">
+<thead><tr><th class="bulk-tick"><input type="checkbox" class="bulk-all" aria-label="Select all invoices" checked></th><th>Invoice</th><th>Payee</th><th>Due</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1041" checked></td><td><a href="#record">INV-1041</a></td><td class="payee">Harbor Print Co.</td><td data-field="Due">3 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€1,240.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1042" checked></td><td><a href="#record">INV-1042</a></td><td class="payee">Lumen Studio</td><td data-field="Due">5 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€860.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1043" checked></td><td><a href="#record">INV-1043</a></td><td class="payee">Northwind Freight</td><td data-field="Due">6 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€4,315.50</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1044" checked></td><td><a href="#record">INV-1044</a></td><td class="payee">Okafor Legal</td><td data-field="Due">8 Dec</td><td data-field="Status"><span class="sketch-badge">Overdue</span></td><td class="num">€2,100.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1045" checked></td><td><a href="#record">INV-1045</a></td><td class="payee">Pine &amp; Vale Catering</td><td data-field="Due">9 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€395.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1046" checked></td><td><a href="#record">INV-1046</a></td><td class="payee">Quarry Cloud Hosting</td><td data-field="Due">10 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€129.99</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1047" checked></td><td><a href="#record">INV-1047</a></td><td class="payee">Ridge Office Supply</td><td data-field="Due">12 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€74.20</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1048" checked></td><td><a href="#record">INV-1048</a></td><td class="payee">Saltmarsh Design and Brand Strategy Partners</td><td data-field="Due">14 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€3,600.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1049" checked></td><td><a href="#record">INV-1049</a></td><td class="payee">Tern Couriers</td><td data-field="Due">15 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€58.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1050" checked></td><td><a href="#record">INV-1050</a></td><td class="payee">Upland Insurance</td><td data-field="Due">18 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€912.40</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1051" checked></td><td><a href="#record">INV-1051</a></td><td class="payee">Vesper Recruiting</td><td data-field="Due">20 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€5,000.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1052" checked></td><td><a href="#record">INV-1052</a></td><td class="payee">Willow Cleaning</td><td data-field="Due">22 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€240.00</td></tr>
+</tbody></table></div>
+  <p class="sketch-muted">12 invoices</p>
+  <div class="bulk-room"><div class="bulk-bar" role="toolbar" aria-label="Actions on the selected invoices" data-shown>
+  <span class="bulk-count"><span aria-live="polite"><b class="bulk-n">12</b> selected</span><button class="bulk-x" type="button" aria-label="Clear the selection"><i data-icon="close"></i></button></span>
+  <span class="sketch-spacer"></span>
+  <button class="bulk-act" type="button" data-sketch-popover="status-all-selected"><i data-icon="check"></i>Status</button>
+  <button class="bulk-act bulk-tablet" type="button" data-sketch-popover="owner-all-selected"><i data-icon="user"></i>Owner</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="due-all-selected"><i data-icon="calendar"></i>Due date</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="tags-all-selected"><i data-icon="link"></i>Tags</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="move-all-selected"><i data-icon="arrow-right"></i>Move</button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Duplicate" data-bulk-toast="Duplicated"><i data-icon="copy"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Archive" data-bulk-toast="Archived"><i data-icon="box"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Delete" data-sketch-open="delete-all-selected"><i data-icon="trash"></i></button>
+  <button class="bulk-act" type="button" aria-label="More actions" data-sketch-popover="more-all-selected"><i data-icon="more"></i><span class="bulk-label">More</span></button>
+</div></div>
+<div class="sketch-popover bulk-picker" id="status-all-selected" role="dialog" aria-label="Set status"><input class="sketch-input" type="search" aria-label="Search status" placeholder="Search"><div class="bulk-picker-list"><button class="sketch-menu-item" type="button" data-field="Status" data-value="Draft" data-sketch-close>Draft</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Sent" data-sketch-close>Sent</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Paid" data-sketch-close>Paid</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Overdue" data-sketch-close>Overdue</button></div></div>
+<div class="sketch-menu" id="owner-all-selected" aria-label="Set owner"><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ana Ruiz" data-sketch-close>Ana Ruiz</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ben Okoro" data-sketch-close>Ben Okoro</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Chen Li" data-sketch-close>Chen Li</button></div>
+<div class="sketch-menu" id="due-all-selected" aria-label="Set due"><button class="sketch-menu-item" type="button" data-field="Due" data-value="Today" data-sketch-close>Today</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="Tomorrow" data-sketch-close>Tomorrow</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a week" data-sketch-close>In a week</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a month" data-sketch-close>In a month</button></div>
+<div class="sketch-menu" id="tags-all-selected" aria-label="Set tags"><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Q4" data-sketch-close>Q4</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Travel" data-sketch-close>Travel</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Software" data-sketch-close>Software</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Needs a receipt" data-sketch-close>Needs a receipt</button></div>
+<div class="sketch-menu" id="move-all-selected" aria-label="Set folder"><button class="sketch-menu-item" type="button" data-field="Folder" data-value="2026 Q4" data-sketch-close>2026 Q4</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Archive 2025" data-sketch-close>Archive 2025</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Disputes" data-sketch-close>Disputes</button></div>
+<div class="sketch-menu" id="more-all-selected" aria-label="More actions">
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-popover="owner-all-selected"><i data-icon="user"></i>Owner</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="due-all-selected"><i data-icon="calendar"></i>Due date</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="tags-all-selected"><i data-icon="link"></i>Tags</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="move-all-selected"><i data-icon="arrow-right"></i>Move</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Duplicated" data-sketch-close><i data-icon="copy"></i>Duplicate</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Archived" data-sketch-close><i data-icon="box"></i>Archive</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-open="delete-all-selected"><i data-icon="trash"></i>Delete</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Exported" data-sketch-close><i data-icon="download"></i>Export</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Links copied for" data-sketch-close><i data-icon="copy"></i>Copy links</button>
+</div>
+<dialog class="sketch-dialog" id="delete-all-selected" aria-labelledby="delete-all-selected-title">
+  <h2 id="delete-all-selected-title">Delete <span class="bulk-n">12</span> invoices?</h2>
+  <p>You can restore them from the bin for 30 days.</p>
+  <div class="sketch-row">
+    <button class="sketch-button" type="button" data-bulk-delete data-sketch-close>Delete</button>
+    <button class="sketch-button secondary" type="button" data-sketch-close data-bulk-keep>Keep</button>
+  </div>
+</dialog>
+</main>
+</section>
+<section data-state="more-open" class="bulk-state">
+<main class="sketch-main">
+  <h1>Invoices</h1>
+  <label class="sketch-choice sketch-phone-only"><input type="checkbox" class="bulk-all" data-mixed>Select all</label>
+  <div class="sketch-table-box"><table class="sketch-table bulk-table">
+<thead><tr><th class="bulk-tick"><input type="checkbox" class="bulk-all" aria-label="Select all invoices" data-mixed></th><th>Invoice</th><th>Payee</th><th>Due</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1041"></td><td><a href="#record">INV-1041</a></td><td class="payee">Harbor Print Co.</td><td data-field="Due">3 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€1,240.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1042" checked></td><td><a href="#record">INV-1042</a></td><td class="payee">Lumen Studio</td><td data-field="Due">5 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€860.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1043" checked></td><td><a href="#record">INV-1043</a></td><td class="payee">Northwind Freight</td><td data-field="Due">6 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€4,315.50</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1044"></td><td><a href="#record">INV-1044</a></td><td class="payee">Okafor Legal</td><td data-field="Due">8 Dec</td><td data-field="Status"><span class="sketch-badge">Overdue</span></td><td class="num">€2,100.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1045"></td><td><a href="#record">INV-1045</a></td><td class="payee">Pine &amp; Vale Catering</td><td data-field="Due">9 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€395.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1046"></td><td><a href="#record">INV-1046</a></td><td class="payee">Quarry Cloud Hosting</td><td data-field="Due">10 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€129.99</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1047"></td><td><a href="#record">INV-1047</a></td><td class="payee">Ridge Office Supply</td><td data-field="Due">12 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€74.20</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1048"></td><td><a href="#record">INV-1048</a></td><td class="payee">Saltmarsh Design and Brand Strategy Partners</td><td data-field="Due">14 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€3,600.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1049"></td><td><a href="#record">INV-1049</a></td><td class="payee">Tern Couriers</td><td data-field="Due">15 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€58.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1050"></td><td><a href="#record">INV-1050</a></td><td class="payee">Upland Insurance</td><td data-field="Due">18 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€912.40</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1051"></td><td><a href="#record">INV-1051</a></td><td class="payee">Vesper Recruiting</td><td data-field="Due">20 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€5,000.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1052"></td><td><a href="#record">INV-1052</a></td><td class="payee">Willow Cleaning</td><td data-field="Due">22 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€240.00</td></tr>
+</tbody></table></div>
+  <p class="sketch-muted">12 invoices</p>
+  <div class="bulk-room"><div class="bulk-bar" role="toolbar" aria-label="Actions on the selected invoices" data-shown>
+  <span class="bulk-count"><span aria-live="polite"><b class="bulk-n">2</b> selected</span><button class="bulk-x" type="button" aria-label="Clear the selection"><i data-icon="close"></i></button></span>
+  <span class="sketch-spacer"></span>
+  <button class="bulk-act" type="button" data-sketch-popover="status-more-open"><i data-icon="check"></i>Status</button>
+  <button class="bulk-act bulk-tablet" type="button" data-sketch-popover="owner-more-open"><i data-icon="user"></i>Owner</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="due-more-open"><i data-icon="calendar"></i>Due date</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="tags-more-open"><i data-icon="link"></i>Tags</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="move-more-open"><i data-icon="arrow-right"></i>Move</button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Duplicate" data-bulk-toast="Duplicated"><i data-icon="copy"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Archive" data-bulk-toast="Archived"><i data-icon="box"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Delete" data-sketch-open="delete-more-open"><i data-icon="trash"></i></button>
+  <button class="bulk-act" type="button" aria-label="More actions" data-sketch-popover="more-more-open"><i data-icon="more"></i><span class="bulk-label">More</span></button>
+</div></div>
+<div class="sketch-popover bulk-picker" id="status-more-open" role="dialog" aria-label="Set status"><input class="sketch-input" type="search" aria-label="Search status" placeholder="Search"><div class="bulk-picker-list"><button class="sketch-menu-item" type="button" data-field="Status" data-value="Draft" data-sketch-close>Draft</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Sent" data-sketch-close>Sent</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Paid" data-sketch-close>Paid</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Overdue" data-sketch-close>Overdue</button></div></div>
+<div class="sketch-menu" id="owner-more-open" aria-label="Set owner"><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ana Ruiz" data-sketch-close>Ana Ruiz</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ben Okoro" data-sketch-close>Ben Okoro</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Chen Li" data-sketch-close>Chen Li</button></div>
+<div class="sketch-menu" id="due-more-open" aria-label="Set due"><button class="sketch-menu-item" type="button" data-field="Due" data-value="Today" data-sketch-close>Today</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="Tomorrow" data-sketch-close>Tomorrow</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a week" data-sketch-close>In a week</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a month" data-sketch-close>In a month</button></div>
+<div class="sketch-menu" id="tags-more-open" aria-label="Set tags"><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Q4" data-sketch-close>Q4</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Travel" data-sketch-close>Travel</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Software" data-sketch-close>Software</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Needs a receipt" data-sketch-close>Needs a receipt</button></div>
+<div class="sketch-menu" id="move-more-open" aria-label="Set folder"><button class="sketch-menu-item" type="button" data-field="Folder" data-value="2026 Q4" data-sketch-close>2026 Q4</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Archive 2025" data-sketch-close>Archive 2025</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Disputes" data-sketch-close>Disputes</button></div>
+<div class="sketch-menu" id="more-more-open" aria-label="More actions" data-open>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-popover="owner-more-open"><i data-icon="user"></i>Owner</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="due-more-open"><i data-icon="calendar"></i>Due date</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="tags-more-open"><i data-icon="link"></i>Tags</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="move-more-open"><i data-icon="arrow-right"></i>Move</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Duplicated" data-sketch-close><i data-icon="copy"></i>Duplicate</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Archived" data-sketch-close><i data-icon="box"></i>Archive</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-open="delete-more-open"><i data-icon="trash"></i>Delete</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Exported" data-sketch-close><i data-icon="download"></i>Export</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Links copied for" data-sketch-close><i data-icon="copy"></i>Copy links</button>
+</div>
+<dialog class="sketch-dialog" id="delete-more-open" aria-labelledby="delete-more-open-title">
+  <h2 id="delete-more-open-title">Delete <span class="bulk-n">2</span> invoices?</h2>
+  <p>You can restore them from the bin for 30 days.</p>
+  <div class="sketch-row">
+    <button class="sketch-button" type="button" data-bulk-delete data-sketch-close>Delete</button>
+    <button class="sketch-button secondary" type="button" data-sketch-close data-bulk-keep>Keep</button>
+  </div>
+</dialog>
+</main>
+</section>
+<section data-state="confirm-delete" class="bulk-state">
+<main class="sketch-main">
+  <h1>Invoices</h1>
+  <label class="sketch-choice sketch-phone-only"><input type="checkbox" class="bulk-all" data-mixed>Select all</label>
+  <div class="sketch-table-box"><table class="sketch-table bulk-table">
+<thead><tr><th class="bulk-tick"><input type="checkbox" class="bulk-all" aria-label="Select all invoices" data-mixed></th><th>Invoice</th><th>Payee</th><th>Due</th><th>Status</th><th class="num">Amount</th></tr></thead><tbody>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1041"></td><td><a href="#record">INV-1041</a></td><td class="payee">Harbor Print Co.</td><td data-field="Due">3 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€1,240.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1042" checked></td><td><a href="#record">INV-1042</a></td><td class="payee">Lumen Studio</td><td data-field="Due">5 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€860.00</td></tr>
+<tr aria-selected="true"><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1043" checked></td><td><a href="#record">INV-1043</a></td><td class="payee">Northwind Freight</td><td data-field="Due">6 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€4,315.50</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1044"></td><td><a href="#record">INV-1044</a></td><td class="payee">Okafor Legal</td><td data-field="Due">8 Dec</td><td data-field="Status"><span class="sketch-badge">Overdue</span></td><td class="num">€2,100.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1045"></td><td><a href="#record">INV-1045</a></td><td class="payee">Pine &amp; Vale Catering</td><td data-field="Due">9 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€395.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1046"></td><td><a href="#record">INV-1046</a></td><td class="payee">Quarry Cloud Hosting</td><td data-field="Due">10 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€129.99</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1047"></td><td><a href="#record">INV-1047</a></td><td class="payee">Ridge Office Supply</td><td data-field="Due">12 Dec</td><td data-field="Status"><span class="sketch-badge">Paid</span></td><td class="num">€74.20</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1048"></td><td><a href="#record">INV-1048</a></td><td class="payee">Saltmarsh Design and Brand Strategy Partners</td><td data-field="Due">14 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€3,600.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1049"></td><td><a href="#record">INV-1049</a></td><td class="payee">Tern Couriers</td><td data-field="Due">15 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€58.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1050"></td><td><a href="#record">INV-1050</a></td><td class="payee">Upland Insurance</td><td data-field="Due">18 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€912.40</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1051"></td><td><a href="#record">INV-1051</a></td><td class="payee">Vesper Recruiting</td><td data-field="Due">20 Dec</td><td data-field="Status"><span class="sketch-badge">Sent</span></td><td class="num">€5,000.00</td></tr>
+<tr><td class="bulk-tick"><input type="checkbox" class="bulk-row" aria-label="Select INV-1052"></td><td><a href="#record">INV-1052</a></td><td class="payee">Willow Cleaning</td><td data-field="Due">22 Dec</td><td data-field="Status"><span class="sketch-badge">Draft</span></td><td class="num">€240.00</td></tr>
+</tbody></table></div>
+  <p class="sketch-muted">12 invoices</p>
+  <div class="bulk-room"><div class="bulk-bar" role="toolbar" aria-label="Actions on the selected invoices" data-shown>
+  <span class="bulk-count"><span aria-live="polite"><b class="bulk-n">2</b> selected</span><button class="bulk-x" type="button" aria-label="Clear the selection"><i data-icon="close"></i></button></span>
+  <span class="sketch-spacer"></span>
+  <button class="bulk-act" type="button" data-sketch-popover="status-confirm-delete"><i data-icon="check"></i>Status</button>
+  <button class="bulk-act bulk-tablet" type="button" data-sketch-popover="owner-confirm-delete"><i data-icon="user"></i>Owner</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="due-confirm-delete"><i data-icon="calendar"></i>Due date</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="tags-confirm-delete"><i data-icon="link"></i>Tags</button>
+  <button class="bulk-act bulk-wide" type="button" data-sketch-popover="move-confirm-delete"><i data-icon="arrow-right"></i>Move</button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Duplicate" data-bulk-toast="Duplicated"><i data-icon="copy"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Archive" data-bulk-toast="Archived"><i data-icon="box"></i></button>
+  <button class="bulk-act bulk-icon bulk-tablet" type="button" aria-label="Delete" data-sketch-open="delete-confirm-delete"><i data-icon="trash"></i></button>
+  <button class="bulk-act" type="button" aria-label="More actions" data-sketch-popover="more-confirm-delete"><i data-icon="more"></i><span class="bulk-label">More</span></button>
+</div></div>
+<div class="sketch-popover bulk-picker" id="status-confirm-delete" role="dialog" aria-label="Set status"><input class="sketch-input" type="search" aria-label="Search status" placeholder="Search"><div class="bulk-picker-list"><button class="sketch-menu-item" type="button" data-field="Status" data-value="Draft" data-sketch-close>Draft</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Sent" data-sketch-close>Sent</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Paid" data-sketch-close>Paid</button><button class="sketch-menu-item" type="button" data-field="Status" data-value="Overdue" data-sketch-close>Overdue</button></div></div>
+<div class="sketch-menu" id="owner-confirm-delete" aria-label="Set owner"><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ana Ruiz" data-sketch-close>Ana Ruiz</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Ben Okoro" data-sketch-close>Ben Okoro</button><button class="sketch-menu-item" type="button" data-field="Owner" data-value="Chen Li" data-sketch-close>Chen Li</button></div>
+<div class="sketch-menu" id="due-confirm-delete" aria-label="Set due"><button class="sketch-menu-item" type="button" data-field="Due" data-value="Today" data-sketch-close>Today</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="Tomorrow" data-sketch-close>Tomorrow</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a week" data-sketch-close>In a week</button><button class="sketch-menu-item" type="button" data-field="Due" data-value="In a month" data-sketch-close>In a month</button></div>
+<div class="sketch-menu" id="tags-confirm-delete" aria-label="Set tags"><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Q4" data-sketch-close>Q4</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Travel" data-sketch-close>Travel</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Software" data-sketch-close>Software</button><button class="sketch-menu-item" type="button" data-field="Tags" data-value="Needs a receipt" data-sketch-close>Needs a receipt</button></div>
+<div class="sketch-menu" id="move-confirm-delete" aria-label="Set folder"><button class="sketch-menu-item" type="button" data-field="Folder" data-value="2026 Q4" data-sketch-close>2026 Q4</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Archive 2025" data-sketch-close>Archive 2025</button><button class="sketch-menu-item" type="button" data-field="Folder" data-value="Disputes" data-sketch-close>Disputes</button></div>
+<div class="sketch-menu" id="more-confirm-delete" aria-label="More actions">
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-popover="owner-confirm-delete"><i data-icon="user"></i>Owner</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="due-confirm-delete"><i data-icon="calendar"></i>Due date</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="tags-confirm-delete"><i data-icon="link"></i>Tags</button>
+  <button class="sketch-menu-item bulk-narrow" type="button" data-sketch-popover="move-confirm-delete"><i data-icon="arrow-right"></i>Move</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Duplicated" data-sketch-close><i data-icon="copy"></i>Duplicate</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-bulk-toast="Archived" data-sketch-close><i data-icon="box"></i>Archive</button>
+  <button class="sketch-menu-item bulk-phone" type="button" data-sketch-open="delete-confirm-delete"><i data-icon="trash"></i>Delete</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Exported" data-sketch-close><i data-icon="download"></i>Export</button>
+  <button class="sketch-menu-item" type="button" data-bulk-toast="Links copied for" data-sketch-close><i data-icon="copy"></i>Copy links</button>
+</div>
+<dialog class="sketch-dialog" id="delete-confirm-delete" aria-labelledby="delete-confirm-delete-title" data-open>
+  <h2 id="delete-confirm-delete-title">Delete <span class="bulk-n">2</span> invoices?</h2>
+  <p>You can restore them from the bin for 30 days.</p>
+  <div class="sketch-row">
+    <button class="sketch-button" type="button" data-bulk-delete data-sketch-close>Delete</button>
+    <button class="sketch-button secondary" type="button" data-sketch-close data-bulk-keep>Keep</button>
+  </div>
+</dialog>
+</main>
+</section>
+<section data-state="record">
+<main class="sketch-main">
+  <a href="#selected"><i data-icon="arrow-left"></i>Invoices</a>
+  <div class="sketch-panel sketch-frame"><p>INV-1042. The record's own page. It is not part of this pattern.</p></div>
+</main>
+</section>
+<script src="../../../assets/sketch.js"></script>
+<script>
+/* Selection and bulk actions. A pick applies at once to each selected row, and the selection stays. */
+const open_layer = () => document.querySelector('.sketch-popover:not([hidden]), .sketch-menu:not([hidden]), dialog[open]');
+const rows_of = state => [...state.querySelectorAll('.bulk-row')];
+function sync_state(state) {
+  const boxes = rows_of(state), on = boxes.filter(box => box.checked).length;
+  state.querySelectorAll('.bulk-all').forEach(all => {
+    all.checked = on > 0 && on === boxes.length;
+    all.indeterminate = on > 0 && on < boxes.length;
+  });
+  boxes.forEach(box => { const row = box.closest('tr'); if (box.checked) row.setAttribute('aria-selected', 'true'); else row.removeAttribute('aria-selected'); });
+  state.querySelectorAll('.bulk-n').forEach(el => { el.textContent = on; });
+  state.querySelector('.bulk-bar').toggleAttribute('data-shown', on > 0);
+  return on;
+}
+/* Focus goes to the select-all box that the width shows. */
+const focus_all = state => [...state.querySelectorAll('.bulk-all')].find(box => box.checkVisibility())?.focus();
+function clear_state(state) { rows_of(state).forEach(box => { box.checked = false; }); sync_state(state); }
+document.querySelectorAll('.bulk-state').forEach(state => {
+  state.querySelectorAll('.bulk-all[data-mixed]').forEach(box => { box.indeterminate = true; });
+  state.addEventListener('change', event => {
+    if (event.target.matches('.bulk-all')) rows_of(state).forEach(box => { box.checked = event.target.checked; });
+    if (event.target.matches('.bulk-all, .bulk-row')) sync_state(state);
+  });
+  state.addEventListener('click', event => {
+    const target = event.target.closest('button');
+    if (!target) return;
+    const on = rows_of(state).filter(box => box.checked);
+    if (target.matches('.bulk-x')) { clear_state(state); focus_all(state); return; }
+    if (target.dataset.field) {
+      const field = target.dataset.field, value = target.dataset.value;
+      on.forEach(box => {
+        const cell = box.closest('tr').querySelector(`[data-field="${field}"]`);
+        if (!cell) return;
+        if (field === 'Status') cell.querySelector('.sketch-badge').textContent = value; else cell.textContent = value;
+      });
+      sketchToast(`${field} set to ${value} on ${on.length} invoices (sample)`);
+      return;
+    }
+    if (target.dataset.bulkToast) { sketchToast(`${target.dataset.bulkToast} ${on.length} invoices (sample)`); return; }
+    if (target.hasAttribute('data-bulk-delete')) {
+      const n = on.length;
+      on.forEach(box => box.closest('tr').remove());
+      sync_state(state);
+      sketchToast(`Deleted ${n} invoices (sample)`);
+      focus_all(state);
+    }
+  });
+});
+/* Escape: the kit closes an open list first. With no list open, Escape clears the selection. */
+addEventListener('keydown', event => {
+  if (event.key !== 'Escape' || open_layer()) return;
+  const state = [...document.querySelectorAll('.bulk-state')].find(s => !s.hidden);
+  if (state && rows_of(state).some(box => box.checked)) clear_state(state);
+}, true);
+/* Keep takes the focus when the delete dialog opens. The frame of a review tool blocks autofocus. */
+document.querySelectorAll('dialog').forEach(dialog => new MutationObserver(() => {
+  if (dialog.open) dialog.querySelector('[data-bulk-keep]').focus();
+}).observe(dialog, { attributes: true, attributeFilter: ['open'] }));
+/* A message belongs to the state that made it. The applied state opens with its own message. */
+function state_message() {
+  document.querySelectorAll('body > .sketch-toast').forEach(toast => { toast.hidden = true; });
+  if (location.hash === '#applied') sketchToast('Status set to Paid on 2 invoices (sample)');
+}
+addEventListener('hashchange', state_message);
+state_message();
+</script>

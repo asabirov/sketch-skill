@@ -1,0 +1,6 @@
+[
+  {"label": "selected", "element": ".bulk-bar", "property": "opacity", "duration": 200, "delay": 0, "easing": "cubic-bezier(0, 0, 0.2, 1)", "measurement": "estimated"},
+  {"label": "selected", "element": ".bulk-bar", "property": "transform", "duration": 200, "delay": 0, "easing": "cubic-bezier(0, 0, 0.2, 1)", "measurement": "estimated"},
+  {"label": "none", "element": ".bulk-bar", "property": "opacity", "duration": 200, "delay": 0, "easing": "cubic-bezier(0, 0, 0.2, 1)", "measurement": "estimated"},
+  {"label": "none", "element": ".bulk-bar", "property": "transform", "duration": 200, "delay": 0, "easing": "cubic-bezier(0, 0, 0.2, 1)", "measurement": "estimated"}
+]

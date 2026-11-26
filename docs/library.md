@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 82 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 83 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -54,6 +54,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 
 | Pattern | Best for |
 | --- | --- |
+| [`content/bulk-action-bar`](../library/content/bulk-action-bar/) | A work tool where a person gives many records of a list the same change, such as a status, an owner or a date, in one step, and then goes on with the same records. |
 | [`content/card-strips`](../library/content/card-strips/) | A team product where a member wants a look at each group of records before a choice. |
 | [`content/catalog-base-view`](../library/content/catalog-base-view/) | A product with one set of records that people scan by picture, compare by field and follow by status. |
 | [`content/catalog-display-panel`](../library/content/catalog-display-panel/) | A product with one set of records that people scan by picture, compare by field and follow by status. |
