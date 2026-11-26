@@ -1,6 +1,6 @@
 # Pattern library
 
-The library has 82 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
+The library has 83 patterns in 9 categories. A category is a product area. Each pattern folder holds `pattern.md`, `transitions.json` and `sketch.html`.
 
 Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits the screen. A pattern value is a proposal to the designer, not a design-system token.
 
@@ -74,6 +74,7 @@ Start a sketch from the `sketch.html` of a pattern whose "Best for" line fits th
 | [`content/product-page`](../library/content/product-page/) | A team product where a member reads the main numbers of one record, then the course of one number, and then the facts. |
 | [`content/ranked-groups`](../library/content/ranked-groups/) | A team product where a member compares groups of records by one number first, and then wants the best records of each group. |
 | [`content/sort-heads`](../library/content/sort-heads/) | A team product where a member compares 2 or more numbers of many records at the same time, and then opens one record. |
+| [`content/table-pager`](../library/content/table-pager/) | A money product where a person reads a long list of records, such as transactions or an audit log, pages forward and back, and must know how many records the list has and where it ends. |
 | [`content/timeline`](../library/content/timeline/) | A product where members post short messages many times a day and the feed has no end. A member sees what happens now and decides on each post in a few seconds. |
 | [`content/wide-grid`](../library/content/wide-grid/) | A team product where a member chooses one group of records, and then scans all records of that group. |
 

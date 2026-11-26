@@ -1,0 +1,47 @@
+[
+  {
+    "label": "loading-next",
+    "element": "skeleton row",
+    "animation": "skeleton_pulse",
+    "duration": 1000,
+    "delay": 0,
+    "easing": "ease",
+    "measurement": "measured"
+  },
+  {
+    "label": "middle-page",
+    "element": "pager button",
+    "property": "color",
+    "duration": 100,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "middle-page",
+    "element": "pager button",
+    "property": "background-color",
+    "duration": 100,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "last-page",
+    "element": "pager button",
+    "property": "color",
+    "duration": 100,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured"
+  },
+  {
+    "label": "last-page",
+    "element": "pager button",
+    "property": "background-color",
+    "duration": 100,
+    "delay": 0,
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "measurement": "measured"
+  }
+]

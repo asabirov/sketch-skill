@@ -1,0 +1,181 @@
+<!doctype html>
+<!--
+  Best for: a money product where a person reads a long list of records, such as transactions or an audit log, pages forward and back, and must know how many records the list has and where it ends.
+  Row opens: in a pane. The sketch draws no pane, because this pattern is only the pager. The rows of the sketch are not links.
+  The pager is under the table, on the left. It shows the range and the count that names the records, such as "101–200 of 1,176 transactions", then quiet chevron buttons.
+  The First page button shows only away from page 1. On page 1 its place stays empty, so Previous and Next do not move.
+  The last page ends with an "End of the list" line. One page shows only the count and no buttons. An empty list shows no pager.
+  Each page has its own address. The sketch keeps the address of the state.
+  Transition values: loading-next pulses the skeleton rows in 1000 ms, ease. A pager button changes its color and its background color in 100 ms, cubic-bezier(0.4, 0, 0.2, 1). All other changes are at once.
+  No value in this file is a design-system token.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Table pager</title>
+<link rel="stylesheet" href="../../../assets/sketch.css">
+<style>
+  [data-sketch] .ledger_amount { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  [data-sketch] .sketch-table th.ledger_amount { text-align: right; }
+  [data-sketch] .ledger_end td { color: var(--sketch-muted); text-align: center; border-bottom: 0; padding-top: 16px; }
+
+  /* The pager: under the table, on the left. The count first, then the quiet chevrons. */
+  [data-sketch] .pager { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: -12px; }
+  [data-sketch] .pager_count { margin: 0; font-variant-numeric: tabular-nums; }
+  [data-sketch] .pager_count strong { font-weight: 600; }
+  [data-sketch] .pager_buttons { display: inline-flex; align-items: center; }
+  [data-sketch] .pager_buttons[hidden] { display: none; }
+  /* The count keeps the width of its longest text, so the buttons do not move from page to page. */
+  @media (min-width: 600px) { [data-sketch] .pager_count { min-width: 31ch; } }
+  /* A pager button changes its color and its hover fill in 100 ms. A disabled button is the thinned ink, not a faded button. */
+  [data-sketch] .pager .sketch-icon-button { transition: color 100ms cubic-bezier(0.4, 0, 0.2, 1), background-color 100ms cubic-bezier(0.4, 0, 0.2, 1); }
+  [data-sketch] .pager .sketch-icon-button:disabled { opacity: 1; color: color-mix(in srgb, var(--sketch-ink) 30%, transparent); }
+  /* First page keeps its place on page 1, so Previous and Next stay where they are. */
+  [data-sketch] .pager_first.is_away { visibility: hidden; }
+
+  /* Loading the next page: skeleton bars pulse. */
+  [data-sketch] .skeleton { display: block; height: 14px; border-radius: 4px 6px 5px 3px; background: var(--sketch-wash); animation: skeleton_pulse 1000ms ease infinite alternate; }
+  @keyframes skeleton_pulse { from { opacity: 1; } to { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { [data-sketch] .skeleton { animation: none; } }
+
+  [data-sketch] .empty_note { display: grid; gap: 4px; padding: 32px 0; border-top: var(--sketch-stroke) solid var(--sketch-ink); }
+  [data-sketch] .empty_note p { margin: 0; }
+
+  @media (max-width: 599px) {
+    [data-sketch] .sketch-table td:first-child { flex-basis: 100%; color: var(--sketch-muted); }
+    [data-sketch] .sketch-table td.ledger_amount { margin-left: auto; }
+    [data-sketch] .ledger_end td { flex-basis: 100%; }
+    [data-sketch] .skeleton_row td { flex: 1 1 30%; }
+    /* On a phone the count is one line, and the buttons are the next line, so they do not move from page to page. */
+    [data-sketch] .pager_buttons { flex-basis: 100%; }
+  }
+</style>
+<body data-sketch>
+<header class="sketch-bar"><strong>Ledger</strong></header>
+<main class="sketch-main">
+  <section data-state="first-page" data-total="1176" data-page="1"></section>
+  <section data-state="middle-page" data-total="1176" data-page="2"></section>
+  <section data-state="last-page" data-total="1176" data-page="12"></section>
+  <section data-state="one-page" data-total="38" data-page="1"></section>
+  <section data-state="empty" data-total="0" data-page="1"></section>
+  <section data-state="loading-next" data-total="1176" data-page="2" data-loading></section>
+</main>
+<script>
+  // One page holds 100 records. The rows are sample records, newest first.
+  const page_size = 100;
+  const load_ms = 600;
+  const payees = [
+    ['Harbor Coffee', 'Card', -14.2], ['Client payment, Orbit Labs', 'Operating', 4820], ['City Power', 'Operating', -312.45],
+    ['Linden Studio', 'Card', -89], ['Payroll run', 'Payroll', -18250], ['Fernhill Printing', 'Card', -146.3],
+    ['Office rent', 'Operating', -3200], ['Client payment, Pine & Co', 'Operating', 1975.5], ['Cloud hosting', 'Card', -640.12],
+    ['Tax office refund', 'Operating', 412.08], ['Courier, North Route', 'Card', -38.6], ['Interest', 'Savings', 21.94]
+  ];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const newest = Date.UTC(2026, 10, 25);
+  const number_text = number => number.toLocaleString('en-US');
+  const money_text = amount => `${amount < 0 ? '−' : '+'}$${Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const row_of = at => {
+    const [payee, account, amount] = payees[(at * 7 + Math.floor(at / 12)) % payees.length];
+    const day = new Date(newest - Math.floor(at / 7) * 86400000);
+    const scale = 1 + ((at * 13) % 9) / 10;
+    return { date: `${day.getUTCDate()} ${months[day.getUTCMonth()]}`, payee, account, amount: Math.round(amount * scale * 100) / 100 };
+  };
+  const page_count = total => Math.max(1, Math.ceil(total / page_size));
+  const state_of = (total, page, loading) => {
+    if (total === 0) return 'empty';
+    if (page_count(total) === 1) return 'one-page';
+    if (loading) return 'loading-next';
+    if (page === 1) return 'first-page';
+    return page === page_count(total) ? 'last-page' : 'middle-page';
+  };
+
+  const head_html = '<thead><tr><th>Date</th><th>Payee</th><th>Account</th><th class="ledger_amount">Amount</th></tr></thead>';
+  const rows_html = (total, page) => {
+    const first = (page - 1) * page_size;
+    const last = Math.min(total, first + page_size);
+    let html = '';
+    for (let at = first; at < last; at += 1) {
+      const row = row_of(at);
+      html += `<tr><td>${row.date}</td><td>${row.payee}</td><td>${row.account}</td><td class="ledger_amount">${money_text(row.amount)}</td></tr>`;
+    }
+    return html;
+  };
+  const skeleton_html = () => '<tr class="skeleton_row">' + ['22%', '60%', '45%', '70%'].map(width => `<td><span class="skeleton" style="width:${width}"></span></td>`).join('') + '</tr>';
+  const range_html = (total, page) => {
+    const first = (page - 1) * page_size + 1;
+    const last = Math.min(total, page * page_size);
+    return `<strong>${number_text(first)}–${number_text(last)}</strong> of <strong>${number_text(total)}</strong> transactions`;
+  };
+
+  // Each section draws its table once. A page change then changes the rows, the count and the buttons in place.
+  const build_section = section => {
+    const total = Number(section.dataset.total);
+    if (total === 0) {
+      section.innerHTML = '<h1>Transactions</h1><div class="empty_note"><p><strong>No transactions yet</strong></p><p class="sketch-muted">Transactions show here after the first bank sync.</p></div>';
+      return;
+    }
+    section.className = 'sketch-stack';
+    section.style.gap = '24px';
+    section.innerHTML = `<h1>Transactions</h1>
+      <div class="sketch-table-box"><table class="sketch-table">${head_html}<tbody></tbody><tfoot></tfoot></table></div>
+      <nav class="pager" aria-label="Pages of transactions">
+        <p class="pager_count" aria-live="polite"></p>
+        <span class="pager_buttons">
+          <button type="button" class="sketch-icon-button pager_first" data-go="first" aria-label="First page"><svg class="sketch-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6l-6 6 6 6M19 6l-6 6 6 6"/></svg></button>
+          <button type="button" class="sketch-icon-button" data-go="previous" aria-label="Previous page"><i data-icon="chevron-left"></i></button>
+          <button type="button" class="sketch-icon-button" data-go="next" aria-label="Next page"><i data-icon="chevron-right"></i></button>
+        </span>
+      </nav>`;
+    section.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => go(section, button.dataset.go)));
+    draw(section, Number(section.dataset.page), section.hasAttribute('data-loading'));
+  };
+
+  const draw = (section, page, loading) => {
+    const total = Number(section.dataset.total);
+    const pages = page_count(total);
+    section.dataset.shown = page;
+    const box = section.querySelector('.sketch-table-box');
+    box.setAttribute('aria-busy', String(loading));
+    section.querySelector('tbody').innerHTML = loading ? skeleton_html().repeat(12) : rows_html(total, page);
+    section.querySelector('tfoot').innerHTML = !loading && page === pages ? '<tr class="ledger_end"><td colspan="4">End of the list</td></tr>' : '';
+    const count = section.querySelector('.pager_count');
+    count.innerHTML = pages === 1 ? `<strong>${number_text(total)}</strong> transactions` : `${loading ? 'Loading ' : ''}${range_html(total, page)}`;
+    section.querySelector('.pager_buttons').hidden = pages === 1;
+    const first = section.querySelector('[data-go="first"]');
+    first.classList.toggle('is_away', page === 1);
+    first.disabled = loading || page === 1;
+    section.querySelector('[data-go="previous"]').disabled = loading || page === 1;
+    section.querySelector('[data-go="next"]').disabled = loading || page === pages;
+  };
+
+  // A page change shows the skeleton rows, then the new rows, and scrolls back to the top of the table.
+  // The address changes to the state of the shown page, so a person can share the page.
+  let load_timer = 0;
+  const go = (section, where) => {
+    const total = Number(section.dataset.total);
+    const now = Number(section.dataset.shown);
+    const page = where === 'first' ? 1 : where === 'previous' ? now - 1 : now + 1;
+    const keep_focus = where;
+    clearTimeout(load_timer);
+    draw(section, page, true);
+    history.replaceState(null, '', `#${state_of(total, page, true)}`);
+    section.scrollIntoView({ block: 'start' });
+    load_timer = setTimeout(() => {
+      draw(section, page, false);
+      history.replaceState(null, '', `#${state_of(total, page, false)}`);
+      const target = section.querySelector(`[data-go="${keep_focus}"]`);
+      const fallback = section.querySelector('[data-go="previous"]');
+      (target && !target.disabled ? target : fallback).focus({ preventScroll: true });
+    }, load_ms);
+  };
+
+  document.querySelectorAll('[data-state]').forEach(build_section);
+  // A state that opens from its address starts from its own page again.
+  addEventListener('hashchange', () => {
+    clearTimeout(load_timer);
+    document.querySelectorAll('[data-state]').forEach(section => {
+      if (section.querySelector('.pager')) draw(section, Number(section.dataset.page), section.hasAttribute('data-loading'));
+    });
+  });
+</script>
+<script src="../../../assets/sketch.js"></script>

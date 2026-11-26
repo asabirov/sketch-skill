@@ -4,6 +4,7 @@
 
 ### Added
 
+- The pattern `content/table-pager`: Table pager. A money product where a person reads a long list of records, such as transactions or an audit log, pages forward and back, and must know how many records the list has and where it ends.
 - The pattern `analytics/dashboard-grid`: Dashboard grid. A dashboard home where each person chooses which cards to see, their order and their size, and the same layout must hold from a phone to a wide screen.
 - The pattern `analytics/breakdown-table`: Breakdown table with shares. A report that splits the money in and the money out of a range into their largest parts, with each part's share of the total.
 - The pattern `analytics/written-insights`: Written insights. Any page with data where a program writes its few most useful facts in plain sentences, next to a chart, a table or a list, for a reader who does not read the data.
