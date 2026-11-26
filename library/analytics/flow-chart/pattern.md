@@ -3,7 +3,7 @@
 Captured: 2026-11-25, recorded by an agent
 Best for: a report that shows where the money of a period came from and where it went, in one picture.
 Row opens: no rows.
-Related: `analytics/breakdown-table` lists the same sources and uses with their shares.
+Related: `analytics/cashflow-chart` shows the same money by period. `analytics/breakdown-table` lists the same sources and uses with their shares.
 
 ## Scenarios
 

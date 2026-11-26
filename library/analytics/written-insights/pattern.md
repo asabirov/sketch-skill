@@ -3,7 +3,7 @@
 Captured: 2026-11-25, recorded by an agent
 Best for: any page with data where a program writes its few most useful facts in plain sentences, next to a chart, a table or a list, for a reader who does not read the data.
 Row opens: no rows.
-Related: `analytics/filter-bar` sets the range that the insights describe.
+Related: `analytics/cashflow-chart` shows the same data as a chart. `analytics/filter-bar` sets the range that the insights describe.
 
 ## Scenarios
 

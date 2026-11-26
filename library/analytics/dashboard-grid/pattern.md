@@ -3,7 +3,7 @@
 Captured: 2026-11-25, recorded by an agent
 Best for: a dashboard home where each person chooses which cards to see, their order and their size, and the same layout must hold from a phone to a wide screen.
 Row opens: no rows. Each card opens its own page.
-Related: the sketch template `list/card-grid` is a grid of records that people find by picture, not a dashboard. `analytics/balance-card`, `analytics/action-row`, `analytics/account-list` and `analytics/summary-card` are cards that this grid holds.
+Related: the sketch template `list/card-grid` is a grid of records that people find by picture, not a dashboard. `analytics/balance-card`, `analytics/action-row`, `analytics/account-list`, `analytics/summary-card` and `analytics/cashflow-chart` are cards that this grid holds.
 
 ## Scenarios
 
