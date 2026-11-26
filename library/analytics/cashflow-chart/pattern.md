@@ -17,7 +17,7 @@ Related: `analytics/filter-bar` sets the range and the direction. `analytics/flo
 ## States
 
 - `overview`: the totals of the range: the net cash flow (largest), the money in and the money out. Below them, a group button (Month) and a switch with Overview, Lines and By category. In the chart, money in is a bar up from the zero line, money out is a bar down, and the net cash flow is a line with points over the bars. The values stand in a margin at the left. A key names each mark. Opens on: the address of the page.
-- `hover`: the period gets a ground, and a dark tooltip gives its money in, money out and net. Opens on: the pointer on a period.
+- `hover`: the period gets a ground, and a dark tooltip gives the period name and its money in, money out and net. A new view or a new grouping hides the tooltip. Opens on: the pointer on a period.
 - `line`: money in is a solid line with round points, and money out is a dashed line with square points, both from zero. Opens on: Lines in the switch.
 - `by-category`: the money out of each period as one bar from zero, split into the largest category and everything else, with the total above the bar. Opens on: By category in the switch.
 - `group-menu`: a menu below the group button with Month and Quarter. The chosen item has a check mark. Opens on: a click on the group button.

@@ -217,8 +217,11 @@
     // The empty and loading states have no data, so a choice in them changes only the controls, not the chart.
     const no_data = () => st.view === 'empty' || st.view === 'loading';
 
+    // A new view or grouping hides the tooltip, because its period can be gone. A change of width keeps the tooltip on its period.
     function draw_chart(still = false) {
       const chart = $('[data-chart]'), d = data[st.group];
+      const kept = still && !tip.hidden ? Number(section.querySelector('.col_hit.on')?.dataset.col) : NaN;
+      hide_tip();
       chart.classList.toggle('cc_still', still);
       section.querySelectorAll(`input[name="view_${id}"]`).forEach(r => { r.checked = r.value === st.view; });
       mark_group();
@@ -228,6 +231,7 @@
       else chart.innerHTML = overview_svg(d, st.direction, w);
       chart.dataset.width = w;
       wire_hover();
+      if (!Number.isNaN(kept)) show(kept);
     }
     $(`#group_${id}`).insertAdjacentHTML('beforeend', ['Month', 'Quarter'].map(g => `<button class="sketch-menu-item" type="button" role="menuitemradio" aria-checked="false" data-group="${g.toLowerCase()}"><i data-icon="check"></i>${g}</button>`).join(''));
     mark_group();
@@ -241,14 +245,17 @@
     }).observe($('[data-chart]'));
 
     const tip = $('[data-tip]'), box = $('.cc_chart_box');
+    // The hover state shows its tooltip only on the first draw.
+    let start_hover = section.dataset.hover;
     const hide_tip = () => { tip.hidden = true; section.querySelectorAll('.col_hit').forEach(c => c.classList.remove('on')); };
     // A column can go away before the frame that shows it runs, so show() looks for the column itself and reads the data of the current view.
     const show = i => {
       const col = section.querySelector(`.col_hit[data-col="${i}"]`), d = data[st.group];
       if (!col) return;
       section.querySelectorAll('.col_hit').forEach(c => c.classList.toggle('on', c === col));
-      const rows = [st.direction !== 'out' && `<dt>Money in</dt><dd>+${k(d.in[i])}</dd>`, st.direction !== 'in' && `<dt>Money out</dt><dd>−${k(d.out[i])}</dd>`, st.direction === 'all' && `<dt>${d.labels[i]} net</dt><dd>${signed(d.in[i] - d.out[i])}</dd>`];
-      tip.innerHTML = rows.filter(Boolean).join('');
+      // The first row names the period, so each direction gives the period name.
+      const rows = [st.direction !== 'out' && ['money in', `+${k(d.in[i])}`], st.direction !== 'in' && ['money out', `−${k(d.out[i])}`], st.direction === 'all' && ['net', signed(d.in[i] - d.out[i])]].filter(Boolean);
+      tip.innerHTML = rows.map(([t, v], n) => `<dt>${n ? t[0].toUpperCase() + t.slice(1) : `${d.labels[i]} ${t}`}</dt><dd>${v}</dd>`).join('');
       tip.hidden = false;
       const c = col.getBoundingClientRect(), r = box.getBoundingClientRect();
       tip.style.left = `${Math.min(r.width - tip.offsetWidth, Math.max(0, c.left - r.left + c.width / 2 - tip.offsetWidth / 2))}px`;
@@ -261,7 +268,7 @@
       const svg = $('.cc_svg');
       if (svg) svg.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch') hide_tip(); });
       // The hover column of the state exists only in the month view, so the quarter view shows no tooltip at the start.
-      if (section.dataset.hover) requestAnimationFrame(() => show(Number(section.dataset.hover)));
+      if (start_hover) { const i = Number(start_hover); start_hover = ''; requestAnimationFrame(() => show(i)); }
     }
 
     // A redraw calls initSketch(), and the kit then opens each data-open layer again. The menu opens again only when its state opens.
@@ -277,6 +284,7 @@
       if (!item) return;
       st.group = item.dataset.group;
       if (no_data()) { mark_group(); return; }
+      hide_tip();
       $('[data-chart]').innerHTML = '<div class="cc_pulse" role="status" aria-label="Loading"></div>';
       setTimeout(() => { draw_totals(true); draw_chart(); redraw_kit(); }, 400);
     });
