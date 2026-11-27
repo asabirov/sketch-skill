@@ -295,9 +295,11 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 [data-sketch] .sketch-facts dt { color: var(--sketch-muted); } [data-sketch] .sketch-facts dd { margin: 0; }
 /* A label beside a control sits on the centre of that control. */
 [data-sketch] .sketch-facts dt:has(+ dd > :is(.sketch-switch, button, input, select)) { align-self: center; }
-/* A wrapper that gives its .sketch-facts groups one shared label column. */
-[data-sketch] .sketch-facts-share { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; }
-[data-sketch] .sketch-facts-share > .sketch-facts { display: contents; }
+/* A wrapper that gives its .sketch-facts groups one shared label column, with a 16 px gap between the groups. */
+[data-sketch] .sketch-facts-share { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 16px 24px; }
+[data-sketch] .sketch-facts-share > .sketch-facts { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; }
+/* A heading between the groups spans both columns, so it does not sit in the label column. */
+[data-sketch] .sketch-facts-share > :not(.sketch-facts) { grid-column: 1 / -1; }
 /* A bar chart: each <i> gets its value as a height. */
 [data-sketch] .sketch-bars { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; align-items: end; height: 160px; text-align: center; }
 [data-sketch] .sketch-bars i { background: var(--sketch-ink); border-radius: 5px 3px 0 0; }
