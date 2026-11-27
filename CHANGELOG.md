@@ -4,7 +4,7 @@
 
 ### Changed
 
-- The kit part `sketch-facts`: each `dt` sits on the vertical centre of its row, and a `sketch-facts-share` wrapper gives several `sketch-facts` groups one shared label column.
+- The kit part `sketch-facts`: a `dt` beside a control, such as a `sketch-switch`, a button, an input or a select, is centred on that control, and a `sketch-facts-share` wrapper gives several `sketch-facts` groups one shared label column.
 
 ### Added
 

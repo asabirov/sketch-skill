@@ -291,10 +291,12 @@ html[data-theme="dark"] [data-sketch], html[data-theme="dark"][data-sketch] {
 [data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]) > div:last-child, [data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]) .sketch-muted { color: color-mix(in srgb, var(--sketch-page) 72%, transparent); }
 [data-sketch] .sketch-list > li.sketch-conversation:has([aria-current]) .sketch-badge.strong { background: var(--sketch-page); color: var(--sketch-ink); border-color: var(--sketch-page); }
 [data-sketch] fieldset { border: 0; padding: 0; margin: 0; } [data-sketch] legend { padding: 0; } [data-sketch] fieldset > .sketch-choice { margin: 0 -12px; }
-[data-sketch] .sketch-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; align-items: center; }
+[data-sketch] .sketch-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
 [data-sketch] .sketch-facts dt { color: var(--sketch-muted); } [data-sketch] .sketch-facts dd { margin: 0; }
+/* A label beside a control sits on the centre of that control. */
+[data-sketch] .sketch-facts dt:has(+ dd > :is(.sketch-switch, button, input, select)) { align-self: center; }
 /* A wrapper that gives its .sketch-facts groups one shared label column. */
-[data-sketch] .sketch-facts-share { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; align-items: center; }
+[data-sketch] .sketch-facts-share { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; }
 [data-sketch] .sketch-facts-share > .sketch-facts { display: contents; }
 /* A bar chart: each <i> gets its value as a height. */
 [data-sketch] .sketch-bars { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; align-items: end; height: 160px; text-align: center; }
