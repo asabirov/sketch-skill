@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- The kit part `sketch-facts`: each `dt` sits on the vertical centre of its row, and a `sketch-facts-share` wrapper gives several `sketch-facts` groups one shared label column.
+
 ### Added
 
 - The pattern `analytics/dashboard-grid`: Dashboard grid. A dashboard home where each person chooses which cards to see, their order and their size, and the same layout must hold from a phone to a wide screen.
