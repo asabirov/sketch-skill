@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.25.0 — 2026-11-27
+
+### Changed
+
+- The kit part `sketch-facts`: a `dt` beside a control, such as a `sketch-switch`, a button, an input or a select, is centred on that control, and a `sketch-facts-share` wrapper gives several `sketch-facts` groups one shared label column.
 
 ### Added
 

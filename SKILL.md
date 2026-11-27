@@ -2,7 +2,7 @@
 name: sketch
 description: "Use when drawing a disposable one-ink UI sketch for a layout or interaction review, or when choosing a sketch template category. Covers the sketch kit, the 48 categorized templates, the chart rules, the template gallery and drawing rules. Not for the final look of a product, its UI kit or its design system and not for the tool that shows the sketch to a reviewer."
 metadata:
-  version: "0.24.0"
+  version: "0.25.0"
 ---
 
 # Sketch
